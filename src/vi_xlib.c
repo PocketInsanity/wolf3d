@@ -37,6 +37,9 @@ XColor clr[256];
 int indexmode;
 int shmmode;
 int fullscreen;
+int dga;
+byte *dgabuf;
+int dgawidth, dgabank, dgamem, vwidth, vheight;
 unsigned char mypal[768];
 
 int main(int argc, char *argv[])
@@ -239,20 +242,10 @@ void VL_Startup()
 	root = RootWindow(dpy, screen);
 	
 	GetVisual(); /* GetVisual will quit for us if no visual.. */                      	
-	attr.colormap = cmap;		   
-	attr.event_mask = KeyPressMask | KeyReleaseMask | ExposureMask;
-	attrmask = CWColormap | CWEventMask;
-	win = XCreateWindow(dpy, root, 0, 0, 320, 200, 0, CopyFromParent, 
-			    InputOutput, vi->visual, attrmask, &attr);
-	
-	if (win == None) {
-		Quit("Unable to create window!");
-	}
 	
 	fullscreen = 0;
 	if (MS_CheckParm("fullscreen") && XF86VidModeQueryExtension(dpy, &eventn, &errorn)) {
-		
-		
+				
 		XF86VidModeGetAllModeLines(dpy, screen, &vmc, (XF86VidModeModeInfo ***)&vmmi);
 		
 		printf("VidMode: eventn = %d, error = %d, vmc = %d\n", eventn, errorn, vmc);
@@ -269,7 +262,55 @@ void VL_Startup()
 					break;
 				}
 			}
+		}
+		
+		dga = 0;
+		if (fullscreen && MS_CheckParm("dga") && XF86DGAQueryExtension(dpy, &eventn, &errorn)) {
+			if (geteuid()) {
+				fprintf(stderr, "must be root to use dga\n");
+			} else {
+				printf("DGA %d %d\n", eventn, errorn);
+				XF86DGAQueryVersion(dpy, &eventn, &errorn);
+				printf("DGA Version %d.%d\n", eventn, errorn);
+				
+				XF86DGAQueryDirectVideo(dpy, screen, &i);
+			
+				if (i & XF86DGADirectPresent) {
+					XF86DGAGetVideo(dpy, screen, (char **)&dgabuf, &dgawidth, &dgabank, &dgamem);
+					printf("addr = %p, width = %d, bank = %d, mem = %d\n", dgabuf, dgawidth, dgabank, dgamem);
+					gfxbuf = disbuf = dgabuf;
+					XF86DGAGetViewPortSize(dpy, screen, &vwidth, &vheight);
+					printf("width = %d, height = %d\n", vwidth, vheight);
+
+					gfxbuf = (byte *)malloc(320 * 200);
+					if (!indexmode)
+						disbuf = (byte *)malloc(320 * 4);
+					dga = 1;
+				}
+			}		
 		}		
+	}
+	
+	//attr.colormap = cmap;		   
+	attr.event_mask = KeyPressMask | KeyReleaseMask | ExposureMask;
+	attrmask = /*CWColormap |*/ CWEventMask;
+	
+	if (dga) {
+		attrmask |= CWOverrideRedirect;
+		attr.override_redirect = True;	
+	}
+	
+	win = XCreateWindow(dpy, root, 0, 0, 320, 200, 0, CopyFromParent, 
+			    InputOutput, vi->visual, attrmask, &attr);
+	
+	if (win == None) {
+		Quit("Unable to create window!");
+	}
+	
+	if (dga) {
+		XMapWindow(dpy, win);
+		XRaiseWindow(dpy, win);
+		XGrabKeyboard(dpy, win, True, GrabModeAsync, GrabModeAsync, CurrentTime);
 	}
 	
 	gcvalues.foreground = BlackPixel(dpy, screen);
@@ -298,7 +339,7 @@ void VL_Startup()
 		
 	shmmode = 0;
 	
-	if (XShmQueryExtension(dpy) == True) {
+	if ( !dga && (XShmQueryExtension(dpy) == True) ) {
 		img = XShmCreateImage(dpy, vi->visual, vi->depth, ZPixmap, 
 				      NULL, &shminfo, 320, 200);
 		printf("Shm: bpl = %d, h = %d, bp = %d\n", img->bytes_per_line, img->height, img->bitmap_pad);
@@ -324,7 +365,7 @@ void VL_Startup()
 		}
 	}
 				
-	if (img == NULL) {
+	if ( !dga && (img == NULL) ) {
 		printf("Falling back on XImage...\n");
 		
 		if (gfxbuf == NULL) 
@@ -349,7 +390,14 @@ void VL_Startup()
 		XWarpPointer(dpy, None, win, 0, 0, 0, 0, 0, 0);
 		XF86VidModeSetViewPort(dpy, screen, 0, 0);
 	}
-				
+
+	if (dga) {
+		XF86DGADirectVideo(dpy, screen, XF86DGADirectGraphics | XF86DGADirectKeyb);
+		XF86DGASetViewPort(dpy, screen, 0, 0);
+	}
+	
+	XSetWindowColormap(dpy, win, cmap);
+	
 	XFlush(dpy);
 }
 
@@ -363,6 +411,14 @@ void VL_Startup()
 
 void VL_Shutdown()
 {
+	if (dga) {
+		XF86DGADirectVideo(dpy, screen, 0);
+		XUngrabKeyboard(dpy, CurrentTime);
+		free(gfxbuf);
+		free(disbuf);
+		gfxbuf = disbuf = NULL;
+	}
+	
 	if (fullscreen) {
 		XF86VidModeLockModeSwitch(dpy, screen, False);
 		//printf("%d, %d\n", vidmode.hdisplay, vidmode.vdisplay);
@@ -401,10 +457,52 @@ void VL_WaitVBL(int vbls)
 void VW_UpdateScreen()
 {
 	word *ptrs;
-	byte *ptrb;
+	byte *ptrb, *ptrbd;
 	
-	int i;
-	
+	int i, j;
+
+	if (dga) {
+		switch(vi->depth) {
+			case 8:
+				ptrb = dgabuf;
+				ptrbd = gfxbuf;
+				for(i = 0; i < 200; i++) {
+					memcpy(ptrb, ptrbd, 320);
+					ptrb += dgawidth;
+					ptrbd += 320;
+				}
+				return;
+			#if 0
+			case 15:
+				ptrs = (word *)disbuf;
+				for (i = 0; i < 64000; i++) {
+					*ptrs = (mypal[gfxbuf[i]*3+0] >> 1) << 10 |
+						(mypal[gfxbuf[i]*3+1] >> 1) << 5  |
+						(mypal[gfxbuf[i]*3+2] >> 1);
+					ptrs++;
+				}
+				break;
+			case 16:
+				ptrs = (word *)disbuf;
+				for (i = 0; i < 64000; i++) {
+					*ptrs = (mypal[gfxbuf[i]*3+0] >> 1) << 11 |
+						(mypal[gfxbuf[i]*3+1] >> 0) << 5  |
+						(mypal[gfxbuf[i]*3+2] >> 1);
+					ptrs++;
+				}
+				break;
+			case 24:
+				ptrb = disbuf;
+				for (i = 0; i < 64000; i++) {
+					*ptrb = mypal[gfxbuf[i]*3+2] << 2; ptrb++;
+					*ptrb = mypal[gfxbuf[i]*3+1] << 2; ptrb++;
+					*ptrb = mypal[gfxbuf[i]*3+0] << 2; ptrb++;
+					ptrb++;
+				}
+				break;
+			#endif
+		} 	
+	}
 	if (indexmode == 0) {
 		switch(vi->depth) {
 		case 15:
@@ -436,7 +534,7 @@ void VW_UpdateScreen()
 			break;
 		}
 	}
-	
+
 	if (shmmode)
 		XShmPutImage(dpy, win, gc, img, 0, 0, 0, 0, 320, 200, False);
 	else
@@ -474,6 +572,7 @@ void VL_FillPalette(int red, int green, int blue)
 		}
 	
 		XStoreColors(dpy, cmap, clr, 256);	
+		if (dga) XF86DGAInstallColormap(dpy, screen, cmap); 
 	} else {
 		for (i = 0; i < 256; i++) {
 			mypal[i*3+0] = red;
@@ -504,13 +603,9 @@ void VL_SetPalette(const byte *palette)
 			clr[i].blue = palette[i*3+2] << 10;
 		}
 		XStoreColors(dpy, cmap, clr, 256);
+		if (dga) XF86DGAInstallColormap(dpy, screen, cmap);
 	} else {
-		/* TODO: memcpy? */
-		for (i = 0; i < 256; i++) {
-			mypal[i*3+0] = palette[i*3+0];
-			mypal[i*3+1] = palette[i*3+1];
-			mypal[i*3+2] = palette[i*3+2];
-		}
+		memcpy(mypal, palette, 768);
 		VW_UpdateScreen();
 	}		
 }
@@ -679,6 +774,14 @@ void VL_DeModeXize(byte *buf, int width, int height)
 
 void VL_DirectPlot(int x1, int y1, int x2, int y2)
 {
+	if (dga) {
+		switch(vi->depth) {
+			case 8:
+				*(dgabuf + x2 + y2 * dgawidth) = *(gfxbuf + x1 + y1 * 320);
+				return;
+		}
+		return;
+	}
 	if (indexmode) {
 		XSetForeground(dpy, gc, *(gfxbuf + x1 + y1 * 320));
 		XDrawPoint(dpy, win, gc, x2, y2);
