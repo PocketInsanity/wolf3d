@@ -332,17 +332,15 @@ void CAL_HuffExpand(byte *source, byte *dest, long length, huffnode *htable)
 	        if (mask == 0x0000) {   // fully cycled bit positions? Get next char.
 			mask = 0x0001;
 			source++;
-	        } // if
-
+	        } 
 		if (path < 256) {  // if (path < 256) it's a byte, else move node.
 			*dest = (byte) path;
 			dest++;
 			nodeon = headptr;
-		} else  // if
+		} else
 			nodeon = (htable + (path - 256));
 	} while (dest != endoff);   // written all data to *dest?
 } 
-
 
 /*
 ======================
@@ -367,55 +365,43 @@ void CAL_CarmackExpand (unsigned *source, unsigned *dest, unsigned length)
 	inptr = source;
 	outptr = dest;
 
-	while (length)
-	{
+	while (length) {
 		ch = *inptr++;
 		chhigh = ch>>8;
-		if (chhigh == NEARTAG)
-		{
+		if (chhigh == NEARTAG) {
 			count = ch&0xff;
-			if (!count)
-			{				// have to insert a word containing the tag byte
+			if (!count) {	
+				// have to insert a word containing the tag byte
 				ch |= *((unsigned char *)inptr)++;
 				*outptr++ = ch;
 				length--;
-			}
-			else
-			{
+			} else {
 				offset = *((unsigned char *)inptr)++;
 				copyptr = outptr - offset;
 				length -= count;
 				while (count--)
 					*outptr++ = *copyptr++;
 			}
-		}
-		else if (chhigh == FARTAG)
-		{
+		} else if (chhigh == FARTAG) {
 			count = ch&0xff;
-			if (!count)
-			{				// have to insert a word containing the tag byte
+			if (!count) {
+				// have to insert a word containing the tag byte
 				ch |= *((unsigned char *)inptr)++;
 				*outptr++ = ch;
 				length --;
-			}
-			else
-			{
+			} else {
 				offset = *inptr++;
 				copyptr = dest + offset;
 				length -= count;
 				while (count--)
 					*outptr++ = *copyptr++;
 			}
-		}
-		else
-		{
+		} else {
 			*outptr++ = ch;
-			length --;
+			length--;
 		}
 	}
 }
-
-
 
 /*
 ======================
@@ -425,12 +411,11 @@ void CAL_CarmackExpand (unsigned *source, unsigned *dest, unsigned length)
 ======================
 */
 
-long CA_RLEWCompress (unsigned *source, long length, unsigned *dest,
-  unsigned rlewtag)
+long CA_RLEWCompress(word *source, long length, word *dest, word rlewtag)
 {
   long complength;
-  unsigned value,count,i;
-  unsigned *start, *end;
+  word value,count,i;
+  word *start, *end;
 
   start = dest;
 
@@ -482,18 +467,13 @@ long CA_RLEWCompress (unsigned *source, long length, unsigned *dest,
 ======================
 */
 
-void CA_RLEWexpand (unsigned *source, unsigned *dest,long length,
-  unsigned rlewtag)
+void CA_RLEWexpand(word *source, word *dest, long length, word rlewtag)
 {
-//  unsigned value,count,i;
-  unsigned *end;
-  unsigned sourceseg,sourceoff,destseg,destoff,endseg,endoff;
-
-
+	word value, count,i;
+	word *end = dest + length / 2;
 //
 // expand it
 //
-#if 0
   do
   {
 	value = *source++;
@@ -513,80 +493,6 @@ void CA_RLEWexpand (unsigned *source, unsigned *dest,long length,
 	*dest++ = value;
 	}
   } while (dest<end);
-#endif
-
-  end = dest + (length)/2;
-  sourceseg = FP_SEG(source);
-  sourceoff = FP_OFF(source);
-  destseg = FP_SEG(dest);
-  destoff = FP_OFF(dest);
-  endseg = FP_SEG(end);
-  endoff = FP_OFF(end);
-
-
-//
-// ax = source value
-// bx = tag value
-// cx = repeat counts
-// dx = scratch
-//
-// NOTE: A repeat count that produces 0xfff0 bytes can blow this!
-//
-
-asm	mov	bx,rlewtag
-asm	mov	si,sourceoff
-asm	mov	di,destoff
-asm	mov	es,destseg
-asm	mov	ds,sourceseg
-
-expand:
-asm	lodsw
-asm	cmp	ax,bx
-asm	je	repeat
-asm	stosw
-asm	jmp	next
-
-repeat:
-asm	lodsw
-asm	mov	cx,ax		// repeat count
-asm	lodsw			// repeat value
-asm	rep stosw
-
-next:
-
-asm	cmp	si,0x10		// normalize ds:si
-asm  	jb	sinorm
-asm	mov	ax,si
-asm	shr	ax,1
-asm	shr	ax,1
-asm	shr	ax,1
-asm	shr	ax,1
-asm	mov	dx,ds
-asm	add	dx,ax
-asm	mov	ds,dx
-asm	and	si,0xf
-sinorm:
-asm	cmp	di,0x10		// normalize es:di
-asm  	jb	dinorm
-asm	mov	ax,di
-asm	shr	ax,1
-asm	shr	ax,1
-asm	shr	ax,1
-asm	shr	ax,1
-asm	mov	dx,es
-asm	add	dx,ax
-asm	mov	es,dx
-asm	and	di,0xf
-dinorm:
-
-asm	cmp     di,ss:endoff
-asm	jne	expand
-asm	mov	ax,es
-asm	cmp	ax,ss:endseg
-asm	jb	expand
-
-asm	mov	ax,ss
-asm	mov	ds,ax
 
 }
 
@@ -631,7 +537,7 @@ void CAL_SetupGrFile (void)
 //
 // load the data offsets from ???head.ext
 //
-	MM_GetPtr (&(memptr)grstarts,(NUMCHUNKS+1)*FILEPOSSIZE);
+	MM_GetPtr ((memptr)&grstarts,(NUMCHUNKS+1)*FILEPOSSIZE);
 
 	strcpy(fname,gheadname);
 	strcat(fname,extension);
@@ -659,11 +565,11 @@ void CAL_SetupGrFile (void)
 //
 // load the pic and sprite headers into the arrays in the data segment
 //
-	MM_GetPtr(&(memptr)pictable,NUMPICS*sizeof(pictabletype));
+	MM_GetPtr((memptr)&pictable,NUMPICS*sizeof(pictabletype));
 	CAL_GetGrChunkLength(STRUCTPIC);		// position file pointer
 	MM_GetPtr(&compseg,chunkcomplen);
-	CA_FarRead (grhandle,compseg,chunkcomplen);
-	CAL_HuffExpand (compseg, (byte *)pictable,NUMPICS*sizeof(pictabletype),grhuffman,false);
+	CA_FarRead(grhandle,compseg,chunkcomplen);
+	CAL_HuffExpand (compseg, (byte *)pictable,NUMPICS*sizeof(pictabletype),grhuffman);
 	MM_FreePtr(&compseg);
 }
 
@@ -696,28 +602,19 @@ void CAL_SetupMapFile (void)
 		CA_CannotOpen(fname);
 
 	length = filelength(handle);
-	MM_GetPtr (&(memptr)tinf,length);
+	MM_GetPtr ((memptr)&tinf,length);
 	CA_FarRead(handle, tinf, length);
 	close(handle);
 
 //
 // open the data file
 //
-#ifdef CARMACIZED
-	strcpy(fname,"GAMEMAPS.");
+	strcpy(fname,"gamemaps.");
 	strcat(fname,extension);
 
 	if ((maphandle = open(fname,
 		 O_RDONLY | O_BINARY, S_IREAD)) == -1)
 		CA_CannotOpen(fname);
-#else
-	strcpy(fname,mfilename);
-	strcat(fname,extension);
-
-	if ((maphandle = open(fname,
-		 O_RDONLY | O_BINARY, S_IREAD)) == -1)
-		CA_CannotOpen(fname);
-#endif
 
 //
 // load all map header
@@ -725,7 +622,7 @@ void CAL_SetupMapFile (void)
 	for (i=0;i<NUMMAPS;i++)
 	{
 		pos = ((mapfiletype *)tinf)->headeroffsets[i];
-		if (pos<0)						// $FFFFFFFF start is a sparse map
+		if (pos<0)	// $FFFFFFFF start is a sparse map
 			continue;
 
 		MM_GetPtr(&(memptr)mapheaderseg[i],sizeof(maptype));
@@ -735,7 +632,7 @@ void CAL_SetupMapFile (void)
 	}
 
 //
-// allocate space for 3 64*64 planes
+// allocate space for 2 64*64 planes
 //
 	for (i=0;i<MAPPLANES;i++)
 	{
@@ -988,7 +885,7 @@ void CAL_ExpandGrChunk (int chunk, byte *source)
 	MM_GetPtr (&grsegs[chunk],expanded);
 	if (mmerror)
 		return;
-	CAL_HuffExpand (source,grsegs[chunk],expanded,grhuffman,false);
+	CAL_HuffExpand (source,grsegs[chunk],expanded,grhuffman);
 }
 
 
@@ -1095,7 +992,8 @@ void CA_CacheScreen (int chunk)
 // allocate final space, decompress it, and free bigbuffer
 // Sprites need to have shifts made and various other junk
 //
-	CAL_HuffExpand (source,MK_FP(SCREENSEG,bufferofs),expanded,grhuffman,true);
+	/* TODO: show screen! */
+	CAL_HuffExpand (source,MK_FP(SCREENSEG,bufferofs),expanded,grhuffman);
 	VW_MarkUpdateBlock (0,0,319,199);
 	MM_FreePtr(&bigbufferseg);
 }
@@ -1119,10 +1017,8 @@ void CA_CacheMap (int mapnum)
 	memptr	*dest,bigbufferseg;
 	unsigned	size;
 	unsigned	*source;
-#ifdef CARMACIZED
 	memptr	buffer2seg;
 	long	expanded;
-#endif
 
 	mapon = mapnum;
 
@@ -1149,7 +1045,6 @@ void CA_CacheMap (int mapnum)
 		}
 
 		CA_FarRead(maphandle,(byte *)source,compressed);
-#ifdef CARMACIZED
 		//
 		// unhuffman, then unRLEW
 		// The huffman'd chunk has a two byte expanded length first
@@ -1163,14 +1058,6 @@ void CA_CacheMap (int mapnum)
 		CA_RLEWexpand (((unsigned *)buffer2seg)+1,*dest,size,
 		((mapfiletype *)tinf)->RLEWtag);
 		MM_FreePtr (&buffer2seg);
-
-#else
-		//
-		// unRLEW, skipping expanded length
-		//
-		CA_RLEWexpand (source+1, *dest,size,
-		((mapfiletype *)tinf)->RLEWtag);
-#endif
 
 		if (compressed>BUFFERSIZE)
 			MM_FreePtr(&bigbufferseg);

@@ -72,7 +72,7 @@ extern char signon;
 
 typedef	enum	{false,true}	boolean;
 typedef	unsigned	char		byte;
-typedef	unsigned	int			word;
+typedef	unsigned	short int		word;
 typedef	unsigned	long		longword;
 typedef	byte *					Ptr;
 

@@ -726,11 +726,9 @@ void ShowArticle (char *article)
 //===========================================================================
 
 #ifndef JAPAN
-#ifdef ARTSEXTERN
 int 	endextern = T_ENDART1;
 #ifndef SPEAR
 int		helpextern = T_HELPART;
-#endif
 #endif
 char helpfilename[13] = "HELPART.",
 	 endfilename[13] = "ENDART1.";
@@ -761,29 +759,14 @@ void HelpScreens (void)
 	MM_SortMem ();
 #else
 
-
-
-
-#ifdef ARTSEXTERN
 	artnum = helpextern;
 	CA_CacheGrChunk (artnum);
 	text = (char *)grsegs[artnum];
 	MM_SetLock (&grsegs[artnum], true);
-#else
-	CA_LoadFile (helpfilename,&layout);
-	text = (char *)layout;
-	MM_SetLock (&layout, true);
-#endif
 
 	ShowArticle (text);
 
-#ifdef ARTSEXTERN
 	MM_FreePtr (&grsegs[artnum]);
-#else
-	MM_FreePtr (&layout);
-#endif
-
-
 
 	VW_FadeOut();
 
@@ -823,28 +806,14 @@ void EndText (void)
 	MM_SortMem ();
 #else
 
-
-
-#ifdef ARTSEXTERN
 	artnum = endextern+gamestate.episode;
 	CA_CacheGrChunk (artnum);
 	text = (char *)grsegs[artnum];
 	MM_SetLock (&grsegs[artnum], true);
-#else
-	endfilename[6] = '1'+gamestate.episode;
-	CA_LoadFile (endfilename,&layout);
-	text = (char *)layout;
-	MM_SetLock (&layout, true);
-#endif
 
 	ShowArticle (text);
 
-#ifdef ARTSEXTERN
 	MM_FreePtr (&grsegs[artnum]);
-#else
-	MM_FreePtr (&layout);
-#endif
-
 
 	VW_FadeOut();
 	SETFONTCOLOR(0,15);

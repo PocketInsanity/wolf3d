@@ -10,10 +10,10 @@
 
 typedef	struct
 {
-	long		planestart[3];
-	unsigned	planelength[3];
-	unsigned	width,height;
-	char		name[16];
+	long planestart[3];
+	word planelength[3];
+	word width,height;
+	char name[16];
 } maptype;
 
 //===========================================================================
@@ -55,11 +55,8 @@ boolean CA_ReadFile(char *filename, memptr *ptr);
 boolean CA_LoadFile(char *filename, memptr *ptr);
 boolean CA_WriteFile(char *filename, void *ptr, long length);
 
-long CA_RLEWCompress (unsigned *source, long length, unsigned *dest,
-  unsigned rlewtag);
-
-void CA_RLEWexpand (unsigned *source, unsigned *dest,long length,
-  unsigned rlewtag);
+long CA_RLEWCompress(word *source, long length, word *dest, word rlewtag);
+void CA_RLEWexpand(word *source, word *dest, long length, word rlewtag);
 
 void CA_Startup (void);
 void CA_Shutdown (void);
@@ -156,7 +153,7 @@ void MM_Startup (void);
 void MM_Shutdown (void);
 void MM_MapEMS (void);
 
-void MM_GetPtr (memptr *baseptr,unsigned long size);
+void MM_GetPtr (memptr *baseptr, unsigned long size);
 void MM_FreePtr (memptr *baseptr);
 
 void MM_SetPurge (memptr *baseptr, int purge);
