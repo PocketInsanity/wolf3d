@@ -35,7 +35,7 @@ NASM = nasm
 
 .SUFFIXES: .asm
 
-all:	swolf3d xwolf3d glwolf3d sdlwolf3d
+all:	swolf3d xwolf3d gwolf3d glwolf3d sdlwolf3d
 
 $(SOBJS):  Sounds.h  Sprites.h  States.h  Wolf.h  burger.h  wolfdef.h
 $(XOBJS):  Sounds.h  Sprites.h  States.h  Wolf.h  burger.h  wolfdef.h

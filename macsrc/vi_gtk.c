@@ -39,11 +39,9 @@ GtkWidget *event_box;
 GdkVisual *visual;
 GdkImage *image;
 GtkImage *image_area;
-GdkColormap *cmap;
 
-GdkColormap *cmapo;
-GdkColor colors[256];
-GdkColor coloro[256];
+GdkColormap *cmap;
+GdkColor game_colors[256], default_colors[256];
 
 int image_focus = 1;
 
@@ -68,21 +66,23 @@ static void menu_quit(GtkWidget *w, gpointer data)
 void RestoreColors()
 {
 	int i;
-	for (i = 0; i < cmapo->size; i++)
-		gdk_color_change(cmap, &cmapo->colors[i]);
+
+	for (i = 0; i < cmap->size; i++)
+		gdk_color_change(cmap, &default_colors[i]);
+
 }
 
 void UpdateColors()
 {
 	int i;
+
 	for (i = 0; i < cmap->size; i++)
-		gdk_color_change(cmap, &colors[i]);
+		gdk_color_change(cmap, &game_colors[i]);
 }
 
 
 static void image_focus_in(GtkWidget *widget, GdkEventButton *event, gpointer data)
-{
-	
+{	
 	UpdateColors();
 	image_focus = 1;		
 }
@@ -128,7 +128,9 @@ static GtkItemFactoryEntry menu_items[] = {
 int main(int argc, char *argv[])
 {
 	int i;
-	
+	gboolean success[256];
+	GdkColormap *cmapo;
+		
 	if (argc != 2) {
 		fprintf(stderr, "usage: %s <mac wolf3d resource fork>\n", argv[0]);
 		exit(EXIT_FAILURE);
@@ -140,33 +142,42 @@ int main(int argc, char *argv[])
 	}
 	
 	gtk_init(&argc, &argv);
-	
-/*	visual = gdk_visual_get_best_with_depth(8); */
+
+
+/* Get our visual and colormap, and create the main window with them */
 	visual = gdk_visual_get_best_with_both(8, GDK_VISUAL_PSEUDO_COLOR);
 	if (visual == NULL) {
 		fprintf(stderr, "Unable to get a 8 bpp visual\n");
 		exit(EXIT_FAILURE);
 	}
-
-/* I forget what this was for ... */	
-/*	gtk_widget_set_default_visual(visual); */
-		
-	cmapo = gdk_colormap_get_system();
 	
 	cmap = gdk_colormap_new(visual, TRUE);
-	for (i = 0; i < 256; i++)
-		colors[i].pixel = i;
-	
-	gtk_widget_set_default_colormap(cmap);
-	
-	RestoreColors();
 	
 	win = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+
+	cmapo = gtk_widget_get_colormap(GTK_WIDGET(win));
+		
+	for (i = 0; i < 256; i++) {
+		game_colors[i].pixel = i; 
+		default_colors[i].pixel = i;
+	}
 	
+	for (i = 0; i < cmapo->size; i++)
+		default_colors[i] = cmapo->colors[i];
+		
+	gdk_colormap_alloc_colors(cmap, default_colors, cmapo->size, TRUE, TRUE, success);
+		
+	gtk_widget_set_visual(GTK_WIDGET(win), visual);	
+	gtk_widget_set_colormap(GTK_WIDGET(win), cmap);	
+
+
+/* Disable user resizing */
 	gtk_window_set_policy(GTK_WINDOW(win), FALSE, FALSE, TRUE);
 	
 	gtk_window_set_title(GTK_WINDOW(win), "Wolfenstein 3D");
-	
+
+
+/* Setup Main Window event signals */
 	gtk_signal_connect(GTK_OBJECT(win), "delete_event", GTK_SIGNAL_FUNC(delete_event), NULL);
 	gtk_signal_connect(GTK_OBJECT(win), "destroy", GTK_SIGNAL_FUNC(destroy), NULL);
 	
@@ -174,13 +185,17 @@ int main(int argc, char *argv[])
 	gtk_signal_connect(GTK_OBJECT(win), "key_release_event", GTK_SIGNAL_FUNC(key_release), NULL);
 	
 	gtk_widget_set_events(GTK_WIDGET(win), GDK_EXPOSURE_MASK | GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK);
-	
+
+
+/* Create vbox for menu and image */	
 	main_vbox = gtk_vbox_new(FALSE, 1);
 	
 	gtk_container_border_width(GTK_CONTAINER(main_vbox), 1);
 	gtk_container_add(GTK_CONTAINER(win), main_vbox);
 	gtk_widget_show(main_vbox);
-	
+
+
+/* Create Menu */	
 	accel_group = gtk_accel_group_new();
 	item_factory = gtk_item_factory_new(GTK_TYPE_MENU_BAR, "<main>", accel_group);
 	gtk_item_factory_create_items(item_factory, sizeof(menu_items) / sizeof(menu_items[0]), menu_items, NULL);
@@ -191,30 +206,37 @@ int main(int argc, char *argv[])
 	gtk_box_pack_start(GTK_BOX(main_vbox), menubar, FALSE, TRUE, 0);
 	
 	gtk_widget_show(menubar);
-	
+
+
+/* Create image and image area */	
 	image = gdk_image_new(GDK_IMAGE_FASTEST, visual, 320, 200);
 	image_area = (GtkImage *)gtk_image_new(image, NULL);
 	
 	gtk_signal_connect(GTK_OBJECT(image_area), "draw", GTK_SIGNAL_FUNC(draw), NULL);
 	gtk_signal_connect(GTK_OBJECT(image_area), "draw_default", GTK_SIGNAL_FUNC(draw_default), NULL);
-	
+
+
+/* Create event box for image area */	
 	event_box = gtk_event_box_new();
-	gtk_container_add(GTK_CONTAINER(main_vbox), event_box); 
+	gtk_container_add(GTK_CONTAINER(main_vbox), event_box); 	
+
 	gtk_widget_show(event_box);
 
 	gtk_container_add(GTK_CONTAINER(event_box), GTK_WIDGET(image_area));
 	gtk_widget_show(GTK_WIDGET(image_area));
-	
+
+
+/* Setup focus changing for colormaps */	
 	gtk_widget_set_events(GTK_WIDGET(event_box), GDK_BUTTON_PRESS_MASK);
 	gtk_signal_connect(GTK_OBJECT(event_box), "button_press_event", GTK_SIGNAL_FUNC(image_focus_in), NULL);
 	gtk_signal_connect(GTK_OBJECT(menubar), "button_press_event", GTK_SIGNAL_FUNC(image_focus_out), NULL);
+
 	
-	gtk_widget_realize(event_box);
-	
-	/* UpdateColors(); */
-	
-	gtk_widget_show(win);
-		
+/* Show Main Window */
+	gtk_widget_show(win);	
+
+
+/* Game-related initialization */	
 	InitData();
 	
 	GameViewSize = 0;	
@@ -222,18 +244,21 @@ int main(int argc, char *argv[])
 
 	ClearTheScreen(BLACK);
 	BlastScreen();
-	
+
+
+/* Run the game */
 	return WolfMain(argc, argv);
 }
 
 void Quit(char *str)
 {	
 	FreeResources();
-	
-	/*
+
+#ifdef SLOWDRAW		
 	if (gfxbuf)
 		free(gfxbuf);
-	*/
+#endif
+	
 	if (image)
 		gdk_image_destroy(image);
 		
@@ -250,10 +275,10 @@ void SetPalette(Byte *pal)
 	int i;
 		
 	for (i = 0; i < 256; i++) {
-		colors[i].red = pal[i*3+0] << 8;
-		colors[i].green = pal[i*3+1] << 8;
-		colors[i].blue = pal[i*3+2] << 8;
-		if (image_focus) gdk_color_change(cmap, &colors[i]);
+		game_colors[i].red = pal[i*3+0] << 8;
+		game_colors[i].green = pal[i*3+1] << 8;
+		game_colors[i].blue = pal[i*3+2] << 8;
+		if (image_focus) gdk_color_change(cmap, &game_colors[i]);
 	}
 }
 
@@ -264,41 +289,45 @@ int VidWidth, VidHeight, ViewHeight;
 
 void BlastScreen2(Rect *BlastRect)
 {
-	/* BlastScreen(); */
 	GdkRectangle r;
-	/*
-	int x;
-	char *ptrs, *ptrd;
-	*/
+
 	r.x = BlastRect->left;
 	r.y = BlastRect->top;
 	r.width = BlastRect->right - BlastRect->left;
 	r.height = BlastRect->bottom - BlastRect->top;
-	
+
+#ifdef SLOWDRAW	
+
+#if 1
 	memcpy(image->mem, gfxbuf, w * h);
+#else
 	/*
+	int x;
+	char *ptrs, *ptrd;
+	
 	ptrs = gfxbuf + (w * r.y) + r.x;
 	ptrd = image->mem;
-	ptrd += (w * r.y) + r.x;
+	ptrd += (image->bpl * r.y) + r.x * image->bpp;
 	for (x = 0; x < r.height; x++) {
-		memcpy(ptrd, ptrs, r.width);
+		memcpy(ptrd, ptrs, r.width * image->bpp);
 		ptrs += w;
-		ptrd += w;
+		ptrd += image->bpl;
 	}
 	*/
+#endif
+	
+#endif
+	
 	gtk_widget_draw(GTK_WIDGET(image_area), &r);
 }
 
 void BlastScreen()
 {
+#ifdef SLOWDRAW
 	memcpy(image->mem, gfxbuf, w * h);
+#endif
 	
-	gtk_widget_draw(GTK_WIDGET(image_area), NULL); 
-	
-	/*
-	gtk_widget_draw_default(GTK_WIDGET(image_area));
-	gtk_widget_draw(GTK_WIDGET(image_area), NULL);
-	*/
+	gtk_widget_draw(GTK_WIDGET(image_area), NULL); 	
 }
 
 Word VidXs[] = {320,512,640,640};       /* Screen sizes to play with */
@@ -336,15 +365,16 @@ Word NewGameWindow(Word NewVidSize)
 	image = gdk_image_new(GDK_IMAGE_FASTEST, visual, w, h);
 	gtk_image_set(image_area, image, NULL);
 	
-/*	gtk_widget_set_usize(GTK_WIDGET(win), w, h); */
+/* Main window will autoshrink */
 	gtk_widget_set_usize(GTK_WIDGET(image_area), w, h);
 	
-	
+#ifdef SLOWDRAW	
 	if (gfxbuf)
 		free(gfxbuf);
 	gfxbuf = malloc(w * h);
-		
-	/* gfxbuf = image->mem; */
+#else		
+	gfxbuf = image->mem;
+#endif
 	
 	VideoPointer = gfxbuf;
 	VideoWidth = w;
@@ -600,9 +630,7 @@ void keyboard_handler(int keycode, int press)
 			case GDK_slash:
 				joystick1 = JOYPAD_START;
 				break;
-			case GDK_Escape:
-				Quit(NULL); /* fast way out */
-			}
+ 			}
 		}
 		
 		if (keys[SC_CURSORUPLEFT])

@@ -1,6 +1,47 @@
+complete:
+	07/22/01 disable escape
+	07/22/01 fix cmap problem at 8bit (Want to change cmaps when going into/from gtk+ menu)
+------------------
+New Game
+Save Game, Load Game
+find keyboard way of changing focus
+fix sprite snapping
+all visuals (loader and drawer code will need to be modified)
+check bigendianesss
+choose difficulty (with graphics from game if possible)
+Psyched bar
+pause key
+About Box
+Detect Shareware version, End Game box (Sharware/Retail)
+add better error checking for invalid file in res.c
+select resolution to use
+make sure all needed keys work
+mouse support
+sound (/dev/dsp?)
+music (what format?, mp3 - there's smpeg?)
+options file
+input config
+.wolf3d/{macfull,macshare} ?
+command line options
+verify other todo lists are also complete
+check bigendianesss
+play through testing
+Documentation
+--------- release one anytime after this point ---------
+SDL support (for full screen), optional
+configure (automake, autoconf, etc?)
+website (no sourceforge this time)
+finish opengl version
+in game menus instead of gtk+ gui
+
 TODO:
 * See TODO in src/TODO
-* FX_GLIDE_SWAPINTERVAL=0 is needed for me to prevent jerkyness
+* FX_GLIDE_SWAPINTERVAL=0 is needed to prevent jerkyness (for me)
+* Finish up gtk+ version and put out a release!
+- Menu
+- Handle all possible 8 bit Pseudo and Direct/TrueColor visuals
+- Sound
+- Music?
 
 * Pause key
   - With windowed systems, put paused in the title bar?
