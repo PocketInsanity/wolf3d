@@ -978,7 +978,7 @@ boolean PreloadUpdate(unsigned current, unsigned total)
 	w = ((long)w * current) / total;
 	if (w)
 	{
-	 VWB_Bar(WindowX + 5,WindowY + WindowH - 3,w,2,0x37); //SECONDCOLOR);
+	 VWB_Bar(WindowX + 5,WindowY + WindowH - 3,w,2,0x37); 
 	 VWB_Bar(WindowX + 5,WindowY + WindowH - 3,w-1,1,0x32);
 
 	}

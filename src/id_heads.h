@@ -88,15 +88,14 @@ typedef	struct
 #define	nil	((void *)0)
 
 
-#include "ID_MM.H"
-#include "ID_PM.H"
-#include "ID_CA.H"
-#include "ID_VL.H"
-#include "ID_VH.H"
-#include "ID_IN.H"
-#include "ID_SD.H"
-#include "ID_US.H"
-
+#include "id_mm.h"
+#include "id_pm.h"
+#include "id_ca.h"
+#include "id_vl.h"
+#include "id_vh.h"
+#include "id_in.h"
+#include "id_sd.h"
+#include "id_us.h"
 
 void	Quit (char *error);		// defined in user program
 
@@ -113,10 +112,7 @@ void	Quit (char *error);		// defined in user program
 #define	MAXTICS				10
 #define DEMOTICS			4
 
-#define	UPDATETERMINATE	0x0301
-
 extern	unsigned	mapwidth,mapheight,tics;
-extern	boolean		compatability;
 
 extern	byte		*updateptr;
 extern	unsigned	uwidthtable[UPDATEHIGH];

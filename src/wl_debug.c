@@ -56,7 +56,6 @@ void DebugMemory (void)
 	int	i;
 	char    scratch[80],str[10];
 	long	mem;
-	spritetype _seg	*block;
 
 	CenterWindow (16,7);
 

@@ -45,7 +45,6 @@ objtype		*actorat[MAPSIZE][MAPSIZE];
 // replacing refresh manager
 //
 unsigned	mapwidth,mapheight,tics;
-boolean		compatability;
 byte		*updateptr;
 unsigned	mapwidthtable[64];
 unsigned	uwidthtable[UPDATEHIGH];

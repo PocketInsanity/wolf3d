@@ -82,11 +82,7 @@
 
 #define PLAYERSIZE		MINDIST			// player radius
 #define MINACTORDIST	0x10000l		// minimum dist from player center
-										// to any actor center
-
-#define NUMLATCHPICS	100
-
-
+						// to any actor center
 #define PI	3.141592657
 
 #define GLOBAL1		(1l<<16)
@@ -793,8 +789,6 @@ extern	char	configname[13];
 
 void		HelpScreens (void);
 void		OrderingInfo (void);
-void		TEDDeath(void);
-void		Quit (char *error);
 void 		CalcProjection (long focal);
 boolean		SetViewSize (unsigned width, unsigned height);
 void		NewGame (int difficulty,int episode);
@@ -815,7 +809,6 @@ void		ShutdownId (void);
 
 
 extern	boolean		ingame,fizzlein;
-extern	unsigned	latchpics[NUMLATCHPICS];
 extern	gametype	gamestate;
 extern	int			doornum;
 
@@ -959,7 +952,6 @@ void PicturePause (void);
 */
 
 extern	unsigned screenloc[3];
-extern	unsigned freelatch;
 
 extern	long 	lasttimecount;
 extern	long 	frameon;

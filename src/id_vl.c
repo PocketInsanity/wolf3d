@@ -1,19 +1,17 @@
-// ID_VL.C
+/* id_vl.c */
 
 #include <dos.h>
 #include <alloc.h>
 #include <mem.h>
 #include <string.h>
 #include "id_heads.h"
-#include "id_vl.h"
-#pragma hdrstop
 
 //
 // SC_INDEX is expected to stay at SC_MAPMASK for proper operation
 //
 
 unsigned	bufferofs;
-unsigned	displayofs,pelpan;
+unsigned	displayofs;
 
 unsigned	screenseg=SCREENSEG;		// set to 0xa000 for asm convenience
 
@@ -25,38 +23,15 @@ unsigned	bordercolor;
 
 boolean		fastpalette;				// if true, use outsb to set
 
-byte		far	palette1[256][3],far palette2[256][3];
+byte		palette1[256][3],far palette2[256][3];
 
 //===========================================================================
 
-// asm
-
-int	 VL_VideoID (void);
+int VL_VideoID (void);
 void VL_SetCRTC (int crtc);
-void VL_SetScreen (int crtc, int pelpan);
 void VL_WaitVBL (int vbls);
 
 //===========================================================================
-
-
-/*
-=======================
-=
-= VL_Startup
-=
-=======================
-*/
-
-#if 0
-void	VL_Startup (void)
-{
-	if ( !MS_CheckParm ("HIDDENCARD") && VL_VideoID () != 5)
-		MS_Quit ("You need a VGA graphics card to run this!");
-
-	asm	cld;				// all string instructions assume forward
-}
-
-#endif
 
 /*
 =======================
@@ -87,8 +62,6 @@ Quit ("Improper video card!  If you really have a VGA card that I am not \n"
 	  "detecting, use the -HIDDENCARD command line parameter!");
 
 }
-
-
 
 /*
 =======================
@@ -589,7 +562,6 @@ byte	pixmasks[4] = {1,2,4,8};
 byte	leftmasks[4] = {15,14,12,8};
 byte	rightmasks[4] = {1,3,7,15};
 
-
 /*
 =================
 =
@@ -607,7 +579,6 @@ void VL_Plot (int x, int y, int color)
 	*(byte far *)MK_FP(SCREENSEG,bufferofs+(ylookup[y]+(x>>2))) = color;
 	VGAMAPMASK(15);
 }
-
 
 /*
 =================
@@ -806,49 +777,11 @@ void VL_MemToScreen (byte far *source, int width, int height, int x, int y)
 
 		screen = dest;
 		for (y=0;y<height;y++,screen+=linewidth,source+=width)
-			_fmemcpy (screen,source,width);
+			memcpy (screen,source,width);
 	}
 }
 
-//==========================================================================
-
-
-/*
-=================
-=
-= VL_MaskedToScreen
-=
-= Masks a block of main memory to the screen.
-=
-=================
-*/
-
-void VL_MaskedToScreen (byte far *source, int width, int height, int x, int y)
-{
-	byte    far *screen,far *dest,mask;
-	byte	far *maskptr;
-	int		plane;
-
-	width>>=2;
-	dest = MK_FP(SCREENSEG,bufferofs+ylookup[y]+(x>>2) );
-//	mask = 1 << (x&3);
-
-//	maskptr = source;
-
-	for (plane = 0; plane<4; plane++)
-	{
-		VGAMAPMASK(mask);
-		mask <<= 1;
-		if (mask == 16)
-			mask = 1;
-
-		screen = dest;
-		for (y=0;y<height;y++,screen+=linewidth,source+=width)
-			_fmemcpy (screen,source,width);
-	}
-}
-
-//==========================================================================
+/* ======================================================================== */
 
 /*
 =================
@@ -893,8 +826,7 @@ asm	mov	ds,ax
 	VGAWRITEMODE(0);
 }
 
-
-//===========================================================================
+/* ======================================================================== */
 
 #if 0
 
@@ -935,150 +867,4 @@ asm	mov	ds,ax
 	VGAWRITEMODE(0);
 }
 
-
 #endif
-
-/*
-=============================================================================
-
-						STRING OUTPUT ROUTINES
-
-=============================================================================
-*/
-
-
-
-
-/*
-===================
-=
-= VL_DrawTile8String
-=
-===================
-*/
-
-void VL_DrawTile8String (char *str, char far *tile8ptr, int printx, int printy)
-{
-	int		i;
-	unsigned	far *dest,far *screen,far *src;
-
-	dest = MK_FP(SCREENSEG,bufferofs+ylookup[printy]+(printx>>2));
-
-	while (*str)
-	{
-		src = (unsigned far *)(tile8ptr + (*str<<6));
-		// each character is 64 bytes
-
-		VGAMAPMASK(1);
-		screen = dest;
-		for (i=0;i<8;i++,screen+=linewidth)
-			*screen = *src++;
-		VGAMAPMASK(2);
-		screen = dest;
-		for (i=0;i<8;i++,screen+=linewidth)
-			*screen = *src++;
-		VGAMAPMASK(4);
-		screen = dest;
-		for (i=0;i<8;i++,screen+=linewidth)
-			*screen = *src++;
-		VGAMAPMASK(8);
-		screen = dest;
-		for (i=0;i<8;i++,screen+=linewidth)
-			*screen = *src++;
-
-		str++;
-		printx += 8;
-		dest+=2;
-	}
-}
-
-
-
-/*
-===================
-=
-= VL_DrawLatch8String
-=
-===================
-*/
-
-void VL_DrawLatch8String (char *str, unsigned tile8ptr, int printx, int printy)
-{
-	int		i;
-	unsigned	src,dest;
-
-	dest = bufferofs+ylookup[printy]+(printx>>2);
-
-	VGAWRITEMODE(1);
-	VGAMAPMASK(15);
-
-	while (*str)
-	{
-		src = tile8ptr + (*str<<4);		// each character is 16 latch bytes
-
-asm	mov	si,[src]
-asm	mov	di,[dest]
-asm	mov	dx,[linewidth]
-
-asm	mov	ax,SCREENSEG
-asm	mov	ds,ax
-
-asm	lodsw
-asm	mov	[di],ax
-asm	add	di,dx
-asm	lodsw
-asm	mov	[di],ax
-asm	add	di,dx
-asm	lodsw
-asm	mov	[di],ax
-asm	add	di,dx
-asm	lodsw
-asm	mov	[di],ax
-asm	add	di,dx
-asm	lodsw
-asm	mov	[di],ax
-asm	add	di,dx
-asm	lodsw
-asm	mov	[di],ax
-asm	add	di,dx
-asm	lodsw
-asm	mov	[di],ax
-asm	add	di,dx
-asm	lodsw
-asm	mov	[di],ax
-asm	add	di,dx
-
-asm	mov	ax,ss
-asm	mov	ds,ax
-
-		str++;
-		printx += 8;
-		dest+=2;
-	}
-
-	VGAWRITEMODE(0);
-}
-
-
-/*
-===================
-=
-= VL_SizeTile8String
-=
-===================
-*/
-
-void VL_SizeTile8String (char *str, int *width, int *height)
-{
-	*height = 8;
-	*width = 8*strlen(str);
-}
-
-
-
-
-
-
-
-
-

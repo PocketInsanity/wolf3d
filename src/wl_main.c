@@ -1,8 +1,7 @@
-// WL_MAIN.C
+/* wl_main.c */
 
 #include <conio.h>
 #include "wl_def.h"
-#pragma hdrstop
 
 
 /*
@@ -28,9 +27,6 @@
 
 #define FOCALLENGTH     (0x5700l)               // in global coordinates
 #define VIEWGLOBAL      0x10000                 // globals visable flush to wall
-
-#define VIEWWIDTH       256                     // size of view window
-#define VIEWHEIGHT      144
 
 /*
 =============================================================================
@@ -932,7 +928,6 @@ void InitDigiMap (void)
 
 }
 
-
 #ifndef SPEAR
 CP_iteminfo	MusicItems={CTL_X,CTL_Y,6,0,32};
 CP_itemtype far MusicMenu[]=
@@ -1543,8 +1538,6 @@ void    DemoLoop (void)
 =
 ==========================
 */
-
-char *nosprtxt[] = {"nospr", nil};
 
 void main (void)
 {

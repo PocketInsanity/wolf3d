@@ -177,19 +177,6 @@ US_Startup(void)
 
 	US_InitRndT(true);		// Initialize the random number generator
 
-	for (i = 1;i < _argc;i++)
-	{
-		switch (US_CheckParm(_argv[i],ParmStrings2))
-		{
-		case 0:
-			compatability = true;
-			break;
-		case 1:
-			compatability = false;
-			break;
-		}
-	}
-
 	// Check for TED launching here
 	for (i = 1;i < _argc;i++)
 	{

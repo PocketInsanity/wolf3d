@@ -1,11 +1,5 @@
 // ID_VL.H
 
-// wolf compatability
-
-#define MS_Quit	Quit
-
-void Quit (char *error);
-
 //===========================================================================
 
 
@@ -82,7 +76,7 @@ void Quit (char *error);
 //===========================================================================
 
 extern	unsigned	bufferofs;			// all drawing is reletive to this
-extern	unsigned	displayofs,pelpan;	// last setscreen coordinates
+extern	unsigned	displayofs;	// last setscreen coordinates
 
 extern	unsigned	screenseg;			// set to 0xa000 for asm convenience
 
@@ -149,11 +143,7 @@ void VL_DrawPicBare (int x, int y, byte far *pic, int width, int height);
 void VL_MemToLatch (byte far *source, int width, int height, unsigned dest);
 void VL_ScreenToScreen (unsigned source, unsigned dest,int width, int height);
 void VL_MemToScreen (byte far *source, int width, int height, int x, int y);
-void VL_MaskedToScreen (byte far *source, int width, int height, int x, int y);
 
-void VL_DrawTile8String (char *str, char far *tile8ptr, int printx, int printy);
-void VL_DrawLatch8String (char *str, unsigned tile8ptr, int printx, int printy);
-void VL_SizeTile8String (char *str, int *width, int *height);
 void VL_DrawPropString (char *str, unsigned tile8ptr, int printx, int printy);
 void VL_SizePropString (char *str, int *width, int *height, char far *font);
 

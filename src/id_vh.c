@@ -1,50 +1,28 @@
-// ID_VH.C
+/* id_vh.c */
 
 #include "id_heads.h"
 
-#define	SCREENWIDTH		80
-#define CHARWIDTH		2
-#define TILEWIDTH		4
-#define GRPLANES		4
-#define BYTEPIXELS		4
+#define PIXTOBLOCK		4 /* 16 pixels to an update block */
 
-#define SCREENXMASK		(~3)
-#define SCREENXPLUS		(3)
-#define SCREENXDIV		(4)
+/* ======================================================================== */
 
-#define VIEWWIDTH		80
+pictabletype *pictable;
 
-#define PIXTOBLOCK		4		// 16 pixels to an update block
+int px,py;
+byte fontcolor,backcolor;
+int fontnumber;
+int bufferwidth, bufferheight;
 
-#define UNCACHEGRCHUNK(chunk)	{MM_FreePtr(&grsegs[chunk]);grneeded[chunk]&=~ca_levelbit;}
+/* ======================================================================== */
 
-byte	update[UPDATEHIGH][UPDATEWIDE];
-
-//==========================================================================
-
-pictabletype	_seg *pictable;
-
-
-int	px,py;
-byte	fontcolor,backcolor;
-int	fontnumber;
-int bufferwidth,bufferheight;
-
-
-//==========================================================================
-
-void	VWL_UpdateScreenBlocks (void);
-
-//==========================================================================
-
-void VW_DrawPropString (char far *string)
+void VW_DrawPropString(char *string)
 {
-	fontstruct	far	*font;
-	int		width,step,height,i;
-	byte	far *source, far *dest, far *origdest;
-	byte	ch,mask;
+	fontstruct *font;
+	int width, step, height, i;
+	byte *source, *dest, *origdest;
+	byte ch, mask;
 
-	font = (fontstruct far *)grsegs[STARTFONT+fontnumber];
+	font = (fontstruct *)grsegs[STARTFONT+fontnumber];
 	height = bufferheight = font->height;
 	dest = origdest = MK_FP(SCREENSEG,bufferofs+ylookup[py]+(px>>2));
 	mask = 1<<(px&3);
@@ -53,7 +31,7 @@ void VW_DrawPropString (char far *string)
 	while ((ch = *string++)!=0)
 	{
 		width = step = font->width[ch];
-		source = ((byte far *)font)+font->location[ch];
+		source = ((byte *)font)+font->location[ch];
 		while (width--)
 		{
 			VGAMAPMASK(mask);
@@ -91,73 +69,6 @@ asm	mov	ds,ax
 bufferheight = height;
 bufferwidth = ((dest+1)-origdest)*4;
 }
-
-
-void VW_DrawColorPropString (char far *string)
-{
-	fontstruct	far	*font;
-	int		width,step,height,i;
-	byte	far *source, far *dest, far *origdest;
-	byte	ch,mask;
-
-	font = (fontstruct far *)grsegs[STARTFONT+fontnumber];
-	height = bufferheight = font->height;
-	dest = origdest = MK_FP(SCREENSEG,bufferofs+ylookup[py]+(px>>2));
-	mask = 1<<(px&3);
-
-
-	while ((ch = *string++)!=0)
-	{
-		width = step = font->width[ch];
-		source = ((byte far *)font)+font->location[ch];
-		while (width--)
-		{
-			VGAMAPMASK(mask);
-
-asm	mov	ah,[BYTE PTR fontcolor]
-asm	mov	bx,[step]
-asm	mov	cx,[height]
-asm	mov	dx,[linewidth]
-asm	lds	si,[source]
-asm	les	di,[dest]
-
-vertloop:
-asm	mov	al,[si]
-asm	or	al,al
-asm	je	next
-asm	mov	[es:di],ah			// draw color
-
-next:
-asm	add	si,bx
-asm	add	di,dx
-
-asm rcr cx,1				// inc font color
-asm jc  cont
-asm	inc ah
-
-cont:
-asm rcl cx,1
-asm	loop	vertloop
-asm	mov	ax,ss
-asm	mov	ds,ax
-
-			source++;
-			px++;
-			mask <<= 1;
-			if (mask == 16)
-			{
-				mask = 1;
-				dest++;
-			}
-		}
-	}
-bufferheight = height;
-bufferwidth = ((dest+1)-origdest)*4;
-}
-
-
-//==========================================================================
-
 
 /*
 =================
@@ -167,21 +78,21 @@ bufferwidth = ((dest+1)-origdest)*4;
 =================
 */
 
-void VL_MungePic (byte far *source, unsigned width, unsigned height)
+void VL_MungePic (byte *source, unsigned width, unsigned height)
 {
 	unsigned	x,y,plane,size,pwidth;
-	byte		_seg *temp, far *dest, far *srcline;
+	byte		*temp, *dest, *srcline;
 
 	size = width*height;
 
 	if (width&3)
-		MS_Quit ("VL_MungePic: Not divisable by 4!");
+		Quit ("VL_MungePic: Not divisable by 4!");
 
 //
 // copy the pic to a temp buffer
 //
 	MM_GetPtr (&(memptr)temp,size);
-	_fmemcpy (temp,source,size);
+	memcpy (temp,source,size);
 
 //
 // munge it back into the original buffer
@@ -203,25 +114,18 @@ void VL_MungePic (byte far *source, unsigned width, unsigned height)
 	MM_FreePtr (&(memptr)temp);
 }
 
-void VWL_MeasureString (char far *string, word *width, word *height
-	, fontstruct _seg *font)
+void VWL_MeasureString (char *string, word *width, word *height, 
+	fontstruct *font)
 {
 	*height = font->height;
 	for (*width = 0;*string;string++)
-		*width += font->width[*((byte far *)string)];	// proportional width
+		*width += font->width[*((byte *)string)];	// proportional width
 }
 
-void	VW_MeasurePropString (char far *string, word *width, word *height)
+void	VW_MeasurePropString (char *string, word *width, word *height)
 {
-	VWL_MeasureString(string,width,height,(fontstruct _seg *)grsegs[STARTFONT+fontnumber]);
+	VWL_MeasureString(string,width,height,(fontstruct *)grsegs[STARTFONT+fontnumber]);
 }
-
-void	VW_MeasureMPropString  (char far *string, word *width, word *height)
-{
-	VWL_MeasureString(string,width,height,(fontstruct _seg *)grsegs[STARTFONTM+fontnumber]);
-}
-
-
 
 /*
 =============================================================================
@@ -294,13 +198,6 @@ void VWB_DrawTile8 (int x, int y, int tile)
 		LatchDrawChar(x,y,tile);
 }
 
-void VWB_DrawTile8M (int x, int y, int tile)
-{
-	if (VW_MarkUpdateBlock (x,y,x+7,y+7))
-		VL_MemToScreen (((byte far *)grsegs[STARTTILE8M])+tile*64,8,8,x,y);
-}
-
-
 void VWB_DrawPic (int x, int y, int chunknum)
 {
 	int	picnum = chunknum - STARTPICS;
@@ -315,9 +212,7 @@ void VWB_DrawPic (int x, int y, int chunknum)
 		VL_MemToScreen (grsegs[chunknum],width,height,x,y);
 }
 
-
-
-void VWB_DrawPropString	 (char far *string)
+void VWB_DrawPropString(char *string)
 {
 	int x;
 	x=px;
@@ -326,25 +221,25 @@ void VWB_DrawPropString	 (char far *string)
 }
 
 
-void VWB_Bar (int x, int y, int width, int height, int color)
+void VWB_Bar(int x, int y, int width, int height, int color)
 {
 	if (VW_MarkUpdateBlock (x,y,x+width,y+height-1) )
 		VW_Bar (x,y,width,height,color);
 }
 
-void VWB_Plot (int x, int y, int color)
+void VWB_Plot(int x, int y, int color)
 {
 	if (VW_MarkUpdateBlock (x,y,x,y))
 		VW_Plot(x,y,color);
 }
 
-void VWB_Hlin (int x1, int x2, int y, int color)
+void VWB_Hlin(int x1, int x2, int y, int color)
 {
 	if (VW_MarkUpdateBlock (x1,y,x2,y))
 		VW_Hlin(x1,x2,y,color);
 }
 
-void VWB_Vlin (int y1, int y2, int x, int color)
+void VWB_Vlin(int y1, int y2, int x, int color)
 {
 	if (VW_MarkUpdateBlock (x,y1,x,y2))
 		VW_Vlin(y1,y2,x,color);
@@ -354,7 +249,6 @@ void VW_UpdateScreen (void)
 {
 	VH_UpdateScreen ();
 }
-
 
 /*
 =============================================================================
@@ -383,8 +277,7 @@ void LatchDrawPic (unsigned x, unsigned y, unsigned picnum)
 	VL_LatchToScreen (source,wide/4,height,x*8,y);
 }
 
-
-//==========================================================================
+/* ======================================================================== */
 
 /*
 ===================
@@ -397,15 +290,15 @@ void LatchDrawPic (unsigned x, unsigned y, unsigned picnum)
 void LoadLatchMem (void)
 {
 	int	i,j,p,m,width,height,start,end;
-	byte	far *src;
+	byte *src;
 	unsigned	destoff;
 
-//
-// tile 8s
-//
+/*
+   tile 8s
+*/
 	latchpics[0] = freelatch;
 	CA_CacheGrChunk (STARTTILE8);
-	src = (byte _seg *)grsegs[STARTTILE8];
+	src = (byte *)grsegs[STARTTILE8];
 	destoff = freelatch;
 
 	for (i=0;i<NUMTILE8;i++)
@@ -416,17 +309,17 @@ void LoadLatchMem (void)
 	}
 	UNCACHEGRCHUNK (STARTTILE8);
 
-#if 0	// ran out of latch space!
-//
-// tile 16s
-//
-	src = (byte _seg *)grsegs[STARTTILE16];
+#if 0 /* ran out of latch space! */
+/*
+   tile 16s
+*/
+	src = (byte *)grsegs[STARTTILE16];
 	latchpics[1] = destoff;
 
 	for (i=0;i<NUMTILE16;i++)
 	{
 		CA_CacheGrChunk (STARTTILE16+i);
-		src = (byte _seg *)grsegs[STARTTILE16+i];
+		src = (byte *)grsegs[STARTTILE16+i];
 		VL_MemToLatch (src,16,16,destoff);
 		destoff+=64;
 		if (src)
@@ -434,9 +327,9 @@ void LoadLatchMem (void)
 	}
 #endif
 
-//
-// pics
-//
+/*
+   pics
+*/
 	start = LATCHPICS_LUMP_START;
 	end = LATCHPICS_LUMP_END;
 
@@ -451,10 +344,10 @@ void LoadLatchMem (void)
 		UNCACHEGRCHUNK(i);
 	}
 
-	EGAMAPMASK(15);
+	VGAMAPMASK(15);
 }
 
-//==========================================================================
+/* ======================================================================== */
 
 /*
 ===================
@@ -465,8 +358,6 @@ void LoadLatchMem (void)
 =
 ===================
 */
-
-extern	ControlInfo	c;
 
 boolean FizzleFade (unsigned source, unsigned dest,
 	unsigned width,unsigned height, unsigned frames, boolean abortable)
@@ -542,6 +433,4 @@ noxor:
 		while (TimeCount<frame)		// don't go too fast
 		;
 	} while (1);
-
-
 }

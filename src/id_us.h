@@ -55,10 +55,8 @@ typedef	enum
 			gd_Hard
 		} GameDiff;
 
-//	Hack import for TED launch support
-extern	boolean		tedlevel;
+extern	boolean		tedlevel; /* TODO: rename or remove */
 extern	int			tedlevelnum;
-extern	void		TEDDeath(void);
 
 extern	boolean		ingame,		// Set by game code if a game is in progress
 					abortgame,	// Set if a game load failed
