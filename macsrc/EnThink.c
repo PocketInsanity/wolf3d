@@ -82,6 +82,8 @@ void KillActor(actor_t *ActorPtr)
 	case CL_DKNIGHT:
 		PlaceItemType(S_G_KEY,ActorPtr);	/* Drop a key */
 		break;
+	default:
+		break;
 	}
 	++gamestate.killcount;		/* I killed someone! */
 	ActorPtr->flags = FL_DEAD;	/* remove old actor marker*/

@@ -303,10 +303,6 @@ void SpawnStand(Word x,Word y,class_t which)
 	if (NoEnemies)		/* DEBUG MODE */
 		return;
 		
-	if (numactors >= MAXACTORS) {
-		fprintf("SpawnStand DEBUG (%d, %d)\n", numactors, MAXACTORS);
-	}
-	
 	if (numactors==MAXACTORS) {	/* Too many actors already? */
 		return;					/* Exit */
 	}
@@ -352,10 +348,6 @@ void SpawnAmbush(Word x,Word y,class_t which)
 	
 	if (NoEnemies)		/* DEBUG MODE */
 		return;
-	
-	if (numactors >= MAXACTORS) {
-		fprintf("SpawnAmbush DEBUG (%d, %d)\n", numactors, MAXACTORS);
-	}
 	
 	ActorPtr = &actors[numactors];	/* Get the pointer to the new actor entry */
 	SpawnStand(x,y,which);		/* Fill in all the entries */
@@ -644,7 +636,7 @@ Boolean SetupGameLevel(void)
 	if (!LoadWallArt()) {	/* Get the wall shapes */
 		return FALSE;
 	}
-/* map.tilemap is now used to hold actor numbers if the TI_ACTOR bit is set in 
+/* map.tilemap is now used to hold actor numbers if the TI_ACTOR bit is set in
 	the word tilemap*/
 	
 	memset(WallHits,0,sizeof(WallHits));	/* Init the wall table */
@@ -653,7 +645,14 @@ Boolean SetupGameLevel(void)
 		WallHits[Count] = 1;	/* Force the permanent sprites to load */
 	} while (++Count<S_VICTORY+1);
 	SpawnThings();	/* Create all the characters in the game level */
-	return LoadSpriteArt();	/* Load in the sprite art */
+	
+	if (!LoadSpriteArt()) { /* Load in the sprite art */
+		return FALSE;
+	}
+	
+	InitRenderView();
+	
+	return TRUE;
 }
 
 /************************************

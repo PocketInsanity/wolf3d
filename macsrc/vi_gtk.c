@@ -93,7 +93,7 @@ static void image_focus_out(GtkWidget *widget, GdkEventButton *event, gpointer d
 	image_focus = 0;
 }
 
-extern int KeyPressed;
+static int KeyPressed;
 
 void keyboard_handler(int key, int press);
 
@@ -127,7 +127,6 @@ static GtkItemFactoryEntry menu_items[] = {
 
 int main(int argc, char *argv[])
 {
-	gboolean s[256];
 	int i;
 	
 	if (argc != 2) {
@@ -155,7 +154,6 @@ int main(int argc, char *argv[])
 	cmap = gdk_colormap_new(visual, TRUE);
 	for (i = 0; i < 256; i++)
 		colors[i].pixel = i;
-	/* printf("%d\n", gdk_colormap_alloc_colors(cmap, colors, 256, TRUE, TRUE, s));  */
 	
 	gtk_widget_set_default_colormap(cmap);
 	
@@ -208,16 +206,7 @@ int main(int argc, char *argv[])
 	gtk_signal_connect(GTK_OBJECT(event_box), "button_press_event", GTK_SIGNAL_FUNC(image_focus_in), NULL);
 	gtk_signal_connect(GTK_OBJECT(menubar), "button_press_event", GTK_SIGNAL_FUNC(image_focus_out), NULL);
 	
-	/* gtk_widget_set_usize(GTK_WIDGET(image_area), 320, 200); */
-	
-	/* gtk_box_pack_start(GTK_BOX(main_vbox), event_box, FALSE, TRUE, 0); */
-	/* gtk_widget_show(event_box); */
 	gtk_widget_realize(event_box);
-	
-	/* gtk_box_pack_start(GTK_BOX(main_vbox), GTK_WIDGET(image_area), FALSE, TRUE, 0);
-	*/
-	
-	/* gtk_widget_show(GTK_WIDGET(image_area)); */
 	
 	/* UpdateColors(); */
 	
@@ -274,9 +263,10 @@ void BlastScreen2(Rect *BlastRect)
 {
 	/* BlastScreen(); */
 	GdkRectangle r;
+	/*
 	int x;
 	char *ptrs, *ptrd;
-	
+	*/
 	r.x = BlastRect->left;
 	r.y = BlastRect->top;
 	r.width = BlastRect->right - BlastRect->left;
@@ -380,7 +370,6 @@ Word NewGameWindow(Word NewVidSize)
 /* Keyboard Hack */
 static int RSJ;
 
-static int KeyPressed;
 static int keys[128];
 
 void FlushKeys()

@@ -72,6 +72,8 @@ void ChangeWeapon (void)
 		break;
 	case WP_MISSILE:
 		IO_DrawAmmo(gamestate.missiles);	/* Draw missiles */
+	default:
+		break;
 	}		
 }
 
@@ -100,6 +102,9 @@ void Cmd_Fire(void)
 		if (!gamestate.missiles) {
 			OutOfAmmo();	/* Change the weapon */
 		}
+		break;
+	default:
+		break;
 	}
 	gamestate.attackframe = 1;		/* Begin the attack */
 	gamestate.attackcount = SHOTRATE;		/* Time before next action */
@@ -476,6 +481,9 @@ void MovePlayer(void)
 				return;
 			}
 			MissileAttack();	/* Shoot the missile */
+			break;
+		default:
+			break;
 		}		
 	}
 
@@ -538,6 +546,9 @@ void MovePlayer(void)
 			if (!gamestate.missiles) {	/* Out of missiles? */
 				OutOfAmmo();		/* Switch weapons */
 			}
+			break;
+		default:
+			break;
 		}		
 		gamestate.attackcount = 0;		/* Shut down the attack */
 		gamestate.attackframe = 0;

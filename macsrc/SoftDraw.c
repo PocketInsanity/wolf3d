@@ -19,7 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "wolfdef.h"
 
-void DisplayScreen(int res)
+void DisplayScreen(Word res)
 {
 	LongWord *PackPtr;
 	LongWord PackLength;	

@@ -228,11 +228,10 @@ static void RollRatio(Word x,Word y,Word ratio)
 	
 **********************************/
 
-void LevelCompleted (void)
+void LevelCompleted(void)
 {
 	Word k;
 	LongWord *PackPtr;
-	Byte *ShapePtr;
 	LongWord PackLength;
 
 /* setup */

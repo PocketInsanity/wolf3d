@@ -555,6 +555,17 @@ extern Boolean	rw_downside;		/* True for dir_east and dir_south*/
 extern Byte *ArtData[64];
 extern Byte textures[MAPSIZE*2+5][MAPSIZE]; /* 0-63 is horizontal, 64-127 is vertical*/
 
+extern void SetPalette(Byte *pal);
+extern void DisplayScreen(Word res);
+extern void InitRenderView();
+extern void StartRenderView();
+extern void Quit(char *str);
+extern int DoEvents();
+extern int InitResources(char *name);
+extern void InitData();
+extern int WolfMain(int argc, char *argv[]);
+extern void FreeResources();
+
 extern void BlastScreen(void);
 extern void BlastScreen2(Rect *BlastRect);
 extern void ReadSystemJoystick(void);
@@ -712,7 +723,6 @@ extern void IO_DisplayViewBuffer(void);
 
 /* In SetupScalers.c */
 
-extern Boolean BuildCompScale (Word height, void **finalspot,Byte *WorkPtr);
 extern Boolean SetupScalers(void);
 extern void ReleaseScalers(void);
 extern void IO_ScaleMaskedColumn(Word x,Word scale, unsigned short *sprite,Word column);

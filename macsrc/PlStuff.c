@@ -181,6 +181,8 @@ void GiveAmmo(Word ammo)
 				gamestate.pendingweapon = WP_CHAINGUN;
 			}
 		}
+	default:
+		break;
 	}
 }
 

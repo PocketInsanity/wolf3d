@@ -1,3 +1,85 @@
+This is not yet finished, but:
+
+Wolfenstein 3D is an id Software game.  This is a port of the Macintosh
+version that was released by MacPlay in 1994.  You can find information about
+the source release at: http://www.maccentral.com/news/0001/24.wolf3d.shtml
+
+To use this, you need the resource fork from the First Encounter (the two
+level shareware version) or the Second Encounter (the for-sell version). 
+You can find the First Encounter on many web sites (Search for: Macintosh
+Wolfenstein 3D download) and you can get the Second Encounter on eBay (I
+believe it is no longer sold by Interplay, but I got my unopened copy from
+eBay).
+
+To get the resource fork from the shareware version, you need something that
+can extract .sit files and then save resource forks TO A DIFFERENT FILE. 
+There is a linux version of Alladin StuffIT Expander but I could not get it
+to work; I had to use the Windows version -- which defaults to ignoring
+resource forks.
+
+If you have the Second Encounter on CD, then it is easy.  Just mount the Mac
+CD and ".resource/Wolfenstein 3D:aa" is your resource fork (make sure you
+have HFS support in the kernel (or load the module) and mount -t hfs
+/dev/cdrom /cdrom.  Resource forks by default on HFS-mounted partitions in
+Linux are kept seperately in .resource directories).
+
+If the First/Second Encounter on some other sort of medium (such as .sit or on
+disks) then I don't know how to get the resource fork -- you could try
+something similiar to what was outlined above.
+
+For comparison:
+First  Encounter reosurce fork size: 1537319
+md5sum: 0283e4ab0143ad47bd32db9bd686b0fa
+Second Encounter resource fork size: 2441827 
+md5sum: c5984ef902523430426a8976e1527742
+
+(No, I won't send them to you... Getting them is part of the challenge!)
+
+The Third Encounter is not supported by this code -- as far as I know, the
+formats are totally different.
+
+The current code does not check for the validity of a resource fork, but if
+you get errors with LoadAResource2, then most likely the file is not a
+resource fork.
+
+Status of the port:
+
+You can play the game, but not save, load, change difficulty, hear sounds
+and music, use the mouse, and change window size.  View TODO for the
+specifics.
+
+Specifically:
+swolf3d : The SVGAlib Version.  Only supports 320x200x256 at the moment, so
+only parts of the intro screens are shown (they are 512x384).
+
+xwolf3d : The Xlib Version.  Only supports 8bpp PseudoColor visuals.
+
+gwolf3d : The gtk+ Version.  Only supports 8bpp visuals, but has a menu that
+has a Quit option.  I currently don't really like gtk+; anyone know of a
+more complete api reference than the one on http://www.gtk.org?  But I'll
+use it so I can have menus and dialogs without having to create them in Xlib.
+Any suggestions?
+
+glwolf3d: The OpenGL Version (written using Xlib w/ GLX).  I like it.  Not
+all graphics are currently shown.
+
+To build these binaries, type 'make' in the directory with the source... If
+you don't want to build a certain binary, edit the Makefile.  On the line
+"all: swolf3d xwolf3d gwolf3d glwolf3d" in the Makefile, you can remove the
+names of which binaries that you do not wish to build.
+
+Now you should be able to do something like:
+./swolf3d <resource file>
+and off you go!
+
+Thanks to id Software for allowing me to release this source under the GNU
+GPL (see LICENSE) and Bill Heineman (Programmer and Project Lead of the
+Macintosh version) for answering my inquiries. WolfReadMe.txt is included
+from the original Mac Wolf3d source release.
+
+Steven Fuller <relnev@users.sourceforge.net>
+----------------------------
+TODO (Stuff to Write About):
 Contents:
 * About (General)
 * How to Compile

@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "wolfdef.h"
 
-void DisplayScreen(int res)
+void DisplayScreen(Word res)
 {
 }
 
@@ -72,6 +72,8 @@ void DrawXMShape(Word x, Word y, void *ShapePtr)
 {
 }
 
+GLuint LastTexture;
+
 GLuint smltex[65];
 
 void MakeSmallFont()
@@ -83,6 +85,8 @@ void MakeSmallFont()
 	buf = (Byte *)malloc(16 * 16);
 	
 	pal = LoadAResource(rGamePal);
+	
+	LastTexture = 0;
 	
 	for (i = 0; i < 64; i++) {
 		ArtStart = ArtData[i];
@@ -181,6 +185,7 @@ void DrawSmall(Word x, Word y, Word tile)
 	glPushMatrix();
 	glLoadIdentity();
 	
+	LastTexture = smltex[tile];
 	glBindTexture(GL_TEXTURE_2D, smltex[tile]);
 	
 	glBegin(GL_QUADS);
@@ -246,6 +251,7 @@ Byte *DeSprite(Byte *data, Byte *pal)
 
 void IO_ClearViewBuffer()
 {
+	LastTexture = 0;
 	glBindTexture(GL_TEXTURE_2D, 0);
 	
 	/* glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); */
@@ -260,10 +266,10 @@ void IO_ClearViewBuffer()
 	glPushMatrix();
 	glLoadIdentity();
 	
-	glColor3b(Pal[0x2F*3+0], Pal[0x2F*3+1], Pal[0x2F*3+2]);
+	glColor3ub(Pal[0x2F*3+0], Pal[0x2F*3+1], Pal[0x2F*3+2]);
 	glRectf(-1, 0, 1, 1);
 	
-	glColor3b(Pal[0x2A*3+0], Pal[0x2A*3+1], Pal[0x2A*3+2]);	
+	glColor3ub(Pal[0x2A*3+0], Pal[0x2A*3+1], Pal[0x2A*3+2]);
 	glRectf(1, -1, -1, 0);
 		
 	glColor3f(1.0, 1.0, 1.0);
@@ -281,6 +287,7 @@ void InitRenderView()
 	Byte *pal;
 	int i;
 	
+	LastTexture = 0;
 	glEnable(GL_TEXTURE_2D);	
 		
 	pal = LoadAResource(rGamePal);
@@ -305,12 +312,13 @@ void InitRenderView()
 		buf = Pal256toRGB(buf2, 128 * 128, pal);
 		free(buf2);
 		
+		/*
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);		
-		///*
+		*/
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		//*/
+		
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
@@ -321,11 +329,12 @@ void InitRenderView()
 	
 	for (i = 1; i < S_LASTONE; i++) {
 		Byte *buf;
-		
+				
 		if (sprtex[i]) {
 			if (SpriteArray[i] == NULL) {
 				glDeleteTextures(1, &sprtex[i]);
 				sprtex[i] = 0;
+			} else {
 			}
 			continue;
 		} else if (SpriteArray[i]) {
@@ -336,13 +345,13 @@ void InitRenderView()
 		glBindTexture(GL_TEXTURE_2D, sprtex[i]);
 		
 		buf = DeSprite(SpriteArray[i], pal);
-
+		/*
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);		
-		///*
+		*/
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		//*/
+		
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
@@ -392,7 +401,15 @@ void DrawSprite(thing_t *t)
 	glTranslatef(-(double)t->x / 256.0, 0, -(double)t->y / 256.0);
 	glRotatef(90.0+((double)gamestate.viewangle / (double)ANGLES * 360.0), 0.0, 1.0, 0.0);
 	
-	glBindTexture(GL_TEXTURE_2D, sprtex[t->sprite]);
+	if (sprtex[t->sprite] == 0) {
+		fprintf(stderr, "ERROR: 0 texture in DrawSprite (%d)\n", t->sprite);
+	}
+
+	if (LastTexture != sprtex[t->sprite]) {
+		LastTexture = sprtex[t->sprite];
+		glBindTexture(GL_TEXTURE_2D, sprtex[t->sprite]);
+	}
+	
 	glBegin(GL_QUADS);
 	glTexCoord2f(1.0, 0.0); glVertex2f( 0.5,  1); 
 	glTexCoord2f(1.0, 1.0); glVertex2f( 0.5, -1);
@@ -411,7 +428,11 @@ void DrawTopSprite()
 	glPushMatrix();
 	glLoadIdentity();
 	
-	glBindTexture(GL_TEXTURE_2D, sprtex[topspritenum]);
+	if (LastTexture != sprtex[topspritenum]) {
+		LastTexture = sprtex[topspritenum];
+		glBindTexture(GL_TEXTURE_2D, sprtex[topspritenum]);
+	}
+	
 	glBegin(GL_QUADS);
 	glTexCoord2f(1.0, 0.0); glVertex3f( 0.5,  1, z);
 	glTexCoord2f(1.0, 1.0); glVertex3f( 0.5, -1, z);
@@ -611,7 +632,6 @@ void AddSprite (thing_t *thing, Word actornum)
 void DrawSprites(void)
 {
 	vissprite_t	*dseg;		/* Pointer to visible sprite record */
-	int x1,x2;				/* Left x, Right x */
 	Word i;					/* Index */
 	static_t *stat;			/* Pointer to static sprite record */
 	actor_t	*actor;			/* Pointer to active actor record */
@@ -665,11 +685,11 @@ void DrawSprites(void)
 /* draw from smallest scale to largest */
 
 		/* TODO: GL should raw back to front with depth */
-		xe=firstevent;
+		xe = &firstevent[i-1];
 		do {
 			dseg = &vissprites[xe[0]&(MAXVISSPRITES-1)];	/* Which one? */
 			DrawSprite(dseg->pos);
-			++xe;
+			--xe;
 		} while (--i);
 	}
 }
@@ -928,11 +948,14 @@ void P_DrawSegx(saveseg_t *seg)
 		        		
 	smin = -((float)pos + texslide); 
 	smax = -((float)pos + (max - min));
-		
-	if (waltex[t]) 
-		glBindTexture(GL_TEXTURE_2D, waltex[t]);
-	else
+	
+	if (waltex[t] == 0)
 		fprintf(stderr, "ERROR: 0 texture in P_DrawSegx!\n");	
+		
+	if (LastTexture != waltex[t]) {
+		LastTexture = waltex[t];
+		glBindTexture(GL_TEXTURE_2D, waltex[t]);
+	}
 	
 	glBegin(GL_QUADS);
 	switch(seg->dir&3) {
@@ -951,16 +974,20 @@ void P_DrawSegx(saveseg_t *seg)
 		}
 		break;
 	case di_south:
-		min += texslide;
-		if (min == 0.5 && texslide == 0.0) { min -= 0.5; max -= 0.5; }
+		if (texslide == 0.0 && min == 0.5)
+			{ min -= 0.5; max -= 0.5; }
+		else
+			min += texslide;
 		glTexCoord2f(max, 0.0); glVertex3f(plane, -1, smin); 
 		glTexCoord2f(min, 0.0); glVertex3f(plane, -1, smax);
 		glTexCoord2f(min, 1.0); glVertex3f(plane,  1, smax);
 		glTexCoord2f(max, 1.0); glVertex3f(plane,  1, smin);
 		break;
 	case di_east:
-		min += texslide;
-		if (min == 0.5 && texslide == 0.0) { min -= 0.5; max -= 0.5; }
+		if (texslide == 0.0 && min == 0.5) 
+			{ min -= 0.5; max -= 0.5; }
+		else
+			min += texslide;
 		glTexCoord2f(max, 0.0); glVertex3f(smin, -1, plane);
 		glTexCoord2f(min, 0.0); glVertex3f(smax, -1, plane);
 	 	glTexCoord2f(min, 1.0); glVertex3f(smax,  1, plane);

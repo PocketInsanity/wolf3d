@@ -18,7 +18,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "wolfdef.h"
-#include <string.h>
 
 /**********************************
 
@@ -314,7 +313,6 @@ void PrepPlayLoop()
 		ReleaseScalers();		/* Release the compiled scalers */
 		PlaySong(0);
 		while (!SetupGameLevel()) {	/* Try loading it again */
-			printf("SetGameLevel returned 0...\n");
 Again:
 			ReleaseMap();		/* Oh oh... */
 			if (!GameViewSize) {	/* Smallest screen? */
@@ -325,7 +323,6 @@ Again:
 		}
 	}
 	if (!StartupRendering(GameViewSize)) {
-		printf("StartupRendering returned 0...\n");
 		ReleaseScalers();
 		goto Again;
 	}

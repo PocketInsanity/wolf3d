@@ -321,9 +321,7 @@ Boolean StartupRendering(Word NewSize)
 		return FALSE;
 	}
 	MathSize = NewSize;
-	
-	InitRenderView();
-	
+		
 	return TRUE;
 }
 

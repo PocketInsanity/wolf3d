@@ -213,7 +213,7 @@ struct {
 { { SC(L), SC(E), SC(D), SC(O), SC(U), SC(X) }, 0 }, /* "LEDOUX" */
 { { SC(S), SC(E), SC(G), SC(E), SC(R) }, 0 }, /* "SEGER" */
 { { SC(M), SC(C), SC(C), SC(A), SC(L), SC(L) }, 0 }, /* "MCCALL" */
-{ { SC(A), SC(P), SC(P), SC(L), SC(E), SC(I), SC(I), SC(G), SC(S) } }, 0 /* "APPLEIIGS" */
+{ { SC(A), SC(P), SC(P), SC(L), SC(E), SC(I), SC(I), SC(G), SC(S) }, 0 } /* "APPLEIIGS" */
 };
 const int CheatCount = sizeof(CheatCodes) / sizeof(CheatCodes[0]);
 int CheatIndex;
@@ -398,4 +398,3 @@ Word ChooseGameDiff(void)
                 
 	return 1;
 }
-                        

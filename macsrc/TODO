@@ -10,24 +10,31 @@ TODO:
     with the keypad arrow keys if only mode supported 320x200x256 (center if
     640x400 or 480 is supported?)
 * Finish moving all 2D code to SoftDraw.c
-* Compile with -Wall -ansi -pedantic (there shouldn't be much in the way)
 * Finish OpenGL
   - Check if top sprite drawing is correct
   + Status bars, Introscreens, etc. [Draw(XM)Shape]
     - Not sure exactly yet how I will implement this.
   - Correct viewing frustum
+  + Allow window resizing
+    - Not sure what to about the currently loaded GameShapes (keep or load
+      most appropiate for the new video mode).
+  - Could use the LastTexture to have less glBegin/Ends (would need to know
+    where to stop though (try IO_DisplayViewBuffer).
 * Save/Load Games
 * Documentation
 * Sound!
   - Waiting for information about music.
-* Command line (temporary workaround for no menus).
+* Interface
+  + Menus and dialog boxes
+    - Command line (temporary workaround for no menus).
+    - Text only menus (similar to what snes9x has).
+* Different depths/visuals for software clients.
 
 BUGS:
 * Software Drawing seems like its imprecise, stationary sprites move back and 
   forth, and walls 'swim' when you move around, or sprites pop into different 
   sizes when are far enough and get closer/farther away
   - Possibly caused by 8.8 imprecision?
-* Floors are drawn with wrong color in GL version?
 
 IDEAS:
 * Menu Keys

@@ -157,7 +157,7 @@ void EndGetPsyched(void)
 void ShareWareEnd(void)
 {
         SetAPalette(rGamePal);
-        printf("ShareWareEnd()\n");
+        /* printf("ShareWareEnd()\n"); */
         SetAPalette(rBlackPal);
 }
 

@@ -47,7 +47,6 @@ void DLZSSSound(Byte *Dest,Byte *Src,LongWord Length)
 			if (Length >= RunCount) {
 				Length -= RunCount;
 			} else {
-				printf("Overrun: l:%d r:%d\n", Length, RunCount);
 				RunCount = Length;
 				Length = 0;
 			}

@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <getopt.h>
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -64,15 +65,27 @@ int main(int argc, char *argv[])
 	XColor fg = { 0 };
 	char data[8] = { 0x01 };
 	char *display;
-	int mask, i, major, minor, verbose = 0;
+	int mask, major, minor, verbose = 0;
+	int opt;
 	
-	if (argc != 2) {
+	while ((opt = getopt(argc, argv, "v")) != -1) {
+		switch(opt) {
+			case 'v':
+				verbose = 1;
+				break;
+			default:
+				fprintf(stderr, "%d (%c) is unknown to me\n", opt, opt);
+				break;
+		}
+	}
+	
+	if ((argc - optind) != 1) {
 		fprintf(stderr, "usage: %s <mac wolf3d resource fork>\n", argv[0]);
 		exit(EXIT_FAILURE);
 	}
 	
-	if (InitResources(argv[1])) {
-		fprintf(stderr, "could not load %s\n", argv[1]);
+	if (InitResources(argv[optind])) {
+		fprintf(stderr, "could not load %s\n", argv[optind]);
 		exit(EXIT_FAILURE);
 	}
 	
