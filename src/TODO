@@ -29,9 +29,12 @@ B M - use something like config file or getenv to point at data directories
 P I - finish handling/mapping for all keys in sys. specific code
 B I - add mouse support
 B M - add joystick/gamepad support
-P I - fix or remove fizzlefade
+P I - add an appropiate replacement where fizzlefade was
+P I - add sound "emulation" to the necessary targets so WaitSoundDone works
 
 Complete:
+P I - fix or remove fizzle fade
+    - Removed [nice, but very hacky effect]
 ------------------------------------------------------------------------------
 Control Menu:
 * TODO
@@ -62,24 +65,15 @@ code, it really needs to be cleaned up
 in the right place
 * change the current parameter handling code to something like getopt
 * remove check for debugmode?
-* fizzlefade is hackish, stipple buf would work ok in opengl, maybe only
-update once per frame or such...
-no idea how to do fizzlefade in TrueColor X
-fix fizzlefade for non 320x200 resolutions
 * check filehandling (ex, file missing, bad file type, and such)
 PlayDemoFromFile specifically
-* deathcam went by too fast, and right before the fizzlefade was being done
-on the border
-same with the spear of destiny animation part of ending
-* reduce code duplication in the vi_* files.
+* deathcam went by too fast, same with the spear of destiny ending animation
+  - probably due to waiting for sounds to finish
 * split wl_draw into two files (draw independent, draw dependent)
 * when window loses focus, it should clear the keys
 * rename visable to visible
 * create 'sound channels' with priority.. ie a door can only make one sound
 at a time
-* systems with no sound should still have working WaitSoundDone.. it's 
-possible to calculate the sound lengths in terms of 70Hz (adlib sound len / 2, 
-pcm sound len / 100).
 ------------------------------------------------------------------------------
 Save game header:
 8 bytes: WOLF3D, 0, 0

@@ -161,20 +161,6 @@ void VL_GetPalette(byte *palette)
 	}
 }
 
-void VL_DirectPlot(int x1, int y1, int x2, int y2)
-{
-	*(graphmem + x1 + y1 * vwidth) = *(gfxbuf + x2 + y2 * vwidth);
-}
-
-void VL_DirectPlotFlush()
-{
-}
-
-void VL_DirectUpdateRect(int x, int y, int w, int h)
-{
-	/* TODO: fixme for FizzleFade */
-}
-
 /*
 =============================================================================
 

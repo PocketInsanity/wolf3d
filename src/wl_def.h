@@ -718,9 +718,9 @@ int WolfMain(int argc, char *argv[]);
 */
 
 
-extern	boolean		ingame,fizzlein;
+extern	boolean		ingame;
 extern	gametype	gamestate;
-extern	int			doornum;
+extern	int		doornum;
 
 extern	char		demoname[13];
 

@@ -626,14 +626,17 @@ void ThreeDRefresh()
 	DrawPlayerWeapon();	/* draw player's hands */
 
 /* show screen and time last cycle */
+/* TODO: fizzlefaze was here */
+/*
 	if (fizzlein)
 	{
 		FizzleFade(xoffset, yoffset, viewwidth, viewheight, 20, false);
 		fizzlein = false;
 
-		lasttimecount = 0;	/* don't make a big tic count */
+		lasttimecount = 0;
 		set_TimeCount(0);
 	}
+*/
 	
 	VW_UpdateScreen();
 	frameon++;

@@ -31,8 +31,6 @@ void	VW_MeasurePropString(char *string, word *width, word *height);
 
 void VW_DrawPropString(char *string);
 
-boolean FizzleFade(unsigned xoffset, unsigned yoffset, unsigned width,unsigned height, unsigned frames,boolean abortable);
-
 void VL_FadeOut(int start, int end, int red, int green, int blue, int steps);
 void VL_FadeIn(int start, int end, const byte *palette, int steps);
 
@@ -42,5 +40,15 @@ void VW_Bar(int x, int y, int width, int height, int color);
 
 void VW_Startup();
 void VW_Shutdown();
+
+void VL_FillPalette(int red, int green, int blue);
+void VW_Plot(int x, int y, int color);
+void VL_Hlin(unsigned x, unsigned y, unsigned width, unsigned color);
+void VL_Vlin(int x, int y, int height, int color);
+void VL_Bar(int x, int y, int width, int height, int color);
+
+void VL_MemToScreen(const byte *source, int width, int height, int x, int y);
+
+void VL_DeModeXize(byte *buf, int width, int height);
 
 #endif

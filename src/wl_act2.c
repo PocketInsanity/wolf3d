@@ -2443,11 +2443,13 @@ void A_StartDeathCam(objtype *ob)
 	}
 
 	gamestate.victoryflag = true;
-	VW_Bar(0, 0, 320,200-STATUSLINES,127);
-	FizzleFade(0, 0, 320, 200-STATUSLINES, 70, false);
+	VW_Bar(0, 0, 320, 200-STATUSLINES, 127);
+	
+	/* TODO: fizzlefaze was here */
+	/* FizzleFade(0, 0, 320, 200-STATUSLINES, 70, false); */
 
-	CA_UpLevel ();
-	CacheLump(LEVELEND_LUMP_START,LEVELEND_LUMP_END);
+	CA_UpLevel();
+	CacheLump(LEVELEND_LUMP_START, LEVELEND_LUMP_END);
 
 	Write(0,7,STR_SEEAGAIN);
 
@@ -2496,9 +2498,8 @@ void A_StartDeathCam(objtype *ob)
 //
 // go back to the game
 //
-	DrawPlayBorder ();
+	DrawPlayBorder();
 
-	fizzlein = true;
 	switch (ob->obclass)
 	{
 	case schabbobj:

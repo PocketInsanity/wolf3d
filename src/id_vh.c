@@ -14,80 +14,6 @@ int xfrac, yfrac;
 
 /* ======================================================================== */
 
-/*
-===================
-=
-= FizzleFade
-=
-= returns true if aborted
-=
-===================
-*/
-
-boolean FizzleFade(unsigned xx, unsigned yy, unsigned width, unsigned height, unsigned frames, boolean abortable)
-{
-	int pixperframe;
-	int x, y, p, frame;
-	unsigned int rndval;
-	int retr;
-	int blocksize;
-
-	rndval = 1;
-	pixperframe = 64000/frames;
-	
-	IN_StartAck();
-
-	frame = 0;
-	set_TimeCount(0);
-
-	if (vwidth & 3)
-		return false;
-        blocksize = (vwidth / 320);
-
-	retr = -1;
-	
-	/* VL_DirectPlotInit(); */
-		
-	do {
-		if (abortable && IN_CheckAck())
-			retr = true;
-		else
-		for (p = 0; p < pixperframe; p++) {
-			y = ((rndval & 0x00FF) - 1) * blocksize;
-                        //y = (rndval & 0x000007FF) - 1;
-			x = ((rndval & 0x00FFFF00) >> 8) * blocksize;
-			
-			if (rndval & 1) {
-				rndval >>= 1;
-				rndval ^= 0x00012000;
-			} else
-				rndval >>= 1;
-				
-			if ((x > width) || (y > height))
-				continue;
-
-			//VL_DirectPlot(xx+x, yy+y, xx+x, yy+y);
-			VL_DirectUpdateRect(xx+x, yy+y, blocksize, blocksize);
-
-			if (rndval == 1) { 
-				/* entire sequence has been completed */
-				retr = false;
-				break;
-			}
-
-		}
-		
-		//VL_DirectPlotFlush();
-
-		frame++;
-		while (get_TimeCount() < frame);
-	} while (retr == -1);
-	
-	VL_DirectPlotFlush();
-	
-	return retr;
-}
-
 void VL_FillPalette(int red, int green, int blue)
 {
 	byte pal[768];
@@ -119,9 +45,7 @@ void VL_FadeOut(int start, int end, int red, int green, int blue, int steps)
 	VL_GetPalette(&palette1[0][0]);
 	memcpy(palette2,palette1,768);
 
-//
-// fade through intermediate frames
-//
+/* fade through intermediate frames */
 	for (i = 0; i < steps; i++)
 	{
 		origptr = &palette1[start][0];
@@ -142,9 +66,7 @@ void VL_FadeOut(int start, int end, int red, int green, int blue, int steps)
 		VL_SetPalette(&palette2[0][0]);
 	}
 
-//
-// final color
-//
+/* final color */
 	VL_FillPalette(red, green, blue);
 
 	screenfaded = true;
@@ -168,9 +90,7 @@ void VL_FadeIn(int start, int end, const byte *palette, int steps)
 	start *= 3;
 	end = end*3+2;
 
-//
-// fade through intermediate frames
-//
+/* fade through intermediate frames */
 	for (i = 0; i < steps; i++)
 	{
 		for (j = start;j <= end; j++)
@@ -182,9 +102,7 @@ void VL_FadeIn(int start, int end, const byte *palette, int steps)
 		VL_SetPalette(&palette2[0][0]);
 	}
 
-//
-// final color
-//
+/* final color */
 	VL_SetPalette(palette);
 	screenfaded = false;
 }

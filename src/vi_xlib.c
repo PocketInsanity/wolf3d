@@ -506,36 +506,6 @@ void Quit(char *error)
 	exit(EXIT_SUCCESS);
 }
 
-void VL_DirectPlot(int x1, int y1, int x2, int y2)
-{
-	if (indexmode) {
-		XSetForeground(dpy, gc, *(gfxbuf + x1 + y1 * 320));
-		XDrawPoint(dpy, win, gc, x2, y2);
-	} else {
-	#if 0
-		unsigned char pix = *(gfxbuf + x1 + y1 * 320);
-		XColor c;
-		c.pixel = 0;
-		c.flags = DoRed|DoGreen|DoBlue;
-		c.red = cpal[pix*3+0] << 10;
-		c.green = cpal[pix*3+1] << 10;
-		c.blue = cpal[pix*3+2] << 10;
-		XAllocColor(dpy, cmap, &c);
-		XSetForeground(dpy, gc, c.pixel);
-		XDrawPoint(dpy, win, gc, x2, y2);
-	#endif
-	}
-}
-
-void VL_DirectPlotFlush()
-{
-}
-
-void VL_DirectUpdateRect(int x, int y, int w, int h)
-{
-	/* TODO: fixme for FizzleFade */
-}
-
 static int XKeysymToScancode(KeySym keysym)
 {
 	switch (keysym) {

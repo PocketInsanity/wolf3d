@@ -172,22 +172,6 @@ void VL_GetPalette(byte *palette)
 	}
 }
 
-void VL_DirectPlot(int x1, int y1, int x2, int y2)
-{
-	*(((Uint8 *)surface->pixels) + x1 + y1 * vwidth) = *(gfxbuf + x2 + y2 * vwidth);
-}
-
-void VL_DirectPlotFlush()
-{
-	//SDL_UpdateRect(surface, 0, 0, 0, 0);
-	SDL_Flip(surface);
-}
-
-void VL_DirectUpdateRect(int x, int y, int w, int h)
-{
-	SDL_UpdateRect(surface, x, y, w, h);
-}
-
 static int XKeysymToScancode(unsigned int keysym)
 {
 	switch (keysym) {

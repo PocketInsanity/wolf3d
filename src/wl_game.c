@@ -8,7 +8,7 @@
 =============================================================================
 */
 
-boolean		ingame,fizzlein;
+boolean		ingame;
 gametype	gamestate;
 
 long		spearx,speary;
@@ -771,7 +771,6 @@ void RecordDemo()
 
 	SetupGameLevel();
 	StartMusic();
-	fizzlein = true;
 
 	PlayLoop();
 
@@ -830,7 +829,6 @@ void PlayDemo(int demonumber)
 
 	SetupGameLevel();
 	StartMusic();
-	fizzlein = true;
 
 	PlayLoop();
 
@@ -876,7 +874,6 @@ int PlayDemoFromFile(char *demoname)
 
 	SetupGameLevel();
 	StartMusic();
-	fizzlein = true;
 
 	PlayLoop();
 
@@ -987,7 +984,9 @@ void Died()
 
 	VL_Bar(xoffset, yoffset, viewwidth, viewheight, 4);
 	
-	FizzleFade(xoffset, yoffset, viewwidth, viewheight, 70, false);
+	/* TODO: fizzlefade was here */
+	/* FizzleFade(xoffset, yoffset, viewwidth, viewheight, 70, false); */
+	
 	IN_ClearKeysDown();
 	
 	IN_UserInput(140);
@@ -1057,13 +1056,12 @@ restartgame:
 
 		ingame = true;
 		StartMusic();
+		
 		if (!died)
 			PreloadGraphics();
-		else {
-			fizzlein = true;
+		else
 			died = false;
-		}
-		//fizzlein = true;
+
 		DrawLevel();
 
 #ifdef SPEAR
