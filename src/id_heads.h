@@ -91,7 +91,9 @@ typedef enum { false, true } boolean;
 
 typedef unsigned char byte;
 typedef unsigned short int word;
-typedef unsigned long longword;
+typedef unsigned int longword;
+typedef unsigned long dword;
+
 typedef long fixed;
 
 typedef void * memptr;
@@ -123,7 +125,10 @@ void Quit(char *error);
 #define	MAXTICS		10
 #define DEMOTICS	4
 
-extern unsigned mapwidth, mapheight, tics;
+extern unsigned tics;
+
+#define mapwidth	64
+#define mapheight	64
 
 extern byte fontcolor, backcolor;
 

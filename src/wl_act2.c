@@ -294,8 +294,8 @@ void T_Projectile (objtype *ob)
 	ob->x += deltax;
 	ob->y += deltay;
 
-	deltax = LABS(ob->x - player->x);
-	deltay = LABS(ob->y - player->y);
+	deltax = labs(ob->x - player->x);
+	deltay = labs(ob->y - player->y);
 
 	if (!ProjectileTryMove (ob))
 	{
@@ -3289,11 +3289,11 @@ void T_DogChase (objtype *ob)
 ===============
 */
 
-void SelectPathDir (objtype *ob)
+void SelectPathDir(objtype *ob)
 {
 	unsigned spot;
 
-	spot = MAPSPOT(ob->tilex,ob->tiley,1)-ICONARROWS;
+	spot = *(mapsegs[1]+farmapylookup[ob->tiley]+ob->tilex)-ICONARROWS;
 
 	if (spot<8)
 	{

@@ -456,15 +456,14 @@ void SetupGameLevel()
 	int x,y;
 	word *map,tile;
 
-	if (!loadedgame)
-	{
-	 gamestate.TimeCount=
-	 gamestate.secrettotal=
-	 gamestate.killtotal=
-	 gamestate.treasuretotal=
-	 gamestate.secretcount=
-	 gamestate.killcount=
-	 gamestate.treasurecount=0;
+	if (!loadedgame) {
+		gamestate.TimeCount =
+		gamestate.secrettotal =
+		gamestate.killtotal =
+		gamestate.treasuretotal =
+		gamestate.secretcount =
+		gamestate.killcount =
+		gamestate.treasurecount = 0;
 	}
 
 	if (demoplayback || demorecord)
@@ -476,12 +475,9 @@ void SetupGameLevel()
 // load the level
 //
 	CA_CacheMap(gamestate.mapon+10*gamestate.episode);
-	mapon-=gamestate.episode*10;
+	mapon -= gamestate.episode*10;
 
-	mapwidth = mapheaderseg[mapon]->width;
-	mapheight = mapheaderseg[mapon]->height;
-
-	if (mapwidth != 64 || mapheight != 64)
+	if ((mapheaderseg[mapon]->width != 64) || (mapheaderseg[mapon]->height != 64))
 		Quit("Map not 64*64!");
 
 
@@ -492,14 +488,13 @@ void SetupGameLevel()
 	memset(actorat, 0, sizeof(actorat));
 	
 	map = mapsegs[0];
-	for (y=0;y<mapheight;y++)
-		for (x=0;x<mapwidth;x++)
-		{
+	for (y = 0; y < mapheight; y++)
+		for (x = 0; x < mapwidth; x++) {
 			tile = *map++;
-			if (tile<AREATILE) { // solid wall
+			if (tile < AREATILE) { /* solid wall */
 				tilemap[x][y] = tile;
 				(unsigned)actorat[x][y] = tile;
-			} else { // area floor
+			} else { /* area floor */
 				tilemap[x][y] = 0;
 				actorat[x][y] = NULL;
 			}
@@ -558,7 +553,7 @@ void SetupGameLevel()
 			if (tile == AMBUSHTILE)
 			{
 				tilemap[x][y] = 0;
-				if ( (unsigned)actorat[x][y] == AMBUSHTILE)
+				if ((unsigned)actorat[x][y] == AMBUSHTILE)
 					actorat[x][y] = NULL;
 
 				if (*map >= AREATILE)
@@ -567,7 +562,7 @@ void SetupGameLevel()
 					tile = *(map-1-mapwidth);
 				if (*(map-1+mapwidth) >= AREATILE)
 					tile = *(map-1+mapwidth);
-				if ( *(map-2) >= AREATILE)
+				if (*(map-2) >= AREATILE)
 					tile = *(map-2);
 
 				*(map-1) = tile;

@@ -26,10 +26,7 @@ byte		tilemap[MAPSIZE][MAPSIZE];	// wall values only
 byte		spotvis[MAPSIZE][MAPSIZE];
 objtype		*actorat[MAPSIZE][MAPSIZE];
 
-//
-// replacing refresh manager
-//
-unsigned	mapwidth,mapheight,tics;
+unsigned tics;
 
 //
 // control info
@@ -345,7 +342,7 @@ void PollKeyboardMove()
 
 void PollMouseMove()
 {
-	int	mousexmove = 0, mouseymove = 0;
+	int mousexmove = 0, mouseymove = 0;
 
 	controlx += mousexmove*10/(13-mouseadjustment);
 	controly += mouseymove*20/(13-mouseadjustment);

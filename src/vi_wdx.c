@@ -528,32 +528,6 @@ void VL_MemToScreen(const byte *source, int width, int height, int x, int y)
 	}
 }
 
-/* TODO: can this go in id_vh.c? */
-void VL_DeModeXize(byte *buf, int width, int height)
-{
-	byte *mem, *ptr, *destline;
-	int plane, x, y;
-	
-	if (width & 3) {
-		printf("Not divisible by 4?\n");
-		return;
-	}
-	
-	/* TODO: is there a better way without mallocing extra memory? */
-	mem = malloc(width * height);
-	ptr = buf;
-	for (plane = 0; plane < 4; plane++) {
-		destline = mem;
-		for (y = 0; y < height; y++) {
-			for (x = 0; x < width / 4; x++)
-				*(destline + x*4 + plane) = *ptr++;
-			destline += width;
-		}
-	}
-	memcpy(buf, mem, width * height);
-	free(mem);
-}
-
 void VL_DirectPlot(int x1, int y1, int x2, int y2)
 {
 

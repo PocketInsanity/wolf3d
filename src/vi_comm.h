@@ -173,27 +173,20 @@ extern	ScanCode	LastScan;
 extern	KeyboardDef	KbdDefs;
 extern	ControlType	Controls[MaxPlayers];
 
-// Function prototypes
 #define	IN_KeyDown(code)	(Keyboard[(code)])
-#define	IN_ClearKey(code) { \
-	Keyboard[code] = false; \
-	if (code == LastScan) \
-		LastScan = sc_None; \
-}
 
-extern	void IN_Startup(void),IN_Shutdown(void),
-		IN_ClearKeysDown(void),
+extern void IN_Startup(), IN_Shutdown(), IN_ClearKeysDown(),
 		IN_ReadControl(int,ControlInfo *),
 		IN_GetJoyAbs(word joy,word *xp,word *yp),
 		IN_SetupJoy(word joy,word minx,word maxx,word miny,word maxy),
-		IN_Ack(void);
+		IN_Ack();
 		
-extern	boolean IN_UserInput(longword delay);
-extern	char	*IN_GetScanName(ScanCode);
+extern boolean IN_UserInput(longword delay);
+extern char *IN_GetScanName(ScanCode);
 
 
-byte	IN_MouseButtons();
-byte	IN_JoyButtons();
+byte IN_MouseButtons();
+byte IN_JoyButtons();
 
 void INL_GetJoyDelta(word joy,int *dx,int *dy);
 void IN_StartAck();

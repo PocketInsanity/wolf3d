@@ -38,62 +38,12 @@ int fullscreen;
 int dga;
 byte *dgabuf;
 int dgawidth, dgabank, dgamem, vwidth, vheight;
-unsigned char mypal[768];
+
+static byte cpal[768];
+static word spal[768];
+static dword ipal[768];
 
 int MyDepth;
-
-int main(int argc, char *argv[])
-{
-	return WolfMain(argc, argv);
-}
-
-/*
-==========================
-=
-= Quit
-=
-==========================
-*/
-
-void DisplayTextSplash(byte *text, int l);
-
-void Quit(char *error)
-{
-	memptr screen = NULL;
-	int l = 0;
-	
-	if (!error || !*error) {
-		CA_CacheGrChunk(ORDERSCREEN);
-		screen = grsegs[ORDERSCREEN];
-		l = 24;
-		WriteConfig();
-	} else if (error) {
-		CA_CacheGrChunk(ERRORSCREEN);
-		screen = grsegs[ERRORSCREEN];
-		l = 7;
-	}
-	
-	ShutdownId();
-	
-	if (screen) {
-		//printf("TODO: spiffy ansi screen goes here..\n");
-		DisplayTextSplash(screen, l);
-	}
-	
-	if (error && *error) {
-		fprintf(stderr, "Quit: %s\n", error);
-		exit(EXIT_FAILURE);
- 	}
-	exit(EXIT_SUCCESS);
-}
-
-/*
-=======================
-=
-= VL_Startup
-=
-=======================
-*/
 
 void GetVisual()
 {
@@ -242,7 +192,7 @@ void VL_Startup()
 	
 	root = RootWindow(dpy, screen);
 	
-	GetVisual(); /* GetVisual will quit for us if no visual.. */                      	
+	GetVisual();
 	
 	attr.colormap = cmap;		   
 	attr.event_mask = KeyPressMask | KeyReleaseMask | ExposureMask 
@@ -427,14 +377,6 @@ void VL_Startup()
 	XFlush(dpy);
 #endif
 
-/*
-=======================
-=
-= VL_Shutdown
-=
-=======================
-*/
-
 void VL_Shutdown()
 {
 	if (fullscreen) {
@@ -491,7 +433,7 @@ void VW_UpdateScreen()
 		switch(vi->depth) {
 			case 8:
 				ptrb = dgabuf;
-				ptrbd = gfxbuf;
+			 	ptrbd = gfxbuf;
 				for(i = 0; i < 200; i++) {
 					memcpy(ptrb, ptrbd, 320);
 					ptrb += dgawidth;
@@ -502,27 +444,27 @@ void VW_UpdateScreen()
 			case 15:
 				ptrs = (word *)disbuf;
 				for (i = 0; i < 64000; i++) {
-					*ptrs = (mypal[gfxbuf[i]*3+0] >> 1) << 10 |
-						(mypal[gfxbuf[i]*3+1] >> 1) << 5  |
-						(mypal[gfxbuf[i]*3+2] >> 1);
+					*ptrs = (cpal[gfxbuf[i]*3+0] >> 1) << 10 |
+						(cpal[gfxbuf[i]*3+1] >> 1) << 5  |
+						(cpal[gfxbuf[i]*3+2] >> 1);
 					ptrs++;
 				}
 				break;
 			case 16:
 				ptrs = (word *)disbuf;
 				for (i = 0; i < 64000; i++) {
-					*ptrs = (mypal[gfxbuf[i]*3+0] >> 1) << 11 |
-						(mypal[gfxbuf[i]*3+1] >> 0) << 5  |
-						(mypal[gfxbuf[i]*3+2] >> 1);
+					*ptrs = (cpal[gfxbuf[i]*3+0] >> 1) << 11 |
+						(cpal[gfxbuf[i]*3+1] >> 0) << 5  |
+						(cpal[gfxbuf[i]*3+2] >> 1);
 					ptrs++;
 				}
 				break;
 			case 24: /* not correct size */
 				ptrb = disbuf;
 				for (i = 0; i < 64000; i++) {
-					*ptrb = mypal[gfxbuf[i]*3+2] << 2; ptrb++;
-					*ptrb = mypal[gfxbuf[i]*3+1] << 2; ptrb++;
-					*ptrb = mypal[gfxbuf[i]*3+0] << 2; ptrb++;
+					*ptrb = cpal[gfxbuf[i]*3+2] << 2; ptrb++;
+					*ptrb = cpal[gfxbuf[i]*3+1] << 2; ptrb++;
+					*ptrb = cpal[gfxbuf[i]*3+0] << 2; ptrb++;
 					ptrb++;
 				}
 				break;
@@ -534,35 +476,35 @@ void VW_UpdateScreen()
 		case 15:
 			ptrs = (word *)disbuf;
 			for (i = 0; i < 64000; i++) {
-				*ptrs = (mypal[gfxbuf[i]*3+0] >> 1) << 10 |
-					(mypal[gfxbuf[i]*3+1] >> 1) << 5  |
-					(mypal[gfxbuf[i]*3+2] >> 1);
+				*ptrs = (cpal[gfxbuf[i]*3+0] >> 1) << 10 |
+					(cpal[gfxbuf[i]*3+1] >> 1) << 5  |
+					(cpal[gfxbuf[i]*3+2] >> 1);
 				ptrs++;
 			}
 			break;
 		case 16:
 			ptrs = (word *)disbuf;
 			for (i = 0; i < 64000; i++) {
-				*ptrs = (mypal[gfxbuf[i]*3+0] >> 1) << 11 |
-					(mypal[gfxbuf[i]*3+1] >> 0) << 5  |
-					(mypal[gfxbuf[i]*3+2] >> 1);
+				*ptrs = (cpal[gfxbuf[i]*3+0] >> 1) << 11 |
+					(cpal[gfxbuf[i]*3+1] >> 0) << 5  |
+					(cpal[gfxbuf[i]*3+2] >> 1);
 				ptrs++;
 			}
 			break;
 		case 24:
 			ptrb = disbuf;
 			for (i = 0; i < 64000; i++) {
-				*ptrb = mypal[gfxbuf[i]*3+2] << 2; ptrb++;
-				*ptrb = mypal[gfxbuf[i]*3+1] << 2; ptrb++;
-				*ptrb = mypal[gfxbuf[i]*3+0] << 2; ptrb++;
+				*ptrb = cpal[gfxbuf[i]*3+2] << 2; ptrb++;
+				*ptrb = cpal[gfxbuf[i]*3+1] << 2; ptrb++;
+				*ptrb = cpal[gfxbuf[i]*3+0] << 2; ptrb++;
 			}
 			break;
 		case 32:
 			ptrb = disbuf;
 			for (i = 0; i < 64000; i++) {
-				*ptrb = mypal[gfxbuf[i]*3+2] << 2; ptrb++;
-				*ptrb = mypal[gfxbuf[i]*3+1] << 2; ptrb++;
-				*ptrb = mypal[gfxbuf[i]*3+0] << 2; ptrb++;
+				*ptrb = cpal[gfxbuf[i]*3+2] << 2; ptrb++;
+				*ptrb = cpal[gfxbuf[i]*3+1] << 2; ptrb++;
+				*ptrb = cpal[gfxbuf[i]*3+0] << 2; ptrb++;
 				ptrb++;
 			}
 			break;
@@ -574,6 +516,45 @@ void VW_UpdateScreen()
 	else
 		XPutImage(dpy, win, gc, img, 0, 0, 0, 0, 320, 200);
 }
+
+void keyboard_handler(int code, int press);
+int XKeysymToScancode(KeySym keysym);
+
+static void HandleXEvents()
+{
+	XEvent event;
+	
+	if (XPending(dpy)) {
+		do {
+			XNextEvent(dpy, &event);
+			switch(event.type) {
+				case KeyPress:
+					keyboard_handler(XKeysymToScancode(XKeycodeToKeysym(dpy, event.xkey.keycode, 0)), 1);
+					break;
+				case KeyRelease:
+					keyboard_handler(XKeysymToScancode(XKeycodeToKeysym(dpy, event.xkey.keycode, 0)), 0);
+					break;
+				case Expose:
+					VW_UpdateScreen();
+					break;
+				case ClientMessage:
+					if (event.xclient.data.l[0] == wmDeleteWindow)
+						Quit(NULL);
+					break;
+				case ConfigureNotify:
+					break;
+				case FocusIn:
+					break;
+				case FocusOut:
+					break;
+				default:
+					break;
+			}
+		} while (XPending(dpy));
+	}
+}
+
+/* ======================================================================== */
 
 /*
 =================
@@ -598,14 +579,12 @@ void VL_FillPalette(int red, int green, int blue)
 		if (dga) XF86DGAInstallColormap(dpy, screen, cmap); 
 	} else {
 		for (i = 0; i < 256; i++) {
-			mypal[i*3+0] = red;
-			mypal[i*3+1] = green;
-			mypal[i*3+2] = blue;
+			cpal[i*3+0] = red;
+			cpal[i*3+1] = green;
+			cpal[i*3+2] = blue;
 		}
 	}
-}	
-
-//===========================================================================
+}
 
 /*
 =================
@@ -628,13 +607,10 @@ void VL_SetPalette(const byte *palette)
 		XStoreColors(dpy, cmap, clr, 256);
 		if (dga) XF86DGAInstallColormap(dpy, screen, cmap);
 	} else {
-		memcpy(mypal, palette, 768);
+		memcpy(cpal, palette, 768);
 		VW_UpdateScreen();
 	}		
 }
-
-
-//===========================================================================
 
 /*
 =================
@@ -655,8 +631,53 @@ void VL_GetPalette(byte *palette)
 			palette[i*3+2] = clr[i].blue >> 10;
 		}
 	} else {
-		memcpy(palette, mypal, 768);
+		memcpy(palette, cpal, 768);
 	}
+}
+
+int main(int argc, char *argv[])
+{
+	return WolfMain(argc, argv);
+}
+
+/*
+==========================
+=
+= Quit
+=
+==========================
+*/
+
+void DisplayTextSplash(byte *text, int l);
+
+void Quit(char *error)
+{
+	memptr screen = NULL;
+	int l = 0;
+	
+	if (!error || !*error) {
+		CA_CacheGrChunk(ORDERSCREEN);
+		screen = grsegs[ORDERSCREEN];
+		l = 24;
+		WriteConfig();
+	} else if (error) {
+		CA_CacheGrChunk(ERRORSCREEN);
+		screen = grsegs[ERRORSCREEN];
+		l = 7;
+	}
+	
+	ShutdownId();
+	
+	if (screen) {
+		//printf("TODO: spiffy ansi screen goes here..\n");
+		DisplayTextSplash(screen, l);
+	}
+	
+	if (error && *error) {
+		fprintf(stderr, "Quit: %s\n", error);
+		exit(EXIT_FAILURE);
+ 	}
+	exit(EXIT_SUCCESS);
 }
 
 /*
@@ -770,31 +791,6 @@ void VL_MemToScreen(const byte *source, int width, int height, int x, int y)
 	}
 }
 
-void VL_DeModeXize(byte *buf, int width, int height)
-{
-	byte *mem, *ptr, *destline;
-	int plane, x, y;
-	
-	if (width & 3) {
-		printf("Not divisible by 4?\n");
-		return;
-	}
-	
-	/* TODO: can this malloc be removed, and have this func swap each pixel? */
-	mem = malloc(width * height);
-	ptr = buf;
-	for (plane = 0; plane < 4; plane++) {
-		destline = mem;
-		for (y = 0; y < height; y++) {
-			for (x = 0; x < width / 4; x++)
-				*(destline + x*4 + plane) = *ptr++;
-			destline += width;
-		}
-	}
-	memcpy(buf, mem, width * height);
-	free(mem);
-}
-
 void VL_DirectPlot(int x1, int y1, int x2, int y2)
 {
 	if (dga) {
@@ -814,9 +810,9 @@ void VL_DirectPlot(int x1, int y1, int x2, int y2)
 		XColor c;
 		c.pixel = 0;
 		c.flags = DoRed|DoGreen|DoBlue;
-		c.red = mypal[pix*3+0] << 10;
-		c.green = mypal[pix*3+1] << 10;
-		c.blue = mypal[pix*3+2] << 10;
+		c.red = cpal[pix*3+0] << 10;
+		c.green = cpal[pix*3+1] << 10;
+		c.blue = cpal[pix*3+2] << 10;
 		XAllocColor(dpy, cmap, &c);
 		XSetForeground(dpy, gc, c.pixel);
 		XDrawPoint(dpy, win, gc, x2, y2);
@@ -884,14 +880,14 @@ static	boolean		IN_Started;
 static	boolean		CapsLock;
 static	ScanCode	CurCode,LastCode;
 
-static	Direction	DirTable[] =		// Quick lookup for total direction
-					{
-						dir_NorthWest,	dir_North,	dir_NorthEast,
-						dir_West,		dir_None,	dir_East,
-						dir_SouthWest,	dir_South,	dir_SouthEast
-					};
+static Direction DirTable[] =		// Quick lookup for total direction
+{
+	dir_NorthWest,	dir_North,	dir_NorthEast,
+	dir_West,	dir_None,	dir_East,
+	dir_SouthWest,	dir_South,	dir_SouthEast
+};
 
-int XKeysymToScancode(unsigned int keysym)
+int XKeysymToScancode(KeySym keysym)
 {
 	switch (keysym) {
 		case XK_1:
@@ -902,12 +898,20 @@ int XKeysymToScancode(unsigned int keysym)
 			return sc_3;
 		case XK_4:
 			return sc_4;
+		case XK_5:
+			return sc_5;
+		case XK_6:
+			return sc_6;
 		case XK_a:
 			return sc_A;
 		case XK_b:
 			return sc_B;
 		case XK_c:
 			return sc_C;
+		case XK_d:
+			return sc_D;
+		case XK_g:
+			return sc_G;
 		case XK_h:
 			return sc_H;
 		case XK_i:
@@ -918,10 +922,26 @@ int XKeysymToScancode(unsigned int keysym)
 			return sc_M;
 		case XK_n:
 			return sc_N;
+		case XK_q:
+			return sc_Q;
+		case XK_s:
+			return sc_S;
 		case XK_t:
 			return sc_T;
 		case XK_y:
 			return sc_Y;
+		case XK_F1:
+			return sc_F1;
+		case XK_F2:
+			return sc_F2;
+		case XK_F3:
+			return sc_F3;
+		case XK_F10:
+			return sc_F10;
+		case XK_F11:
+			return sc_F11;
+		case XK_F12:
+			return sc_F12;
 		case XK_Left:
 		case XK_KP_Left:
 			return sc_LeftArrow;
@@ -935,8 +955,10 @@ int XKeysymToScancode(unsigned int keysym)
 		case XK_KP_Down:
 			return sc_DownArrow;
 		case XK_Control_L:
+		case XK_Control_R:
 			return sc_Control;
 		case XK_Alt_L:
+		case XK_Alt_R:
 			return sc_Alt;
 		case XK_Shift_L:
 			return sc_LShift;
@@ -968,7 +990,7 @@ void keyboard_handler(int code, int press)
 
  	k = code;
 
-	if (k == 0xe1)	// Handle Pause key
+	if (k == 0xE1)	// Handle Pause key
 		Paused = true;
 	else
 	{
@@ -1311,37 +1333,14 @@ void IN_StartAck(void)
 
 boolean IN_CheckAck()
 {
-	XEvent event;
-	
 	unsigned i, buttons;
 	
-	if (XPending(dpy)) {
-		do {
-			XNextEvent(dpy, &event);
-			switch(event.type) {
-				case KeyPress:
-					keyboard_handler(XKeysymToScancode(XKeycodeToKeysym(dpy, event.xkey.keycode, 0)), 1);
-					break;
-				case KeyRelease:
-					keyboard_handler(XKeysymToScancode(XKeycodeToKeysym(dpy, event.xkey.keycode, 0)), 0);
-					break;
-				case Expose:
-					VW_UpdateScreen();
-					break;
-				case ClientMessage:
-					if (event.xclient.data.l[0] == wmDeleteWindow)
-						Quit(NULL);
-					break;
-				default:
-					break;
-			}
-		} while (XPending(dpy));
-	}
-	
+	HandleXEvents();
+		
 	if (LastScan)
 		return true;
 
-	buttons = IN_JoyButtons () << 4;
+	buttons = IN_JoyButtons() << 4;
 	if (MousePresent)
 		buttons |= IN_MouseButtons ();
 

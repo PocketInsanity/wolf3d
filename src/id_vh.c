@@ -10,7 +10,7 @@ int fontnumber;
 
 boolean	screenfaded;
 
-byte palette1[256][3], palette2[256][3];
+static byte palette1[256][3], palette2[256][3];
 
 /* ======================================================================== */
 
@@ -258,4 +258,30 @@ void VL_CacheScreen(int chunk)
 	CA_CacheGrChunk(chunk);
 	VL_MemToScreen(grsegs[chunk], 320, 200, 0, 0);
 	CA_UnCacheGrChunk(chunk);
+}
+
+void VL_DeModeXize(byte *buf, int width, int height)
+{
+	byte *mem, *ptr, *destline;
+	int plane, x, y;
+	
+	if (width & 3) {
+		printf("Not divisible by 4?\n");
+		return;
+	}
+	
+	mem = malloc(width * height);
+	ptr = buf;
+
+	for (plane = 0; plane < 4; plane++) {
+		destline = mem;
+		for (y = 0; y < height; y++) {
+			for (x = 0; x < width / 4; x++)
+				*(destline + x*4 + plane) = *ptr++;
+			destline += width;
+		}
+	}
+
+	memcpy(buf, mem, width * height);
+	free(mem);
 }

@@ -1,3 +1,4 @@
+------------------------------------------------------------------------------
 Control Menu:
 * TODO
 
@@ -14,31 +15,69 @@ Sound Menu:
 - 44100
 - 22050
 ------------------------------------------------------------------------------
+[Indexed?]:
+Yes:
+- palette (8bit)
+No:
+- truecolor (15, 16, 24, 32)
+
+[Shm?]:
+Yes:
+- XShmImage
+No:
+- XImage
+
+[Windowed]:
+- [Indexed?]
+- [Shm?]
+
+[DGA1?]:
+Yes:
+- YES
+No:
+- NO
+
+[DGA2?]:
+Yes:
+- YES
+No:
+- [DGA1?]
+
+[DGA?]:
+- [DGA2?]
+Yes:
+- [Indexed?]
+No:
+- [Windowed]	
+
+[Fullscreen?]:
+Yes:
+- [DGA?]
+No:
+- [Windowed]
+
+[Init]:
+- [Fullscreen?]
+
+------------------------------------------------------------------------------
 *
 SD_StartMusic((MusicGroup *)audiosegs[STARTMUSIC + chunk]);
 =>
 SD_StartMusic(chunk);
-
+------------------------------------------------------------------------------
 * would be nice if Quit() used vsnprintf, etc
 * actor walking through door is drawn in front of door: near end of E1M1 for
 example
-* move DeModeXize so it does not have to be in every vi_ file
 * clean up vi_xlib.c: fix vid mode changing, fix dga for non8bit modes and
 the nonpalette setting stuff... lots of if statements
 also, it should be able to compile without extensions
-also, update xlib code with new knowledge of how things work
 * getenv so that you can point an env. var to the proper dir
 * refresh rate under svgalib is horrible. the screen keeps getting updated
 midframe.  it's due to the way CalcTics works
 * rewrite hw (sound, input) code, remove stuff like SD_SetSoundMode
 * proper left/right sound
 * adlib sounds seem like they play at twice the freq
-* set up a "build number" system where every time a file is recompiled via
-make (ver.c depends on the source code) the number is incremented and so on
-note: this debug system would have to be disabled for all public releases to
-prevent confusion. OR ver.c would depend on the source, but it does not have
-a version number, just __TIME__.  this version id would be used for
-savegames until they are fixed to not use pointers
+* fix config file and savegames
 * use static and const where appropriate
 * convert uses of open() to fopen(), etc maybe
 * menu code is a mess, always does things differently than the rest of the
@@ -63,7 +102,6 @@ key type, and for everything not scancode-based, have a function to
 translate
 * wl_menu uses specific scancodes for names, config file will have to use
 metaname like sc_Left etc or something
-* perhaps rename UPLOAD
 * add a ViewMap? (could be done similar to mac version)
 * find and remove any function stubs (functions which just call another
 function with same parameters, only difference is the name)
@@ -80,13 +118,8 @@ PlayDemoFromFile specifically
 * deathcam went by too fast, and right before the fizzlefade was being done
 on the border
 same with the spear of destiny animation part of ending
-* move all references to gfxbuf to vi_* only (gl will need this anyway,
-since it would replace id_vh, (parts of) wl_draw)
-by putting in code from id_vh (either by using Plot or just copying it in)
-we can mostly stop the large conversion before each UpdateScreen
-* the higher depths are a hack since a palette lookup has to be done
-for every byte when transferring to the pixmap, palette fades require a
-screen update
+* reduce code duplication in the vi_* files.
+* split wl_draw into two files (draw independent, draw dependent)
 * make sure none of the non-loader code tries to handle gfx/sound data 
 directly
 * when window loses focus, it should clear the keys
@@ -99,3 +132,4 @@ pcm sound len / 100).
 
 Things to try:
 * Create a native palette format instead of doing conversions each frame
+------------------------------------------------------------------------------

@@ -12,9 +12,9 @@ Just some random facts/thoughts/ideas/musings:
 * Rumored/Never Released?
   - Atari Lynx
   - Sega Genesis (was cancelled after a month)
-  - Japanese PC Version
-  - Spanish PC Version
-  - Japanese Mac Version
+  - Japanese PC Version (referenced in source)
+  - Spanish PC Version (referenced in source)
+  - Japanese Mac Version (referenced in source ??)
 
 * Unofficial ports:
   - Linux (this, xwolf, wolfgl)
@@ -24,19 +24,35 @@ Just some random facts/thoughts/ideas/musings:
   - Windows (wolfgl) [http://www.sourceforge.net/projects/wolfgl/]
   - Acorn/Archemedes
  
-* PC source released on:
-  - now many ports, projects, etc
-  - urls
-  - http://www.abraxis.com/brucel/wolf3d.html
-  - http://www.wolf3dbunker.com
-* Macintosh source released January 22(?), 2000
-  - url
-* TED source (editor used for tons of games including wolf3d)
-
+* PC source released August(?) ??, 1995:
+  - ftp://ftp.idsoftware.com/idstuff/source/wolfsrc.zip
+  * now many ports, projects, etc
+    - http://www.abraxis.com/brucel/wolf3d.html
+    - http://www.wolf3dbunker.com
+    - http://www.wolf3dmansion.com/index.phtml
+* Macintosh source released January 21, 2000
+  - http://www.maccentral.com/news/0001/24.wolf3d.shtml
+* TED5 source (editor used for tons of games including wolf3d)
+  - ftp://ftp.3drealms.com/misc/ted5.zip
 * Games which used the Wolfenstein 3D Engine:
   - Blake Stone
   - Corridor 7
   - Operation Body Count
+
+Apogee FAQ (lots of information regarding Wolf3D):
+- http://www.rinkworks.com/apogee/
+
+Wolfenstein 3D FAQ:
+- http://www.wolf3d.co.uk/Wolfenstein-3D.faq
+
+How to get Wolfenstein 3D:
+- Wolfenstein 3D Shareware:
+  ftp://ftp.gamers.org/pub/games/wolf3d/official/1wolf14.zip
+  http://www.3drealms.com/downloads.html
+- Spear of Destiny Demo:
+  ftp://ftp.gamers.org/pub/3daction/00archives/speardestiny/releases/soddemo2.zip
+- Macintosh versions: TODO
+- Where to Buy: TODO
 
 Wolfenstein 3D was originally planned to be a much more complex game. ...
 ... lots of unused code ... possibly from previous projects and incarnations
@@ -46,3 +62,6 @@ Version 1.4 of Wolfenstein 3D (full) did not had a Read Me! option, but the
 text still exists in the data files, but all the graphics are incorrect
 (wrong graphic numbers, etc).
 
+-----
+Steven Fuller
+relnev@atdot.org

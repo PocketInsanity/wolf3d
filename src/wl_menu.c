@@ -149,8 +149,9 @@ CusMenu[]=
 static int color_hlite[] = { DEACTIVE, HIGHLIGHT, READHCOLOR, 0x67 };
 static int color_norml[] = { DEACTIVE, TEXTCOLOR, READCOLOR, 0x6b };
 
-static int EpisodeSelect[6]={1};
-
+#ifndef SPEAR
+static int EpisodeSelect[6] = { 1 };
+#endif
 
 int SaveGamesAvail[10],StartGame,SoundStatus=1,pickquick;
 char SaveGameNames[10][32],SaveName[13]="savegam?.";
