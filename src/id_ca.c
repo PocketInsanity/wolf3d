@@ -74,13 +74,12 @@ boolean CA_WriteFile(char *filename, void *ptr, long length)
 	ssize_t l;
 	int handle;
 
-	handle = open(filename, O_CREAT | O_BINARY | O_WRONLY, 
-			S_IREAD | S_IWRITE | S_IFREG);
+	handle = OpenWrite(filename);
 
 	if (handle == -1)
 		return false;
 
-	l = write(handle, ptr, length);
+	l = WriteBytes(handle, (byte *)ptr, length);
 	if (l == -1) {
 		perror("CA_FarWrite");
 		return false;
@@ -92,7 +91,8 @@ boolean CA_WriteFile(char *filename, void *ptr, long length)
 		return false;
 	}
 
-	close(handle);
+	CloseWrite(handle);
+	
 	return true;
 }
 
@@ -112,13 +112,13 @@ boolean CA_LoadFile(char *filename, memptr *ptr)
 	ssize_t l;
 	long size;
 
-	if ((handle = open(filename, O_RDONLY | O_BINARY)) == -1)
+	if ((handle = OpenRead(filename)) == -1)
 		return false;
 
-	size = filelength(handle);
+	size = ReadLength(handle);
 	MM_GetPtr(ptr, size);
 	
-	l = read(handle, ptr, size);
+	l = ReadBytes(handle, (byte *)ptr, size);
 	
 	if (l == -1) {
 		perror("CA_FarRead");
@@ -131,7 +131,8 @@ boolean CA_LoadFile(char *filename, memptr *ptr)
 		return false;
 	}
 	
-	close(handle);
+	CloseRead(handle);
+	
 	return true;
 }
 
@@ -274,7 +275,7 @@ void CA_RLEWexpand(word *source, word *dest, long length, word rlewtag)
 			/* compressed string */
 			count = SwapInt16L(*source); source++;
 			value = *source++;
-			for (i = 1; i <= count; i++)
+			for (i = 0; i < count; i++)
 				*dest++ = value;
 		}
 	} while (dest < end);
@@ -370,7 +371,6 @@ static void CAL_SetupGrFile()
 }
 
 /* ======================================================================== */
-
 
 /*
 ======================

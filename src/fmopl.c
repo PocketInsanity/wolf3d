@@ -645,23 +645,6 @@ static void OPLCloseTable()
 	free(VIB_TABLE);
 }
 
-/* CSM Key Controll */
-INLINE void CSMKeyControll(OPL_CH *CH)
-{
-	OPL_SLOT *slot1 = &CH->SLOT[SLOT1];
-	OPL_SLOT *slot2 = &CH->SLOT[SLOT2];
-	/* all key off */
-	OPL_KEYOFF(slot1);
-	OPL_KEYOFF(slot2);
-	/* total level latch */
-	slot1->TLL = slot1->TL + (CH->ksl_base>>slot1->ksl);
-	slot1->TLL = slot1->TL + (CH->ksl_base>>slot1->ksl);
-	/* key on */
-	CH->op1_out[0] = CH->op1_out[1] = 0;
-	OPL_KEYON(slot1);
-	OPL_KEYON(slot2);
-}
-
 /* ---------- opl initialize ---------- */
 static void OPL_initalize(FM_OPL *OPL)
 {
