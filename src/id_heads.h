@@ -15,7 +15,7 @@
 #define PACKED __attribute__((packed))
 
 #ifndef O_BINARY
-#define O_BINARY
+#define O_BINARY 0
 #endif
 
 
