@@ -1170,7 +1170,7 @@ void Quit(char *error)
 	}
 	
 	if (error && *error) {
-		printf("Quit: %s\n", error);
+		fprintf(stderr, "Quit: %s\n", error);
 		exit(EXIT_FAILURE);
  	}
 		

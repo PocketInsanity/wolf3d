@@ -33,7 +33,12 @@ void VL_Startup (void)
 		gfxbuf = malloc(320 * 200 * 1);
 		
 	vga_init(); /* TODO: maybe move into main or such? */
-	vga_setmode(G320x200x256);
+	
+	if (vga_hasmode(G320x200x256) == 0) 
+		Quit("vga_hasmode failed!");
+			
+	if (vga_setmode(G320x200x256) != 0)
+		Quit("vga_setmode failed!");
 }
 
 /*
@@ -262,18 +267,6 @@ void VL_FadeIn(int start, int end, byte *palette, int steps)
 //
 	VL_SetPalette (palette);
 	screenfaded = false;
-}
-
-/*
-==================
-=
-= VL_ColorBorder
-=
-==================
-*/
-
-void VL_ColorBorder (int color)
-{
 }
 
 /*
@@ -824,7 +817,6 @@ void IN_ReadControl(int player,ControlInfo *info)
 	mx = my = motion_None;
 	buttons = 0;
 
-//keyboard_update();
 IN_CheckAck();
 
 		switch (type = Controls[player])

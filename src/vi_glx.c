@@ -251,18 +251,6 @@ void VL_FadeIn(int start, int end, byte *palette, int steps)
 }
 
 /*
-==================
-=
-= VL_ColorBorder
-=
-==================
-*/
-
-void VL_ColorBorder (int color)
-{
-}
-
-/*
 =============================================================================
 
 							PIXEL OPS

@@ -1936,12 +1936,12 @@ void EnterCtrlData(int index,CustomCtrls *cust,void (*DrawRtn)(int),void (*Print
    do
    {
 	int button,result=0;
-	
-	IN_CheckAck(); /* force update */
 
 	if (type==KEYBOARDBTNS||type==KEYBOARDMOVE)
 	  IN_ClearKeysDown();
 
+	IN_CheckAck(); /* force update */
+	
 	//
 	// FLASH CURSOR
 	//

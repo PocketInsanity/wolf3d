@@ -14,24 +14,28 @@
 /* #define SPEARDEMO */
 /* #define GOODTIMES */
 #define UPLOAD
+#define GAMENAME "Wolfenstein 3D Shareware"
 
 #elif WMODE == 1
 /* #define SPEAR */
 /* #define SPEARDEMO */
 #define GOODTIMES
 /* #define UPLOAD */
+#define GAMENAME "Wolfenstein 3D"
 
 #elif WMODE == 2
 #define SPEAR 
 #define SPEARDEMO 
 #define GOODTIMES
 /* #define UPLOAD */
+#define GAMENAME "Spear of Destiny Demo"
 
 #elif WMODE == 3
 #define SPEAR
 /* #define SPEARDEMO */
 #define GOODTIMES
 /* #define UPLOAD */
+#define GAMENAME "Spear of Destiny"
 
 #else
 #error "please edit version.h and fix WMODE"

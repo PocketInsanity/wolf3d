@@ -137,7 +137,6 @@ void PicturePause (void)
 	byte		*dest, *src;
 	memptr		buffer;
 
-	VW_ColorBorder (15);
 	FinishPaletteShifts ();
 
 	LastScan = 0;
@@ -145,11 +144,9 @@ void PicturePause (void)
 	;
 	if (LastScan != sc_Enter)
 	{
-		VW_ColorBorder (0);
 		return;
 	}
 
-	VW_ColorBorder (1);
 //
 // vga stuff...
 //
@@ -353,26 +350,10 @@ static	char	buf[10];
 ================
 */
 
-int DebugKeys (void)
+int DebugKeys()
 {
 	boolean esc;
 	int level,i;
-
-	if (Keyboard[sc_B])		// B = border color
-	{
-		CenterWindow(24,3);
-		PrintY+=6;
-		US_Print(" Border color (0-15):");
-		VW_UpdateScreen();
-		esc = !US_LineInput (px,py,str,NULL,true,2,0);
-		if (!esc)
-		{
-			level = atoi (str);
-			if (level>=0 && level<=15)
-				VW_ColorBorder (level);
-		}
-		return 1;
-	}
 
 	if (Keyboard[sc_C])		// C = count objects
 	{
