@@ -186,8 +186,10 @@ static int XKeysymToScancode(unsigned int keysym)
 		case SDLK_TAB:
 			return sc_Tab;
 		case SDLK_LALT:
+		case SDLK_RALT:
 			return sc_Alt;
 		case SDLK_LCTRL:
+		case SDLK_RCTRL:
 			return sc_Control;
 		case SDLK_CAPSLOCK:
 			return sc_CapsLock;
