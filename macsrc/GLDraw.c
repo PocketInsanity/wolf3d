@@ -26,6 +26,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "wolfdef.h"
 
+void DisplayScreen(int res)
+{
+}
+
 extern Byte Pal[768];
 
 void FadeToPtr(unsigned char *PalPtr)
@@ -399,46 +403,6 @@ void DrawSprite(thing_t *t)
 	glPopMatrix();
 }
 
-#if 0
-void DrawSprites(void)
-{
-	Word i;
-	static_t *stat;
-	actor_t *actor;
-	missile_t *MissilePtr;
-			
-	if (numstatics) {
-		i = numstatics;
-		stat = statics;
-		do {
-			if (areavis[stat->areanumber]) 
-				DrawSprite((thing_t *)stat);
-			++stat;
-		} while (--i);
-	}
-	
-	if (numactors > 1) {
-		i = 1;
-		actor = &actors[1];
-		do {
-			if (areavis[actor->areanumber])
-				DrawSprite((thing_t *)actor);
-			++actor;
-		} while (++i<numactors);
-	}
-	
-	if (nummissiles) {
-		i = nummissiles;
-		MissilePtr = missiles;
-		do {
-			if (areavis[MissilePtr->areanumber])
-				DrawSprite((thing_t *)MissilePtr);
-			++MissilePtr;
-		} while (--i);
-	}
-}
-#endif
-
 void DrawTopSprite()
 {
 	GLfloat z = -128.0 / (GLfloat)topspritescale;
@@ -456,18 +420,6 @@ void DrawTopSprite()
 	glEnd();
 
 	glPopMatrix();
-}
-
-int WallSeen = 0;
-
-void WallIsSeen(saveseg_t *seg)
-{
-/* mark the segment as visible for auto map*/
-
-	seg->dir |= DIR_SEENFLAG;		/* for automap*/
-	areavis[seg->area] = 1;			/* for sprite drawing*/
-
-	WallSeen = 1;	
 }
 
 Word *src1,*src2,*dest;		/* Used by the sort */
@@ -720,6 +672,16 @@ void DrawSprites(void)
 			++xe;
 		} while (--i);
 	}
+}
+
+static int WallSeen = 0;
+
+void WallIsSeen(saveseg_t *seg)
+{
+	seg->dir |= DIR_SEENFLAG;		/* for automap*/
+	areavis[seg->area] = 1;			/* for sprite drawing*/
+
+	WallSeen = 1;	
 }
 
 /*

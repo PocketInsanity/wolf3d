@@ -132,21 +132,14 @@ void StartGame(void)
 Boolean TitleScreen()
 {
 	Word RetVal;		/* Value to return */
-	LongWord PackLen;
-	LongWord *PackPtr;
-	Byte *ShapePtr;
 
 	playstate = EX_LIMBO;	/* Game is not in progress */
 	NewGameWindow(1);	/* Set to 512 mode */
 	FadeToBlack();		/* Fade out the video */
-	PackPtr = LoadAResource(rTitlePic);
-	PackLen = lMSB(PackPtr[0]);
-	ShapePtr = (Byte *)AllocSomeMem(PackLen);
-	DLZSS(ShapePtr, (Byte *)&PackPtr[1], PackLen);
-	DrawShape(0,0,ShapePtr);
-	ReleaseAResource(rTitlePic);
-	FreeSomeMem(ShapePtr);
+
+	DisplayScreen(rTitlePic);
 	BlastScreen();
+
 	StartSong(SongListPtr[0]);
 	FadeTo(rTitlePal);	/* Fade in the picture */
 	BlastScreen();

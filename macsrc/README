@@ -1,4 +1,10 @@
-The README has not been written yet.
+Contents:
+* About (General)
+* How to Compile
+* How to Use
+* About (More Specific, document how this source is different than original)
+* License
+* Contact
 
 File Organization:
 Some functions were moved to different files to account for functions which

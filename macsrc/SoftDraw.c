@@ -19,6 +19,22 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "wolfdef.h"
 
+void DisplayScreen(int res)
+{
+	LongWord *PackPtr;
+	LongWord PackLength;	
+	unsigned short *ShapePtr;
+	
+	PackPtr = LoadAResource(res);
+	PackLength = lMSB(PackPtr[0]);
+	ShapePtr = (unsigned short *)AllocSomeMem(PackLength);
+	DLZSS((Byte *)ShapePtr, (Byte *)&PackPtr[1], PackLength);
+	DrawShape((VidWidth - sMSB(ShapePtr[0]))/2, 
+		  (VidHeight- sMSB(ShapePtr[1]))/2, (Byte *)ShapePtr);
+	FreeSomeMem(ShapePtr);
+	ReleaseAResource(res);
+}
+
 /**********************************
 
 	Load and set a palette from a pointer
@@ -164,7 +180,7 @@ typedef struct {
                         
 void IO_ScaleMaskedColumn(Word x,Word scale, unsigned short *CharPtr,Word column)
 {
-	Byte * CharPtr2;
+	Byte *CharPtr2;
 	int Y1,Y2;
 	Byte *Screenad;
 	SpriteRun *RunPtr;

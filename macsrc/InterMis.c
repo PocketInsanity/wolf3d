@@ -243,13 +243,9 @@ void LevelCompleted (void)
 	IntermissionHack = TRUE;	/* Hack to keep score from drawing twice */
 	NumberIndex = 47;		/* Hack to draw score using an alternate number set */
 	NewGameWindow(1);		/* Force 512 mode screen */
-	PackPtr = LoadAResource(rIntermission);
-	PackLength = lMSB(PackPtr[0]);
-	ShapePtr = (Byte *) AllocSomeMem(PackLength);
-	DLZSS(ShapePtr,(Byte *) &PackPtr[1],PackLength);
-	DrawShape(0,0,ShapePtr);
-	FreeSomeMem(ShapePtr);
-	ReleaseAResource(rIntermission);
+	
+	DisplayScreen(rIntermission);
+
 	PackPtr = LoadAResource(rInterPics);
 	PackLength = lMSB(PackPtr[0]);
 	BJPtr = (Byte *)AllocSomeMem(PackLength);

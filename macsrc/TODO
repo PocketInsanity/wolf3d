@@ -1,43 +1,43 @@
 TODO:
 * Correct copyrights
-- vi_ are mostly mine, with portions based on the original code
-- move stuff out of stub.c to more proper places
+  - vi_ are mostly mine, with portions based on the original code
+  - move stuff out of stub.c to more proper places
 * Pause key
 * SVGAlib Hack:
-- Require 320x200x256
-- If user requests a gamemode which SVGAlib says it does not support, fail
-- If SVGAlib does not support 512x384x256, allow the user to pan around 
-  with the keypad arrow keys if only mode supported 320x200x256 (center if
-  640x400 or 480 is supported?)
+  - Require 320x200x256
+  - If user requests a gamemode which SVGAlib says it does not support, fail
+  - If SVGAlib does not support 512x384x256, allow the user to pan around 
+    with the keypad arrow keys if only mode supported 320x200x256 (center if
+    640x400 or 480 is supported?)
 * Finish moving all 2D code to SoftDraw.c
 * Compile with -Wall -ansi -pedantic (there shouldn't be much in the way)
 * Finish OpenGL
-- Check if top sprite drawing is correct
-- Status bars
-- Draw(XM)Shape
-- Correct viewing frustum
+  - Check if top sprite drawing is correct
+  + Status bars, Introscreens, etc. [Draw(XM)Shape]
+    - Not sure exactly yet how I will implement this.
+  - Correct viewing frustum
 * Save/Load Games
 * Documentation
 * Sound!
-- Waiting for information about music.
+  - Waiting for information about music.
 * Command line (temporary workaround for no menus).
 
 BUGS:
 * Software Drawing seems like its imprecise, stationary sprites move back and 
   forth, and walls 'swim' when you move around, or sprites pop into different 
   sizes when are far enough and get closer/farther away
-- Possibly caused by 8.8 imprecision?
+  - Possibly caused by 8.8 imprecision?
 * Floors are drawn with wrong color in GL version?
 
 IDEAS:
 * Menu Keys
-- ESC: Quit
-- F1:  Help
-- XXX: Load Game
-- XXX: Load Previously Loaded Game
-- XXX: Save Game
-- XXX: Save Game to Previously used File
-- XXX: Options
+  - ESC: Quit
+  - F1:  Help
+  - XXX: Load Game
+  - XXX: Load Previously Loaded Game
+  - XXX: Save Game
+  - XXX: Save Game to Previously used File
+  - XXX: Options
 * How about adding red/white shifts (from PC wolf3d)? So screen changes
   color when you are hit or pick up items.
 * when saving/loading games, run them through htons/etc.

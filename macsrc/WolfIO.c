@@ -118,7 +118,7 @@ void IO_DrawFloor(Word floor)
 
 void IO_DrawScore(LongWord score)
 {
-	if (!IntermissionHack) {			/* Don't draw during intermission! */
+    if (!IntermissionHack) {		/* Don't draw during intermission! */
     	SetNumber(score,ScaleX(56),ScaleY(176),7);
     }
 }
@@ -130,14 +130,13 @@ void IO_DrawScore(LongWord score)
 **********************************/
 
 void IO_DrawLives(Word lives)
-{
-    
-   	if (!IntermissionHack) {			/* Don't draw during intermission! */   	
-	    --lives;			/* Adjust for zero start value */
-    	if (lives > 9) {
-    		lives = 9;		/* Failsafe */
+{   
+   	if (!IntermissionHack) {	/* Don't draw during intermission! */   	
+		--lives;		/* Adjust for zero start value */
+    		if (lives > 9) {
+    			lives = 9;	/* Failsafe */
 		}
-		SetNumber(lives,ScaleX(188),ScaleY(176),1);		/* Draw the lives count */
+		SetNumber(lives,ScaleX(188),ScaleY(176),1);	/* Draw the lives count */
 	}
 }
 
