@@ -2,17 +2,6 @@
 
 #include "wl_def.h"
 
-
-/*
-=============================================================================
-
-						 LOCAL CONSTANTS
-
-=============================================================================
-*/
-
-#define sc_Question	0x35
-
 /*
 =============================================================================
 
@@ -53,7 +42,7 @@ byte		update[UPDATESIZE];
 //
 // control info
 //
-boolean		mouseenabled,joystickenabled,joypadenabled,joystickprogressive;
+boolean		mouseenabled,joystickenabled,joypadenabled;
 int			joystickport;
 int			dirscan[4] = {sc_UpArrow,sc_RightArrow,sc_DownArrow,sc_LeftArrow};
 int			buttonscan[NUMBUTTONS] =
@@ -391,22 +380,11 @@ void PollMouseMove (void)
 
 void PollJoystickMove (void)
 {
-	int	joyx,joyy;
+	int joyx, joyy;
 
 	INL_GetJoyDelta(joystickport,&joyx,&joyy);
 
-	if (joystickprogressive)
-	{
-		if (joyx > 64)
-			controlx += (joyx-64)*JOYSCALE*tics;
-		else if (joyx < -64)
-			controlx -= (-joyx-64)*JOYSCALE*tics;
-		if (joyy > 64)
-			controlx += (joyy-64)*JOYSCALE*tics;
-		else if (joyy < -64)
-			controly -= (-joyy-64)*JOYSCALE*tics;
-	}
-	else if (buttonstate[bt_run])
+	if (buttonstate[bt_run])
 	{
 		if (joyx > 64)
 			controlx += RUNMOVE*tics;
@@ -1348,7 +1326,6 @@ void PlayLoop (void)
 
 	playstate = TimeCount = lasttimecount = 0;
 	frameon = 0;
-	running = false;
 	anglefrac = 0;
 	facecount = 0;
 	funnyticount = 0;

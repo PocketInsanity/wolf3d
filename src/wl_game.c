@@ -1180,8 +1180,7 @@ void Died (void)
 	IN_UserInput(100);
 	SD_WaitSoundDone ();
 
-	if (tedlevel == false)	// SO'S YA DON'T GET KILLED WHILE LAUNCHING!
-	  gamestate.lives--;
+	gamestate.lives--;
 
 	if (gamestate.lives > -1)
 	{

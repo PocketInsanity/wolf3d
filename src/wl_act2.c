@@ -3673,7 +3673,7 @@ void T_BJRun (objtype *ob)
 ===============
 */
 
-void T_BJJump (objtype *ob)
+void T_BJJump(objtype *ob)
 {
 	long 	move;
 
@@ -3690,9 +3690,9 @@ void T_BJJump (objtype *ob)
 ===============
 */
 
-void T_BJYell (objtype *ob)
+void T_BJYell(objtype *ob)
 {
-	PlaySoundLocActor(YEAHSND,ob);	// JAB
+	PlaySoundLocActor(YEAHSND, ob);
 }
 
 

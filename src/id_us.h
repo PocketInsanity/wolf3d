@@ -22,9 +22,6 @@ typedef	struct
 				px,py;
 		} WindowRec;	// Record used to save & restore screen windows
 
-extern	boolean		tedlevel; /* TODO: rename or remove */
-extern	int			tedlevelnum;
-
 extern	boolean		ingame,		// Set by game code if a game is in progress
 					abortgame,	// Set if a game load failed
 					loadedgame,	// Set if the current game was loaded
@@ -32,8 +29,6 @@ extern	boolean		ingame,		// Set by game code if a game is in progress
 extern	word		PrintX,PrintY;	// Current printing location in the window
 extern	word		WindowX,WindowY,// Current location of window
 					WindowW,WindowH;// Current size of window
-
-extern	int			CursorX,CursorY;
 
 extern	void		(*USL_MeasureString)(char *,word *,word *),
 					(*USL_DrawString)(char *);

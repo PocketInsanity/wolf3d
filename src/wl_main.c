@@ -35,8 +35,6 @@
 */
 
 char            str[80],str2[20];
-int				tedlevelnum;
-boolean         tedlevel;
 int                     dirangle[9] = {0,ANGLES/8,2*ANGLES/8,3*ANGLES/8,4*ANGLES/8,
 	5*ANGLES/8,6*ANGLES/8,7*ANGLES/8,ANGLES};
 
@@ -105,7 +103,6 @@ void ReadConfig(void)
 		read(file,&mouseenabled,sizeof(mouseenabled));
 		read(file,&joystickenabled,sizeof(joystickenabled));
 		read(file,&joypadenabled,sizeof(joypadenabled));
-		read(file,&joystickprogressive,sizeof(joystickprogressive));
 		read(file,&joystickport,sizeof(joystickport));
 
 		read(file,&dirscan,sizeof(dirscan));
@@ -165,7 +162,6 @@ void ReadConfig(void)
 		joystickenabled = false;
 		joypadenabled = false;
 		joystickport = 0;
-		joystickprogressive = false;
 
 		viewsize = 15;
 		mouseadjustment=5;
@@ -204,7 +200,6 @@ void WriteConfig(void)
 		write(file,&mouseenabled,sizeof(mouseenabled));
 		write(file,&joystickenabled,sizeof(joystickenabled));
 		write(file,&joypadenabled,sizeof(joypadenabled));
-		write(file,&joystickprogressive,sizeof(joystickprogressive));
 		write(file,&joystickport,sizeof(joystickport));
 
 		write(file,&dirscan,sizeof(dirscan));
@@ -1267,43 +1262,12 @@ void Quit (char *error)
 =====================
 */
 
-static  char *ParmStrings[] = {"baby","easy","normal","hard",""};
-
-void    DemoLoop (void)
+void DemoLoop (void)
 {
 	static int LastDemo;
 	int     i,level;
 	long nsize;
 	memptr	nullblock;
-
-//
-// check for launch from ted
-//
-	if (tedlevel)
-	{
-		NoWait = true;
-		NewGame(1,0);
-
-		for (i = 1;i < _argc;i++)
-		{
-			if ( (level = US_CheckParm(_argv[i],ParmStrings)) != -1)
-			{
-			 gamestate.difficulty=level;
-			 break;
-			}
-		}
-
-#ifndef SPEAR
-		gamestate.episode = tedlevelnum/10;
-		gamestate.mapon = tedlevelnum%10;
-#else
-		gamestate.episode = 0;
-		gamestate.mapon = tedlevelnum;
-#endif
-		GameLoop();
-		Quit (NULL);
-	}
-
 
 //
 // main game cycle

@@ -91,12 +91,6 @@
 
 #define STATUSLINES		40
 
-#define SCREENSIZE		(SCREENBWIDE*208)
-#define PAGE1START		0
-#define PAGE2START		(SCREENSIZE)
-#define PAGE3START		(SCREENSIZE*2u)
-#define	FREESTART		(SCREENSIZE*3u)
-
 #define STARTAMMO		8
 
 // object flag values
@@ -577,7 +571,7 @@ typedef struct statstruct
 {
 	byte	tilex,tiley;
 	byte	*visspot;
-	int		shapenum;			// if shapenum == -1 the obj has been removed
+	int	shapenum;		/* if shapenum == -1 the obj has been removed */
 	byte	flags;
 	byte	itemnumber;
 } statobj_t;
@@ -610,25 +604,25 @@ typedef struct objstruct
 	classtype	obclass;
 	statetype	*state;
 
-	byte		flags;				//	FL_SHOOTABLE, etc
+	byte		flags;		/* FL_SHOOTABLE, etc */
 
-	long		distance;			// if negative, wait for that door to open
+	long		distance;	/* if negative, wait for that door to open */
 	dirtype		dir;
 
 	fixed 		x,y;
 	unsigned	tilex,tiley;
 	byte		areanumber;
 
-	int	 		viewx;
+	int	 	viewx;
 	unsigned	viewheight;
-	fixed		transx,transy;		// in global coord
+	fixed		transx, transy;		/* in global coord */
 
 	int 		angle;
 	int			hitpoints;
 	long		speed;
 
-	int			temp1,temp2,temp3;
-	struct		objstruct	*next,*prev;
+	int		temp1,temp2,temp3;
+	struct		objstruct *next,*prev;
 } objtype;
 
 
@@ -715,8 +709,6 @@ typedef	enum	{
 extern	boolean		MS_CheckParm (char *string);
 
 extern	char		str[80],str2[20];
-extern	int			tedlevelnum;
-extern	boolean		tedlevel;
 
 extern	fixed		focallength;
 extern	unsigned	viewangles;
@@ -835,7 +827,7 @@ extern	int			extravbls;
 //
 // control info
 //
-extern	boolean		mouseenabled,joystickenabled,joypadenabled,joystickprogressive;
+extern	boolean		mouseenabled,joystickenabled,joypadenabled;
 extern	int			joystickport;
 extern	int			dirscan[4];
 extern	int			buttonscan[NUMBUTTONS];
@@ -968,7 +960,7 @@ void  FarScalePost (void);
 
 =============================================================================
 */
-#define TURNTICS	10
+
 #define SPDPATROL	512
 #define SPDDOG		1500
 
@@ -1003,38 +995,14 @@ boolean	CheckSight (objtype *ob);
 =============================================================================
 */
 
-
-#define COMPSCALECODESTART	(65*4)		// offset to start of code in comp scaler
-
-typedef struct
-{
-	unsigned	codeofs[65];
-	unsigned	width[65];
-	byte		*code;
-}	t_compscale;
-
 typedef struct
 {
 	unsigned	leftpix,rightpix;
 	unsigned	dataofs[64];
-// table data after dataofs[rightpix-leftpix+1]
+/* table data after dataofs[rightpix-leftpix+1] */
 }	t_compshape;
 
-
-extern	t_compscale *scaledirectory[MAXSCALEHEIGHT+1];
-extern	long			fullscalefarcall[MAXSCALEHEIGHT+1];
-
-extern	byte		bitmasks1[8][8];
-extern	byte		bitmasks2[8][8];
-extern	unsigned	wordmasks[8][8];
-
-extern	byte		mapmasks1[4][8];
-extern	byte		mapmasks2[4][8];
-extern	byte		mapmasks3[4][8];
-
 extern	int			maxscale,maxscaleshl2;
-
-extern	boolean	insetupscaling;
 
 void SetupScaling (int maxscaleheight);
 void ScaleShape (int xcenter, int shapenum, unsigned height);
@@ -1051,7 +1019,6 @@ void SimpleScaleShape (int xcenter, int shapenum, unsigned height);
 //
 // player state info
 //
-extern	boolean		running;
 extern	long		thrustspeed;
 extern	unsigned	plux,pluy;		// player coordinates scaled to unsigned
 
