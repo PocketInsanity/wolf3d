@@ -175,6 +175,7 @@ int main(int argc, char *argv[])
 	
 	InitData();
 	
+	SlowDown = 1;
 	GameViewSize = 3;	
 	NewGameWindow(GameViewSize); 
 

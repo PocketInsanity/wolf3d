@@ -36,16 +36,45 @@ typedef struct {
 	int bottom;
 } Rect;
 
+
+typedef struct {
+	unsigned long frames;
+	unsigned long mintime;
+	unsigned long maxtime;
+	unsigned long total;
+	
+	long secs;
+	long usecs;
+} TimeCounter;
+
+extern void InitTimeCounter(TimeCounter *t);
+extern void StartTimeCounter(TimeCounter *t);
+extern void EndTimeCounter(TimeCounter *t);
+extern void PrintTimeCounter(TimeCounter *t, char *header);
+
+extern TimeCounter gametime, rendtime;
+
+#define InitGameCounter() InitTimeCounter(&gametime)
+#define StartGameCounter() StartTimeCounter(&gametime)
+#define EndGameCounter() EndTimeCounter(&gametime)
+#define PrintGameCounter() PrintTimeCounter(&gametime, "Game Loop Time")
+
+#define InitRendCounter() InitTimeCounter(&rendtime)
+#define StartRendCounter() StartTimeCounter(&rendtime)
+#define EndRendCounter() EndTimeCounter(&rendtime)
+#define PrintRendCounter() PrintTimeCounter(&rendtime, "Render Loop Time")
+
+
 #ifdef    __BIGENDIAN__
-unsigned short int sLSB(unsigned short int i);
+extern unsigned short int sLSB(unsigned short int i);
 #define sMSB(i) i
-unsigned long lLSB(unsigned long i);
+extern unsigned long lLSB(unsigned long i);
 #define lMSB(i) i
 #else  /* __BIGENDIAN__ */
-unsigned short int sLSB(unsigned short int i);
-unsigned short int sMSB(unsigned short int i);
-unsigned long lLSB(unsigned long i);
-unsigned long lMSB(unsigned long i);
+#define sLSB(i) i
+extern unsigned short int sMSB(unsigned short int i);
+#define lLSB(i) i
+extern unsigned long lMSB(unsigned long i);
 #endif /* __BIGENDIAN__ */
 
 /* an angle_t occupies an entire 16 bits so wraparound is automatically handled */
@@ -104,10 +133,10 @@ typedef unsigned short ufixed_t;	/* 8.8 unsigned fixed point number */
 #define VIEWHEIGHT	160	/* Height of the viewing area */
 #endif
 
+extern int VidWidth, VidHeight, ViewHeight;
 #define SCREENWIDTH	VidWidth
 #define SCREENHEIGHT	VidHeight
 #define VIEWHEIGHT	ViewHeight
-extern int VidWidth, VidHeight, ViewHeight;
 
 Word ScaleX(Word x);	/* Scale factor for 320 mode points projected to SCREEN */
 Word ScaleY(Word y);

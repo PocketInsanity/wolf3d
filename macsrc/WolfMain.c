@@ -358,20 +358,29 @@ Again:
 void PlayLoop(void)
 {
 	LongWord Timer;
-	LastTicCount = ReadTick();
+
+	InitGameCounter();
+	InitRendCounter();
+	
+	LastTicCount = ReadTick();	
 	do {
 		Timer = ReadTick();		/* How much time has elapsed */
 		TicCount = (Timer-LastTicCount);
 		gamestate.playtime += TicCount;	/* Add the physical time to the elapsed time */
 		
 		LastTicCount=Timer;
+		
 		if (!SlowDown) {
 			TicCount = 4;		/* Adjust from 4 */
 		}
 		if (TicCount>=5) {
 			TicCount = 4;
 		}
+		
 		IO_CheckInput();	/* Read the controls from the system */
+		
+		StartGameCounter();
+		
 		madenoise = FALSE;	/* No noise made (Yet) */
 		MoveDoors();		/* Open and close all doors */
 		MovePWalls();		/* Move all push walls */
@@ -381,8 +390,17 @@ void PlayLoop(void)
 		UpdateFace();		/* Draw BJ's face and animate it */
 		viewx = actors[0].x;	/* Where is the camera? */
 		viewy = actors[0].y;		
+		
+		StartRendCounter();
 		RenderView();		/* Draw the 3D view */
+		EndRendCounter();
+		
+		EndGameCounter();
 	} while (playstate==EX_STILLPLAYING);
+	
+	PrintGameCounter();
+	PrintRendCounter();
+	
 	StopSong();
 }
 

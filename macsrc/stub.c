@@ -20,10 +20,66 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <sys/time.h>
 #include <unistd.h>
+#include <stdio.h>
 
 #include "wolfdef.h"
 
 LongWord LastTick; 
+
+TimeCounter gametime, rendtime;
+
+void InitTimeCounter(TimeCounter *t)
+{
+	t->frames = 0;
+	t->mintime = 0xFFFFFFFF;
+	t->maxtime = 0;
+	t->total = 0;
+}
+
+void StartTimeCounter(TimeCounter *t)
+{
+	struct timeval t0;
+	
+	gettimeofday(&t0, NULL);
+	
+	t->secs = t0.tv_sec;
+	t->usecs = t0.tv_usec;
+}
+
+void EndTimeCounter(TimeCounter *t)
+{
+	struct timeval t0;
+	unsigned long curtime;
+	long secs, usecs;
+	
+	gettimeofday(&t0, NULL);
+	
+	secs = t0.tv_sec - t->secs;
+	usecs = t0.tv_usec - t->usecs;
+	
+	curtime = secs * 1000000 + usecs;
+	
+	if (curtime > t->maxtime)
+		t->maxtime = curtime;
+	if (curtime < t->mintime)
+		t->mintime = curtime;
+		
+	t->total += curtime;
+	t->frames++;
+}
+
+void PrintTimeCounter(TimeCounter *t, char *header)
+{
+	double avg;
+	 
+	if (t->frames == 0)
+		return;
+		
+	avg = (double)t->total / (double)t->frames;
+	printf("%s:\n", header);
+	printf("Frames: %lu, time %lu, avg %f\n", t->frames, t->total, avg);
+	printf("Min: %lu, max:%lu\n", t->mintime, t->maxtime);
+}
 
 unsigned short int sMSB(unsigned short int x)
 {

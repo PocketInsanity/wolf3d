@@ -442,9 +442,8 @@ void AdvancePushWall(void)
 
 void RenderView(void)
 {
-
 	Word frame;
-	
+		
 	centerangle = gamestate.viewangle<<GAMEANGLETOFINE;	/* 512 to 2048 */
 	centershort = centerangle<<ANGLETOFINESHIFT;	/* 2048 to 64k */
 	viewsin = sintable[gamestate.viewangle];	/* Get the basic sine */
@@ -472,5 +471,5 @@ void RenderView(void)
 		}
 		IO_AttackShape(gamestate.weapon*4 + frame);		/* Draw the gun shape */
 	}
-	IO_DisplayViewBuffer();	/* blit to screen */
+	IO_DisplayViewBuffer();	/* blit to screen */	
 }
