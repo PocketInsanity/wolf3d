@@ -2,18 +2,17 @@
 
 #include "wl_def.h" 
 
+/* Originally from David Haslam -- dch@sirius.demon.co.uk */
+
 // the door is the last picture before the sprites
 #define DOORWALL	(PMSpriteStart-8)
 
 #define ACTORSIZE	0x4000
 
-
 long 	lasttimecount;
 long 	frameon;
 
 unsigned	wallheight[MAXVIEWWIDTH];
-
-fixed	tileglobal	= TILEGLOBAL;
 
 #define mindist	MINDIST
 

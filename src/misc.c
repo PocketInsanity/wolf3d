@@ -11,6 +11,7 @@
 static struct timeval t0;
 static long tc0;
 
+/* From David Haslam -- dch@sirius.demon.co.uk */
 void set_TimeCount(unsigned long t)
 {
 	tc0 = t;

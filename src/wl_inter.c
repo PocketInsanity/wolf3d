@@ -1685,4 +1685,3 @@ void CopyProtection(void)
 
 #endif // SPEARDEMO
 #endif // SPEAR
-//===========================================================================

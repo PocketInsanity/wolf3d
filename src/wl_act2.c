@@ -1024,7 +1024,7 @@ void SpawnPatrol (enemy_t which, int tilex, int tiley, int dir)
 	new->obclass = guardobj+which;
 	new->dir = dir*2;
 	new->hitpoints = starthitpoints[gamestate.difficulty][which];
-	new->distance = tileglobal;
+	new->distance = TILEGLOBAL;
 	new->flags |= FL_SHOOTABLE;
 	new->active = true;
 

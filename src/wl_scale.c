@@ -2,6 +2,8 @@
 
 #include "wl_def.h" 
 
+/* Originally from David Haslam -- dch@sirius.demon.co.uk */
+
 extern unsigned xoffset, yoffset;
 
 /*
