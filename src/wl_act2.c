@@ -2446,12 +2446,9 @@ void A_StartDeathCam(objtype *ob)
 	
 	FizzleFade(false, 70, 127);
 
-	CA_UpLevel();
 	CacheLump(LEVELEND_LUMP_START, LEVELEND_LUMP_END);
 
 	Write(0, 7, STR_SEEAGAIN);
-
-	CA_DownLevel();
 
 	VW_UpdateScreen();
 

@@ -715,14 +715,6 @@ void CA_CacheMap(int mapnum)
 
 /* ======================================================================== */
 
-void CA_UpLevel()
-{
-}
-
-void CA_DownLevel()
-{
-}
-
 void MM_Startup()
 {
 }

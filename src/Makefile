@@ -22,11 +22,6 @@ OBJS += sd_null.o
 #OBJS += sd_oss.o fmopl.o
 #CFLAGS += -D_REENTRANT
 #LFLAGS += -lpthread
-#OBJS += sd_oal.o fmopl.o
-#CFLAGS += -D_REENTRANT -I/home/relnev/cvs/oal/include/
-#LFLAGS += -lpthread -ldl -L/home/relnev/cvs/oal/linux/src/ -lopenal # /home/relnev/cvs/oal/linux/src/libopenal.a
-
-#LFLAGS += -lpthread /home/relnev/ElectricFence-2.2.2/libefence.a
 
 CFLAGS += `sdl-config --cflags`
 

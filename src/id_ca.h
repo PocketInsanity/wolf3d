@@ -43,9 +43,6 @@ void CA_CacheMap(int mapnum);
 void CA_CacheGrChunk(int chunk);
 void CA_UnCacheGrChunk(int chunk);
 
-void CA_UpLevel();
-void CA_DownLevel();
-
 /* ======================================================================= */
 
 void MM_Startup();

@@ -661,8 +661,6 @@ void HelpScreens()
 	int artnum;
 	char *text;
 
-	CA_UpLevel();
-
 	artnum = helpextern;
 	CA_CacheGrChunk(artnum);
 	text = (char *)grsegs[artnum];
@@ -674,7 +672,6 @@ void HelpScreens()
 	VW_FadeOut();
 
 	FreeMusic();
-	CA_DownLevel();
 }
 
 //
@@ -686,8 +683,6 @@ void EndText()
 	char *text;
 
 	ClearMemory();
-
-	CA_UpLevel();
 
 	artnum = endextern+gamestate.episode;
 	CA_CacheGrChunk(artnum);
@@ -702,7 +697,6 @@ void EndText()
 	IN_ClearKeysDown();
 
 	FreeMusic();
-	CA_DownLevel();
 }
 
 #endif

@@ -16,7 +16,7 @@ M M - add music (would need to RE the sound lib)
 B I - complete savegame, config formats
 M I - add SDL
 B R - decide if to keep SVGA/X11 targets
-B M - configure scripts?
+B M - configure scripts? (autoconf/automake/etc)
 B M - port to dreamcast?
 B M - add compression to savegames/config
 B I - play through game (w/ sound and music) to make sure things work
@@ -30,19 +30,23 @@ B I - add mouse support
 B M - add joystick/gamepad support
 P I - fill in the new fizzlefade function
 P I - add sound "emulation" to the necessary targets so WaitSoundDone works
-B R - autoconf/automake
 P R - change boolean SD_PlaySound to void SD_PlaySound
 P M - position pushwall sounds
 P M - id_ca.c cache code: fix/readd/rewrite the "garbage collection" system
 P M - rewrite id_ca.c: uniform memory handling system
 P M - either move id_heads into wl_def or split header files apart
 P R - rewrite fmopl.c to avoid licensing issues
+P R - remove CA_LoadAllSounds now that the sound code does everything
+B I - README, etc.
+B M - Code Documentation
+P M - rename visable to visible
+B M - change the commandline handling (use something like getopt?)
+P R - rewrite RLEWexpand to not use words
+B M - openal support
 
 Complete:
 P I - fix or remove fizzle fade
     - Removed [nice, but very hacky effect]
-P R - openal sound
-    - almost complete
 ------------------------------------------------------------------------------
 * what exactly is the point of all the DigiMode checks in wl_act2.c?
 * add ylookup?
@@ -53,7 +57,6 @@ example (is this reproducible?)
 * use static and const where appropriate
 * clean up header files, especially wl_def.h, where some declarations aren't 
 in the right place
-* change the current parameter handling code to something like getopt
 * remove check for debugmode?
 * check filehandling (ex, file missing, bad file type, and such)
 PlayDemoFromFile specifically
@@ -61,7 +64,6 @@ PlayDemoFromFile specifically
   - probably due to waiting for sounds to finish
 * split wl_draw into two files (draw independent, draw dependent)
 * when window loses focus, it should clear the keys
-* rename visable to visible
 ------------------------------------------------------------------------------
 fix:
 void ControlMovement(objtype *ob) (wl_agent.c)
@@ -81,6 +83,17 @@ Sound Menu:
 * Music:
 - On [AdLib/OPL2]
 - Off
+------------------------------------------------------------------------------
+Where to Look for/Save Files:
+
+~/.wolf3d
+cwd
+/usr/games/share
+$ENVIRONMENT_VARIABLE
+
+Need to establish where to look, order to look, strict/lenient loading (load
+all files from the determined game directory, or look in order for each
+file), and where to put savegames and config files.
 ------------------------------------------------------------------------------
 Save game header:
 8 bytes: WOLF3D, 0, 0
