@@ -39,7 +39,6 @@ void	DrawScaleds (void);
 void	CalcTics (void);
 void	ThreeDRefresh (void);
 
-unsigned char crapmap[4096]; /* TODO: remove this testing code */
 //
 // ray tracing variables
 //

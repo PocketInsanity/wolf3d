@@ -754,7 +754,7 @@ void CA_CacheAudioChunk(int chunk)
 
 	if (audiosegs[chunk])
 	{
-		MM_SetPurge ((memptr)&audiosegs[chunk],0);
+		MM_SetPurge((memptr)&audiosegs[chunk],0);
 		return;	
 	}
 
@@ -774,6 +774,7 @@ void CA_CacheAudioChunk(int chunk)
 
 void CA_UnCacheAudioChunk(int chunk)
 {
+	/* TODO: For now the warning is ignorable since wl_menu.c does it */
 	if (audiosegs[chunk] == 0) {
 		fprintf(stderr, "Trying to free null audio chunk %d!\n", chunk);
 		return;
@@ -1338,20 +1339,9 @@ void CA_CacheMarks (void)
 #endif
 
 /*
-=============================================================================
-
-						 LOCAL VARIABLES
-
-=============================================================================
-*/
-
-/*
 ===================
 =
 = MM_Startup
-=
-= Grabs all space from turbo with malloc/farmalloc
-= Allocates bufferseg misc buffer
 =
 ===================
 */
@@ -1365,8 +1355,6 @@ void MM_Startup (void)
 =
 = MM_Shutdown
 =
-= Frees all conventional, EMS, and XMS allocated
-=
 ====================
 */
 
@@ -1378,8 +1366,6 @@ void MM_Shutdown(void)
 ====================
 =
 = MM_GetPtr
-=
-= Allocates an unlocked, unpurgable block
 =
 ====================
 */
@@ -1394,8 +1380,6 @@ void MM_GetPtr(memptr *baseptr, unsigned long size)
 ====================
 =
 = MM_FreePtr
-=
-= Deallocates an unlocked, purgable block
 =
 ====================
 */
@@ -1441,36 +1425,12 @@ void MM_SetLock (memptr *baseptr, boolean locked)
 =
 = MM_SortMem
 =
-= Throws out all purgable stuff and compresses movable blocks
+= Throws out all purgable stuff
 =
 =====================
 */
 
 void MM_SortMem (void)
-{
-}
-
-/*
-=====================
-=
-= MM_ShowMemory
-=
-=====================
-*/
-
-void MM_ShowMemory (void)
-{
-}
-
-/*
-=====================
-=
-= MM_DumpData
-=
-=====================
-*/
-
-void MM_DumpData (void)
 {
 }
 
@@ -1502,18 +1462,6 @@ long MM_UnusedMemory(void)
 long MM_TotalFree (void)
 {
 	return 0;
-}
-
-/*
-=====================
-=
-= MM_BombOnError
-=
-=====================
-*/
-
-void MM_BombOnError(boolean bomb)
-{
 }
 
 	boolean PMStarted;
@@ -1617,9 +1565,7 @@ void PML_ClosePageFile(void)
 
 //
 //	PM_GetPageAddress() - Returns the address of a given page
-//		Maps in EMS if necessary
-//		Returns nil if block is not cached into Main Memory or EMS
-//
+//		Returns nil if block is not loaded
 //
 memptr PM_GetPageAddress(int pagenum)
 {
@@ -1632,9 +1578,6 @@ memptr PM_GetPageAddress(int pagenum)
 
 //
 //	PM_GetPage() - Returns the address of the page, loading it if necessary
-//		First, check if in Main Memory or EMS
-//		Then, check XMS
-//		If not in XMS, load into Main Memory or EMS
 //
 memptr PM_GetPage(int pagenum)
 {
@@ -1657,8 +1600,6 @@ memptr PM_GetPage(int pagenum)
 //	PM_SetPageLock() - Sets the lock type on a given page
 //		pml_Unlocked: Normal, page can be purged
 //		pml_Locked: Cannot be purged
-//		pml_EMS?: Same as pml_Locked, but if in EMS, use the physical page
-//					specified when returning the address. For sound stuff.
 //
 void PM_SetPageLock(int pagenum,PMLockType lock)
 {
@@ -1685,13 +1626,7 @@ void PM_Preload(boolean (*update)(word current,word total))
 /////////////////////////////////////////////////////////////////////////////
 
 //
-//	PM_NextFrame() - Increments the frame counter and adjusts the thrash
-//		avoidence variables
-//
-//		If currently in panic mode (to avoid thrashing), check to see if the
-//			appropriate number of frames have passed since the last time that
-//			we would have thrashed. If so, take us out of panic mode.
-//
+//	PM_NextFrame() - Increments the frame counter
 //
 void PM_NextFrame(void)
 {

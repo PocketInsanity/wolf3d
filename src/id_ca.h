@@ -95,12 +95,8 @@ void MM_SetPurge (memptr *baseptr, int purge);
 void MM_SetLock (memptr *baseptr, boolean locked);
 void MM_SortMem (void);
 
-void MM_ShowMemory (void);
-
 long MM_UnusedMemory (void);
 long MM_TotalFree (void);
-
-void MM_BombOnError (boolean bomb);
 
 #define PMPageSize              4096
 
@@ -136,8 +132,7 @@ void	PM_Startup(void),
 				PM_SetPageLock(int pagenum,PMLockType lock),
 				PM_SetMainPurge(int level),
 				PM_CheckMainMem(void);
-memptr	PM_GetPageAddress(int pagenum),
-				PM_GetPage(int pagenum);		// Use this one to cache page
+memptr	PM_GetPageAddress(int pagenum), PM_GetPage(int pagenum);
 
 #else 
 #error "fix me TODO"

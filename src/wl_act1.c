@@ -348,7 +348,6 @@ void InitDoorList (void)
 
 void SpawnDoor (int tilex, int tiley, boolean vertical, int lock)
 {
-	int	areanumber;
 	word *map;
 
 	if (doornum==64)

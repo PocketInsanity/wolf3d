@@ -1119,17 +1119,7 @@ boolean SetViewSize (unsigned width, unsigned height)
 //
 // build all needed compiled scalers
 //
-//	MM_BombOnError (false);
 	SetupScaling (viewwidth*1.5);
-#if 0
-	MM_BombOnError (true);
-	if (mmerror)
-	{
-		Quit ("Can't build scalers!");
-		mmerror = false;
-		return false;
-	}
-#endif
 	return true;
 }
 

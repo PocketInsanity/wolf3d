@@ -5,7 +5,7 @@
 
 typedef	enum	{
 					sdm_Off,
-					sdm_PC,sdm_AdLib,
+					sdm_PC,sdm_AdLib
 				}	SDMode;
 typedef	enum	{
 					smm_Off,smm_AdLib

@@ -802,13 +802,10 @@ int CP_CheckQuick(unsigned scancode)
 				#ifdef SPANISH
 			if (Confirm(ENDGAMESTR))
 				#else
-			if (Confirm(endStrings[US_RndT()&0x7+(US_RndT()&1)]))
+			if (Confirm(endStrings[(US_RndT()&0x7)+(US_RndT()&1)]))
 				#endif
 			#endif
 			{
-				int i;
-
-
 				VW_UpdateScreen();
 				SD_MusicOff();
 				SD_StopSound();
@@ -1553,7 +1550,7 @@ int CP_SaveGame(int quick)
 			//
 			// OVERWRITE EXISTING SAVEGAME?
 			//
-			if (SaveGamesAvail[which])
+			if (SaveGamesAvail[which]) {
 				#ifdef JAPAN
 				if (!GetYorN(7,8,C_JAPSAVEOVERPIC))
 				#else
@@ -1569,7 +1566,7 @@ int CP_SaveGame(int quick)
 					PrintLSEntry(which,HIGHLIGHT);
 					VW_UpdateScreen();
 				}
-
+			}
 			ShootSnd();
 
 			strcpy(input,&SaveGameNames[which][0]);
@@ -1886,6 +1883,8 @@ void MouseSensitivity(void)
 					WaitKeyUp();
 				}
 				break;
+			default: /* ignore */
+				break;
 		}
 
 		#ifndef SPEAR
@@ -2004,9 +2003,8 @@ void DrawCtlScreen(void)
 //
 ////////////////////////////////////////////////////////////////////
 enum {FIRE,STRAFE,RUN,OPEN};
-char mbarray[4][3]={"b0","b1","b2","b3"},
-	   order[4]={RUN,OPEN,FIRE,STRAFE};
-
+char mbarray[4][3]={"b0","b1","b2","b3"};
+int order[4]={RUN,OPEN,FIRE,STRAFE};
 
 void CustomControls(void)
 {
@@ -2049,7 +2047,7 @@ void CustomControls(void)
 //
 void DefineMouseBtns(void)
 {
- CustomCtrls mouseallowed={0,1,1,1};
+ CustomCtrls mouseallowed={ {0,1,1,1} };
  EnterCtrlData(2,&mouseallowed,DrawCustMouse,PrintCustMouse,MOUSE);
 }
 
@@ -2060,7 +2058,7 @@ void DefineMouseBtns(void)
 //
 void DefineJoyBtns(void)
 {
- CustomCtrls joyallowed={1,1,1,1};
+ CustomCtrls joyallowed={ {1,1,1,1} };
  EnterCtrlData(5,&joyallowed,DrawCustJoy,PrintCustJoy,JOYSTICK);
 }
 
@@ -2071,7 +2069,7 @@ void DefineJoyBtns(void)
 //
 void DefineKeyBtns(void)
 {
- CustomCtrls keyallowed={1,1,1,1};
+ CustomCtrls keyallowed={ {1,1,1,1} };
  EnterCtrlData(8,&keyallowed,DrawCustKeybd,PrintCustKeybd,KEYBOARDBTNS);
 }
 
@@ -2082,7 +2080,7 @@ void DefineKeyBtns(void)
 //
 void DefineKeyMove(void)
 {
-	CustomCtrls keyallowed={1,1,1,1};
+	CustomCtrls keyallowed={ {1,1,1,1} };
 	EnterCtrlData(10,&keyallowed,DrawCustKeys,PrintCustKeys,KEYBOARDMOVE);
 }
 
@@ -2098,7 +2096,6 @@ void EnterCtrlData(int index,CustomCtrls *cust,void (*DrawRtn)(int),void (*Print
 {
  int j,exit,tick,redraw,which,x,picked;
  ControlInfo ci;
-
 
  ShootSnd();
  PrintY=CST_Y+13*index;
@@ -2815,7 +2812,7 @@ void CP_Quit(void)
 	#ifdef SPANISH
 	if (Confirm(ENDGAMESTR))
 	#else
-	if (Confirm(endStrings[US_RndT()&0x7+(US_RndT()&1)]))
+	if (Confirm(endStrings[(US_RndT()&0x7)+(US_RndT()&1)]))
 	#endif
 
 	#endif
@@ -3561,7 +3558,7 @@ int GetYorN(int x,int y,int pic)
 ////////////////////////////////////////////////////////////////////
 void Message(char *string)
 {
-	int h=0,w=0,mw=0,i,x,y,time;
+	int h=0,w=0,mw=0,i;
 	fontstruct *font;
 
 
@@ -3578,7 +3575,7 @@ void Message(char *string)
 			h+=font->height;
 		}
 		else
-			w+=font->width[string[i]];
+			w+=font->width[(int)string[i]];
 
 	if (w+10>mw)
 		mw=w+10;
@@ -3605,11 +3602,10 @@ void StartCPMusic(int song)
 {
 	musicnames	chunk;
 	
+	SD_MusicOff();
 	CA_UnCacheAudioChunk(STARTMUSIC + lastmusic);
 
 	lastmusic = song;
-
-	SD_MusicOff();
 	chunk =	song;
 
 	CA_CacheAudioChunk(STARTMUSIC + chunk);

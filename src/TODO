@@ -31,8 +31,6 @@ japanese version (unless the text was removed, but then why?)
 version than a spanish version
 * remove GOODTIMES (the piracy message is somewhat worthless)
 * then consider removing the SOD manual check
-* fix wolf shareware gfx
-* fix status bar gfx junk, and those tiles that do not wish to be extracted
 * Use either US_CheckParm or MS_CheckParm.
 * perhaps rename UPLOAD
 * TOO MANY #IFDEFs
@@ -48,6 +46,7 @@ CA_FarRead hit EOF?
 * if possible fix/or at least add ViewMap?
 * remove the #else at the end of each header since nothing is being doubly
 included now (if ever)
+* fix those tiles that do not wish to be extracted (latches or whathaveyou)
 * i don't like this latch nonsense. i think it was for originally storing
 data in vga memory. so figure it out, fix it, and remove
 * especially with the video functions, there are functions/defines which
