@@ -1,7 +1,6 @@
-// WL_TEXT.C
+/* wl_text.c */
 
-#include "WL_DEF.H"
-#pragma	hdrstop
+#include "wl_def.h"
 
 /*
 =============================================================================
@@ -351,28 +350,28 @@ void HandleCtrls (void)
 
 void HandleWord (void)
 {
-	char		word[WORDLIMIT];
-	int			i,wordindex;
-	unsigned	wwidth,wheight,newpos;
+	char words[WORDLIMIT];
+	int i, wordindex;
+	word wwidth,wheight,newpos;
 
 
 	//
-	// copy the next word into [word]
+	// copy the next word into words[]
 	//
-	word[0] = *text++;
+	words[0] = *text++;
 	wordindex = 1;
 	while (*text>32)
 	{
-		word[wordindex] = *text++;
+		words[wordindex] = *text++;
 		if (++wordindex == WORDLIMIT)
 			Quit ("PageLayout: Word limit exceeded");
 	}
-	word[wordindex] = 0;		// stick a null at end for C
+	words[wordindex] = 0;		// stick a null at end for C
 
 	//
 	// see if it fits on this line
 	//
-	VW_MeasurePropString (word,&wwidth,&wheight);
+	VW_MeasurePropString (words, &wwidth, &wheight);
 
 	while (px+wwidth > rightmargin[rowon])
 	{
@@ -385,7 +384,7 @@ void HandleWord (void)
 	// print it
 	//
 	newpos = px+wwidth;
-	VWB_DrawPropString (word);
+	VWB_DrawPropString (words);
 	px = newpos;
 
 	//
@@ -796,8 +795,6 @@ void EndText (void)
 
 	SETFONTCOLOR(0,15);
 	IN_ClearKeysDown();
-	if (MousePresent)
-		Mouse(MDelta);	// Clear accumulated mouse movement
 
 	FreeMusic ();
 	CA_DownLevel ();
@@ -816,8 +813,6 @@ void EndText (void)
 	VW_FadeOut();
 	SETFONTCOLOR(0,15);
 	IN_ClearKeysDown();
-	if (MousePresent)
-		Mouse(MDelta);	// Clear accumulated mouse movement
 
 	FreeMusic ();
 	CA_DownLevel ();

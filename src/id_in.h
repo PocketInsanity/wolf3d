@@ -89,14 +89,6 @@ typedef	byte		ScanCode;
 #define	key_Tab			0x09
 #define	key_Delete		0x7f
 
-// 	Stuff for the mouse
-#define	MReset		0
-#define	MButtons	3
-#define	MDelta		11
-
-#define	MouseInt	0x33
-#define	Mouse(x)	_AX = x,geninterrupt(MouseInt)
-
 typedef	enum		{
 						ctrl_Keyboard,
 						ctrl_Joystick,
