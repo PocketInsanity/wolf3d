@@ -216,7 +216,7 @@ static boolean TransformTile(int tx, int ty, int *dispx, int *dispheight)
 =====================
 */
 
-static int dirangle[9] = {0,ANGLES/8,2*ANGLES/8,3*ANGLES/8,4*ANGLES/8, 5*ANGLES/8,6*ANGLES/8,7*ANGLES/8,ANGLES};
+static const int dirangle[9] = {0,ANGLES/8,2*ANGLES/8,3*ANGLES/8,4*ANGLES/8, 5*ANGLES/8,6*ANGLES/8,7*ANGLES/8,ANGLES};
 
 static int CalcRotate(objtype *ob)
 {
@@ -386,7 +386,7 @@ static void DrawScaleds()
 ==============
 */
 
-static int weaponscale[NUMWEAPONS] = {SPR_KNIFEREADY,SPR_PISTOLREADY
+static const int weaponscale[NUMWEAPONS] = {SPR_KNIFEREADY,SPR_PISTOLREADY
 	,SPR_MACHINEGUNREADY,SPR_CHAINREADY};
 
 static void DrawPlayerWeapon()
