@@ -272,7 +272,7 @@ long DoChecksum(byte *source,unsigned size,long checksum)
 
 boolean SaveTheGame(int file,int x,int y)
 {
-	long avail,size,checksum;
+	long checksum;
 	objtype *ob,nullobj;
 
 	checksum = 0;
@@ -358,8 +358,7 @@ boolean SaveTheGame(int file,int x,int y)
 boolean LoadTheGame(int file,int x,int y)
 {
 	long checksum,oldchecksum;
-	objtype *ob,nullobj;
-
+	objtype nullobj;
 
 	checksum = 0;
 
@@ -557,15 +556,12 @@ void BuildTables (void)
 
 void CalcProjection (long focal)
 {
-	int             i;
-	long            intang;
+	int     i;
+	long    intang;
 	float   angle;
 	double  tang;
-	double  planedist;
-	double  globinhalf;
-	int             halfview;
-	double  halfangle,facedist;
-
+	int     halfview;
+	double  facedist;
 
 	focallength = focal;
 	facedist = focal+MINDIST;
@@ -1021,7 +1017,7 @@ void DoJukebox(void)
 
 void InitGame(void)
 {
-	int i,x,y;
+	int i;
 
 	MM_Startup (); 
 	VW_Startup ();
@@ -1191,7 +1187,6 @@ void Quit(char *error)
 
 void DemoLoop (void)
 {
-	static int LastDemo;
 	int i;
 //
 // main game cycle
@@ -1210,6 +1205,8 @@ void DemoLoop (void)
 	if ( i && ( (i+1) < _argc) ) {
 		i++;
 		for (; i < _argc; i++) {
+			if (_argv[i][0] == '-')
+				break;
 			IN_ClearKeysDown();
 			if (PlayDemoFromFile(_argv[i]))
 				IN_UserInput(3 * 70);
@@ -1310,8 +1307,6 @@ void DemoLoop (void)
 
 int WolfMain(int argc, char *argv[])
 {
-	int i;
-
 	_argc = argc;
 	_argv = argv;
 	

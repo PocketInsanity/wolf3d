@@ -31,10 +31,6 @@ int WolfMain(int argc, char *argv[]);
 
 /* ------------------------------------------------------------------------ */
 
-extern char signon;
-
-#define	introscn signon
-
 #ifndef SPEAR
 
 #ifndef UPLOAD
@@ -58,9 +54,6 @@ extern char signon;
 #endif /* SPEAR */
 
 /* ---------------- */
-
-
-#define GREXT	"VGA"
 
 typedef	enum	{false,true}	boolean;
 typedef	unsigned	char		byte;
@@ -87,6 +80,10 @@ typedef	struct
 #include "id_vh.h"
 #include "id_sd.h"
 #include "id_us.h"
+
+extern byte signon;
+
+#define	introscn signon
 
 void	Quit (char *error);		// defined in user program
 

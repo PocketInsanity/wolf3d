@@ -414,7 +414,7 @@ enum	{
 		SPR_MACHINEGUNATK4,
 
 		SPR_CHAINREADY,SPR_CHAINATK1,SPR_CHAINATK2,SPR_CHAINATK3,
-		SPR_CHAINATK4,
+		SPR_CHAINATK4
 
 		};
 
@@ -868,6 +868,7 @@ void LevelCompleted (void);
 void CheckHighScore (long score,word other);
 void Victory (void);
 void ClearSplitVWB (void);
+void PG13();
 
 /*
 =============================================================================

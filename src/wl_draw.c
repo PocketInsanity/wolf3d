@@ -945,7 +945,7 @@ void HitVertWall (void)
 {
 	int			wallpic;
 	unsigned	texture;
-	char *wall;
+	byte *wall;
 
 #ifdef DEBUGx
   printf ("HitVertWall: xtile = %d, TILE(yintercept) = %d\n",
@@ -981,7 +981,7 @@ void HitHorizWall (void)
 {
 	int			wallpic;
 	unsigned	texture;
-	char *wall;
+	byte *wall;
 
 #ifdef DEBUGx
    printf ("HitHorizWall: ytile = %d, TILE(xintercept) = %d\n",

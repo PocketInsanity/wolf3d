@@ -1,7 +1,7 @@
 CC = gcc
 #CFLAGS = -O6 -fomit-frame-pointer -ffast-math -funroll-loops -mpentiumpro -mcpu=pentiumpro -march=pentiumpro 
-#CFLAGS = -g -Wall -pedantic
-CFLAGS = -g
+CFLAGS = -g -Wall
+#CFLAGS = -g
 #CFLAGS = -Os
 OBJS = objs.o misc.o id_ca.o id_sd.o id_vh.o id_us.o \
 	wl_scale.o wl_draw.o wl_act1.o wl_act2.o wl_agent.o wl_game.o \
@@ -21,8 +21,8 @@ NASM = nasm
 
 all:	swolf3d xwolf3d
 
-$(SOBJS): version.h id_heads.h
-$(XOBJS): version.h id_heads.h
+$(SOBJS): version.h id_heads.h wl_def.h
+$(XOBJS): version.h id_heads.h wl_def.h
 
 .asm.o:
 	$(NASM) -f elf -o $@ $<

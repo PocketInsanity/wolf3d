@@ -134,7 +134,7 @@ void VL_Startup()
 	if (gfxbuf == NULL) 
 		gfxbuf = malloc(320 * 200 * 1);
 	
-	img = XCreateImage(dpy, vi->visual, 8, ZPixmap, 0, gfxbuf, 320, 200,
+	img = XCreateImage(dpy, vi->visual, 8, ZPixmap, 0, (char *)gfxbuf, 320, 200,
 			   8, 320);
 			   
 	XMapWindow(dpy, win);
@@ -275,8 +275,8 @@ void VL_SetPalette(byte *palette)
 */
 
 void VL_GetPalette(byte *palette)
-{
-	int i, r, g, b;
+{	
+	int i;
 	
 	for (i = 0; i < 256; i++) {
 		palette[i*3+0] = clr[i].red >> 10;
@@ -540,8 +540,7 @@ int XKeysymToScancode(unsigned int keysym)
 void keyboard_handler(int code, int press)
 {
 	static boolean special;
-	byte k, c, temp;
-	int i;
+	byte k, c;
 
 	k = code;
 

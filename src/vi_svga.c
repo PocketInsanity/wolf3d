@@ -378,76 +378,11 @@ static	char			*ParmStrings[] = {"nojoys","nomouse",nil};
 
 //	Internal routines
 
-///////////////////////////////////////////////////////////////////////////
-//
-//	INL_KeyService() - Handles a keyboard interrupt (key up/down)
-//
-///////////////////////////////////////////////////////////////////////////
-static void INL_KeyService(void)
-{
-	static boolean special;
-	byte k, c, temp;
-	int i;
-
-	/* k = inportb(0x60);	// Get the scan code */
-
-	if (k == 0xe0)		// Special key prefix
-		special = true;
-	else if (k == 0xe1)	// Handle Pause key
-		Paused = true;
-	else
-	{
-		if (k & 0x80)	// Break code
-		{
-			k &= 0x7f;
-
-// DEBUG - handle special keys: ctl-alt-delete, print scrn
-
-			Keyboard[k] = false;
-		}
-		else			// Make code
-		{
-			LastCode = CurCode;
-			CurCode = LastScan = k;
-			Keyboard[k] = true;
-
-			if (special)
-				c = SpecialNames[k];
-			else
-			{
-				if (k == sc_CapsLock)
-				{
-					CapsLock ^= true;
-				}
-
-				if (Keyboard[sc_LShift] || Keyboard[sc_RShift])	// If shifted
-				{
-					c = ShiftNames[k];
-					if ((c >= 'A') && (c <= 'Z') && CapsLock)
-						c += 'a' - 'A';
-				}
-				else
-				{
-					c = ASCIINames[k];
-					if ((c >= 'a') && (c <= 'z') && CapsLock)
-						c -= 'a' - 'A';
-				}
-			}
-			if (c)
-				LastASCII = c;
-		}
-
-		special = false;
-	}
-}
-
 void keyboard_handler(int code, int press)
 {
 	static boolean special;
-	byte k, c, temp;
-	int i;
+	byte k, c;
 
-	/* k = inportb(0x60);	// Get the scan code */
 	k = code;
 
 	if (k == 0xe0)		// Special key prefix
