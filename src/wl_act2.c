@@ -150,10 +150,10 @@ void A_Smoke(objtype *ob)
 	GetNewActor();
 #ifdef SPEAR
 	if (ob->obclass == hrocketobj)
-		new->state = &s_hsmoke1;
+		new->state = s_hsmoke1;
 	else
 #endif
-		new->state = &s_smoke1;
+		new->state = s_smoke1;
 	new->ticcount = 6;
 
 	new->tilex = ob->tilex;
@@ -238,17 +238,17 @@ void T_Projectile(objtype *ob)
 		if (ob->obclass == rocketobj)
 		{
 			PlaySoundLocActor(MISSILEHITSND,ob);
-			ob->state = &s_boom1;
+			ob->state = s_boom1;
 		}
 #ifdef SPEAR
 		else if (ob->obclass == hrocketobj)
 		{
 			PlaySoundLocActor(MISSILEHITSND,ob);
-			ob->state = &s_hboom1;
+			ob->state = s_hboom1;
 		}
 #endif
 		else
-			ob->state = NULL;		// mark for removal
+			ob->state = s_none;		// mark for removal
 
 		return;
 	}
@@ -273,7 +273,7 @@ void T_Projectile(objtype *ob)
 		}
 
 		TakeDamage(damage, ob);
-		ob->state = NULL;		// mark for removal
+		ob->state = s_none;		// mark for removal
 		return;
 	}
 
@@ -306,28 +306,28 @@ void SpawnStand (enemy_t which, int tilex, int tiley, int dir)
 	switch (which)
 	{
 	case en_guard:
-		SpawnNewObj (tilex,tiley,&s_grdstand);
+		SpawnNewObj (tilex,tiley,s_grdstand);
 		new->speed = SPDPATROL;
 		if (!loadedgame)
 		  gamestate.killtotal++;
 		break;
 
 	case en_officer:
-		SpawnNewObj (tilex,tiley,&s_ofcstand);
+		SpawnNewObj (tilex,tiley,s_ofcstand);
 		new->speed = SPDPATROL;
 		if (!loadedgame)
 		  gamestate.killtotal++;
 		break;
 
 	case en_mutant:
-		SpawnNewObj (tilex,tiley,&s_mutstand);
+		SpawnNewObj (tilex,tiley,s_mutstand);
 		new->speed = SPDPATROL;
 		if (!loadedgame)
 		  gamestate.killtotal++;
 		break;
 
 	case en_ss:
-		SpawnNewObj (tilex,tiley,&s_ssstand);
+		SpawnNewObj (tilex,tiley,s_ssstand);
 		new->speed = SPDPATROL;
 		if (!loadedgame)
 		  gamestate.killtotal++;
@@ -375,7 +375,7 @@ void SpawnStand (enemy_t which, int tilex, int tiley, int dir)
 
 void SpawnDeadGuard (int tilex, int tiley)
 {
-	SpawnNewObj (tilex,tiley,&s_grddie4);
+	SpawnNewObj (tilex,tiley,s_grddie4);
 	new->obclass = inertobj;
 }
 
@@ -394,35 +394,35 @@ void SpawnPatrol (enemy_t which, int tilex, int tiley, int dir)
 	switch (which)
 	{
 	case en_guard:
-		SpawnNewObj (tilex,tiley,&s_grdpath1);
+		SpawnNewObj (tilex,tiley,s_grdpath1);
 		new->speed = SPDPATROL;
 		if (!loadedgame)
 		  gamestate.killtotal++;
 		break;
 
 	case en_officer:
-		SpawnNewObj (tilex,tiley,&s_ofcpath1);
+		SpawnNewObj (tilex,tiley,s_ofcpath1);
 		new->speed = SPDPATROL;
 		if (!loadedgame)
 		  gamestate.killtotal++;
 		break;
 
 	case en_ss:
-		SpawnNewObj (tilex,tiley,&s_sspath1);
+		SpawnNewObj (tilex,tiley,s_sspath1);
 		new->speed = SPDPATROL;
 		if (!loadedgame)
 		  gamestate.killtotal++;
 		break;
 
 	case en_mutant:
-		SpawnNewObj (tilex,tiley,&s_mutpath1);
+		SpawnNewObj (tilex,tiley,s_mutpath1);
 		new->speed = SPDPATROL;
 		if (!loadedgame)
 		  gamestate.killtotal++;
 		break;
 
 	case en_dog:
-		SpawnNewObj (tilex,tiley,&s_dogpath1);
+		SpawnNewObj (tilex,tiley,s_dogpath1);
 		new->speed = SPDDOG;
 		if (!loadedgame)
 		  gamestate.killtotal++;
@@ -831,14 +831,14 @@ void T_Bite (objtype *ob)
 void SpawnTrans (int tilex, int tiley)
 {
 	if (SoundBlasterPresent && DigiMode != sds_Off)
-		s_transdie01.tictime = 105;
+		gamestates[s_transdie01].tictime = 105;
 
-	SpawnNewObj (tilex,tiley,&s_transstand);
+	SpawnNewObj(tilex,tiley,s_transstand);
 	new->obclass = transobj;
 	new->hitpoints = starthitpoints[gamestate.difficulty][en_trans];
 	new->flags |= FL_SHOOTABLE|FL_AMBUSH;
 	if (!loadedgame)
-	  gamestate.killtotal++;
+		gamestate.killtotal++;
 }
 
 //
@@ -856,14 +856,14 @@ void SpawnTrans (int tilex, int tiley)
 void SpawnUber (int tilex, int tiley)
 {
 	if (SoundBlasterPresent && DigiMode != sds_Off)
-		s_uberdie01.tictime = 70;
+		gamestates[s_uberdie01].tictime = 70;
 
-	SpawnNewObj (tilex,tiley,&s_uberstand);
+	SpawnNewObj (tilex,tiley,s_uberstand);
 	new->obclass = uberobj;
 	new->hitpoints = starthitpoints[gamestate.difficulty][en_uber];
 	new->flags |= FL_SHOOTABLE|FL_AMBUSH;
 	if (!loadedgame)
-	  gamestate.killtotal++;
+		gamestate.killtotal++;
 }
 
 /*
@@ -895,17 +895,17 @@ void T_UShoot(objtype *ob)
 ===============
 */
 
-void SpawnWill (int tilex, int tiley)
+void SpawnWill(int tilex, int tiley)
 {
 	if (SoundBlasterPresent && DigiMode != sds_Off)
-		s_willdie2.tictime = 70;
+		gamestates[s_willdie2].tictime = 70;
 
-	SpawnNewObj (tilex,tiley,&s_willstand);
+	SpawnNewObj (tilex,tiley,s_willstand);
 	new->obclass = willobj;
 	new->hitpoints = starthitpoints[gamestate.difficulty][en_will];
 	new->flags |= FL_SHOOTABLE|FL_AMBUSH;
 	if (!loadedgame)
-	  gamestate.killtotal++;
+		gamestate.killtotal++;
 }
 
 /*
@@ -916,7 +916,7 @@ void SpawnWill (int tilex, int tiley)
 ================
 */
 
-void T_Will (objtype *ob)
+void T_Will(objtype *ob)
 {
 	long move;
 	int	dx,dy,dist;
@@ -935,11 +935,11 @@ void T_Will (objtype *ob)
 		// go into attack frame
 		//
 			if (ob->obclass == willobj)
-				NewState (ob,&s_willshoot1);
+				NewState (ob,s_willshoot1);
 			else if (ob->obclass == angelobj)
-				NewState (ob,&s_angelshoot1);
+				NewState (ob,s_angelshoot1);
 			else
-				NewState (ob,&s_deathshoot1);
+				NewState (ob,s_deathshoot1);
 			return;
 		}
 		dodge = true;
@@ -1011,12 +1011,12 @@ void T_Will (objtype *ob)
 ===============
 */
 
-void SpawnDeath (int tilex, int tiley)
+void SpawnDeath(int tilex, int tiley)
 {
 	if (SoundBlasterPresent && DigiMode != sds_Off)
-		s_deathdie2.tictime = 105;
+		gamestates[s_deathdie2].tictime = 105;
 
-	SpawnNewObj (tilex,tiley,&s_deathstand);
+	SpawnNewObj (tilex,tiley,s_deathstand);
 	new->obclass = deathobj;
 	new->hitpoints = starthitpoints[gamestate.difficulty][en_death];
 	new->flags |= FL_SHOOTABLE|FL_AMBUSH;
@@ -1032,11 +1032,11 @@ void SpawnDeath (int tilex, int tiley)
 ===============
 */
 
-void T_Launch (objtype *ob)
+void T_Launch(objtype *ob)
 {
-	long	deltax,deltay;
-	float	angle;
-	int		iangle;
+	long deltax, deltay;
+	float angle;
+	int iangle;
 
 	deltax = player->x - ob->x;
 	deltay = ob->y - player->y;
@@ -1047,7 +1047,7 @@ void T_Launch (objtype *ob)
 	if (ob->obclass == deathobj)
 	{
 		T_Shoot (ob);
-		if (ob->state == &s_deathshoot2)
+		if (ob->state == s_deathshoot2)
 		{
 			iangle-=4;
 			if (iangle<0)
@@ -1061,8 +1061,8 @@ void T_Launch (objtype *ob)
 		}
 	}
 
-	GetNewActor ();
-	new->state = &s_rocket;
+	GetNewActor();
+	new->state = s_rocket;
 	new->ticcount = 1;
 
 	new->tilex = ob->tilex;
@@ -1073,17 +1073,17 @@ void T_Launch (objtype *ob)
 	switch(ob->obclass)
 	{
 	case deathobj:
-		new->state = &s_hrocket;
+		new->state = s_hrocket;
 		new->obclass = hrocketobj;
-		PlaySoundLocActor (KNIGHTMISSILESND,new);
+		PlaySoundLocActor(KNIGHTMISSILESND,new);
 		break;
 	case angelobj:
-		new->state = &s_spark1;
+		new->state = s_spark1;
 		new->obclass = sparkobj;
-		PlaySoundLocActor (ANGELFIRESND,new);
+		PlaySoundLocActor(ANGELFIRESND,new);
 		break;
 	default:
-		PlaySoundLocActor (MISSILEFIRESND,new);
+		PlaySoundLocActor(MISSILEFIRESND,new);
 	}
 
 	new->dir = nodir;
@@ -1111,19 +1111,18 @@ void A_Breathing(objtype *ob)
 ===============
 */
 
-void SpawnAngel (int tilex, int tiley)
+void SpawnAngel(int tilex, int tiley)
 {
 	if (SoundBlasterPresent && DigiMode != sds_Off)
-		s_angeldie11.tictime = 105;
+		gamestates[s_angeldie11].tictime = 105;
 
-	SpawnNewObj (tilex,tiley,&s_angelstand);
+	SpawnNewObj (tilex,tiley,s_angelstand);
 	new->obclass = angelobj;
 	new->hitpoints = starthitpoints[gamestate.difficulty][en_angel];
 	new->flags |= FL_SHOOTABLE|FL_AMBUSH;
 	if (!loadedgame)
-	  gamestate.killtotal++;
+		gamestate.killtotal++;
 }
-
 
 /*
 =================
@@ -1133,11 +1132,10 @@ void SpawnAngel (int tilex, int tiley)
 =================
 */
 
-void A_Victory (objtype *ob)
+void A_Victory(objtype *ob)
 {
 	playstate = ex_victorious;
 }
-
 
 /*
 =================
@@ -1147,11 +1145,10 @@ void A_Victory (objtype *ob)
 =================
 */
 
-void A_StartAttack (objtype *ob)
+void A_StartAttack(objtype *ob)
 {
 	ob->temp1 = 0;
 }
-
 
 /*
 =================
@@ -1161,17 +1158,17 @@ void A_StartAttack (objtype *ob)
 =================
 */
 
-void A_Relaunch (objtype *ob)
+void A_Relaunch(objtype *ob)
 {
 	if (++ob->temp1 == 3)
 	{
-		NewState (ob,&s_angeltired);
+		NewState(ob, s_angeltired);
 		return;
 	}
 
 	if (US_RndT()&1)
 	{
-		NewState (ob,&s_angelchase1);
+		NewState(ob, s_angelchase1);
 		return;
 	}
 }
@@ -1184,14 +1181,14 @@ void A_Relaunch (objtype *ob)
 ===============
 */
 
-void SpawnSpectre (int tilex, int tiley)
+void SpawnSpectre(int tilex, int tiley)
 {
-	SpawnNewObj (tilex,tiley,&s_spectrewait1);
+	SpawnNewObj (tilex,tiley,s_spectrewait1);
 	new->obclass = spectreobj;
 	new->hitpoints = starthitpoints[gamestate.difficulty][en_spectre];
 	new->flags |= FL_SHOOTABLE|FL_AMBUSH; // |FL_NEVERMARK|FL_NONMARK;
 	if (!loadedgame)
-	  gamestate.killtotal++;
+		gamestate.killtotal++;
 }
 
 /*
@@ -1202,12 +1199,12 @@ void SpawnSpectre (int tilex, int tiley)
 ===============
 */
 
-void A_Dormant (objtype *ob)
+void A_Dormant(objtype *ob)
 {
-	long	deltax,deltay;
-	int	xl,xh,yl,yh;
-	int	x,y;
-	unsigned	tile;
+	long deltax, deltay;
+	int xl,xh,yl,yh;
+	int x,y;
+	unsigned tile;
 
 	deltax = ob->x - player->x;
 	if (deltax < -MINACTORDIST || deltax > MINACTORDIST)
@@ -1239,7 +1236,7 @@ moveok:
 	ob->flags |= FL_AMBUSH | FL_SHOOTABLE;
 	ob->flags &= ~FL_ATTACKMODE;
 	ob->dir = nodir;
-	NewState (ob,&s_spectrewait1);
+	NewState (ob,s_spectrewait1);
 }
 
 
@@ -1265,7 +1262,7 @@ moveok:
 
 void SpawnBoss (int tilex, int tiley)
 {
-	SpawnNewObj (tilex,tiley,&s_bossstand);
+	SpawnNewObj (tilex,tiley,s_bossstand);
 	new->speed = SPDPATROL;
 
 	new->obclass = bossobj;
@@ -1286,7 +1283,7 @@ void SpawnBoss (int tilex, int tiley)
 
 void SpawnGretel (int tilex, int tiley)
 {
-	SpawnNewObj (tilex,tiley,&s_gretelstand);
+	SpawnNewObj (tilex,tiley,s_gretelstand);
 	new->speed = SPDPATROL;
 
 	new->obclass = gretelobj;
@@ -1310,16 +1307,16 @@ void SpawnGhosts (int which, int tilex, int tiley)
 	switch(which)
 	{
 	 case en_blinky:
-	   SpawnNewObj (tilex,tiley,&s_blinkychase1);
+	   SpawnNewObj (tilex,tiley,s_blinkychase1);
 	   break;
 	 case en_clyde:
-	   SpawnNewObj (tilex,tiley,&s_clydechase1);
+	   SpawnNewObj (tilex,tiley,s_clydechase1);
 	   break;
 	 case en_pinky:
-	   SpawnNewObj (tilex,tiley,&s_pinkychase1);
+	   SpawnNewObj (tilex,tiley,s_pinkychase1);
 	   break;
 	 case en_inky:
-	   SpawnNewObj (tilex,tiley,&s_inkychase1);
+	   SpawnNewObj (tilex,tiley,s_inkychase1);
 	   break;
 	}
 
@@ -1343,11 +1340,11 @@ void SpawnGhosts (int which, int tilex, int tiley)
 void SpawnSchabbs(int tilex, int tiley)
 { 
 	if (DigiMode != sds_Off) /* TODO: what? */
-		s_schabbdie2.tictime = 140;
+		gamestates[s_schabbdie2].tictime = 140;
 	else
-		s_schabbdie2.tictime = 5;
+		gamestates[s_schabbdie2].tictime = 5;
 
-	SpawnNewObj (tilex,tiley,&s_schabbstand);
+	SpawnNewObj(tilex, tiley, s_schabbstand);
 	new->speed = SPDPATROL;
 
 	new->obclass = schabbobj;
@@ -1370,11 +1367,11 @@ void SpawnSchabbs(int tilex, int tiley)
 void SpawnGift (int tilex, int tiley)
 {
 	if (DigiMode != sds_Off)
-	  s_giftdie2.tictime = 140;
+		gamestates[s_giftdie2].tictime = 140;
 	else
-	  s_giftdie2.tictime = 5;
+		gamestates[s_giftdie2].tictime = 5;
 
-	SpawnNewObj (tilex,tiley,&s_giftstand);
+	SpawnNewObj (tilex,tiley,s_giftstand);
 	new->speed = SPDPATROL;
 
 	new->obclass = giftobj;
@@ -1397,11 +1394,11 @@ void SpawnGift (int tilex, int tiley)
 void SpawnFat (int tilex, int tiley)
 {
 	if (DigiMode != sds_Off)
-	  s_fatdie2.tictime = 140;
+		gamestates[s_fatdie2].tictime = 140;
 	else
-	  s_fatdie2.tictime = 5;
+		gamestates[s_fatdie2].tictime = 5;
 
-	SpawnNewObj (tilex,tiley,&s_fatstand);
+	SpawnNewObj (tilex,tiley,s_fatstand);
 	new->speed = SPDPATROL;
 
 	new->obclass = fatobj;
@@ -1435,7 +1432,7 @@ void T_SchabbThrow (objtype *ob)
 	iangle = angle/(PI*2)*ANGLES;
 
 	GetNewActor ();
-	new->state = &s_needle1;
+	new->state = s_needle1;
 	new->ticcount = 1;
 
 	new->tilex = ob->tilex;
@@ -1475,7 +1472,7 @@ void T_GiftThrow(objtype *ob)
 	iangle = angle/(PI*2)*ANGLES;
 
 	GetNewActor ();
-	new->state = &s_rocket;
+	new->state = s_rocket;
 	new->ticcount = 1;
 
 	new->tilex = ob->tilex;
@@ -1521,7 +1518,7 @@ void T_Schabb (objtype *ob)
 		//
 		// go into attack frame
 		//
-			NewState (ob,&s_schabbshoot1);
+			NewState (ob,s_schabbshoot1);
 			return;
 		}
 		dodge = true;
@@ -1613,7 +1610,7 @@ void T_Gift (objtype *ob)
 		//
 		// go into attack frame
 		//
-			NewState (ob,&s_giftshoot1);
+			NewState (ob,s_giftshoot1);
 			return;
 		}
 		dodge = true;
@@ -1705,7 +1702,7 @@ void T_Fat (objtype *ob)
 		//
 		// go into attack frame
 		//
-			NewState (ob,&s_fatshoot1);
+			NewState (ob,s_fatshoot1);
 			return;
 		}
 		dodge = true;
@@ -1786,14 +1783,14 @@ void T_Fat (objtype *ob)
 ===============
 */
 
-void SpawnFakeHitler (int tilex, int tiley)
+void SpawnFakeHitler(int tilex, int tiley)
 {
 	if (DigiMode != sds_Off)
-	  s_hitlerdie2.tictime = 140;
+		gamestates[s_hitlerdie2].tictime = 140;
 	else
-	  s_hitlerdie2.tictime = 5;
+		gamestates[s_hitlerdie2].tictime = 5;
 
-	SpawnNewObj (tilex,tiley,&s_fakestand);
+	SpawnNewObj(tilex, tiley, s_fakestand);
 	new->speed = SPDPATROL;
 
 	new->obclass = fakeobj;
@@ -1813,15 +1810,15 @@ void SpawnFakeHitler (int tilex, int tiley)
 ===============
 */
 
-void SpawnHitler (int tilex, int tiley)
+void SpawnHitler(int tilex, int tiley)
 {
 	if (DigiMode != sds_Off)
-		s_hitlerdie2.tictime = 140;
+		gamestates[s_hitlerdie2].tictime = 140;
 	else
-		s_hitlerdie2.tictime = 5;
+		gamestates[s_hitlerdie2].tictime = 5;
 
 
-	SpawnNewObj (tilex,tiley,&s_mechastand);
+	SpawnNewObj (tilex,tiley,s_mechastand);
 	new->speed = SPDPATROL;
 
 	new->obclass = mechahitlerobj;
@@ -1845,7 +1842,7 @@ void A_HitlerMorph (objtype *ob)
 {
 	word hitpoints[4]={500,700,800,900};
 
-	SpawnNewObj (ob->tilex,ob->tiley,&s_hitlerchase1);
+	SpawnNewObj (ob->tilex,ob->tiley,s_hitlerchase1);
 	new->speed = SPDPATROL*5;
 
 	new->x = ob->x;
@@ -1900,7 +1897,7 @@ void T_FakeFire (objtype *ob)
 	iangle = angle/(PI*2)*ANGLES;
 
 	GetNewActor ();
-	new->state = &s_fire1;
+	new->state = s_fire1;
 	new->ticcount = 1;
 
 	new->tilex = ob->tilex;
@@ -1936,7 +1933,7 @@ void T_Fake (objtype *ob)
 		//
 		// go into attack frame
 		//
-			NewState (ob,&s_fakeshoot1);
+			NewState (ob,s_fakeshoot1);
 			return;
 		}
 	}
@@ -2046,45 +2043,45 @@ void T_Chase (objtype *ob)
 			switch (ob->obclass)
 			{
 			case guardobj:
-				NewState (ob,&s_grdshoot1);
+				NewState (ob,s_grdshoot1);
 				break;
 			case officerobj:
-				NewState (ob,&s_ofcshoot1);
+				NewState (ob,s_ofcshoot1);
 				break;
 			case mutantobj:
-				NewState (ob,&s_mutshoot1);
+				NewState (ob,s_mutshoot1);
 				break;
 			case ssobj:
-				NewState (ob,&s_ssshoot1);
+				NewState (ob,s_ssshoot1);
 				break;
 #ifndef SPEAR
 			case bossobj:
-				NewState (ob,&s_bossshoot1);
+				NewState (ob,s_bossshoot1);
 				break;
 			case gretelobj:
-				NewState (ob,&s_gretelshoot1);
+				NewState (ob,s_gretelshoot1);
 				break;
 			case mechahitlerobj:
-				NewState (ob,&s_mechashoot1);
+				NewState (ob,s_mechashoot1);
 				break;
 			case realhitlerobj:
-				NewState (ob,&s_hitlershoot1);
+				NewState (ob,s_hitlershoot1);
 				break;
 #else
 			case angelobj:
-				NewState (ob,&s_angelshoot1);
+				NewState (ob,s_angelshoot1);
 				break;
 			case transobj:
-				NewState (ob,&s_transshoot1);
+				NewState (ob,s_transshoot1);
 				break;
 			case uberobj:
-				NewState (ob,&s_ubershoot1);
+				NewState (ob,s_ubershoot1);
 				break;
 			case willobj:
-				NewState (ob,&s_willshoot1);
+				NewState (ob,s_willshoot1);
 				break;
 			case deathobj:
-				NewState (ob,&s_deathshoot1);
+				NewState (ob,s_deathshoot1);
 				break;
 #endif
 			default:
@@ -2240,7 +2237,7 @@ void T_DogChase (objtype *ob)
 			dy -= move;
 			if (dy <= MINACTORDIST)
 			{
-				NewState (ob,&s_dogjump1);
+				NewState (ob,s_dogjump1);
 				return;
 			}
 		}
@@ -2295,7 +2292,7 @@ void T_DogChase (objtype *ob)
 
 void SpawnBJVictory()
 {
-	SpawnNewObj(player->tilex,player->tiley+1, &s_bjrun1);
+	SpawnNewObj(player->tilex,player->tiley+1, s_bjrun1);
 	new->x = player->x;
 	new->y = player->y;
 	new->obclass = bjobj;
@@ -2335,7 +2332,7 @@ void T_BJRun(objtype *ob)
 
 		if (!(--ob->temp1))
 		{
-			NewState(ob,&s_bjjump1);
+			NewState(ob,s_bjjump1);
 			return;
 		}
 	}
@@ -2468,7 +2465,7 @@ void A_StartDeathCam(objtype *ob)
 //
 // line angle up exactly
 //
-	NewState (player,&s_deathcam);
+	NewState (player,s_deathcam);
 
 	player->x = gamestate.killx;
 	player->y = gamestate.killy;
@@ -2510,16 +2507,16 @@ void A_StartDeathCam(objtype *ob)
 	switch (ob->obclass)
 	{
 	case schabbobj:
-		NewState(ob, &s_schabbdeathcam);
+		NewState(ob, s_schabbdeathcam);
 		break;
 	case realhitlerobj:
-		NewState(ob, &s_hitlerdeathcam);
+		NewState(ob, s_hitlerdeathcam);
 		break;
 	case giftobj:
-		NewState(ob, &s_giftdeathcam);
+		NewState(ob, s_giftdeathcam);
 		break;
 	case fatobj:
-		NewState(ob, &s_fatdeathcam);
+		NewState(ob, s_fatdeathcam);
 		break;
 	default:
 		break;

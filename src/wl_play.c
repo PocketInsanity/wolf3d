@@ -831,7 +831,7 @@ static void RemoveObj(objtype *gone)
 	if (gone == player)
 		Quit ("RemoveObj: Tried to remove the player!");
 
-	gone->state = NULL;
+	gone->state = s_none;
 
 //
 // fix the next object's back link
@@ -1120,11 +1120,11 @@ void DoActor(objtype *ob)
 
 	if (!ob->ticcount)
 	{
-		think =	ob->state->think;
+		think =	gamestates[ob->state].think;
 		if (think)
 		{
-			think (ob);
-			if (!ob->state)
+			think(ob);
+			if (ob->state == s_none)
 			{
 				RemoveObj (ob);
 				return;
@@ -1145,45 +1145,45 @@ void DoActor(objtype *ob)
 // transitional object
 //
 	ob->ticcount-=tics;
-	while ( ob->ticcount <= 0)
+	while (ob->ticcount <= 0)
 	{
-		think = ob->state->action;			// end of state action
+		think = gamestates[ob->state].action;	// end of state action
 		if (think)
 		{
-			think (ob);
-			if (!ob->state)
+			think(ob);
+			if (ob->state == s_none)
 			{
 				RemoveObj(ob);
 				return;
 			}
 		}
 
-		ob->state = ob->state->next;
+		ob->state = gamestates[ob->state].next;
 
-		if (!ob->state)
+		if (ob->state == s_none)
 		{
-			RemoveObj (ob);
+			RemoveObj(ob);
 			return;
 		}
 
-		if (!ob->state->tictime)
+		if (!gamestates[ob->state].tictime)
 		{
 			ob->ticcount = 0;
 			goto think;
 		}
 
-		ob->ticcount += ob->state->tictime;
+		ob->ticcount += gamestates[ob->state].tictime;
 	}
 
 think:
 	//
 	// think
 	//
-	think =	ob->state->think;
+	think =	gamestates[ob->state].think;
 	if (think)
 	{
-		think (ob);
-		if (!ob->state)
+		think(ob);
+		if (ob->state == s_none)
 		{
 			RemoveObj(ob);
 			return;

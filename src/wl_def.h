@@ -524,8 +524,8 @@ typedef struct statestruct
 	int shapenum; /* a shapenum of -1 means get from ob->temp1 */
 	int tictime;
 	void (*think)(), (*action)();
-	struct statestruct *next;
-} PACKED statetype;
+	int next; /* stateenum */
+} statetype;
 
 //---------------------
 //
@@ -540,7 +540,7 @@ typedef struct statstruct
 	int	shapenum;		/* if shapenum == -1 the obj has been removed */
 	byte	flags;
 	byte	itemnumber;
-} PACKED statobj_t;
+} statobj_t;
 
 //---------------------
 //
@@ -555,7 +555,7 @@ typedef struct doorstruct
 	byte	lock;
 	enum	{dr_open,dr_closed,dr_opening,dr_closing}	action;
 	int		ticcount;
-} PACKED doorobj_t;
+} doorobj_t;
 
 //--------------------
 //
@@ -568,7 +568,7 @@ typedef struct objstruct
 	activetype	active;
 	int		ticcount;
 	classtype	obclass;
-	statetype	*state;
+	int		state; /* stateenum */
 
 	byte		flags;		/* FL_SHOOTABLE, etc */
 
@@ -589,11 +589,11 @@ typedef struct objstruct
 
 	int		temp1,temp2,temp3;
 	struct		objstruct *next,*prev;
-} PACKED objtype;
+} objtype;
 
 
 #define NUMBUTTONS	8
-enum	{
+enum {
 	bt_nobutton=-1,
 	bt_attack=0,
 	bt_strafe,
@@ -607,7 +607,7 @@ enum	{
 
 
 #define NUMWEAPONS	4
-typedef enum	{
+typedef enum {
 	wp_knife,
 	wp_pistol,
 	wp_machinegun,
@@ -647,7 +647,7 @@ typedef	struct
 	long		TimeCount;
 	long		killx,killy;
 	boolean		victoryflag;		// set during victory animations
-} PACKED gametype;
+} gametype;
 
 
 typedef	enum	{
@@ -730,7 +730,6 @@ extern	boolean		spearflag;
 void 	ScanInfoPlane (void);
 void	SetupGameLevel (void);
 void 	DrawPlayScreen (void);
-void 	FizzleOut (void);
 void 	GameLoop (void);
 void ClearMemory (void);
 void PlayDemo(int demonumber);
@@ -878,8 +877,8 @@ void	ThreeDRefresh (void);
 #define SPDPATROL	512
 #define SPDDOG		1500
 
-void	SpawnNewObj (unsigned tilex, unsigned tiley, statetype *state);
-void	NewState (objtype *ob, statetype *state);
+void	SpawnNewObj(unsigned tilex, unsigned tiley, int state); /* stateenum */ 
+void	NewState(objtype *ob, int state); /* stateenum */
 
 boolean TryWalk (objtype *ob);
 void 	SelectChaseDir (objtype *ob);

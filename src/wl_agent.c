@@ -909,7 +909,7 @@ void Cmd_Fire()
 
 	gamestate.weaponframe = 0;
 
-	player->state = &s_attack;
+	player->state = s_attack;
 
 	gamestate.attackframe = 0;
 	gamestate.attackcount =
@@ -1028,7 +1028,7 @@ void SpawnPlayer (int tilex, int tiley, int dir)
 		*(mapsegs[0] + farmapylookup[player->tiley]+player->tilex);
 	player->x = ((long)tilex<<TILESHIFT)+TILEGLOBAL/2;
 	player->y = ((long)tiley<<TILESHIFT)+TILEGLOBAL/2;
-	player->state = &s_player;
+	player->state = s_player;
 	player->angle = (1-dir)*90;
 	if (player->angle<0)
 		player->angle += ANGLES;
@@ -1250,7 +1250,7 @@ void T_Attack(objtype *ob)
 		switch (cur->attack)
 		{
 		case -1:
-			ob->state = &s_player;
+			ob->state = s_player;
 			if (!gamestate.ammo)
 			{
 				gamestate.weapon = wp_knife;
