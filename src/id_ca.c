@@ -30,16 +30,16 @@ typedef struct
 =============================================================================
 */
 
-byte 			*tinf;
-int			mapon;
+static byte *tinf;
+int mapon;
 
 word		*mapsegs[MAPPLANES];
-maptype			*mapheaderseg[NUMMAPS];
-byte			*audiosegs[NUMSNDCHUNKS];
-byte			*grsegs[NUMCHUNKS];
+maptype		*mapheaderseg[NUMMAPS];
+byte		*audiosegs[NUMSNDCHUNKS];
+byte		*grsegs[NUMCHUNKS];
 
-byte			grneeded[NUMCHUNKS];
-byte		ca_levelbit,ca_levelnum;
+static byte 	grneeded[NUMCHUNKS];
+static byte	ca_levelbit, ca_levelnum;
 
 /*
 =============================================================================
@@ -56,21 +56,22 @@ char extension[5],
      mheadname[10] = "maphead.",
      gmapsname[10] = "gamemaps.",
      aheadname[10] = "audiohed.",
-     afilename[10] = "audiot.";
+     afilename[10] = "audiot.",
+     pfilename[10] = "vswap.";
 
-long *grstarts;	/* array of offsets in vgagraph, -1 for sparse */
-long *audiostarts; /* array of offsets in audio / audiot */
+static long *grstarts;	/* array of offsets in vgagraph, -1 for sparse */
+static long *audiostarts; /* array of offsets in audio / audiot */
 
-huffnode grhuffman[255];
+static huffnode grhuffman[255];
 
-int grhandle; /* handle to VGAGRAPH */
-int maphandle; /* handle to MAPTEMP / GAMEMAPS */
-int audiohandle; /* handle to AUDIOT / AUDIO */
+static int grhandle; /* handle to VGAGRAPH */
+static int maphandle; /* handle to MAPTEMP / GAMEMAPS */
+static int audiohandle; /* handle to AUDIOT / AUDIO */
 
 SDMode oldsoundmode;
 
 #define FILEPOSSIZE	3
-long GRFILEPOS(int c)
+static long GRFILEPOS(int c)
 {
 	long value;
 	int	offset;
@@ -471,7 +472,7 @@ void CA_RLEWexpand(word *source, word *dest, long length, word rlewtag)
 ============================
 */
 
-long CAL_GetGrChunkLength(int chunk)
+static long CAL_GetGrChunkLength(int chunk)
 {
 	long chunkexplen;
 	
@@ -488,7 +489,7 @@ long CAL_GetGrChunkLength(int chunk)
 ======================
 */
 
-void CAL_SetupGrFile()
+static void CAL_SetupGrFile()
 {
 	char fname[13];
 	int handle;
@@ -555,9 +556,9 @@ void CAL_SetupGrFile()
 ======================
 */
 
-void CAL_SetupMapFile()
+static void CAL_SetupMapFile()
 {
-	int	i;
+	int i;
 	int handle;
 	long length,pos;
 	char fname[13];
@@ -565,8 +566,8 @@ void CAL_SetupMapFile()
 //
 // load maphead.ext (offsets and tileinfo for map file)
 //
-	strcpy(fname,mheadname);
-	strcat(fname,extension);
+	strcpy(fname, mheadname);
+	strcat(fname, extension);
 
 	if ((handle = open(fname, O_RDONLY | O_BINARY)) == -1)
 		CA_CannotOpen(fname);
@@ -622,7 +623,7 @@ void CAL_SetupMapFile()
 ======================
 */
 
-void CAL_SetupAudioFile()
+static void CAL_SetupAudioFile()
 {
 	int handle;
 	long length;
@@ -663,7 +664,7 @@ void CAL_SetupAudioFile()
 ======================
 */
 
-void CA_Startup(void)
+void CA_Startup()
 {
 	CAL_SetupMapFile();
 	CAL_SetupGrFile();
@@ -806,7 +807,7 @@ cachein:
 ======================
 */
 
-void CAL_ExpandGrChunk(int chunk, byte *source)
+static void CAL_ExpandGrChunk(int chunk, byte *source)
 {
 	int tilecount = 0, i;
 	long expanded;
@@ -1383,11 +1384,11 @@ void MM_SortMem()
 {
 }
 
-boolean PMStarted;
-char			PageFileName[13] = {"vswap."};
-int			PageFile = -1;
-word			ChunksInFile;
-word			PMSpriteStart,PMSoundStart;
+static boolean PMStarted;
+
+static int PageFile = -1;
+static word ChunksInFile;
+word PMSpriteStart, PMSoundStart;
 
 word PMNumBlocks;
 long PMFrameCount;
@@ -1419,14 +1420,18 @@ static void PML_ReadFromFile(byte *buf, long offset, word length)
 //
 static void PML_OpenPageFile()
 {
-	int				i;
-	long			size;
-	void			*buf;
-	longword		*offsetptr;
-	word			*lengthptr;
+	int i;
+	long size;
+	void *buf;
+	longword *offsetptr;
+	word *lengthptr;
 	PageListStruct *page;
-
-	PageFile = open(PageFileName, O_RDONLY | O_BINARY);
+	char fname[13];
+	
+	strcpy(fname, pfilename);
+	strcat(fname, extension);
+	
+	PageFile = open(fname, O_RDONLY | O_BINARY);
 	if (PageFile == -1)
 		Quit("PML_OpenPageFile: Unable to open page file");
 

@@ -18,16 +18,12 @@ typedef	struct
 
 //===========================================================================
 
-extern	byte 			*tinf;
 extern	int			mapon;
 
 extern	word *mapsegs[MAPPLANES];
 extern	maptype			*mapheaderseg[NUMMAPS];
 extern	byte			*audiosegs[NUMSNDCHUNKS];
 extern	byte			*grsegs[NUMCHUNKS];
-
-extern	byte		grneeded[NUMCHUNKS];
-extern	byte		ca_levelbit,ca_levelnum;
 
 extern	char		extension[5],
 			gheadname[10],
@@ -36,9 +32,6 @@ extern	char		extension[5],
 			mheadname[10],
 			aheadname[10],
 			afilename[10];
-
-extern long		*grstarts;	// array of offsets in vgagraph, -1 for sparse
-extern long		*audiostarts;	// array of offsets in audio / audiot
 
 //===========================================================================
 
@@ -50,25 +43,25 @@ boolean CA_WriteFile(char *filename, void *ptr, long length);
 
 void CA_RLEWexpand(word *source, word *dest, long length, word rlewtag);
 
-void CA_Startup (void);
-void CA_Shutdown (void);
+void CA_Startup();
+void CA_Shutdown();
 
-void CA_SetGrPurge (void);
+void CA_SetGrPurge();
 void CA_CacheAudioChunk(int chunk);
 void CA_UnCacheAudioChunk(int chunk);
-void CA_LoadAllSounds (void);
+void CA_LoadAllSounds();
 
-void CA_CacheMap (int mapnum);
+void CA_CacheMap(int mapnum);
 void CA_CacheGrChunk(int chunk);
 void CA_UnCacheGrChunk(int chunk);
 
-void CA_UpLevel (void);
-void CA_DownLevel (void);
+void CA_UpLevel();
+void CA_DownLevel();
 /*
-void CA_SetAllPurge (void);
+void CA_SetAllPurge();
 
-void CA_ClearMarks (void);
-void CA_ClearAllMarks (void);
+void CA_ClearMarks();
+void CA_ClearAllMarks();
 
 #define CA_MarkGrChunk(chunk)	grneeded[chunk]|=ca_levelbit
 
@@ -105,15 +98,13 @@ extern	PageListStruct *PMPages;
 #define	PM_GetSoundPage(v)	PM_GetPage(PMSoundStart + (v))
 #define	PM_GetSpritePage(v)	PM_GetPage(PMSpriteStart + (v))
 
-extern	char	PageFileName[13];
-
-
 void	PM_Startup(void),
-				PM_Shutdown(void),
-				PM_Reset(void),
-				PM_Preload(boolean (*update)(word current,word total)),
-				PM_NextFrame(void),
-				PM_SetMainPurge(int level);
+	PM_Shutdown(void),
+	PM_Reset(void),
+	PM_Preload(boolean (*update)(word current,word total)),
+	PM_NextFrame(void),
+	PM_SetMainPurge(int level);
+	
 memptr	PM_GetPageAddress(int pagenum), PM_GetPage(int pagenum);
 
 #endif

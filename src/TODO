@@ -1,20 +1,26 @@
 
 
 
+
 ------------- Please Disregard the Following Outdated Text: ----------------
+*
+SD_StartMusic((MusicGroup *)audiosegs[STARTMUSIC + chunk]);
+=>
+SD_StartMusic(chunk);
+
 General:
+* half of these things belong in IDEAS; they are not bugs, just random
+musings
 * inconsistancy:
 id_ca.c has code for setting the data filenames' extension
 so does wl_menu.c
 * menu code is a mess, always does things differently than the rest of the
 code, it really needs to be cleaned up
-* id_ca.c cache code: nice idea but messy and maybe can be fixed 
-in an effort to not allocate everything to memory and forget about it
-some sort of garbage collection
+* id_ca.c cache code: fix/rewrite the "garbage collection" system?
 * clean up header files, especially wl_def.h, where some declarations aren't 
 in the right place
 * every structure that is read/written must be PACKED, with datatypes
-specifically set! (ie, no int, but short or long int)
+specifially set to correct size!
 * or at least have PACKED versions of read/write structures, and transfer
 to/from just for reading, so only not-packed structures are used during
 actual gameplay/etc. 
@@ -22,23 +28,17 @@ actual gameplay/etc.
 would be nice to show what version is loaded, but doom just printed text
 and the intro screen which came with wolf3d has copyrighted/trademarked images
 maybe make a new intro screen...
-* then, what about PG13? OH NO!!!! -- people would probably want the first
-two screens for nostalga
 * fix the input code, everything is spread out... ideally everything should
 work the same, let the input handler do it all instead
 i think its safe for now to go with the scancodes as being the "universal"
 key type, and for everything not scancode-based, have a function to
 translate
 * remove GOODTIMES?
-* Consider removing the SOD manual check
+* Remove the SOD manual check?
 * perhaps rename UPLOAD
 * TOO MANY #IFDEFs
-* and upload builds with lots of wl6 code anyway (sound references were just
-ifndefed out)
 * verify if the sounds and graphics are correctly numbered, once again...
-* add a ViewMap? 
-* remove the #else at the end of each header since nothing is being doubly
-included now (if ever)
+* add a ViewMap? (could be done similar to mac version)
 * find and remove any function stubs (functions which just call another
 function with same parameters, only difference is the name)
 * fix wl_debug.c, lots of junk code..
@@ -51,14 +51,10 @@ calling wait vbl when doing palette stuffs
 * wl_menu uses specific scancodes for names, config file will have to use
 metaname like sc_Left etc or something
 * fizzlefade is hackish, stipple buf would work ok in opengl, maybe only
-update once per frame or such.. hm
+update once per frame or such...
 and where is that stray pixel coming from (when using end game with largest
-window size) in svgalib
+window size) in svgalib -- is that another bug with my geforce?
 no idea how to do fizzlefade in 16bit X
-* change id_sd to sd_oss, sd_win, sd_dos, sd_oal, etc
-idea is that different <outputs> can share some drivers, unlike video
-although glx and x11 share a lot of code (i guess since gl will be a great
-undertaking, better to keep them seperated)
 * check filehandling (ex, file missing, bad file type, and such)
 PlayDemoFromFile specifically
 * make sure all infinite loops are found (looping around Keyboard)
@@ -69,38 +65,28 @@ same with the spear of destiny animation part of ending
 since it deprecates: id_vh, (parts of) wl_draw, wl_scale)
 by putting in code from id_vh (either by using Plot or just copying it in)
 we can stop the large conversion before each UpdateScreen
-but palette fades will still need it! damnit
-* what are special keys... ?
+but palette fades will still need it!
 * the higher depths are a hack since a palette lookup has to be done
 for every byte when transferring to the pixmap, palette fades require a
 screen update
 * make sure none of the code tries to handle gfx/sound data directly
-* GL_EXT_shared_texture_palette for opengl
-* if window looses focus, should it clear the keys ?
+* if window loses focus, should it clear the keys? most likely
 * clean up vi_xlib.c: fix vid mode changing, fix dga for non8bit modes and
 the nonpalette setting stuff... lots of if statements
-* fix broken opengl.. argh wolf3d updates lots of stuff used in other parts
-of the game (namely stuff used for hit testing when firing weapon) in the
-draw loop.. start by cp wl_draw.c vi_ogl.c and just take out the actual
-drawing bits and replace with opengl.
+also, it should be able to compile without extensions
 * rename visable to visible
 * fix up windows port
 * create 'sound channels' with priority.. ie a door can only make one sound
 at a time
-* beos is c++ (and uses gcc as a compiler i think) but wolf3d will need many
-cleanups for c++
-either that or use extern "C" { ... } in the header files
+* beos is c++ but wolf3d will need many cleanups for c++ either that or use 
+extern "C" { ... } in the header files
 * change wl_scale to use mac wolf3d's version of scaling
 wall drawing is done, just needed to fix sprite code
 * check in wolftools and add mac wolftools (currently the res dumping stuff)
-* have vi_xlib.c compile without the extensions
 * cat file.c | perl -e 'while($in = <STDIN>)
 {$in =~ s/\/\/(.*)$/\/\* \1\ *\//gm;print $in;}'
 or
 cat foo.txt |sed -e "s/\/\/\(.*\)$/\/\*\1\*\//g"
-* oal version locks up at end of level (hit switch but before the ratios)
-the api is a bit unstable at the moment so wait for 1.0 of linux version to
-be released before fixing it, although that lame sampling bug got fixed
 
 Things to try:
 * Any speed gain with comparing values in screen before writing?

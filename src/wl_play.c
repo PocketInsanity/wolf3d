@@ -941,15 +941,12 @@ void StopMusic(void)
 =================
 */
 
-void StartMusic(void)
+void StartMusic()
 {
-	musicnames	chunk;
+	musicnames chunk;
 
 	SD_MusicOff();
 	chunk = songs[gamestate.mapon+gamestate.episode*10];
-
-//	if ((chunk == -1) || (MusicMode != smm_AdLib))
-//DEBUG control panel		return;
 
 	CA_CacheAudioChunk(STARTMUSIC + chunk);
 	MM_SetLock((memptr)&(audiosegs[STARTMUSIC + chunk]),true);

@@ -3428,7 +3428,6 @@ void CheckForEpisodes()
 
 	strcat(configname, extension);
 	strcat(SaveName, extension);
-	strcat(PageFileName, extension);
 
 #else
 
@@ -3485,7 +3484,6 @@ void CheckForEpisodes()
 
 	strcat(configname, extension);
 	strcat(SaveName, extension);
-	strcat(PageFileName, extension);
 #endif
 
 #else
@@ -3539,8 +3537,6 @@ void CheckForEpisodes()
 
 	strcat(configname, extension);
 	strcat(SaveName, extension);
-	strcat(PageFileName, extension);
-
 #endif
 
 }

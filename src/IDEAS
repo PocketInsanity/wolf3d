@@ -7,7 +7,7 @@
 * A key to change viewsize while playing (note: max == 20, min == 5 or so...)
 * Game able to cope at any virtual resolution in software mode. OpenGL
   handles this transparently (after setting correct glViewport)
-* Audio support using OpenAL (somewhat decently supported at the moment)
+* Audio support using OpenAL
 * Add support for the Mac version, if possible
 * Network support!
 * Fully compile with no warnings/errors using -Wall -ansi -pedantic and with
