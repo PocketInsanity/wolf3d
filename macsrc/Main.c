@@ -79,7 +79,7 @@ void RunAutoMap(void)
 		oldjoy &= joystick1;
 		newjoy = joystick1 ^ oldjoy;
 
-		if (newjoy & (JOYPAD_START|JOYPAD_SELECT|JOYPAD_A|JOYPAD_B|JOYPAD_X|JOYPAD_Y)) {
+		if (newjoy & (JOYPAD_SELECT|JOYPAD_A|JOYPAD_B|JOYPAD_X|JOYPAD_Y)) {
 			playstate = EX_STILLPLAYING;
 		} 
 		if (newjoy & JOYPAD_UP && vy) {

@@ -289,7 +289,7 @@ void IO_ClearViewBuffer()
 	/* glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); */
 	glClear(GL_DEPTH_BUFFER_BIT);
 	
-	/* IO_AttackShape disables depth */
+	glDisable(GL_DEPTH_TEST);
 	
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -508,25 +508,34 @@ void DrawSprite(thing_t *t)
 
 void DrawTopSprite()
 {
-	GLfloat z = -128.0 / (GLfloat)topspritescale;
+	GLfloat z;
+	 
+	if (topspritescale) {
 	
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadIdentity();
+		z = -128.0 / (GLfloat)topspritescale;
 	
-	if (LastTexture != sprtex[topspritenum]) {
-		LastTexture = sprtex[topspritenum];
-		glBindTexture(GL_TEXTURE_2D, sprtex[topspritenum]);
-	}
+		glDisable(GL_DEPTH_TEST);
 	
-	glBegin(GL_QUADS);
-	glTexCoord2f(1.0, 0.0); glVertex3f( 0.5,  1, z);
-	glTexCoord2f(1.0, 1.0); glVertex3f( 0.5, -1, z);
-	glTexCoord2f(0.0, 1.0); glVertex3f(-0.5, -1, z);
-	glTexCoord2f(0.0, 0.0); glVertex3f(-0.5,  1, z);
-	glEnd();
+		glMatrixMode(GL_MODELVIEW);
+		glPushMatrix();
+		glLoadIdentity();
+	
+		if (LastTexture != sprtex[topspritenum]) {
+			LastTexture = sprtex[topspritenum];
+			glBindTexture(GL_TEXTURE_2D, sprtex[topspritenum]);
+		}
+	
+		glBegin(GL_QUADS);
+		glTexCoord2f(1.0, 0.0); glVertex3f( 0.5,  1, z);
+		glTexCoord2f(1.0, 1.0); glVertex3f( 0.5, -1, z);
+		glTexCoord2f(0.0, 1.0); glVertex3f(-0.5, -1, z);
+		glTexCoord2f(0.0, 0.0); glVertex3f(-0.5,  1, z);
+		glEnd();
 
-	glPopMatrix();
+		glPopMatrix();
+		
+		glEnable(GL_DEPTH_TEST);
+	}
 }
 
 Word *src1,*src2,*dest;		/* Used by the sort */

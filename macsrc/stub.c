@@ -1,5 +1,6 @@
 /*
 Copyright (C) 1992-1994 Id Software, Inc.
+Copyright (C) 2000 Steven Fuller <relnev@atdot.org>
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License

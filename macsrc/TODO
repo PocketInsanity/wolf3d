@@ -11,15 +11,14 @@ TODO:
     640x400 or 480 is supported?)
 * Finish moving all 2D code to SoftDraw.c
 * Finish OpenGL
-  - Check if topsprite drawing is correct
   + Status bars, Introscreens [DrawShape]
-    - Not sure exactly yet how I will implement this yet.
+    - Not exactly sure how I will implement this yet.
   - Correct viewing frustum
-  + Allow window resizing
-    - Only bother with 640x480 versions of GameShapes.  Minimum for GLQuake
-      was 640x480, and you could get lower resolutions with software.
+  - Allow window resizing
   - Could use the LastTexture to have less glBegin/Ends (would need to know
     where to stop though (try IO_DisplayViewBuffer).
+  - When all drawing is implemented, remove any unnecessary state/matrix
+    changes.
 * Save/Load Games
 * Documentation
 * Sound!
@@ -37,6 +36,9 @@ BUGS:
   forth, and walls 'swim' when you move around, or sprites pop into different 
   sizes when are far enough and get closer/farther away
   - Possibly caused by 8.8 imprecision?
+* Automap may not be "just right" in OpenGL.  Some walls are clipped on the
+  left side for example.
+* If you die/win, and have a key held down, screen passes by too fast
 
 IDEAS:
 * Menu Keys

@@ -31,7 +31,6 @@ Byte *gfxbuf;
 void keyboard_handler(int key, int press);
 
 
-
 int main(int argc, char *argv[])
 {
 	if (argc != 2) {
@@ -195,7 +194,9 @@ static int keys[128];
 void FlushKeys()
 {
 	while (keyboard_update()) ;
+	keyboard_clearstate();
 	
+	gamestate.keys = 0;
 	joystick1 = 0;
 	memset(keys, 0, sizeof(keys));
 }

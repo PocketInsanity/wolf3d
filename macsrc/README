@@ -1,6 +1,6 @@
 This is not yet finished, but:
 
-Wolfenstein 3D is an id Software game.  This is a port of the Macintosh
+Wolfenstein 3D is an Id Software game.  This is a port of the Macintosh
 version that was released by MacPlay in 1994.  You can find information about
 the source release at: http://www.maccentral.com/news/0001/24.wolf3d.shtml 
 WolfReadMe.txt, from that Mac Wolf3d source release, is also included with
@@ -13,7 +13,7 @@ to Linux before, so when I found the source to the Macintosh version, I
 thought "Why not?"  So here it is.  My goal is to implement everything the
 Macintosh version had, and then somehow improve on that.
 
-To use this, you need the resource fork from the First Encounter (the two
+To use this, you need the resource fork from the First Encounter (the three
 level shareware version) or the Second Encounter (the for-sell version). 
 You can find the First Encounter on many web sites (Search for: Macintosh
 Wolfenstein 3D download) and you can get the Second Encounter on eBay (I
@@ -54,8 +54,8 @@ resource fork.
 Status of the port:
 
 You can play the game, but not save, load, change difficulty, hear sounds
-and music, use the mouse, and change window size.  View TODO for the
-specifics.
+and music, use the mouse and joystics, and change window size.  View TODO for 
+the specifics.
 
 Specifically:
 swolf3d : The SVGAlib Version.  Only supports 320x200x256 at the moment, so
@@ -70,7 +70,8 @@ use it so I can have menus and dialogs without having to create them in Xlib.
 Any suggestions?
 
 glwolf3d: The OpenGL Version (written using Xlib w/ GLX).  I like it.  Not
-all graphics are currently shown.
+all graphics are currently shown (So when you have a blank screen, press
+enter a few times to get passed the screens).
 
 Note: The available targets (binaries) may change over time as I decide
 which APIs work the best, etc.
@@ -90,7 +91,7 @@ Macintosh version) for answering my inquiries.
 
 
 Steven Fuller <relnev@users.sourceforge.net>
-
+http://wolf3d.sourceforge.net/
 
 ----------------------------
 TODO (Stuff to Write About):

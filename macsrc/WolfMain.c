@@ -140,9 +140,12 @@ angle_t PointToAngle(fixed_t x, fixed_t y)
 
 void GameOver(void)
 {	
+	FlushKeys();
+	
 	topspritenum = S_GAMEOVER;		/* Game over words */
 	topspritescale = 8;	/* Start the scale factor */
 	do {
+		WaitTick();
 		RenderView();		/* Draw the 3-d view */
 		topspritescale+=8;
 	} while (topspritescale<120);
@@ -173,10 +176,13 @@ void GameOver(void)
 
 void VictoryScale(void)
 {
+	FlushKeys();
+	
 	topspritenum = S_VICTORY;
 	topspritescale = 16;
 	
 	do {
+		WaitTick();
 		RenderView();
 		topspritescale += 16;
 	} while (topspritescale<240);
@@ -461,6 +467,7 @@ skipbrief:
 			nextmap = MapListPtr->InfoArray[gamestate.mapon].NextLevel; /* Normal warp? */
 		}			/* If warped, then nextmap is preset */
 		if (nextmap == 0xffff) {		/* Last level? */
+			FlushKeys();
 			VictoryScale();			/* You win!! */
 			ReleaseMap();			/* Unload the map */
 			Intermission();			/* Display the wrapup... */
