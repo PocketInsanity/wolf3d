@@ -3832,13 +3832,7 @@ void	A_StartDeathCam (objtype *ob)
 //
 // go back to the game
 //
-	temp = bufferofs;
-	for (i=0;i<3;i++)
-	{
-		bufferofs = screenloc[i];
-		DrawPlayBorder ();
-	}
-	bufferofs = temp;
+	DrawPlayBorder ();
 
 	fizzlein = true;
 	switch (ob->obclass)

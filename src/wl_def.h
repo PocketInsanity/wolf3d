@@ -812,14 +812,10 @@ extern	statobj_t	statobjlist[MAXSTATS],*laststatobj;
 extern	doorobj_t	doorobjlist[MAXDOORS],*lastdoorobj;
 
 extern	unsigned	farmapylookup[MAPSIZE];
-extern	byte		*nearmapylookup[MAPSIZE];
 
 extern	byte		tilemap[MAPSIZE][MAPSIZE];	// wall values only
 extern	byte		spotvis[MAPSIZE][MAPSIZE];
 extern	objtype		*actorat[MAPSIZE][MAPSIZE];
-
-#define UPDATESIZE			(UPDATEWIDE*UPDATEHIGH)
-extern	byte		update[UPDATESIZE];
 
 extern	boolean		singlestep,godmode,noclip;
 extern	int			extravbls;

@@ -14,7 +14,6 @@
 
 void ClearSplitVWB (void)
 {
-	memset (update,0,sizeof(update));
 	WindowX = 0;
 	WindowY = 0;
 	WindowW = 320;
@@ -941,13 +940,7 @@ void LevelCompleted (void)
 	#endif
 
 	VW_FadeOut ();
-	temp = bufferofs;
-	for (i=0;i<3;i++)
-	{
-		bufferofs = screenloc[i];
-		DrawPlayBorder ();
-	}
-	bufferofs = temp;
+	DrawPlayBorder ();
 
 	UnCacheLump(LEVELEND_LUMP_START,LEVELEND_LUMP_END);
 }

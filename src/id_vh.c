@@ -2,8 +2,6 @@
 
 #include "id_heads.h"
 
-#define PIXTOBLOCK		4 /* 16 pixels to an update block */
-
 /* ======================================================================== */
 
 pictabletype *pictable;

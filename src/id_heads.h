@@ -103,24 +103,10 @@ typedef	struct
 
 void	Quit (char *error);		// defined in user program
 
-//
-// replacing refresh manager with custom routines
-//
-
-#define	PORTTILESWIDE		20      // all drawing takes place inside a
-#define	PORTTILESHIGH		13		// non displayed port of this size
-
-#define UPDATEWIDE			PORTTILESWIDE
-#define UPDATEHIGH			PORTTILESHIGH
-
 #define	MAXTICS				10
 #define DEMOTICS			4
 
 extern	unsigned	mapwidth,mapheight,tics;
-
-extern	byte		*updateptr;
-extern	unsigned	uwidthtable[UPDATEHIGH];
-extern	unsigned	blockstarts[UPDATEWIDE*UPDATEHIGH];
 
 extern	byte		fontcolor,backcolor;
 

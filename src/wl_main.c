@@ -1066,14 +1066,8 @@ void InitGame (void)
 
 	for (i=0;i<MAPSIZE;i++)
 	{
-		nearmapylookup[i] = &tilemap[0][0]+MAPSIZE*i;
 		farmapylookup[i] = i*64;
 	}
-
-	for (i=0;i<PORTTILESHIGH;i++)
-		uwidthtable[i] = UPDATEWIDE*i;
-
-	updateptr = &update[0];
 
 	ReadConfig ();
 

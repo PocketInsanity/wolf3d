@@ -779,15 +779,7 @@ void DrawPlayBorderSides (void)
 
 void DrawAllPlayBorderSides (void)
 {
-	unsigned	i,temp;
-
-	temp = bufferofs;
-	for (i=0;i<3;i++)
-	{
-		bufferofs = screenloc[i];
-		DrawPlayBorderSides ();
-	}
-	bufferofs = temp;
+	DrawPlayBorderSides ();
 }
 
 /*
@@ -799,15 +791,7 @@ void DrawAllPlayBorderSides (void)
 */
 void DrawAllPlayBorder (void)
 {
-	unsigned	i,temp;
-
-	temp = bufferofs;
-	for (i=0;i<3;i++)
-	{
-		bufferofs = screenloc[i];
-		DrawPlayBorder ();
-	}
-	bufferofs = temp;
+	DrawPlayBorder ();
 }
 
 /*
@@ -848,22 +832,13 @@ void DrawPlayBorder (void)
 void DrawPlayScreen (void)
 {
 	int	i,j,p,m;
-	unsigned	temp;
 
 	VW_FadeOut ();
 
-	temp = bufferofs;
-
 	CA_CacheGrChunk (STATUSBARPIC);
 
-	for (i=0;i<3;i++)
-	{
-		bufferofs = screenloc[i];
-		DrawPlayBorder ();
-		VWB_DrawPic (0,200-STATUSLINES,STATUSBARPIC);
-	}
-
-	bufferofs = temp;
+	DrawPlayBorder ();
+	VWB_DrawPic (0,200-STATUSLINES,STATUSBARPIC);
 
 	UNCACHEGRCHUNK (STATUSBARPIC);
 
@@ -1172,11 +1147,9 @@ void Died (void)
 //
 	FinishPaletteShifts ();
 
-	bufferofs += screenofs;
 	VW_Bar (0,0,viewwidth,viewheight,4);
 	IN_ClearKeysDown ();
 	FizzleFade(bufferofs,displayofs+screenofs,viewwidth,viewheight,70,false);
-	bufferofs -= screenofs;
 	IN_UserInput(100);
 	SD_WaitSoundDone ();
 

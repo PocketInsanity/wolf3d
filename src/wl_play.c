@@ -20,7 +20,6 @@ objtype 	objlist[MAXACTORS],*new,*obj,*player,*lastobj,
 			*objfreelist,*killerobj;
 
 unsigned	farmapylookup[MAPSIZE];
-byte		*nearmapylookup[MAPSIZE];
 
 boolean		singlestep,godmode,noclip;
 int			extravbls;
@@ -33,11 +32,6 @@ objtype		*actorat[MAPSIZE][MAPSIZE];
 // replacing refresh manager
 //
 unsigned	mapwidth,mapheight,tics;
-byte		*updateptr;
-unsigned	mapwidthtable[64];
-unsigned	uwidthtable[UPDATEHIGH];
-unsigned	blockstarts[UPDATEWIDE*UPDATEHIGH];
-byte		update[UPDATESIZE];
 
 //
 // control info
@@ -721,7 +715,6 @@ void CheckKeys (void)
 //
 	if (Paused)
 	{
-		bufferofs = displayofs;
 		LatchDrawPic (20-4,80-2*8,PAUSEDPIC);
 		SD_MusicOff();
 		IN_Ack();
