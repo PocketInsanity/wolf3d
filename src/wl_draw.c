@@ -681,13 +681,6 @@ void ThreeDRefresh()
 
 /* ======================================================================== */
 
-typedef struct
-{
-	word leftpix, rightpix;
-	word dataofs[64];
-        /* table data after dataofs[rightpix-leftpix+1] */
-} PACKED t_compshape;
-
 /* TODO: this accesses gfxbuf directly! */
 static void ScaledDraw(byte *gfx, int scale, byte *vid, unsigned long tfrac, unsigned long tint, unsigned long delta)
 {
@@ -786,6 +779,13 @@ static void ScaleLineTrans(unsigned int height, byte *source, int x)
 
 static unsigned char *spritegfx[SPR_TOTAL];
 
+typedef struct
+{
+	word leftpix, rightpix;
+	word dataofs[64];
+        /* table data after dataofs[rightpix-leftpix+1] */
+} PACKED t_compshape;
+
 static void DeCompileSprite(int shapenum)
 {
 	t_compshape *ptr;
@@ -802,34 +802,8 @@ static void DeCompileSprite(int shapenum)
 	
 	ptr = PM_GetSpritePage(shapenum);
 
-	cmdptr = &ptr->dataofs[31 - ptr->leftpix];
-	
-	for (srcx = 31; srcx >= ptr->leftpix; srcx--) {
-		linecmds = (short *)((unsigned char *)ptr + *cmdptr--);
-		
-		while (linecmds[0]) {
-			y0 = linecmds[2] / 2;
-			y1 = linecmds[0] / 2;
-			pixels = (unsigned char *)ptr + y0 + linecmds[1];
-			
-			for (y = y0; y < y1; y++) {
-				//*(buf + slinex + (y*64)) = *pixels;
-				*(buf + (srcx*64) + y) = *pixels;
-				pixels++;
-			}
-			linecmds += 3;
-		}
-	}
-	
-	if (ptr->leftpix < 31) {
-		srcx = 32;
-		cmdptr = &ptr->dataofs[32 - ptr->leftpix];
-	} else {
-		srcx = ptr->leftpix;
-		cmdptr = &ptr->dataofs[0];
-	}
-	
-	for (; srcx <= ptr->rightpix; srcx++) {
+	cmdptr = &ptr->dataofs[0];
+	for (srcx = ptr->leftpix; srcx <= ptr->rightpix; srcx++) {
 		linecmds = (short *)((unsigned char *)ptr + *cmdptr++);
 		
 		while (linecmds[0]) {
@@ -845,7 +819,6 @@ static void DeCompileSprite(int shapenum)
 			linecmds += 3;
 		}
 	}
-	
 	spritegfx[shapenum] = buf;
 }
 

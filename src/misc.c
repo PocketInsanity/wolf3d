@@ -179,20 +179,24 @@ static void put_dos2ansi(byte attrib)
 		printf ("%c[%d;25;%dm%c[%dm", 27, intens, fore, 27, back);
 }
 
-void DisplayTextSplash(byte *text)
+void DisplayTextSplash(byte *text, int l)
 {
-	int i;
+	int i, x;
 	
 	//printf("%02X %02X %02X %02X\n", text[0], text[1], text[2], text[3]);
 	text += 4;
+	//printf("%02X %02X %02X %02X\n", text[0], text[1], text[2], text[3]);
+	text += 2;
 	
-	for (i = 0; i < 7*160; i += 2) {
-		put_dos2ansi(text[i+0]);
-		if (text[i+1])
-			printf("%c", text[i+1]);
-		else
-			printf(" ");
+	for (x = 0; x < l; x++) {
+		for (i = 0; i < 160; i += 2) {
+			put_dos2ansi(text[160*x+i+2]);
+			if (text[160*x+i+1] && text[160*x+i+1] != 160)
+				printf("%c", text[160*x+i+1]);
+			else
+				printf(" ");
+		}
+		printf("%c[m", 27);
+		printf("\n");
 	}
-	printf("%c[m", 27);
-	printf("\n");
 }

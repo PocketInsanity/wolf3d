@@ -50,4 +50,4 @@ distclean: clean
 	rm -rf *~ DEADJOE
 
 forced: distclean all
-#	rm -rf *.o
+	rm -rf *.o

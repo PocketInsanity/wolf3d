@@ -19,6 +19,7 @@ SD_StartMusic((MusicGroup *)audiosegs[STARTMUSIC + chunk]);
 =>
 SD_StartMusic(chunk);
 
+* move DeModeXize so it does not have to be in every vi_ file
 * clean up vi_xlib.c: fix vid mode changing, fix dga for non8bit modes and
 the nonpalette setting stuff... lots of if statements
 also, it should be able to compile without extensions
@@ -77,7 +78,7 @@ PlayDemoFromFile specifically
 on the border
 same with the spear of destiny animation part of ending
 * move all references to gfxbuf to vi_* only (gl will need this anyway,
-since it would replace id_vh, (parts of) wl_draw, wl_scale)
+since it would replace id_vh, (parts of) wl_draw)
 by putting in code from id_vh (either by using Plot or just copying it in)
 we can mostly stop the large conversion before each UpdateScreen
 * the higher depths are a hack since a palette lookup has to be done

@@ -55,26 +55,29 @@ int main(int argc, char *argv[])
 ==========================
 */
 
-void DisplayTextSplash(byte *text);
+void DisplayTextSplash(byte *text, int l);
 
 void Quit(char *error)
 {
 	memptr screen = NULL;
-
+	int l = 0;
+	
 	if (!error || !*error) {
 		CA_CacheGrChunk(ORDERSCREEN);
 		screen = grsegs[ORDERSCREEN];
+		l = 24;
 		WriteConfig();
 	} else if (error) {
 		CA_CacheGrChunk(ERRORSCREEN);
 		screen = grsegs[ERRORSCREEN];
+		l = 7;
 	}
 	
 	ShutdownId();
 	
 	if (screen) {
 		//printf("TODO: spiffy ansi screen goes here..\n");
-		DisplayTextSplash(screen);
+		DisplayTextSplash(screen, l);
 	}
 	
 	if (error && *error) {

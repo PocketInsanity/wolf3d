@@ -1,5 +1,3 @@
-/* id_vl.c */
-
 #include "wl_def.h"
 
 #include <vga.h>

@@ -1,5 +1,6 @@
 #include "wl_def.h"
 
+#include <math.h>
 #include <pthread.h>
 #include <sys/ioctl.h>
 #include <sys/soundcard.h>
@@ -56,6 +57,7 @@ short int musbuf[256];
 void *SoundThread(void *data)
 {
 	int i, snd;
+	short int samp;
 	int MusicLength;
 	int MusicCount;
 	word *MusicData;
@@ -73,6 +75,11 @@ void *SoundThread(void *data)
 	AdlibBlock = 0;
 	AdlibData = NULL;
 	AdlibLength = -1;
+
+	OPLWrite(OPL, 0x01, 0x20); /* Set WSE=1 */
+	OPLWrite(OPL, 0x08, 0x00); /* Set CSM=0 & SEL=0 */
+
+/* Yeah, one day I'll rewrite this... */
 	
 	while (SD_Started) {
 		if (audiofd != -1) {
@@ -170,13 +177,17 @@ void *SoundThread(void *data)
 			for (i = 0; i < (sizeof(sndbuf)/sizeof(sndbuf[0])); i += 2) {
 				if (SoundPlaying != -1) {
 					if (SoundPositioned) {
-						snd = ((((signed short)((SoundData[(SoundPlayPos >> 16)] << 8)^0x8000))>>1)/(L+1))+musbuf[i/2];
+						samp = (SoundData[(SoundPlayPos >> 16)] << 8)^0x8000;
+						snd = samp*(16-L)/32+musbuf[i/2];
+						//snd = (((signed short)((SoundData[(SoundPlayPos >> 16)] << 8)^0x8000))*(16-L)>>5)+musbuf[i/2];
 						if (snd > 32767)
 							snd = 32767;
 						if (snd < -32768)
 							snd = -32768;
 						sndbuf[i+0] = snd;
-						snd = ((((signed short)((SoundData[(SoundPlayPos >> 16)] << 8)^0x8000))>>1)/(R+1))+musbuf[i/2];
+						samp = (SoundData[(SoundPlayPos >> 16)] << 8)^0x8000;
+						snd = samp*(16-R)/32+musbuf[i/2];
+						//snd = (((signed short)((SoundData[(SoundPlayPos >> 16)] << 8)^0x8000))*(16-R)>>5)+musbuf[i/2];
 						if (snd > 32767)
 							snd = 32767;
 						if (snd < -32768)

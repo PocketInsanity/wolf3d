@@ -19,17 +19,6 @@ typedef INT16 OPLSAMPLE;
 typedef unsigned char  OPLSAMPLE;
 #endif
 
-typedef void (*OPL_TIMERHANDLER)(int channel,double interval_Sec);
-typedef void (*OPL_IRQHANDLER)(int param,int irq);
-typedef void (*OPL_UPDATEHANDLER)(int param,int min_interval_us);
-
-/* !!!!! here is private section , do not access there member direct !!!!! */
-
-#define OPL_TYPE_WAVESEL   0x01  /* waveform select    */
-#define OPL_TYPE_ADPCM     0x02  /* DELTA-T ADPCM unit */
-#define OPL_TYPE_KEYBOARD  0x04  /* keyboard interface */
-#define OPL_TYPE_IO        0x08  /* I/O port */
-
 /* ---------- OPL one of slot  ---------- */
 typedef struct fm_opl_slot {
 	INT32 TL;		/* total level     :TL << 8            */
@@ -82,14 +71,8 @@ typedef struct fm_opl_f {
 	int clock;			/* master clock  (Hz)                */
 	int rate;			/* sampling rate (Hz)                */
 	double freqbase;	/* frequency base                    */
-	double TimerBase;	/* Timer base time (==sampling time) */
 	UINT8 address;		/* address register                  */
-	UINT8 status;		/* status flag                       */
-	UINT8 statusmask;	/* status mask                       */
 	UINT32 mode;		/* Reg.08 : CSM , notesel,etc.       */
-	/* Timer */
-	int T[2];			/* timer counter       */
-	UINT8 st[2];		/* timer enable        */
 	/* FM channel slots */
 	OPL_CH *P_CH;		/* pointer of CH       */
 	int	max_ch;			/* maximum channel     */
@@ -109,29 +92,18 @@ typedef struct fm_opl_f {
 	/* wave selector enable flag */
 	UINT8 wavesel;
 	/* external event callback handler */
-	OPL_TIMERHANDLER  TimerHandler;		/* TIMER handler   */
-	int TimerParam;						/* TIMER parameter */
-	OPL_IRQHANDLER    IRQHandler;		/* IRQ handler    */
-	int IRQParam;						/* IRQ parameter  */
-	OPL_UPDATEHANDLER UpdateHandler;	/* stream update handler   */
-	int UpdateParam;					/* stream update parameter */
 } FM_OPL;
 
 /* ---------- Generic interface section ---------- */
-#define OPL_TYPE_YM3812 (OPL_TYPE_WAVESEL)
+#define OPL_TYPE_YM3812 0
 
 FM_OPL *OPLCreate(int type, int clock, int rate);
 void OPLDestroy(FM_OPL *OPL);
-void OPLSetTimerHandler(FM_OPL *OPL,OPL_TIMERHANDLER TimerHandler,int channelOffset);
-void OPLSetIRQHandler(FM_OPL *OPL,OPL_IRQHANDLER IRQHandler,int param);
-void OPLSetUpdateHandler(FM_OPL *OPL,OPL_UPDATEHANDLER UpdateHandler,int param);
 
 void OPLResetChip(FM_OPL *OPL);
-int OPLWrite(FM_OPL *OPL,int a,int v);
+void OPLWrite(FM_OPL *OPL,int a,int v);
 unsigned char OPLRead(FM_OPL *OPL,int a);
-int OPLTimerOver(FM_OPL *OPL,int c);
 
-/* YM3626/YM3812 local section */
 void YM3812UpdateOne(FM_OPL *OPL, INT16 *buffer, int length);
 
 #endif
