@@ -46,16 +46,16 @@ CP_iteminfo
 CP_itemtype 
 MainMenu[]=
 {
-	{1,STR_NG,(void *)CP_NewGame},
-	{1,STR_SD,(void *)CP_Sound},
-	{1,STR_CL,(void *)CP_Control},
-	{1,STR_LG,(void *)CP_LoadGame},
-	{0,STR_SG,(void *)CP_SaveGame},
-	{1,STR_CV,(void *)CP_ChangeView},
+	{1,STR_NG,(MenuFunc)CP_NewGame},
+	{1,STR_SD,(MenuFunc)CP_Sound},
+	{1,STR_CL,(MenuFunc)CP_Control},
+	{1,STR_LG,(MenuFunc)CP_LoadGame},
+	{0,STR_SG,(MenuFunc)CP_SaveGame},
+	{1,STR_CV,(MenuFunc)CP_ChangeView},
 #ifdef UPLOAD
-	{2,"Read This!",(void *)CP_ReadThis},
+	{2,"Read This!",(MenuFunc)CP_ReadThis},
 #endif
-	{1,STR_VS,(void *)CP_ViewScores},
+	{1,STR_VS,(MenuFunc)CP_ViewScores},
 	{1,STR_BD,0},
 	{1,STR_QT,0}
 },
@@ -82,8 +82,8 @@ CtlMenu[]=
 	{0,STR_JOYEN,0},
 	{0,STR_PORT2,0},
 	{0,STR_GAMEPAD,0},
-	{0,STR_SENS,(void *)MouseSensitivity},
-	{1,STR_CUSTOM,(void *)CustomControls}
+	{0,STR_SENS,(MenuFunc)MouseSensitivity},
+	{1,STR_CUSTOM,(MenuFunc)CustomControls}
 },
 
 #ifndef SPEAR
@@ -204,7 +204,7 @@ char *IN_GetScanName(ScanCode scan)
 
 #else
 
-static byte
+static char
 					*ScanNames[] =		// Scan code names with single chars
 					{
 	"?","?","1","2","3","4","5","6","7","8","9","0","-","+","?","?",
@@ -233,14 +233,14 @@ static byte
 
 char *IN_GetScanName(ScanCode scan)
 {
-	byte	**p;
+	char **p;
 	ScanCode *s;
 
-	for (s = ExtScanCodes, p = ExtScanNames; *s; p++, s++)
+	for (s = (ScanCode *)ExtScanCodes, p = (char **)ExtScanNames; *s; p++, s++)
 		if (*s == scan)
 			return *p;
 
-	return ScanNames[scan];
+	return ScanNames[(int)scan];
 }
 #endif
 
@@ -704,7 +704,7 @@ int CP_EndGame()
 	playstate = ex_died;
 
 	MainMenu[savegame].active = 0;
-	MainMenu[viewscores].routine= (void *)CP_ViewScores;
+	MainMenu[viewscores].routine = (MenuFunc)CP_ViewScores;
 	strcpy(MainMenu[viewscores].string,STR_VS);
 
 	return 1;

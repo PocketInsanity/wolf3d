@@ -1400,5 +1400,3 @@ boolean SightPlayer (objtype *ob)
 
 	return true;
 }
-
-

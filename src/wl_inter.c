@@ -856,7 +856,7 @@ void LevelCompleted()
 =================
 */
 
-boolean PreloadUpdate(unsigned current, unsigned total)
+boolean PreloadUpdate(int current, int total)
 {
 	int w = WindowW - 10;
 
@@ -887,8 +887,8 @@ void PreloadGraphics()
 	VW_UpdateScreen();
 	VW_FadeIn();
 
-	PM_Preload((void *)PreloadUpdate);
-	IN_UserInput (70);
+	PM_Preload(PreloadUpdate);
+	IN_UserInput(70);
 	VW_FadeOut();
 
 	DrawPlayBorder();

@@ -258,7 +258,7 @@ void VL_Startup()
 		
 		gb = (char *)malloc(320);
 		imgtmp = XCreateImage(dpy, vi->visual, vi->depth, ZPixmap, 0,
-				gfxbuf, 16, 1, 8, 16*4);
+				gb, 16, 1, 8, 16*4);
 		
 		if (gfxbuf == NULL) 
 			gfxbuf = malloc(vwidth * vheight * 1);

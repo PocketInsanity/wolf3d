@@ -77,7 +77,7 @@ extern PageListStruct *PMPages;
 
 void PM_Startup();
 void PM_Shutdown();
-void PM_Preload(boolean (*update)(word current,word total));
+void PM_Preload(boolean (*update)(int current, int total));
 	
 memptr PM_GetPage(int pagenum);
 

@@ -39,10 +39,11 @@ static void AsmRefresh();
 
 #ifndef NOASM
 #define FixedByFrac(x, y) \
- ({ unsigned long z; \
-  asm("imull %2; shrdl $16, %%edx, %%eax" : "=a" (z) : "a" (x), "q" (y) : "%edx"); \
-  z; \
- })
+__extension__  \
+({ unsigned long z; \
+ asm("imull %2; shrdl $16, %%edx, %%eax" : "=a" (z) : "a" (x), "q" (y) : "%edx"); \
+ z; \
+})
 #endif
 
 void ScaleShape(int xcenter, int shapenum, unsigned height);
@@ -157,7 +158,6 @@ static boolean TransformTile(int tx, int ty, int *dispx, int *dispheight)
 	gyt = FixedByFrac(gy,viewcos);
 	ny = gyt+gxt;
 
-
 //
 // calculate perspective ratio
 //
@@ -180,43 +180,7 @@ static boolean TransformTile(int tx, int ty, int *dispx, int *dispheight)
 		return false;
 }
 
-
 /* ======================================================================== */
-
-static unsigned int Ceiling[]=
-{
-#ifndef SPEAR
- 0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0xbfbf,
- 0x4e4e,0x4e4e,0x4e4e,0x1d1d,0x8d8d,0x4e4e,0x1d1d,0x2d2d,0x1d1d,0x8d8d,
- 0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x2d2d,0xdddd,0x1d1d,0x1d1d,0x9898,
-
- 0x1d1d,0x9d9d,0x2d2d,0xdddd,0xdddd,0x9d9d,0x2d2d,0x4d4d,0x1d1d,0xdddd,
- 0x7d7d,0x1d1d,0x2d2d,0x2d2d,0xdddd,0xd7d7,0x1d1d,0x1d1d,0x1d1d,0x2d2d,
- 0x1d1d,0x1d1d,0x1d1d,0x1d1d,0xdddd,0xdddd,0x7d7d,0xdddd,0xdddd,0xdddd
-#else
- 0x6f6f,0x4f4f,0x1d1d,0xdede,0xdfdf,0x2e2e,0x7f7f,0x9e9e,0xaeae,0x7f7f,
- 0x1d1d,0xdede,0xdfdf,0xdede,0xdfdf,0xdede,0xe1e1,0xdcdc,0x2e2e,0x1d1d,0xdcdc
-#endif
-};
-
-/*
-=====================
-=
-= ClearScreen
-=
-=====================
-*/
-
-static void ClearScreen()
-{
-	unsigned int ceiling = Ceiling[gamestate.episode*10+mapon] & 0xFF;
-	unsigned int floor = 0x19;
-
-	VL_Bar(xoffset, yoffset, viewwidth, viewheight / 2, ceiling);
-	VL_Bar(xoffset, yoffset + viewheight / 2, viewwidth, viewheight / 2, floor);
-}
-
-//==========================================================================
 
 /*
 =====================
@@ -467,20 +431,20 @@ static int spanstart[MAXVIEWHEIGHT/2];
 
 static fixed basedist[MAXVIEWHEIGHT/2];
 
-static unsigned char planepics[8192];	/* 4k of ceiling, 4k of floor */
+static byte planepics[8192];	/* 4k of ceiling, 4k of floor */
 
 static int halfheight = 0;
 
 static byte *planeylookup[MAXVIEWHEIGHT/2];
 static unsigned	mirrorofs[MAXVIEWHEIGHT/2];
 
-static unsigned short int mr_rowofs;
-static unsigned short int mr_count;
+static int mr_rowofs;
+static int mr_count;
 static unsigned short int mr_xstep;
 static unsigned short int mr_ystep;
 static unsigned short int mr_xfrac;
 static unsigned short int mr_yfrac;
-static char *mr_dest;
+static byte *mr_dest;
 
 static void MapRow()
 {
@@ -624,6 +588,41 @@ void DrawPlanes()
 	height = halfheight;
 	for (; lastheight < height; lastheight++)
 		DrawSpans(spanstart[lastheight], x-1, lastheight);
+}
+
+/* ======================================================================== */
+
+static unsigned int Ceiling[]=
+{
+#ifndef SPEAR
+ 0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0xbfbf,
+ 0x4e4e,0x4e4e,0x4e4e,0x1d1d,0x8d8d,0x4e4e,0x1d1d,0x2d2d,0x1d1d,0x8d8d,
+ 0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x2d2d,0xdddd,0x1d1d,0x1d1d,0x9898,
+
+ 0x1d1d,0x9d9d,0x2d2d,0xdddd,0xdddd,0x9d9d,0x2d2d,0x4d4d,0x1d1d,0xdddd,
+ 0x7d7d,0x1d1d,0x2d2d,0x2d2d,0xdddd,0xd7d7,0x1d1d,0x1d1d,0x1d1d,0x2d2d,
+ 0x1d1d,0x1d1d,0x1d1d,0x1d1d,0xdddd,0xdddd,0x7d7d,0xdddd,0xdddd,0xdddd
+#else
+ 0x6f6f,0x4f4f,0x1d1d,0xdede,0xdfdf,0x2e2e,0x7f7f,0x9e9e,0xaeae,0x7f7f,
+ 0x1d1d,0xdede,0xdfdf,0xdede,0xdfdf,0xdede,0xe1e1,0xdcdc,0x2e2e,0x1d1d,0xdcdc
+#endif
+};
+
+/*
+=====================
+=
+= ClearScreen
+=
+=====================
+*/
+
+static void ClearScreen()
+{
+	unsigned int ceiling = Ceiling[gamestate.episode*10+mapon] & 0xFF;
+	unsigned int floor = 0x19;
+
+	VL_Bar(xoffset, yoffset, viewwidth, viewheight / 2, ceiling);
+	VL_Bar(xoffset, yoffset + viewheight / 2, viewwidth, viewheight / 2, floor);
 }
 
 /* ======================================================================== */

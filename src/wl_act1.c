@@ -11,7 +11,6 @@
 
 statobj_t statobjlist[MAXSTATS], *laststatobj;
 
-
 struct
 {
 	int	picnum;
@@ -26,9 +25,6 @@ struct
 {SPR_STAT_5,block},				// Hanged man      "
 {SPR_STAT_6,bo_alpo},			// Bad food        "
 {SPR_STAT_7,block},				// Red pillar      "
-//
-// NEW PAGE
-//
 {SPR_STAT_8,block},				// Tree            spr2v
 {SPR_STAT_9},					// Skeleton flat   "
 {SPR_STAT_10,block},			// Sink            " (SOD:gibs)
@@ -36,14 +32,13 @@ struct
 {SPR_STAT_12,block},			// Urn             "
 {SPR_STAT_13,block},			// Bare table      "
 {SPR_STAT_14},					// Ceiling light   "
+
 #ifndef SPEAR
 {SPR_STAT_15},					// Kitchen stuff   "
 #else
 {SPR_STAT_15,block},			// Gibs!
 #endif
-//
-// NEW PAGE
-//
+
 {SPR_STAT_16,block},			// suit of armor   spr3v
 {SPR_STAT_17,block},			// Hanging cage    "
 {SPR_STAT_18,block},			// SkeletoninCage  "
@@ -52,9 +47,6 @@ struct
 {SPR_STAT_21,bo_key2},			// Key 2           "
 {SPR_STAT_22,block},			// stuff				(SOD:gibs)
 {SPR_STAT_23},					// stuff
-//
-// NEW PAGE
-//
 {SPR_STAT_24,bo_food}, 			// Good food       spr4v
 {SPR_STAT_25,bo_firstaid},		// First aid       "
 {SPR_STAT_26,bo_clip},			// Clip            "
@@ -63,9 +55,6 @@ struct
 {SPR_STAT_29,bo_cross},			// Cross           "
 {SPR_STAT_30,bo_chalice},		// Chalice         "
 {SPR_STAT_31,bo_bible},			// Bible           "
-//
-// NEW PAGE
-//
 {SPR_STAT_32,bo_crown},			// crown           spr5v
 {SPR_STAT_33,bo_fullheal},		// one up          "
 {SPR_STAT_34,bo_gibs},			// gibs            "
@@ -74,31 +63,27 @@ struct
 {SPR_STAT_37,block},			// Empty well      "
 {SPR_STAT_38,bo_gibs},			// Gibs 2          "
 {SPR_STAT_39,block},			// flag				"
-//
-// NEW PAGE
-//
+
 #ifndef SPEAR
 {SPR_STAT_40,block},			// Call Apogee		spr7v
 #else
 {SPR_STAT_40},					// Red light
 #endif
-//
-// NEW PAGE
-//
+
 {SPR_STAT_41},					// junk            "
 {SPR_STAT_42},					// junk 		   "
 {SPR_STAT_43},					// junk            "
+
 #ifndef SPEAR
 {SPR_STAT_44},					// pots            "
 #else
 {SPR_STAT_44,block},			// Gibs!
 #endif
+
 {SPR_STAT_45,block},			// stove           " (SOD:gibs)
 {SPR_STAT_46,block},			// spears          " (SOD:gibs)
 {SPR_STAT_47},					// vines			"
-//
-// NEW PAGE
-//
+
 #ifdef SPEAR
 {SPR_STAT_48,block},			// marble pillar
 {SPR_STAT_49,bo_25clip},		// bonus 25 clip
@@ -255,7 +240,7 @@ Open doors conect two areas, so sounds will travel between them and sight
 Areaconnect is incremented/decremented by each door. If >0 they connect
 
 Every time a door opens or closes the areabyplayer matrix gets recalculated.
-	An area is true if it connects with the player's current spor.
+	An area is true if it connects with the player's current spot.
 
 =============================================================================
 */
@@ -265,9 +250,8 @@ Every time a door opens or closes the areabyplayer matrix gets recalculated.
 doorobj_t	doorobjlist[MAXDOORS],*lastdoorobj;
 int			doornum;
 
-unsigned	doorposition[MAXDOORS];		// leading edge of door 0=closed
-										// 0xffff = fully open
-
+unsigned	doorposition[MAXDOORS];	// leading edge of door 0=closed
+					// 0xffff = fully open
 byte		areaconnect[NUMAREAS][NUMAREAS];
 
 boolean		areabyplayer[NUMAREAS];
@@ -724,7 +708,7 @@ void PushWall(int checkx, int checky, int dir)
 	case di_north:
 		if (actorat[checkx][checky-1])
 		{
-			SD_PlaySound (NOWAYSND);
+			SD_PlaySound(NOWAYSND);
 			return;
 		}
 		(unsigned)actorat[checkx][checky-1] =
@@ -734,7 +718,7 @@ void PushWall(int checkx, int checky, int dir)
 	case di_east:
 		if (actorat[checkx+1][checky])
 		{
-			SD_PlaySound (NOWAYSND);
+			SD_PlaySound(NOWAYSND);
 			return;
 		}
 		(unsigned)actorat[checkx+1][checky] =
@@ -744,7 +728,7 @@ void PushWall(int checkx, int checky, int dir)
 	case di_south:
 		if (actorat[checkx][checky+1])
 		{
-			SD_PlaySound (NOWAYSND);
+			SD_PlaySound(NOWAYSND);
 			return;
 		}
 		(unsigned)actorat[checkx][checky+1] =
@@ -754,7 +738,7 @@ void PushWall(int checkx, int checky, int dir)
 	case di_west:
 		if (actorat[checkx-1][checky])
 		{
-			SD_PlaySound (NOWAYSND);
+			SD_PlaySound(NOWAYSND);
 			return;
 		}
 		(unsigned)actorat[checkx-1][checky] =
@@ -771,7 +755,7 @@ void PushWall(int checkx, int checky, int dir)
 	tilemap[pwallx][pwally] |= 0xc0;
 	*(mapsegs[1]+farmapylookup[pwally]+pwallx) = 0;	// remove P tile info
 
-	SD_PlaySound (PUSHWALLSND);
+	SD_PlaySound(PUSHWALLSND);
 }
 
 

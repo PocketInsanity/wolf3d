@@ -41,7 +41,7 @@ int			buttonjoy[4]={bt_attack,bt_strafe,bt_use,bt_run};
 boolean		buttonheld[NUMBUTTONS];
 
 boolean		demorecord,demoplayback;
-char		*demoptr, *lastdemoptr;
+byte		*demoptr, *lastdemoptr;
 memptr		demobuffer;
 
 //

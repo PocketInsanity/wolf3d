@@ -31,7 +31,7 @@ void VL_DirectPlotFlush();
 #define	MaxJoys		2
 #define	NumCodes	128
 
-typedef	byte ScanCode;
+typedef	int8_t ScanCode;
 
 #define	sc_None			0
 #define	sc_Bad			0xff

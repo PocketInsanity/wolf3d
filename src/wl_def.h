@@ -791,7 +791,7 @@ extern	int			controlx,controly;		// range from -100 to 100
 extern	boolean		buttonstate[NUMBUTTONS];
 
 extern	boolean		demorecord,demoplayback;
-extern	char		*demoptr, *lastdemoptr;
+extern	byte		*demoptr, *lastdemoptr;
 extern	memptr		demobuffer;
 
 

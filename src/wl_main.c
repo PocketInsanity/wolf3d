@@ -260,7 +260,11 @@ int ReadConfig()
 		MainMenu[readthis].active = 1;
 		MainItems.curpos = 0;
 #endif
+	} else {
+		viewsize = 15;
 	}
+	
+	viewsize = 15;
 	
 	mouseenabled = false;
 

@@ -681,9 +681,9 @@ void DrawPlayScreen()
 
 void StartDemoRecord(int levelnumber)
 {
-	MM_GetPtr(&demobuffer,MAXDEMOSIZE);
+	MM_GetPtr(&demobuffer, MAXDEMOSIZE);
 	MM_SetLock(&demobuffer,true);
-	demoptr = (char *)demobuffer;
+	demoptr = (byte *)demobuffer;
 	lastdemoptr = demoptr+MAXDEMOSIZE;
 
 	*demoptr = levelnumber;
@@ -707,10 +707,12 @@ void FinishDemoRecord()
 
 	demorecord = false;
 
-	length = demoptr - (char *)demobuffer;
+	length = demoptr - (byte *)demobuffer;
 
-	demoptr = ((char *)demobuffer)+1;
-	*(word *)demoptr = length;
+	demoptr = ((byte *)demobuffer)+1;
+
+	demoptr[0] = length & 0xFF;
+	demoptr[1] = (length >> 8) & 0xFF;
 
 	CenterWindow(24,3);
 	PrintY+=6;
@@ -821,14 +823,14 @@ void PlayDemo(int demonumber)
 	NewGame (1,0);
 	gamestate.mapon = *demoptr++;
 	gamestate.difficulty = gd_hard;
-	length = *((word *)demoptr)++;
-	demoptr++;
+	length = demoptr[0] | (demoptr[1] << 8); // *((word *)demoptr)++;
+	demoptr += 3;
 	lastdemoptr = demoptr-4+length;
 
-	VW_FadeOut ();
+	VW_FadeOut();
 
 	SETFONTCOLOR(0,15);
-	DrawPlayScreen ();
+	DrawPlayScreen();
 	VW_UpdateScreen(); /* force redraw */
 	
 	VW_FadeIn();
@@ -837,10 +839,10 @@ void PlayDemo(int demonumber)
 	demoplayback = true;
 
 	SetupGameLevel ();
-	StartMusic ();
+	StartMusic();
 	fizzlein = true;
 
-	PlayLoop ();
+	PlayLoop();
 
 	CA_UnCacheGrChunk(dems[demonumber]);
 
@@ -862,13 +864,13 @@ int PlayDemoFromFile(char *demoname)
 	}
 		
 	MM_SetLock(&demobuffer,true);
-	demoptr = (char *)demobuffer;
+	demoptr = (byte *)demobuffer;
 
 	NewGame(1,0);
 	gamestate.mapon = *demoptr++;
 	gamestate.difficulty = gd_hard;
-	length = *((word *)demoptr)++;
-	demoptr++;
+	length = demoptr[0] | (demoptr[1] << 8); // *((word *)demoptr)++;
+	demoptr += 3;
 	lastdemoptr = demoptr-4+length;
 
 	VW_FadeOut();
@@ -1132,16 +1134,16 @@ startplayloop:
 #ifdef SPEARDEMO
 			if (gamestate.mapon == 1)
 			{
-				died = true;			// don't "get psyched!"
+				died = true;		// don't "get psyched!"
 
-				VW_FadeOut ();
+				VW_FadeOut();
 
-				ClearMemory ();
+				ClearMemory();
 
-				CheckHighScore (gamestate.score,gamestate.mapon+1);
+				CheckHighScore(gamestate.score,gamestate.mapon+1);
 
 				strcpy(MainMenu[viewscores].string,STR_VS);
-				MainMenu[viewscores].routine = (void *)CP_ViewScores;
+				MainMenu[viewscores].routine = (MenuFunc)CP_ViewScores;
 
 				return;
 			}
@@ -1209,7 +1211,7 @@ startplayloop:
 			CheckHighScore(gamestate.score,gamestate.mapon+1);
 
 			strcpy(MainMenu[viewscores].string,STR_VS);
-			MainMenu[viewscores].routine = (void *)CP_ViewScores;
+			MainMenu[viewscores].routine = (MenuFunc)CP_ViewScores;
 
 			return;
 
@@ -1229,7 +1231,7 @@ startplayloop:
 			CheckHighScore(gamestate.score,gamestate.mapon+1);
 
 			strcpy(MainMenu[viewscores].string,STR_VS);
-			MainMenu[viewscores].routine = (void *)CP_ViewScores;
+			MainMenu[viewscores].routine = (MenuFunc)CP_ViewScores;
 
 			return;
 

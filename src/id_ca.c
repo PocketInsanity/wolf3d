@@ -926,7 +926,7 @@ memptr PM_GetPage(int pagenum)
 //		Calls the update function after each load, indicating the current
 //		page, and the total pages that need to be loaded (for thermometer).
 //
-void PM_Preload(boolean (*update)(word current, word total))
+void PM_Preload(boolean (*update)(int current, int total))
 {
 	int i;
 	

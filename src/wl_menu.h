@@ -94,10 +94,12 @@ typedef struct {
 	int x,y,amount,curpos,indent;
 } CP_iteminfo;
 
+typedef void (* MenuFunc)(int temp1);
+
 typedef struct {
 	int active;
 	char string[36];
-	void (* routine)(int temp1);
+	MenuFunc routine;
 } CP_itemtype;
 
 typedef struct {
