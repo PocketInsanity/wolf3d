@@ -11,12 +11,12 @@
 */
 
 
-statobj_t	statobjlist[MAXSTATS],*laststatobj;
+statobj_t statobjlist[MAXSTATS], *laststatobj;
 
 
 struct
 {
-	int		picnum;
+	int	picnum;
 	stat_t	type;
 } statinfo[] =
 {
@@ -120,12 +120,10 @@ struct
 ===============
 */
 
-void InitStaticList (void)
+void InitStaticList()
 {
 	laststatobj = &statobjlist[0];
 }
-
-
 
 /*
 ===============
@@ -135,7 +133,7 @@ void InitStaticList (void)
 ===============
 */
 
-void SpawnStatic (int tilex, int tiley, int type)
+void SpawnStatic(int tilex, int tiley, int type)
 {
 	laststatobj->shapenum = statinfo[type].picnum;
 	laststatobj->tilex = tilex;
@@ -197,15 +195,15 @@ void SpawnStatic (int tilex, int tiley, int type)
 ===============
 */
 
-void PlaceItemType (int itemtype, int tilex, int tiley)
+void PlaceItemType(int itemtype, int tilex, int tiley)
 {
-	int			type;
-	statobj_t	*spot;
+	int type;
+	statobj_t *spot;
 
 //
 // find the item number
 //
-	for (type=0 ;  ; type++)
+	for (type = 0; ; type++)
 	{
 		if (statinfo[type].picnum == -1) /* end of list */
 			Quit("PlaceItemType: couldn't find type!");
@@ -291,32 +289,32 @@ boolean		areabyplayer[NUMAREAS];
 ==============
 */
 
-void RecursiveConnect (int areanumber)
+void RecursiveConnect(int areanumber)
 {
-	int	i;
+	int i;
 
-	for (i=0;i<NUMAREAS;i++)
+	for (i = 0; i < NUMAREAS; i++)
 	{
 		if (areaconnect[areanumber][i] && !areabyplayer[i])
 		{
 			areabyplayer[i] = true;
-			RecursiveConnect (i);
+			RecursiveConnect(i);
 		}
 	}
 }
 
 
-void ConnectAreas (void)
+void ConnectAreas()
 {
-	memset (areabyplayer,0,sizeof(areabyplayer));
+	memset(areabyplayer, 0, sizeof(areabyplayer));
 	areabyplayer[player->areanumber] = true;
-	RecursiveConnect (player->areanumber);
+	RecursiveConnect(player->areanumber);
 }
 
 
-void InitAreas (void)
+void InitAreas()
 {
-	memset (areabyplayer,0,sizeof(areabyplayer));
+	memset(areabyplayer, 0, sizeof(areabyplayer));
 	areabyplayer[player->areanumber] = true;
 }
 
@@ -330,7 +328,7 @@ void InitAreas (void)
 ===============
 */
 
-void InitDoorList (void)
+void InitDoorList()
 {
 	memset (areabyplayer,0,sizeof(areabyplayer));
 	memset (areaconnect,0,sizeof(areaconnect));
@@ -348,11 +346,11 @@ void InitDoorList (void)
 ===============
 */
 
-void SpawnDoor (int tilex, int tiley, boolean vertical, int lock)
+void SpawnDoor(int tilex, int tiley, boolean vertical, int lock)
 {
 	word *map;
 
-	if (doornum==64)
+	if (doornum == 64)
 		Quit ("64+ doors on level!");
 
 	doorposition[doornum] = 0;		// doors start out fully closed

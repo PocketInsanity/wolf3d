@@ -70,15 +70,9 @@ MainMenu[]=
 	{1,STR_LG,(void *)CP_LoadGame},
 	{0,STR_SG,(void *)CP_SaveGame},
 	{1,STR_CV,(void *)CP_ChangeView},
-
-#ifndef GOODTIMES
-#ifndef SPEAR
-
+#if !defined(GOODTIMES) && !defined(SPEAR)
 	{2,"Read This!",(void *)CP_ReadThis},
-
 #endif
-#endif
-
 	{1,STR_VS,(void *)CP_ViewScores},
 	{1,STR_BD,0},
 	{1,STR_QT,0}
@@ -171,19 +165,8 @@ CusMenu[]=
 ;
 
 
-int color_hlite[]={
-   DEACTIVE,
-   HIGHLIGHT,
-   READHCOLOR,
-   0x67
-   },
-
-   color_norml[]={
-   DEACTIVE,
-   TEXTCOLOR,
-   READCOLOR,
-   0x6b
-   };
+int color_hlite[] = { DEACTIVE, HIGHLIGHT, READHCOLOR, 0x67 };
+int color_norml[] = { DEACTIVE, TEXTCOLOR, READCOLOR, 0x6b };
 
 int EpisodeSelect[6]={1};
 
@@ -194,9 +177,51 @@ char SaveGameNames[10][32],SaveName[13]="savegam?.";
 
 ////////////////////////////////////////////////////////////////////
 //
-// INPUT MANAGER SCANCODE TABLES
+// INPUT MANAGER SCANCODE TABLES and
+//
+//	IN_GetScanName() - Returns a string containing the name of the
+//		specified scan code
 //
 ////////////////////////////////////////////////////////////////////
+
+#if 0
+static struct {
+	int sc;
+	char *str;
+} ScanNames[] = {
+{ sc_1,		"1"	},
+{ sc_2,		"2"	},
+{ sc_3,		"3"	},
+{ sc_4,		"4"	},
+{ sc_5,		"5"	},
+{ sc_6,		"6"	},
+{ sc_7,		"7"	},
+{ sc_8,		"8"	},
+{ sc_9,		"9"	},
+
+{ sc_Escape,	"Esc"	},
+
+{ sc_LeftArrow,	"Left"	},
+{ sc_RightArrow,"Right" },
+{ sc_UpArrow,	"Up"	},
+{ sc_DownArrow,	"Down"	},
+
+{ sc_Bad,	"?" 	},
+{ sc_None,	"?"	}
+};
+
+char *IN_GetScanName(ScanCode scan)
+{
+	int i;
+	
+	for (i = 0; i < (sizeof(ScanNames)/sizeof(ScanNames[0])); i++)
+		if (ScanNames[i].sc == scan)
+			return ScanNames[i].str;
+	return "?";
+}
+
+#else
+
 static byte
 					*ScanNames[] =		// Scan code names with single chars
 					{
@@ -211,10 +236,10 @@ static byte
 					},	// DEBUG - consolidate these
 					ExtScanCodes[] =	// Scan codes with >1 char names
 					{
-	1,0xe,0xf,0x1d,0x2a,0x39,0x3a,0x3b,0x3c,0x3d,0x3e,
-	0x3f,0x40,0x41,0x42,0x43,0x44,0x57,0x59,0x46,0x1c,0x36,
-	0x37,0x38,0x47,0x49,0x4f,0x51,0x52,0x53,0x45,0x48,
-	0x50,0x4b,0x4d,0x00
+	1,0xe,0xf,0x1d,sc_LShift,0x39,0x3a,0x3b,0x3c,0x3d,0x3e,
+	0x3f,0x40,0x41,0x42,0x43,0x44,0x57,0x59,0x46,0x1c,sc_RShift,
+	0x37,0x38,0x47,0x49,0x4f,0x51,0x52,0x53,0x45,sc_UpArrow,
+	sc_DownArrow,sc_LeftArrow,sc_RightArrow,0x00
 					},
 					*ExtScanNames[] =	// Names corresponding to ExtScanCodes
 					{
@@ -224,6 +249,18 @@ static byte
 	"Down","Left","Right",""
 					};
 
+char *IN_GetScanName(ScanCode scan)
+{
+	byte	**p;
+	ScanCode *s;
+
+	for (s = ExtScanCodes, p = ExtScanNames; *s; p++, s++)
+		if (*s == scan)
+			return *p;
+
+	return ScanNames[scan];
+}
+#endif
 
 ////////////////////////////////////////////////////////////////////
 //
@@ -306,15 +343,13 @@ void US_ControlPanel(byte scancode)
 		//
 		// EASTER EGG FOR SPEAR OF DESTINY!
 		//
-		if (Keyboard[sc_I] && Keyboard[sc_D])
-		{
+		if (IN_KeyDown(sc_I) && IN_KeyDown(sc_D)) {
 			VW_FadeOut();
 			StartCPMusic (XJAZNAZI_MUS);
 			UnCacheLump(OPTIONS_LUMP_START,OPTIONS_LUMP_END);
 			UnCacheLump(BACKDROP_LUMP_START,BACKDROP_LUMP_END);
-			MM_SortMem ();
-			ClearMemory ();
-
+			MM_SortMem();
+			ClearMemory();
 
 			CA_CacheGrChunk (IDGUYS1PIC);
 			VWB_DrawPic(0,0,IDGUYS1PIC);
@@ -330,7 +365,8 @@ void US_ControlPanel(byte scancode)
 			VL_FadeIn(0,255,grsegs[IDGUYSPALETTE],30);
 			CA_UnCacheGrChunk(IDGUYSPALETTE);
 
-			while (Keyboard[sc_I] || Keyboard[sc_D]) IN_CheckAck();
+			while (IN_KeyDown(sc_I) || IN_KeyDown(sc_D)) IN_CheckAck();
+			
 			IN_ClearKeysDown();
 			IN_Ack();
 
@@ -1466,14 +1502,13 @@ int CalibrateJoystick(void)
 
 	VW_UpdateScreen();
 
-	do
-	{
+	do {
 		jb=IN_JoyButtons();
-		IN_CheckAck(); /* TODO: force update */
-		if (Keyboard[sc_Escape])
+		IN_CheckAck(); /* force update */
+		if (IN_KeyDown(sc_Escape))
 			return 0;
 		
-		if (Keyboard[sc_Tab] && Keyboard[sc_P] && MS_CheckParm("goobers"))
+		if (IN_KeyDown(sc_Tab) && IN_KeyDown(sc_P) && MS_CheckParm("goobers"))
 			PicturePause();
 
 	} while(!(jb&1));
@@ -1497,13 +1532,12 @@ int CalibrateJoystick(void)
 
 	VW_UpdateScreen();
 
-	do
-	{
-		jb=IN_JoyButtons();
-		IN_CheckAck(); /* TODO: force update */
-		if (Keyboard[sc_Escape])
+	do {
+		jb = IN_JoyButtons();
+		IN_CheckAck(); /* force update */
+		if (IN_KeyDown(sc_Escape))
 			return 0;
-		if (Keyboard[sc_Tab] && Keyboard[sc_P] && MS_CheckParm("goobers"))
+		if (IN_KeyDown(sc_Tab) && IN_KeyDown(sc_P) && MS_CheckParm("goobers"))
 			PicturePause();
 	} while(!(jb&2));
 
@@ -1652,7 +1686,8 @@ void MouseSensitivity(void)
 					VW_Bar(61+20*mouseadjustment,98,19,9,READHCOLOR);
 					VW_UpdateScreen();
 					SD_PlaySound(MOVEGUN1SND);
-					while(Keyboard[sc_LeftArrow]) IN_CheckAck();
+					
+					while(IN_KeyDown(sc_LeftArrow)) IN_CheckAck();
 					WaitKeyUp();
 				}
 				break;
@@ -1668,7 +1703,8 @@ void MouseSensitivity(void)
 					VW_Bar(61+20*mouseadjustment,98,19,9,READHCOLOR);
 					VW_UpdateScreen();
 					SD_PlaySound(MOVEGUN1SND);
-					while(Keyboard[sc_RightArrow]) IN_CheckAck();
+					
+					while(IN_KeyDown(sc_RightArrow)) IN_CheckAck();
 					WaitKeyUp();
 				}
 				break;
@@ -1676,23 +1712,20 @@ void MouseSensitivity(void)
 				break;
 		}
 
-		if (Keyboard[sc_Tab] && Keyboard[sc_P] && MS_CheckParm("debugmode"))
+		if (IN_KeyDown(sc_Tab) && IN_KeyDown(sc_P) && MS_CheckParm("debugmode"))
 			PicturePause();
 
-		if (ci.button0 || Keyboard[sc_Space] || Keyboard[sc_Enter])
-			exit=1;
-		else
-		if (ci.button1 || Keyboard[sc_Escape])
-			exit=2;
+		if (ci.button0 || IN_KeyDown(sc_Space) || IN_KeyDown(sc_Enter))
+			exit = 1;
+		else if (ci.button1 || IN_KeyDown(sc_Escape))
+			exit = 2;
 
 	} while(!exit);
 
-	if (exit==2)
-	{
-		mouseadjustment=oldMA;
+	if (exit == 2) {
+		mouseadjustment = oldMA;
 		SD_PlaySound(ESCPRESSEDSND);
-	}
-	else
+	} else
 		SD_PlaySound(SHOOTSND);
 
 	WaitKeyUp();
@@ -1704,16 +1737,15 @@ void MouseSensitivity(void)
 //
 // DRAW CONTROL MENU SCREEN
 //
-void DrawCtlScreen(void)
+void DrawCtlScreen()
 {
- int i,x,y;
+	int i, x, y;
 
-
- ClearMScreen();
- DrawStripes(10);
- VWB_DrawPic(80,0,C_CONTROLPIC);
- VWB_DrawPic(112,184,C_MOUSELBACKPIC);
- DrawWindow(CTL_X-8,CTL_Y-5,CTL_W,CTL_H,BKGDCOLOR);
+	ClearMScreen();
+	DrawStripes(10);
+	VWB_DrawPic(80,0,C_CONTROLPIC);
+	VWB_DrawPic(112,184,C_MOUSELBACKPIC);
+	DrawWindow(CTL_X-8,CTL_Y-5,CTL_W,CTL_H,BKGDCOLOR);
 
  WindowX=0;
  WindowW=320;
@@ -1915,12 +1947,12 @@ void EnterCtrlData(int index,CustomCtrls *cust,void (*DrawRtn)(int),void (*Print
 
   ReadAnyControl(&ci);
 
-  if (type==MOUSE || type==JOYSTICK)
-	if (IN_KeyDown(sc_Enter)||IN_KeyDown(sc_Control)||IN_KeyDown(sc_Alt))
-	{
-	 IN_ClearKeysDown();
-	 ci.button0=ci.button1=false;
-	}
+	if (type==MOUSE || type==JOYSTICK)
+		if (IN_KeyDown(sc_Enter) || IN_KeyDown(sc_Control) || IN_KeyDown(sc_Alt))
+		{
+			IN_ClearKeysDown();
+			ci.button0=ci.button1=false;
+		}
 
   //
   // CHANGE BUTTON VALUE?
@@ -2458,14 +2490,12 @@ void CP_ChangeView(void)
 			break;
 		}
 
-		if (Keyboard[sc_Tab] && Keyboard[sc_P] && MS_CheckParm("debugmode"))
+		if (IN_KeyDown(sc_Tab) && IN_KeyDown(sc_P) && MS_CheckParm("debugmode"))
 			PicturePause();
 
-		if (ci.button0 || Keyboard[sc_Enter])
+		if (ci.button0 || IN_KeyDown(sc_Enter))
 			exit=1;
-		else
-		if (ci.button1 || Keyboard[sc_Escape])
-		{
+		else if (ci.button1 || IN_KeyDown(sc_Escape)) {
 			viewwidth=oldview*16;
 			SD_PlaySound(ESCPRESSEDSND);
 			MenuFadeOut();
@@ -2830,9 +2860,9 @@ int HandleMenu(CP_iteminfo *item_i,CP_itemtype *items,void (*routine)(int w))
 			// CHECK FOR SCREEN CAPTURE
 			//
 			#ifndef SPEAR
-			if (Keyboard[sc_Tab] && Keyboard[sc_P] && MS_CheckParm("goobers"))
+			if (IN_KeyDown(sc_Tab) && IN_KeyDown(sc_P) && MS_CheckParm("goobers"))
 			#else
-			if (Keyboard[sc_Tab] && Keyboard[sc_P] && MS_CheckParm("debugmode"))
+			if (IN_KeyDown(sc_Tab) && IN_KeyDown(sc_P) && MS_CheckParm("debugmode"))
 			#endif
 				PicturePause();
 
@@ -2945,14 +2975,11 @@ int HandleMenu(CP_iteminfo *item_i,CP_itemtype *items,void (*routine)(int w))
 				break;
 		}
 
-		if (ci.button0 ||
-			Keyboard[sc_Space] ||
-			Keyboard[sc_Enter])
-				exit=1;
+		if (ci.button0 || IN_KeyDown(sc_Space) || IN_KeyDown(sc_Enter))
+			exit = 1;
 
-		if (ci.button1 ||
-			Keyboard[sc_Escape])
-				exit=2;
+		if (ci.button1 || IN_KeyDown(sc_Escape))
+			exit = 2;
 
 	} while(!exit);
 
@@ -3126,13 +3153,9 @@ void SetMenuTextColor(CP_itemtype *items,int hlight)
 void WaitKeyUp(void)
 {
 	ControlInfo ci;
-	while(ReadAnyControl(&ci),	ci.button0|
-								ci.button1|
-								ci.button2|
-								ci.button3|
-								Keyboard[sc_Space]|
-								Keyboard[sc_Enter]|
-								Keyboard[sc_Escape]);
+	while(ReadAnyControl(&ci), 
+		ci.button0|ci.button1|ci.button2|ci.button3|
+		IN_KeyDown(sc_Space)|IN_KeyDown(sc_Enter)|IN_KeyDown(sc_Escape));
 }
 
 
@@ -3179,7 +3202,7 @@ int Confirm(char *string)
 
 	do
 	{
-		IN_CheckAck(); /* TODO: force update */
+		IN_CheckAck(); /* force update */
 		if (get_TimeCount() >= 10)
 		{
 			switch(tick)
@@ -3197,18 +3220,17 @@ int Confirm(char *string)
 			set_TimeCount(0);
 		}
 
-		if (Keyboard[sc_Tab] && Keyboard[sc_P] && MS_CheckParm("goobers"))
+		if (IN_KeyDown(sc_Tab) && IN_KeyDown(sc_P) && MS_CheckParm("goobers"))
 			PicturePause();
 
-	} while(!Keyboard[sc_Y] && !Keyboard[sc_N] && !Keyboard[sc_Escape]);
+	} while(!IN_KeyDown(sc_Y) && !IN_KeyDown(sc_N) && !IN_KeyDown(sc_Escape));
 
-	if (Keyboard[sc_Y])
-	{
+	if (IN_KeyDown(sc_Y)) {
 		xit=1;
 		ShootSnd();
 	}
 
-	while(Keyboard[sc_Y] || Keyboard[sc_N] || Keyboard[sc_Escape]) IN_CheckAck();
+	while(IN_KeyDown(sc_Y) || IN_KeyDown(sc_N) || IN_KeyDown(sc_Escape)) IN_CheckAck();
 
 	IN_ClearKeysDown();
 	SD_PlaySound(whichsnd[xit]);
@@ -3283,24 +3305,6 @@ void FreeMusic(void)
 }
 
 
-///////////////////////////////////////////////////////////////////////////
-//
-//	IN_GetScanName() - Returns a string containing the name of the
-//		specified scan code
-//
-///////////////////////////////////////////////////////////////////////////
-byte *IN_GetScanName(ScanCode scan)
-{
-	byte		**p;
-	ScanCode *s;
-
-	for (s = ExtScanCodes,p = ExtScanNames;*s;p++,s++)
-		if (*s == scan)
-			return(*p);
-
-	return(ScanNames[scan]);
-}
-
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -3332,11 +3336,11 @@ void CheckPause(void)
 ///////////////////////////////////////////////////////////////////////////
 void DrawMenuGun(CP_iteminfo *iteminfo)
 {
-	int x,y;
+	int x, y;
 
-
-	x=iteminfo->x;
-	y=iteminfo->y+iteminfo->curpos*13-2;
+	x = iteminfo->x;
+	y = iteminfo->y+iteminfo->curpos*13-2;
+	
 	VWB_DrawPic(x,y,C_CURSOR1PIC);
 }
 
@@ -3357,7 +3361,7 @@ void DrawStripes(int y)
 #endif
 }
 
-void ShootSnd(void)
+void ShootSnd()
 {
 	SD_PlaySound(SHOOTSND);
 }
@@ -3378,9 +3382,8 @@ void CheckForEpisodes()
 //
 #ifndef UPLOAD
 #ifndef SPEAR
-	if (!findfirst("*.WL6",&f,FA_ARCH))
-	{
-		strcpy(extension,"WL6");
+	if (!findfirst("*.wl6", &f, FA_ARCH)) {
+		strcpy(extension, "wl6");
 		NewEmenu[2].active =
 		NewEmenu[4].active =
 		NewEmenu[6].active =
@@ -3392,10 +3395,8 @@ void CheckForEpisodes()
 		EpisodeSelect[4] =
 		EpisodeSelect[5] = 1;
 	}
-	else
-	if (!findfirst("*.WL3",&f,FA_ARCH))
-	{
-		strcpy(extension,"WL3");
+	else if (!findfirst("*.wl3", &f, FA_ARCH)) {
+		strcpy(extension, "wl3");
 		NewEmenu[2].active =
 		NewEmenu[4].active =
 		EpisodeSelect[1] =
@@ -3407,33 +3408,27 @@ void CheckForEpisodes()
 
 #ifdef SPEAR
 #ifndef SPEARDEMO
-	if (!findfirst("*.SOD",&f,FA_ARCH))
-	{
-		strcpy(extension,"SOD");
-	}
-	else
+	if (!findfirst("*.sod", &f, FA_ARCH)) {
+		strcpy(extension, "sod");
+	} else
 		Quit("NO SPEAR OF DESTINY DATA FILES TO BE FOUND!");
 #else /* SPEARDEMO */
-	if (!findfirst("*.SDM",&f,FA_ARCH))
-	{
-		strcpy(extension,"SDM");
-	}
-	else
+	if (!findfirst("*.sdm",&f,FA_ARCH)) {
+		strcpy(extension, "sdm");
+	} else
 		Quit("NO SPEAR OF DESTINY DEMO DATA FILES TO BE FOUND!");
 #endif /* SPEARDEMO */
 
 #else /* SPEAR */
-	if (!findfirst("*.WL1",&f,FA_ARCH))
-	{
-		strcpy(extension,"WL1");
-	}
-	else
+	if (!findfirst("*.wl1",&f,FA_ARCH)) {
+		strcpy(extension, "wl1");
+	} else
 		Quit("NO WOLFENSTEIN 3-D DATA FILES to be found!");
 #endif /* SPEAR */
 
-	strcat(configname,extension);
-	strcat(SaveName,extension);
-	strcat(PageFileName,extension);
+	strcat(configname, extension);
+	strcat(SaveName, extension);
+	strcat(PageFileName, extension);
 
 #else
 
@@ -3444,9 +3439,9 @@ void CheckForEpisodes()
 //
 #ifndef UPLOAD
 #ifndef SPEAR
-	if (_findfirst("*.WL6", &f) != -1)
+	if (_findfirst("*.wl6", &f) != -1)
 	{
-		strcpy(extension,"WL6");
+		strcpy(extension, "wl6");
 		NewEmenu[2].active =
 		NewEmenu[4].active =
 		NewEmenu[6].active =
@@ -3457,8 +3452,8 @@ void CheckForEpisodes()
 		EpisodeSelect[3] =
 		EpisodeSelect[4] =
 		EpisodeSelect[5] = 1;
-	} else if (_findfirst("*.WL3",&f) != -1) {
-		strcpy(extension,"WL3");
+	} else if (_findfirst("*.wl3",&f) != -1) {
+		strcpy(extension, "wl3");
 		NewEmenu[2].active =
 		NewEmenu[4].active =
 		EpisodeSelect[1] =
@@ -3470,33 +3465,27 @@ void CheckForEpisodes()
 
 #ifdef SPEAR
 #ifndef SPEARDEMO
-	if (_findfirst("*.SOD",&f) != -1)
-	{
-		strcpy(extension,"SOD");
-	}
-	else
+	if (_findfirst("*.sod", &f) != -1) {
+		strcpy(extension, "sod");
+	} else
 		Quit("NO SPEAR OF DESTINY DATA FILES TO BE FOUND!");
 #else /* SPEARDEMO */
-	if (_findfirst("*.SDM",&f) != -1)
-	{
-		strcpy(extension,"SDM");
-	}
-	else
+	if (_findfirst("*.sdm", &f) != -1) {
+		strcpy(extension, "sdm");
+	} else
 		Quit("NO SPEAR OF DESTINY DEMO DATA FILES TO BE FOUND!");
 #endif /* SPEARDEMO */
 
 #else /* SPEAR */
-	if (_findfirst("*.WL1",&f) != -1)
-	{
-		strcpy(extension,"WL1");
-	}
-	else
+	if (_findfirst("*.wl1",&f) != -1) {
+		strcpy(extension, "wl1");
+	} else
 		Quit("NO WOLFENSTEIN 3-D DATA FILES to be found!");
 #endif /* SPEAR */
 
-	strcat(configname,extension);
-	strcat(SaveName,extension);
-	strcat(PageFileName,extension);
+	strcat(configname, extension);
+	strcat(SaveName, extension);
+	strcat(PageFileName, extension);
 #endif
 
 #else
@@ -3507,7 +3496,7 @@ void CheckForEpisodes()
 #ifndef UPLOAD
 #ifndef SPEAR
 	if (glob("*.wl6", 0, NULL, &globbuf) == 0) {
-		strcpy(extension,"wl6");
+		strcpy(extension, "wl6");
 		NewEmenu[2].active =
 		NewEmenu[4].active =
 		NewEmenu[6].active =
@@ -3519,13 +3508,12 @@ void CheckForEpisodes()
 		EpisodeSelect[4] =
 		EpisodeSelect[5] = 1;
 	} else if (glob("*.wl3", 0, NULL, &globbuf) == 0) {
-		strcpy(extension,"wl3");
+		strcpy(extension, "wl3");
 		NewEmenu[2].active =
 		NewEmenu[4].active =
 		EpisodeSelect[1] =
 		EpisodeSelect[2] = 1;
-	}
-	else
+	} else
 #endif /* SPEAR */
 #endif /* UPLOAD */
 
@@ -3538,22 +3526,20 @@ void CheckForEpisodes()
 #else /* SPEARDEMO */
 	if (glob("*.sdm", 0, NULL, &globbuf) == 0) {
 		strcpy(extension, "sdm");
-	}
-	else
+	} else
 		Quit("NO SPEAR OF DESTINY DEMO DATA FILES TO BE FOUND!");
 #endif /* SPEARDEMO */
 
 #else /* SPEAR */
 	if (glob("*.wl1", 0, NULL, &globbuf) == 0) {
-		strcpy(extension,"wl1");
-	}
-	else
+		strcpy(extension, "wl1");
+	} else
 		Quit("NO WOLFENSTEIN 3-D DATA FILES to be found!");
 #endif /* SPEAR */
 
-	strcat(configname,extension);
-	strcat(SaveName,extension);
-	strcat(PageFileName,extension);
+	strcat(configname, extension);
+	strcat(SaveName, extension);
+	strcat(PageFileName, extension);
 
 #endif
 

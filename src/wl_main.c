@@ -1095,8 +1095,8 @@ void InitGame(void)
 // HOLDING DOWN 'M' KEY?
 //
 #ifndef SPEARDEMO
-	if (Keyboard[sc_M])
-	  DoJukebox();
+	if (IN_KeyDown(sc_M))
+		DoJukebox();
 	else
 #endif
 
@@ -1190,7 +1190,7 @@ void NewViewSize(int width)
 =====================
 */
 
-void DemoLoop (void)
+void DemoLoop()
 {
 	static int LastDemo;
 	
@@ -1211,7 +1211,7 @@ void DemoLoop (void)
 		PG13 ();
 
 	i = MS_CheckParm("playdemo");
-	if ( i && ( (i+1) < _argc) ) {
+	if (i && ((i+1) < _argc)) {
 		i++;
 		for (; i < _argc; i++) {
 			if (_argv[i][0] == '-')
@@ -1240,8 +1240,8 @@ void DemoLoop (void)
 
 			CA_CacheGrChunk (TITLE2PIC);
 			VWB_DrawPic (0,80,TITLE2PIC);
-			CA_UnCacheGrChunk (TITLE2PIC);
-			VW_UpdateScreen ();
+			CA_UnCacheGrChunk(TITLE2PIC);
+			VW_UpdateScreen();
 			VL_FadeIn(0,255,grsegs[TITLEPALETTE],30);
 
 			CA_UnCacheGrChunk (TITLEPALETTE);
@@ -1288,7 +1288,7 @@ void DemoLoop (void)
 
 		VW_FadeOut ();
 
-		if (Keyboard[sc_Tab] && MS_CheckParm("debugmode"))
+		if (IN_KeyDown(sc_Tab) && MS_CheckParm("debugmode"))
 			RecordDemo ();
 		else
 			US_ControlPanel (0);

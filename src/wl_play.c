@@ -244,7 +244,7 @@ void PollKeyboardButtons (void)
 	int		i;
 
 	for (i=0;i<NUMBUTTONS;i++)
-		if (Keyboard[buttonscan[i]])
+		if (IN_KeyDown(buttonscan[i]))
 			buttonstate[i] = true;
 }
 
@@ -319,28 +319,28 @@ void PollJoystickButtons (void)
 ===================
 */
 
-void PollKeyboardMove (void)
+void PollKeyboardMove()
 {
 	if (buttonstate[bt_run])
 	{
-		if (Keyboard[dirscan[di_north]])
+		if (IN_KeyDown(dirscan[di_north]))
 			controly -= RUNMOVE*tics;
-		if (Keyboard[dirscan[di_south]])
+		if (IN_KeyDown(dirscan[di_south]))
 			controly += RUNMOVE*tics;
-		if (Keyboard[dirscan[di_west]])
+		if (IN_KeyDown(dirscan[di_west]))
 			controlx -= RUNMOVE*tics;
-		if (Keyboard[dirscan[di_east]])
+		if (IN_KeyDown(dirscan[di_east]))
 			controlx += RUNMOVE*tics;
 	}
 	else
 	{
-		if (Keyboard[dirscan[di_north]])
+		if (IN_KeyDown(dirscan[di_north]))
 			controly -= BASEMOVE*tics;
-		if (Keyboard[dirscan[di_south]])
+		if (IN_KeyDown(dirscan[di_south]))
 			controly += BASEMOVE*tics;
-		if (Keyboard[dirscan[di_west]])
+		if (IN_KeyDown(dirscan[di_west]))
 			controlx -= BASEMOVE*tics;
-		if (Keyboard[dirscan[di_east]])
+		if (IN_KeyDown(dirscan[di_east]))
 			controlx += BASEMOVE*tics;
 	}
 }
@@ -590,10 +590,7 @@ void CheckKeys (void)
 	//
 	// SECRET CHEAT CODE: TAB-G-F10
 	//
-	if (Keyboard[sc_Tab] &&
-		Keyboard[sc_G] &&
-		Keyboard[sc_F10])
-	{
+	if (IN_KeyDown(sc_Tab) && IN_KeyDown(sc_G) && IN_KeyDown(sc_F10)) {
 		WindowH = 160;
 		if (godmode)
 		{
@@ -616,16 +613,13 @@ void CheckKeys (void)
 	//
 	// SECRET CHEAT CODE: 'MLI'
 	//
-	if (Keyboard[sc_M] &&
-		Keyboard[sc_L] &&
-		Keyboard[sc_I])
-	{
+	if (IN_KeyDown(sc_M) &&	IN_KeyDown(sc_L) && IN_KeyDown(sc_I)) {
 		gamestate.health = 100;
 		gamestate.ammo = 99;
 		gamestate.keys = 3;
 		gamestate.score = 0;
 		gamestate.TimeCount += 42000L;
-		GiveWeapon (wp_chaingun);
+		GiveWeapon(wp_chaingun);
 
 		DrawWeapon();
 		DrawHealth();
@@ -653,11 +647,8 @@ void CheckKeys (void)
 	//
 	// OPEN UP DEBUG KEYS
 	//
-	if (Keyboard[sc_BackSpace] &&
-		Keyboard[sc_LShift] &&
-		Keyboard[sc_Alt] &&
-		MS_CheckParm("debugmode"))
-	{
+	if (IN_KeyDown(sc_BackSpace) && IN_KeyDown(sc_LShift) &&
+		IN_KeyDown(sc_Alt) && MS_CheckParm("debugmode")) {
 	 ClearMemory ();
 	 CA_CacheGrChunk (STARTFONT+1);
 	 ClearSplitVWB ();
@@ -674,35 +665,32 @@ void CheckKeys (void)
 	//
 	// TRYING THE KEEN CHEAT CODE!
 	//
-	if (Keyboard[sc_B] &&
-		Keyboard[sc_A] &&
-		Keyboard[sc_T])
-	{
-	 ClearMemory ();
-	 CA_CacheGrChunk (STARTFONT+1);
-	 ClearSplitVWB ();
+	if (IN_KeyDown(sc_B) && IN_KeyDown(sc_A) && IN_KeyDown(sc_T)) {
+		ClearMemory();
+		CA_CacheGrChunk(STARTFONT+1);
+		ClearSplitVWB();
 
-	 Message("Commander Keen is also\n"
-			 "available from Apogee, but\n"
-			 "then, you already know\n"
-			 "that - right, Cheatmeister?!");
+		Message("Commander Keen is also\n"
+			"available from Apogee, but\n"
+			"then, you already know\n"
+			"that - right, Cheatmeister?!");
 
-	 CA_UnCacheGrChunk(STARTFONT+1);
-	 IN_ClearKeysDown();
-	 IN_Ack();
+		CA_UnCacheGrChunk(STARTFONT+1);
+		IN_ClearKeysDown();
+		IN_Ack();
 
-	 DrawAllPlayBorder ();
+		DrawAllPlayBorder();
 	}
 
-	if (Paused)
-	{
+	if (Paused) {
 		VWB_DrawPic(128, 64, PAUSEDPIC);
 		VW_UpdateScreen();
 		
 		SD_MusicOff();
 		IN_Ack();
-		IN_ClearKeysDown ();
+		IN_ClearKeysDown();
 		SD_MusicOn();
+		
 		Paused = false;
 		return;
 	}
@@ -759,8 +747,7 @@ void CheckKeys (void)
 //
 // TAB-? debug keys
 //
-	if (Keyboard[sc_Tab] && DebugOk)
-	{
+	if (IN_KeyDown(sc_Tab) && DebugOk) {
 		CA_CacheGrChunk (STARTFONT);
 		fontnumber=0;
 		SETFONTCOLOR(0,15);

@@ -277,19 +277,19 @@ int DebugKeys()
 	boolean esc;
 	int level;
 
-	if (Keyboard[sc_C])		// C = count objects
+	if (IN_KeyDown(sc_C))		// C = count objects
 	{
 		CountObjects();
 		return 1;
 	}
 
-	if (Keyboard[sc_E])		// E = quit level
+	if (IN_KeyDown(sc_E))		// E = quit level
 	{
 		playstate = ex_completed;
 //		gamestate.mapon++;
 	}
 
-	if (Keyboard[sc_F])		// F = facing spot
+	if (IN_KeyDown(sc_F))		// F = facing spot
 	{
 		CenterWindow (14,4);
 		US_Print ("X:");
@@ -303,7 +303,7 @@ int DebugKeys()
 		return 1;
 	}
 
-	if (Keyboard[sc_G])		// G = god mode
+	if (IN_KeyDown(sc_G))		// G = god mode
 	{
 		CenterWindow (12,2);
 		if (godmode)
@@ -315,12 +315,12 @@ int DebugKeys()
 		godmode ^= 1;
 		return 1;
 	}
-	if (Keyboard[sc_H])		// H = hurt self
+	if (IN_KeyDown(sc_H))		// H = hurt self
 	{
 		IN_ClearKeysDown ();
 		TakeDamage (16,NULL);
 	}
-	else if (Keyboard[sc_I])			// I = item cheat
+	else if (IN_KeyDown(sc_I))			// I = item cheat
 	{
 		CenterWindow (12,3);
 		US_PrintCentered ("Free items!");
@@ -336,7 +336,7 @@ int DebugKeys()
 		IN_Ack ();
 		return 1;
 	}
-	else if (Keyboard[sc_N])			// N = no clip
+	else if (IN_KeyDown(sc_N))			// N = no clip
 	{
 		noclip^=1;
 		CenterWindow (18,3);
@@ -348,14 +348,14 @@ int DebugKeys()
 		IN_Ack ();
 		return 1;
 	}
-	else if (Keyboard[sc_P])			// P = pause with no screen disruptioon
+	else if (IN_KeyDown(sc_P))			// P = pause with no screen disruptioon
 	{
 		PicturePause ();
 		return 1;
 	}
-	else if (Keyboard[sc_Q])			// Q = fast quit
+	else if (IN_KeyDown(sc_Q))			// Q = fast quit
 		Quit(NULL);
-	else if (Keyboard[sc_S])			// S = slow motion
+	else if (IN_KeyDown(sc_S))			// S = slow motion
 	{
 		singlestep^=1;
 		CenterWindow (18,3);
@@ -367,12 +367,12 @@ int DebugKeys()
 		IN_Ack ();
 		return 1;
 	}
-	else if (Keyboard[sc_T])			// T = shape test
+	else if (IN_KeyDown(sc_T))			// T = shape test
 	{
-		ShapeTest ();
+		ShapeTest();
 		return 1;
 	}
-	else if (Keyboard[sc_V])			// V = extra VBLs
+	else if (IN_KeyDown(sc_V))			// V = extra VBLs
 	{
 		CenterWindow(30,3);
 		PrintY+=6;
@@ -387,11 +387,10 @@ int DebugKeys()
 		}
 		return 1;
 	}
-	else if (Keyboard[sc_W])			// W = warp to level
+	else if (IN_KeyDown(sc_W))			// W = warp to level
 	{
 		CenterWindow(26,3);
 		PrintY+=6;
-	/* TODO: wouldn't work on sod demo etc */
 #ifndef SPEAR
 		US_Print("  Warp to which level(1-10):");
 #elif defined(SPEARDEMO)

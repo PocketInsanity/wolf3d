@@ -313,18 +313,18 @@ void VL_DirectPlot(int x1, int y1, int x2, int y2)
 //
 // configuration variables
 //
-boolean			MousePresent;
-boolean			JoysPresent[MaxJoys];
+boolean		MousePresent;
+boolean		JoysPresent[MaxJoys];
 
 // 	Global variables
-		boolean		Keyboard[NumCodes];
-		boolean		Paused;
-		char		LastASCII;
-		ScanCode	LastScan;
+boolean		Keyboard[NumCodes];
+boolean		Paused;
+char		LastASCII;
+ScanCode	LastScan;
 
 KeyboardDef KbdDefs = {sc_Control, sc_Alt, sc_Home, sc_UpArrow, sc_PgUp, sc_LeftArrow, sc_RightArrow, sc_End, sc_DownArrow, sc_PgDn};
 
-		ControlType	Controls[MaxPlayers];
+ControlType	Controls[MaxPlayers];
 
 /*
 =============================================================================
@@ -362,14 +362,11 @@ static	boolean		IN_Started;
 static	boolean		CapsLock;
 static	ScanCode	CurCode,LastCode;
 
-static	Direction	DirTable[] =		// Quick lookup for total direction
-					{
-						dir_NorthWest,	dir_North,	dir_NorthEast,
-						dir_West,		dir_None,	dir_East,
-						dir_SouthWest,	dir_South,	dir_SouthEast
-					};
-
-//	Internal routines
+static	Direction	DirTable[] =	{	// Quick lookup for total direction 
+	dir_NorthWest,	dir_North,	dir_NorthEast,
+	dir_West,	dir_None,	dir_East,
+	dir_SouthWest,	dir_South,	dir_SouthEast
+};
 
 void keyboard_handler(int code, int press)
 {

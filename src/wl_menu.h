@@ -84,25 +84,25 @@
 #define CST_X		20
 #define CST_Y		48
 #define CST_START	60
-#define CST_SPC	60
+#define CST_SPC		60
 
 
 //
 // TYPEDEFS
 //
 typedef struct {
-		int x,y,amount,curpos,indent;
-		} CP_iteminfo;
+	int x,y,amount,curpos,indent;
+} CP_iteminfo;
 
 typedef struct {
-		int active;
-		char string[36];
-		void (* routine)(int temp1);
-		} CP_itemtype;
+	int active;
+	char string[36];
+	void (* routine)(int temp1);
+} CP_itemtype;
 
 typedef struct {
-		int allowed[4];
-		} CustomCtrls;
+	int allowed[4];
+} CustomCtrls;
 
 extern CP_itemtype MainMenu[], NewEMenu[];
 extern CP_iteminfo MainItems;
@@ -114,9 +114,7 @@ void SetupControlPanel(void);
 void CleanupControlPanel(void);
 
 void DrawMenu(CP_iteminfo *item_i,CP_itemtype *items);
-int  HandleMenu(CP_iteminfo *item_i,
-		CP_itemtype *items,
-		void (*routine)(int w));
+int HandleMenu(CP_iteminfo *item_i, CP_itemtype *items, void (*routine)(int w));
 void ClearMScreen(void);
 void DrawWindow(int x,int y,int w,int h,int wcolor);
 void DrawOutline(int x,int y,int w,int h,int color1,int color2);
@@ -214,13 +212,13 @@ enum
 // WL_INTER
 //
 typedef struct {
-		int kill,secret,treasure;
-		long time;
-		} LRstruct;
+	int kill,secret,treasure;
+	long time;
+} LRstruct;
 
 extern LRstruct LevelRatios[];
 
-void Write (int x,int y,char *string);
+void Write(int x,int y,char *string);
 int GetYorN(int x,int y,int pic);
 
 #endif

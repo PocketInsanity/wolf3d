@@ -3,8 +3,8 @@ CC = gcc
 
 #CFLAGS = -Wall -O6 -fomit-frame-pointer -ffast-math -funroll-loops -mpentiumpro -mcpu=pentiumpro -march=pentiumpro 
 CFLAGS = -g -Wall
-#CFLAGS = -g
-#CFLAGS = -Os
+#CFLAGS = -Os -Wall
+#CFLAGS = -Os -Wall -fomit-frame-pointer -ffast-math -mpentiumpro -mcpu=pentiumpro -march=pentiumpro 
 #CFLAGS = -g -Wall -I/home/relnev/cvs/oal/include
 
 OBJS = objs.o misc.o id_ca.o id_vh.o id_us.o \

@@ -50,12 +50,13 @@ byte		ca_levelbit,ca_levelnum;
 */
 
 char extension[5],
-     gheadname[10]="vgahead.",
-     gfilename[10]="vgagraph.",
-     gdictname[10]="vgadict.",
-     mheadname[10]="maphead.",
-     aheadname[10]="audiohed.",
-     afilename[10]="audiot.";
+     gheadname[10] = "vgahead.",
+     gfilename[10] = "vgagraph.",
+     gdictname[10] = "vgadict.",
+     mheadname[10] = "maphead.",
+     gmapsname[10] = "gamemaps.",
+     aheadname[10] = "audiohed.",
+     afilename[10] = "audiot.";
 
 long *grstarts;	/* array of offsets in vgagraph, -1 for sparse */
 long *audiostarts; /* array of offsets in audio / audiot */
@@ -144,7 +145,7 @@ boolean CA_FarRead(int handle, byte *dest, long length)
 ==========================
 */
 
-boolean CA_FarWrite (int handle, byte *source, long length)
+boolean CA_FarWrite(int handle, byte *source, long length)
 {
 	ssize_t l;
 	
@@ -177,7 +178,7 @@ boolean CA_ReadFile(char *filename, memptr *ptr)
 	int handle;
 	long size;
 
-	if ((handle = open(filename, O_RDONLY | O_BINARY, S_IREAD)) == -1)
+	if ((handle = open(filename, O_RDONLY | O_BINARY)) == -1)
 		return false;
 	size = filelength(handle);
 	
@@ -234,7 +235,7 @@ boolean CA_LoadFile (char *filename, memptr *ptr)
 	int handle;
 	long size;
 
-	if ((handle = open(filename,O_RDONLY | O_BINARY, S_IREAD)) == -1)
+	if ((handle = open(filename, O_RDONLY | O_BINARY)) == -1)
 		return false;
 
 	size = filelength(handle);
@@ -266,7 +267,6 @@ boolean CA_LoadFile (char *filename, memptr *ptr)
 ======================
 */
 
-#if 1
 /* From Ryan C. Gordon -- ryan_gordon@hotmail.com */
 void CAL_HuffExpand(byte *source, byte *dest, long length, huffnode *htable)
 {
@@ -289,56 +289,13 @@ void CAL_HuffExpand(byte *source, byte *dest, long length, huffnode *htable)
 			source++;
 	        } 
 		if (path < 256) {  
-			*dest = (byte) path;
+			*dest = (byte)path;
 			dest++;
 			nodeon = headptr;
 		} else
 			nodeon = (htable + (path - 256));
 	} while (dest != endoff);   
 } 
-#else
-
-void CAL_HuffExpand(byte *source, byte *dest, long length, huffnode *hufftable)
-{
-        int x;
-        huffnode *headptr, *nodeon;
-        byte *ptr, *ptrd, *ptrm;
-        byte a, mask;
-        unsigned short int b;
-
-        ptrd = dest;
-
-        headptr = hufftable + 254; /* head node is always node 254 */
-
-        nodeon = headptr;
-        ptr = source;
-        a = *ptr;
-        ptr++;
-        mask = 1;
-
-        for (x = 0; x < length; x++) {
-        again:
-                if (a & mask)
-                        b = nodeon->bit1;
-                else
-                        b = nodeon->bit0;
-                mask <<= 1;
-                if (mask == 0) {
-                        a = *ptr;
-                        ptr++;
-                        mask = 1;
-                }
-                if (b & 0xFF00) {
-                        nodeon = hufftable + (b - 256);
-                        goto again;
-                } else {
-                        nodeon = headptr;
-                        *ptrd = (b & 0x00FF);
-                        ptrd++;
-                }
-        }
-}
-#endif
 
 /*
 ======================
@@ -353,6 +310,63 @@ void CAL_HuffExpand(byte *source, byte *dest, long length, huffnode *hufftable)
 #define NEARTAG	0xa7
 #define FARTAG	0xa8
 
+void CAL_CarmackExpand(word *source, word *dest, word length)
+{
+	unsigned int offset;
+	word *copyptr, *outptr;	
+	byte chhigh, chlow, *inptr;
+	
+	length /= 2;
+
+	inptr = (byte *)source;
+	outptr = dest;
+
+	while (length) {
+		/* LSB */
+		chlow = *inptr++; /* count */
+		chhigh = *inptr++;
+		
+		if (chhigh == NEARTAG) {
+			if (!chlow) {	
+				/* have to insert a word containing the tag byte */
+				*outptr++ = (chhigh << 8) | *inptr;
+				inptr++;
+				
+				length--;
+			} else {
+				offset = *inptr;
+				inptr++;
+				
+				copyptr = outptr - offset;
+				
+				length -= chlow;
+				while (chlow--)
+					*outptr++ = *copyptr++;
+			}
+		} else if (chhigh == FARTAG) {
+			if (!chlow) {
+				/* have to insert a word containing the tag byte */
+				*outptr++ = (chhigh << 8) | *inptr;
+				inptr++;
+				
+				length--;
+			} else {
+				offset = *inptr | (*(inptr+1) << 8);
+				inptr += 2;
+				
+				copyptr = dest + offset;
+				length -= chlow;
+				while (chlow--)
+					*outptr++ = *copyptr++;
+			}
+		} else {
+			*outptr++ = (chhigh << 8) | chlow;
+			length--;
+		}
+	}
+}
+
+#if 0
 void CAL_CarmackExpand(word *source, word *dest, word length)
 {
 	word ch, chhigh, count, offset;
@@ -404,47 +418,7 @@ void CAL_CarmackExpand(word *source, word *dest, word length)
 		}
 	}
 }
-
-/*
-======================
-=
-= CA_RLEWcompress
-=
-======================
-*/
-
-/* TODO: actually this isn't used so it can be removed from here */
-long CA_RLEWCompress(word *source, long length, word *dest, word rlewtag)
-{
-	word value, count, i;
-	word *start, *end;
-
-	start = dest;
-
-	end = source + (length + 1)/2;
-
-	/* compress it */
-	do {
-		count = 1;
-		value = *source++;
-		while ( (*source == value) && (source < end) ) { 
-			count++;
-			source++;
-		}
-		if ( (count > 3) || (value == rlewtag) ) {
-		 	/* send a tag / count / value string */
-			*dest++ = rlewtag;
-			*dest++ = count;
-			*dest++ = value;
-		} else {
-			/* send word without compressing */
-			for (i = 1; i <= count; i++)
-				*dest++ = value;
-		}
-	} while (source < end);
-
-	return 2*(dest-start);
-}
+#endif
 
 /*
 ======================
@@ -501,8 +475,8 @@ long CAL_GetGrChunkLength(int chunk)
 {
 	long chunkexplen;
 	
-	lseek(grhandle,GRFILEPOS(chunk),SEEK_SET);
-	read(grhandle,&chunkexplen,sizeof(chunkexplen));
+	lseek(grhandle, GRFILEPOS(chunk), SEEK_SET);
+	read(grhandle, &chunkexplen, sizeof(chunkexplen));
 	return GRFILEPOS(chunk+1)-GRFILEPOS(chunk)-4;
 }
 
@@ -514,7 +488,7 @@ long CAL_GetGrChunkLength(int chunk)
 ======================
 */
 
-void CAL_SetupGrFile (void)
+void CAL_SetupGrFile()
 {
 	char fname[13];
 	int handle;
@@ -525,11 +499,10 @@ void CAL_SetupGrFile (void)
 // load ???dict.ext (huffman dictionary for graphics files)
 //
 
-	strcpy(fname,gdictname);
-	strcat(fname,extension);
+	strcpy(fname, gdictname);
+	strcat(fname, extension);
 
-	if ((handle = open(fname,
-		 O_RDONLY | O_BINARY, S_IREAD)) == -1)
+	if ((handle = open(fname, O_RDONLY | O_BINARY)) == -1)
 		CA_CannotOpen(fname);
 
 	read(handle, &grhuffman, sizeof(grhuffman));
@@ -537,25 +510,23 @@ void CAL_SetupGrFile (void)
 //
 // load the data offsets from ???head.ext
 //
-	MM_GetPtr ((memptr)&grstarts,(NUMCHUNKS+1)*FILEPOSSIZE);
+	MM_GetPtr((memptr)&grstarts, (NUMCHUNKS+1)*FILEPOSSIZE);
 
-	strcpy(fname,gheadname);
-	strcat(fname,extension);
+	strcpy(fname, gheadname);
+	strcat(fname, extension);
 
-	if ((handle = open(fname,
-		 O_RDONLY | O_BINARY, S_IREAD)) == -1)
+	if ((handle = open(fname, O_RDONLY | O_BINARY)) == -1)
 		CA_CannotOpen(fname);
 
 	CA_FarRead(handle, (memptr)grstarts, (NUMCHUNKS+1)*FILEPOSSIZE);
 
 	close(handle);
 
-
 //
 // Open the graphics file, leaving it open until the game is finished
 //
-	strcpy(fname,gfilename);
-	strcat(fname,extension);
+	strcpy(fname, gfilename);
+	strcat(fname, extension);
 
 	grhandle = open(fname, O_RDONLY | O_BINARY);
 	if (grhandle == -1)
@@ -584,7 +555,7 @@ void CAL_SetupGrFile (void)
 ======================
 */
 
-void CAL_SetupMapFile (void)
+void CAL_SetupMapFile()
 {
 	int	i;
 	int handle;
@@ -597,8 +568,7 @@ void CAL_SetupMapFile (void)
 	strcpy(fname,mheadname);
 	strcat(fname,extension);
 
-	if ((handle = open(fname,
-		 O_RDONLY | O_BINARY, S_IREAD)) == -1)
+	if ((handle = open(fname, O_RDONLY | O_BINARY)) == -1)
 		CA_CannotOpen(fname);
 
 	length = filelength(handle);
@@ -611,11 +581,10 @@ void CAL_SetupMapFile (void)
 //
 // open the data file
 //
-	strcpy(fname,"gamemaps.");
+	strcpy(fname, gmapsname);
 	strcat(fname,extension);
 
-	if ((maphandle = open(fname,
-		 O_RDONLY | O_BINARY, S_IREAD)) == -1)
+	if ((maphandle = open(fname, O_RDONLY | O_BINARY)) == -1)
 		CA_CannotOpen(fname);
 
 //
@@ -624,7 +593,7 @@ void CAL_SetupMapFile (void)
 	for (i=0;i<NUMMAPS;i++)
 	{
 		pos = ((mapfiletype *)tinf)->headeroffsets[i];
-		if (pos<0)	/* $FFFFFFFF start is a sparse map */
+		if (pos < 0)	/* $FFFFFFFF start is a sparse map */
 			continue;
 
 		MM_GetPtr((memptr)&mapheaderseg[i],sizeof(maptype));
@@ -636,10 +605,9 @@ void CAL_SetupMapFile (void)
 //
 // allocate space for 2 64*64 planes
 //
-	for (i=0;i<MAPPLANES;i++)
-	{
-		MM_GetPtr ((memptr)&mapsegs[i],64*64*2);
-		MM_SetLock ((memptr)&mapsegs[i],true);
+	for (i = 0;i < MAPPLANES; i++) {
+		MM_GetPtr((memptr)&mapsegs[i], 64*64*2);
+		MM_SetLock((memptr)&mapsegs[i], true);
 	}
 }
 
@@ -654,7 +622,7 @@ void CAL_SetupMapFile (void)
 ======================
 */
 
-void CAL_SetupAudioFile (void)
+void CAL_SetupAudioFile()
 {
 	int handle;
 	long length;
@@ -665,8 +633,7 @@ void CAL_SetupAudioFile (void)
 	strcpy(fname,aheadname);
 	strcat(fname,extension);
 
-	if ((handle = open(fname,
-		 O_RDONLY | O_BINARY, S_IREAD)) == -1)
+	if ((handle = open(fname, O_RDONLY | O_BINARY)) == -1)
 		CA_CannotOpen(fname);
 
 	length = filelength(handle);
@@ -680,8 +647,7 @@ void CAL_SetupAudioFile (void)
 	strcpy(fname,afilename);
 	strcat(fname,extension);
 
-	if ((audiohandle = open(fname,
-		 O_RDONLY | O_BINARY, S_IREAD)) == -1)
+	if ((audiohandle = open(fname, O_RDONLY | O_BINARY)) == -1)
 		CA_CannotOpen(fname);
 }
 
@@ -842,7 +808,7 @@ cachein:
 
 void CAL_ExpandGrChunk(int chunk, byte *source)
 {
-	int tilecount = 0;
+	int tilecount = 0, i;
 	long expanded;
 	
 	int width = 0, height = 0;
@@ -852,25 +818,10 @@ void CAL_ExpandGrChunk(int chunk, byte *source)
 	//
 	// expanded sizes of tile8/16/32 are implicit
 	//
-#define BLOCK		64
-#define MASKBLOCK	128
-
-		if (chunk<STARTTILE8M) { /* tile 8s are all in one chunk! */
-			expanded = BLOCK*NUMTILE8;
-			width = 8;
-			height = 8;
-			tilecount = NUMTILE8;
-		} else if (chunk<STARTTILE16) /* TODO: This is removable */
-			expanded = MASKBLOCK*NUMTILE8M;
-		else if (chunk<STARTTILE16M)	// all other tiles are one/chunk
-			expanded = BLOCK*4;
-		else if (chunk<STARTTILE32)
-			expanded = MASKBLOCK*4;
-		else if (chunk<STARTTILE32M)
-			expanded = BLOCK*16;
-		else
-			expanded = MASKBLOCK*16;
-		
+		expanded = (8*8)*NUMTILE8;
+		width = 8;
+		height = 8;
+		tilecount = NUMTILE8;
 	} else if (chunk >= STARTPICS && chunk < STARTSPRITES) {
 		width = pictable[chunk - STARTPICS].width;
 		height = pictable[chunk - STARTPICS].height;
@@ -891,7 +842,6 @@ void CAL_ExpandGrChunk(int chunk, byte *source)
 	CAL_HuffExpand(source, grsegs[chunk], expanded, grhuffman);
 	if (width && height) {
 		if (tilecount) {
-			int i;
 			for (i = 0; i < tilecount; i++) 
 				VL_DeModeXize(grsegs[chunk]+(width*height)*i, width, height);
 		} else			
@@ -916,8 +866,8 @@ void CA_CacheGrChunk(int chunk)
 	byte *source;
 	int next;
 
-	/* this is due to Quit wanting to cache the error screen before this has been set up! */
-	if ( (grhandle == 0) || (grhandle == -1) ) /* make sure this works ok */
+	/* this is due to Quit() wanting to cache the error screen before this has been set up! */
+	if ( (grhandle == 0) || (grhandle == -1) ) 
 		return;
 		
 	grneeded[chunk] |= ca_levelbit;	/* make sure it doesn't get removed */
@@ -959,7 +909,6 @@ void CA_UnCacheGrChunk(int chunk)
 	MM_FreePtr((void *)&grsegs[chunk]);
 	grneeded[chunk] &= ~ca_levelbit;
 	
-	/* Or should MM_FreePtr set it to zero? */
 	grsegs[chunk] = 0;
 }
 
@@ -1346,7 +1295,7 @@ void CA_CacheMarks (void)
 ===================
 */
 
-void MM_Startup (void)
+void MM_Startup()
 {
 }
 
@@ -1358,7 +1307,7 @@ void MM_Startup (void)
 ====================
 */
 
-void MM_Shutdown(void)
+void MM_Shutdown()
 {
 }
 
@@ -1477,7 +1426,7 @@ void PML_OpenPageFile(void)
 	word			*lengthptr;
 	PageListStruct *page;
 
-	PageFile = open(PageFileName,O_RDONLY | O_BINARY);
+	PageFile = open(PageFileName, O_RDONLY | O_BINARY);
 	if (PageFile == -1)
 		Quit("PML_OpenPageFile: Unable to open page file");
 

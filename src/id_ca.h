@@ -48,7 +48,6 @@ boolean CA_ReadFile(char *filename, memptr *ptr);
 boolean CA_LoadFile(char *filename, memptr *ptr);
 boolean CA_WriteFile(char *filename, void *ptr, long length);
 
-long CA_RLEWCompress(word *source, long length, word *dest, word rlewtag);
 void CA_RLEWexpand(word *source, word *dest, long length, word rlewtag);
 
 void CA_Startup (void);
@@ -78,7 +77,7 @@ void CA_CacheMarks();
 
 void CA_CacheScreen(int chunk);
 
-//==========================================================================
+/* ======================================================================= */
 
 void MM_Startup();
 void MM_Shutdown();

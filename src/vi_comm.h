@@ -1,7 +1,7 @@
 #ifndef __VI_COMM_H__
 #define __VI_COMM_H__
 
-//===========================================================================
+/* ======================================================================== */
 
 extern byte *gfxbuf;
 
@@ -32,14 +32,15 @@ void VL_DirectPlot(int x1, int y1, int x2, int y2);
 #define	MaxJoys		2
 #define	NumCodes	128
 
-typedef	byte		ScanCode;
+typedef	byte ScanCode;
+
 #define	sc_None			0
 #define	sc_Bad			0xff
 #define	sc_Return		0x1c
 #define	sc_Enter		sc_Return
 #define	sc_Escape		0x01
 #define	sc_Space		0x39
-#define	sc_BackSpace	0x0e
+#define	sc_BackSpace		0x0e
 #define	sc_Tab			0x0f
 #define	sc_Alt			0x38
 #define	sc_Control		0x1d
@@ -47,7 +48,7 @@ typedef	byte		ScanCode;
 #define	sc_LShift		0x2a
 #define	sc_RShift		0x36
 
-/* TODO: have all these defines map into system specific values */
+/* TODO */
 /*
 #define	sc_UpArrow	0x48
 #define	sc_DownArrow	0x50
@@ -123,41 +124,49 @@ typedef	byte		ScanCode;
 
 #define	key_None		0
 
-typedef	enum		{
-						ctrl_Keyboard,
-						ctrl_Joystick,
-							ctrl_Joystick1 = ctrl_Joystick,ctrl_Joystick2,
-						ctrl_Mouse
-					} ControlType;
-typedef	enum		{
-						motion_Left = -1,motion_Up = -1,
-						motion_None = 0,
-						motion_Right = 1,motion_Down = 1
-					} Motion;
-typedef	enum		{
-						dir_North,dir_NorthEast,
-						dir_East,dir_SouthEast,
-						dir_South,dir_SouthWest,
-						dir_West,dir_NorthWest,
-						dir_None
-					} Direction;
-typedef	struct		{
-						boolean		button0,button1,button2,button3;
-						int			x,y;
-						Motion		xaxis,yaxis;
-						Direction	dir;
-					} CursorInfo;
-typedef	CursorInfo	ControlInfo;
-typedef	struct		{
-						ScanCode	button0,button1,
-									upleft,		up,		upright,
-									left,				right,
-									downleft,	down,	downright;
-					} KeyboardDef;
+typedef	enum {
+	ctrl_Keyboard,
+	ctrl_Joystick,
+	ctrl_Joystick1 = ctrl_Joystick, 
+	ctrl_Joystick2,
+	ctrl_Mouse
+} ControlType;
+
+typedef	enum {
+	motion_Left = -1,
+	motion_Up = -1,
+	motion_None = 0,
+	motion_Right = 1,
+	motion_Down = 1
+} Motion;
+
+typedef	enum {
+	dir_North,
+	dir_NorthEast,
+	dir_East,
+	dir_SouthEast,
+	dir_South,
+	dir_SouthWest,
+	dir_West,
+	dir_NorthWest,
+	dir_None
+} Direction;
+
+typedef	struct {
+	boolean button0, button1, button2, button3;
+	int x, y;
+	Motion xaxis, yaxis;
+	Direction dir;
+} ControlInfo;
+
+typedef	struct {
+	ScanCode button0, button1, upleft, up, upright, 
+		left, right, downleft, down, downright;
+} KeyboardDef;
+
 // Global variables
-extern	boolean		Keyboard[],
-					MousePresent,
-					JoysPresent[];
+extern boolean Keyboard[], MousePresent, JoysPresent[];
+
 extern	boolean		Paused;
 extern	char		LastASCII;
 extern	ScanCode	LastScan;
@@ -166,25 +175,28 @@ extern	ControlType	Controls[MaxPlayers];
 
 // Function prototypes
 #define	IN_KeyDown(code)	(Keyboard[(code)])
-#define	IN_ClearKey(code)	{Keyboard[code] = false; \
-							if (code == LastScan) LastScan = sc_None;}
+#define	IN_ClearKey(code) { \
+	Keyboard[code] = false; \
+	if (code == LastScan) \
+		LastScan = sc_None; \
+}
 
-extern	void		IN_Startup(void),IN_Shutdown(void),
-					IN_ClearKeysDown(void),
-					IN_ReadControl(int,ControlInfo *),
-					IN_GetJoyAbs(word joy,word *xp,word *yp),
-					IN_SetupJoy(word joy,word minx,word maxx,
-								word miny,word maxy),
-					IN_Ack(void);
-extern	boolean		IN_UserInput(longword delay);
-extern	byte		*IN_GetScanName(ScanCode);
+extern	void IN_Startup(void),IN_Shutdown(void),
+		IN_ClearKeysDown(void),
+		IN_ReadControl(int,ControlInfo *),
+		IN_GetJoyAbs(word joy,word *xp,word *yp),
+		IN_SetupJoy(word joy,word minx,word maxx,word miny,word maxy),
+		IN_Ack(void);
+		
+extern	boolean IN_UserInput(longword delay);
+extern	char	*IN_GetScanName(ScanCode);
 
 
-byte	IN_MouseButtons (void);
-byte	IN_JoyButtons (void);
+byte	IN_MouseButtons();
+byte	IN_JoyButtons();
 
 void INL_GetJoyDelta(word joy,int *dx,int *dy);
-void IN_StartAck(void);
-boolean IN_CheckAck (void);
+void IN_StartAck();
+boolean IN_CheckAck();
 
 #endif

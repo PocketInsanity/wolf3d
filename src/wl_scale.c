@@ -86,60 +86,6 @@ void SetupScaling(int maxscaleheight)
 
 //===========================================================================
 
-/*
-========================
-=
-= BuildCompScale
-=
-= Builds a compiled scaler object that will scale a 64 tall object to
-= the given height (centered vertically on the screen)
-=
-= height should be even
-=
-========================
-*/
-#if 0
-void xBuildCompScale(int height, byte *source, int x)
-{
-
-	int			i;
-	long		fix,step;
-	int	 startpix,endpix,toppix;
-	unsigned char al;
-	
-	step = height << 10; 
-	
-	toppix = (viewheight-height) >> 1;
-		
-	fix = 0;
-		
-	for (i = 0; i < 64; i++)
-	{
-		startpix = fix>>16;
-		fix += step;
-		endpix = fix>>16;
-		
-		startpix+=toppix;
-		endpix+=toppix;
-
-		if (startpix == endpix || endpix < 0 || startpix >= viewheight)
-			continue;
-
-	       al = source[i];
-
-		for (;startpix<endpix;startpix++)
-		{
-		    if (startpix >= viewheight)
-			break;	   /* off the bottom of the view area */
-		    if (startpix < 0)
-			continue;	/* not into the view area */
-		    VL_Plot(x+xoffset, startpix+yoffset, al);
-		}
-
-	}
-}
-#endif
-
 /* TODO: this accesses gfxbuf directly! */
 static void ScaledDraw(byte *gfx, int scale, byte *vid, unsigned long tfrac, unsigned long tint, unsigned long delta)
 {
