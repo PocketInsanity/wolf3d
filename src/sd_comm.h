@@ -135,7 +135,6 @@ extern	boolean	SD_MusicPlaying(void),
 extern	word	SD_SoundPlaying(void);
 
 extern	void	SD_SetDigiDevice(SDSMode),
-				SD_PlayDigitized(word which,int leftpos,int rightpos),
 				SD_StopDigitized(void),
 				SD_Poll(void);
 

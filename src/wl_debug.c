@@ -248,8 +248,7 @@ static	char	buf[10];
 				PM_GetPage(j);
 			break;
 		case sc_P:
-//			if (sound != -1)
-//				SD_PlayDigitized(sound);
+/* TODO: this would play the current digital sound */
 			break;
 		case sc_Escape:
 			done = true;

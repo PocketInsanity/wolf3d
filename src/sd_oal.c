@@ -70,6 +70,8 @@ static	word			sqMode,sqFadeStep;
 
 /* ------------------------------------------------------------------------ */
 
+ALuint *sources;
+ALuint *buffers;
 void *cc;
 
 void SD_StopDigitized(void)
@@ -81,10 +83,6 @@ void SD_Poll(void)
 }
 
 void SD_SetPosition(int leftpos,int rightpos)
-{
-}
-
-void SD_PlayDigitized(word which,int leftpos,int rightpos)
 {
 }
 
@@ -122,14 +120,86 @@ boolean SD_SetMusicMode(SMMode mode)
 ///////////////////////////////////////////////////////////////////////////
 void SD_Startup(void)
 {
+	int i;
+	
 	if (SD_Started)
 		return;
 
+	for (i = 0; i < LASTSOUND; i++)
+		DigiMap[i] = -1;
+		
 	cc = alcCreateContext(NULL);
 	
 	if (cc == NULL)
 		printf("alcCreateContext failed..\n");
+	else {
+		word *SoundList = PM_GetPage(ChunksInFile - 1);
+		PageListStruct *page = &PMPages[ChunksInFile - 1];
+		int p = page->length;
+		int x = 0, w, y, z;
+		for (i = 0; i < p / 2; i += 2) {
+			w = *(SoundList + i);
+			y = *(SoundList + i+1);
+			
+			page = &PMPages[w + PMSoundStart];
+			
+			if (page->length == 0) {
+				x++; // count it?
+				continue;
+			}
+				
+			for (z = 0; z < y; w++, z++) {
+				page = &PMPages[w + PMSoundStart];
+				z += page->length;
+			}
+			
+			x++;
+		}
+			
+		buffers = (ALuint *)malloc(sizeof(ALuint) * x);
+		if (alGenBuffers(x, buffers) != x) 
+			printf("OpenAL buffer allocation problem\n");
+				
+			
+		x = 0;
+		for (i = 0; i < p / 2; i += 2) {
+			byte *dat;
+			w = *(SoundList + i);
+			y = *(SoundList + i+1);
+			
+			page = &PMPages[w + PMSoundStart];
+			
+			if (page->length == 0) {
+				x++; // count it?
+				continue;
+			}
+			
+			if (y == 0){
+				printf("wtf?\n");
+				continue;
+			}
+			
+			dat = (byte *)malloc(y);
+				
+			for (z = 0; z < y; w++) {
+				page = &PMPages[w + PMSoundStart];
+				memcpy(dat+z, PM_GetPage(w + PMSoundStart), page->length);
+				z += page->length;
+			}
+			alBufferData(buffers[x], AL_FORMAT_MONO8, dat, y, 6896);
+			
+			if(alGetError() != AL_NO_ERROR) {
+				printf("AL error\n");
+			}
+			
+			free(dat);
+			x++;
+		}
 		
+		sources = (ALuint *)malloc(sizeof(ALuint) * 1);
+		alGenSources(1, sources);
+			
+	}	
 	SD_Started = true;
 }
 
@@ -178,6 +248,15 @@ boolean SD_PlaySound(soundnames sound)
 	boolean		ispos;
 	int	lp,rp;
 
+	printf("Playing sound %d, digimap %d\n", sound, DigiMap[sound]);
+	fflush(stdout);
+	
+	if (DigiMap[sound] != -1) {
+		alSourceStop(*sources);
+		alSourcei(*sources, AL_BUFFER, buffers[DigiMap[sound]]);
+		alSourcePlay(*sources);
+	}
+	
 	lp = LeftPosition;
 	rp = RightPosition;
 	LeftPosition = 0;
