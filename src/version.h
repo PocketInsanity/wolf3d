@@ -1,12 +1,21 @@
 #ifndef __VERSION_H__
 #define __VERSION_H__
 
-/* Change WMODE to point to the executable you would like to build: */
-/* WL1 = 0 */ 
-/* WL6 = 1 */
-/* SDM = 2 */
-/* SOD = 3 */
-/* WL3 not supported */
+/* 
+ Change WMODE to point to the executable you would like to build:
+ WL1 (Wolfenstein 3D Shareware): 0 
+ WL6 (Wolfenstein 3D Retail):    1 
+ SDM (Spear of Destiny Demo):    2
+ SOD (Spear of Destiny Retail):  3
+
+ WL3 not yet supported.
+*/
+
+/* 
+   The default is 0 (WL1).  
+   Change this to match the version you have (see above).
+*/
+   
 #ifndef WMODE
 #define WMODE 0
 #endif
