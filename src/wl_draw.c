@@ -597,7 +597,171 @@ static void WallRefresh()
 	AsmRefresh();
 }
 
-//==========================================================================
+/* ======================================================================== */
+
+#define	MAXVIEWHEIGHT	200
+
+static int spanstart[MAXVIEWHEIGHT/2];
+
+static fixed basedist[MAXVIEWHEIGHT/2];
+
+static unsigned char planepics[8192];	/* 4k of ceiling, 4k of floor */
+
+static int halfheight = 0;
+
+static byte *planeylookup[MAXVIEWHEIGHT/2];
+static unsigned	mirrorofs[MAXVIEWHEIGHT/2];
+
+static unsigned short int mr_rowofs;
+static unsigned short int mr_count;
+static unsigned short int mr_xstep;
+static unsigned short int mr_ystep;
+static unsigned short int mr_xfrac;
+static unsigned short int mr_yfrac;
+static char *mr_dest;
+
+static void MapRow()
+{
+	unsigned int ebx, edx, esi;
+	
+	edx = (mr_ystep << 16) | (mr_xstep);
+	esi = (mr_yfrac << 16) | (mr_xfrac);
+	
+	while (mr_count--) {
+		ebx = ((esi & 0xFC000000) >> 25) | ((esi & 0xFC00) >> 3);
+		esi += edx;
+	/*	
+		mr_dest[0] = planepics[0x1F00|(planepics[(ebx&0x1FFE)+0]&0xFF)];
+		mr_dest[mr_rowofs] = planepics[0x1F00|(planepics[(ebx&0x1FFE)+1]&0xFF)];
+	*/
+		mr_dest[0] = planepics[ebx+0];
+		mr_dest[mr_rowofs] = planepics[ebx+1];
+		mr_dest++;
+	}
+}
+
+/*
+==============
+=
+= DrawSpans
+=
+= Height ranges from 0 (infinity) to viewheight/2 (nearest)
+==============
+*/
+
+static void DrawSpans(int x1, int x2, int height)
+{
+	fixed length;
+	int prestep;
+	fixed startxfrac, startyfrac; 
+	byte *toprow;
+
+	toprow = planeylookup[height]+(320*yoffset+xoffset);
+	mr_rowofs = mirrorofs[height];
+
+	mr_xstep = (viewsin / height) >> 1;
+	mr_ystep = (viewcos / height) >> 1;
+
+	length = basedist[height];
+	startxfrac = (viewx + FixedByFrac(length, viewcos));
+	startyfrac = (viewy - FixedByFrac(length, viewsin));
+
+// draw two spans simultaniously
+
+	prestep = viewwidth/2 - x1;
+
+	mr_xfrac = startxfrac - mr_xstep*prestep;
+	mr_yfrac = startyfrac - mr_ystep*prestep;
+
+	mr_dest = toprow + x1;
+	mr_count = x2 - x1 + 1;
+
+	if (mr_count)
+		MapRow();
+}
+
+/*
+===================
+=
+= SetPlaneViewSize
+=
+===================
+*/
+
+static void SetPlaneViewSize()
+{
+	int x, y;
+	byte *dest, *src;
+
+	halfheight = viewheight >> 1;
+
+	for (y = 0; y < halfheight; y++) {
+		planeylookup[y] = gfxbuf + (halfheight-1-y)*320;
+		mirrorofs[y] = (y*2+1)*320;
+
+		if (y > 0)
+			basedist[y] = GLOBAL1/2*scale/y;
+	}
+
+	src = PM_GetPage(0);
+	dest = planepics;
+	for (x = 0; x < 4096; x++) {
+		*dest = *src++;
+		dest += 2;
+	}
+	
+	src = PM_GetPage(1);
+	dest = planepics+1;
+	for (x = 0; x < 4096; x++) {
+		*dest = *src++;
+		dest += 2;
+	}
+
+}
+
+/*
+===================
+=
+= DrawPlanes
+=
+===================
+*/
+
+void DrawPlanes()
+{
+	int height, lastheight;
+	int x;
+
+	if ((viewheight>>1) != halfheight)
+		SetPlaneViewSize();		// screen size has changed
+
+//
+// loop over all columns
+//
+	lastheight = halfheight;
+
+	for (x = 0; x < viewwidth; x++)
+	{
+		height = wallheight[x]>>3;
+		if (height < lastheight) {	// more starts
+			do
+			{
+				spanstart[--lastheight] = x;
+			} while (lastheight > height);
+		} else if (height > lastheight) {	// draw spans
+			if (height > halfheight)
+				height = halfheight;
+			for (; lastheight < height; lastheight++)
+				DrawSpans(spanstart[lastheight], x-1, lastheight);
+		}
+	}
+
+	height = halfheight;
+	for (; lastheight < height; lastheight++)
+		DrawSpans(spanstart[lastheight], x-1, lastheight);
+}
+
+/* ======================================================================== */
 
 /*
 ========================
@@ -622,11 +786,13 @@ void ThreeDRefresh()
 	ClearScreen();
 
 	WallRefresh();
-
+#if 0
+	DrawPlanes();  /* silly floor/ceiling drawing */
+#endif
 //
 // draw all the scaled images
 //
-	DrawScaleds();			// draw scaled stuff
+	DrawScaleds();		/* draw scaled stuff */
 	DrawPlayerWeapon();	/* draw player's hands */
 
 //
@@ -640,7 +806,7 @@ void ThreeDRefresh()
 		lasttimecount = 0;		/* don't make a big tic count */
 		set_TimeCount(0);
 	}
-
+	
 	VW_UpdateScreen();
 	frameon++;
 }
@@ -655,17 +821,17 @@ void ThreeDRefresh()
 
 static int samex(int intercept, int tile)
 {
-    if (xtilestep > 0) {
-	if ((intercept>>16) >= tile)
-	    return 0;
-	else
-	    return 1;
-    } else {
-	if ((intercept>>16) <= tile)
-	    return 0;
-	else
-	    return 1;
-    }
+	if (xtilestep > 0) {
+		if ((intercept>>16) >= tile)
+			return 0;
+		else
+			return 1;
+	} else {
+		if ((intercept>>16) <= tile)
+			return 0;
+		else
+			return 1;
+	}
 }
 
 static int samey(int intercept, int tile)
@@ -703,9 +869,9 @@ static void AsmRefresh()
 	angle = midangle + pixelangle[postx];
 
 	if (angle < 0) {
-	    /* -90 - -1 degree arc */
-	    angle += FINEANGLES;
-	    goto entry360;
+		/* -90 - -1 degree arc */
+		angle += FINEANGLES;
+		goto entry360;
 	} else if (angle < DEG90) {
 		/* 0-89 degree arc */
 	    entry90:
@@ -715,7 +881,7 @@ static void AsmRefresh()
 		ystep = -finetangent[angle];
 		xpartial = xpartialup;
 		ypartial = ypartialdown;
-	    } else if (angle < DEG180) {
+	} else if (angle < DEG180) {
 		    /* 90-179 degree arc */
 		    xtilestep = -1;
 		    ytilestep = -1;
@@ -723,7 +889,7 @@ static void AsmRefresh()
 		    ystep = -finetangent[DEG180-1-angle];
 		    xpartial = xpartialdown;
 		    ypartial = ypartialdown;
-		} else if (angle < DEG270) {
+	} else if (angle < DEG270) {
 			/* 180-269 degree arc */
 			xtilestep = -1;
 			ytilestep = 1;
@@ -731,7 +897,7 @@ static void AsmRefresh()
 			ystep = finetangent[angle-DEG180];
 			xpartial = xpartialdown;
 			ypartial = ypartialup;
-		    } else if (angle < DEG360) {
+	} else if (angle < DEG360) {
 			    /* 270-359 degree arc */
 			entry360:
 			    xtilestep = 1;
@@ -740,11 +906,11 @@ static void AsmRefresh()
 			    ystep = finetangent[DEG360-1-angle];
 			    xpartial = xpartialup;
 			    ypartial = ypartialup;
-			} else {
-			    angle -= FINEANGLES;
-			    goto entry90;
-			}
-
+	} else {
+		angle -= FINEANGLES;
+		goto entry90;
+	}
+	
 	yintercept = viewy + xpartialbyystep ();
 	xtile = focaltx + xtilestep;
 
@@ -786,8 +952,7 @@ static void AsmRefresh()
 			xintercept = (xtile << 16) + 32768;
 			HitVertDoor();
 		    }
-		}
-		else {
+		} else {
 		    xintercept = xtile << 16;
 		    HitVertWall();
 		}
@@ -817,8 +982,7 @@ static void AsmRefresh()
 			xintercept = xtemp;
 			yintercept = ytile << 16; 
 			HitHorizPWall();
-		    }
-		    else {
+		    } else {
 			doorxhit = xintercept + xstep / 2;
 			if (TILE (doorxhit) != TILE (xintercept))
 			    goto passhoriz;
@@ -829,8 +993,7 @@ static void AsmRefresh()
 			yintercept = (ytile << 16) + 32768;
 			HitHorizDoor();
 		    }
-		}
-		else {
+		} else {
 		    yintercept = ytile << 16;
 		    HitHorizWall();
 		}
@@ -844,7 +1007,6 @@ static void AsmRefresh()
     nextpix: ;
     }
 }
-
 
 static void HitVertWall()
 {
@@ -935,7 +1097,6 @@ static void HitHorizPWall()
 	wall = PM_GetPage(wallpic);
 	ScalePost(wall, texture);
 }
-
 
 /*
 ====================

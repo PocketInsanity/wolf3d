@@ -442,7 +442,7 @@ void PollControls()
 		lasttimecount += DEMOTICS;
 		tics = DEMOTICS;
 	} else
-		CalcTics ();
+		CalcTics();
 
 	controlx = 0;
 	controly = 0;
@@ -1291,15 +1291,15 @@ void PlayLoop()
 //
 		madenoise = false;
 
-		MoveDoors ();
-		MovePWalls ();
+		MoveDoors();
+		MovePWalls();
 
 		for (obj = player;obj;obj = obj->next)
 			DoActor (obj);
 
-		UpdatePaletteShifts ();
+		UpdatePaletteShifts();
 
-		ThreeDRefresh ();
+		ThreeDRefresh();
 
 		//
 		// MAKE FUNNY FACE IF BJ DOESN'T MOVE FOR AWHILE

@@ -44,12 +44,15 @@ void Quit(char *error)
 
 void VL_WaitVBL(int vbls)
 {
-	vga_waitretrace();
+	int i;
+	
+	for (i = 0; i < vbls; i++)
+		vga_waitretrace();
 }
 
 void VW_UpdateScreen()
 {
-	/* VL_WaitVBL(1); */
+	VL_WaitVBL(1); 
 	memcpy(graph_mem, gfxbuf, 64000);
 }
 

@@ -16,10 +16,10 @@ XOBJS = $(OBJS) $(ROBJS) vi_xlib.o
 
 LFLAGS = -lm
 
-#OBJS += sd_null.o
-OBJS += sd_oss.o fmopl.o
-CFLAGS += -D_REENTRANT
-LFLAGS += -lpthread
+OBJS += sd_null.o
+#OBJS += sd_oss.o fmopl.o
+#CFLAGS += -D_REENTRANT
+#LFLAGS += -lpthread
 
 
 SLFLAGS = $(LFLAGS) -lvga

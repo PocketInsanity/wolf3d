@@ -4,8 +4,6 @@
 
 boolean SoundSourcePresent, AdLibPresent, SoundBlasterPresent;
 
-static boolean SoundPositioned;
-	
 SDMode SoundMode, MusicMode;
 SDSMode DigiMode;
 
@@ -53,8 +51,6 @@ void SD_Startup()
 {
 	if (SD_Started)
 		return;
-
-	SD_Started = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -67,9 +63,6 @@ void SD_Shutdown()
 	if (!SD_Started)
 		return;
 
-	SD_MusicOff();
-	SD_StopSound();
-
 	SD_Started = false;
 }
 
@@ -78,8 +71,9 @@ void SD_Shutdown()
 //	SD_PlaySound() - plays the specified sound on the appropriate hardware
 //
 ///////////////////////////////////////////////////////////////////////////
-void SD_PlaySound(soundnames sound)
+boolean SD_PlaySound(soundnames sound)
 {
+	return false;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -170,112 +164,6 @@ boolean SD_MusicPlaying()
 /*
 ==========================
 =
-= SetSoundLoc - Given the location of an object (in terms of global
-=	coordinates, held in globalsoundx and globalsoundy), munges the values
-=	for an approximate distance from the left and right ear, and puts
-=	those values into leftchannel and rightchannel.
-=
-= JAB
-=
-==========================
-*/
-
-static fixed globalsoundx, globalsoundy;
-static int leftchannel, rightchannel;
-
-#define ATABLEMAX 15
-static byte righttable[ATABLEMAX][ATABLEMAX * 2] = {
-{ 8, 8, 8, 8, 8, 8, 8, 7, 7, 7, 7, 7, 7, 6, 0, 0, 0, 0, 0, 1, 3, 5, 8, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 7, 7, 7, 7, 7, 6, 4, 0, 0, 0, 0, 0, 2, 4, 6, 8, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 7, 7, 7, 7, 6, 6, 4, 1, 0, 0, 0, 1, 2, 4, 6, 8, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 7, 7, 7, 7, 6, 5, 4, 2, 1, 0, 1, 2, 3, 5, 7, 8, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 8, 7, 7, 7, 6, 5, 4, 3, 2, 2, 3, 3, 5, 6, 8, 8, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 8, 7, 7, 7, 6, 6, 5, 4, 4, 4, 4, 5, 6, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 7, 7, 6, 6, 5, 5, 5, 6, 6, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 7, 7, 6, 6, 7, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8}
-};
-static byte lefttable[ATABLEMAX][ATABLEMAX * 2] = {
-{ 8, 8, 8, 8, 8, 8, 8, 8, 5, 3, 1, 0, 0, 0, 0, 0, 6, 7, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 8, 6, 4, 2, 0, 0, 0, 0, 0, 4, 6, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 8, 6, 4, 2, 1, 0, 0, 0, 1, 4, 6, 6, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 8, 7, 5, 3, 2, 1, 0, 1, 2, 4, 5, 6, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 8, 8, 6, 5, 3, 3, 2, 2, 3, 4, 5, 6, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 6, 5, 4, 4, 4, 4, 5, 6, 6, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 6, 6, 5, 5, 5, 6, 6, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 7, 6, 6, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8}
-};
-
-static void SetSoundLoc(fixed gx, fixed gy)
-{
-//	fixed xt, yt;
-	int x, y;
-
-#if 0
-//
-// translate point to view centered coordinates
-//
-	gx -= viewx;
-	gy -= viewy;
-
-//
-// calculate newx
-//
-	xt = FixedByFrac(gx,viewcos);
-	yt = FixedByFrac(gy,viewsin);
-	x = (xt - yt) >> TILESHIFT;
-
-//
-// calculate newy
-//
-	xt = FixedByFrac(gx,viewsin);
-	yt = FixedByFrac(gy,viewcos);
-	y = (yt + xt) >> TILESHIFT;
-#endif
-
-	if (y >= ATABLEMAX)
-		y = ATABLEMAX - 1;
-	else if (y <= -ATABLEMAX)
-		y = -ATABLEMAX;
-	if (x < 0)
-		x = -x;
-	if (x >= ATABLEMAX)
-		x = ATABLEMAX - 1;
-
-	leftchannel  =  lefttable[x][y + ATABLEMAX];
-	rightchannel = righttable[x][y + ATABLEMAX];
-}
-
-///////////////////////////////////////////////////////////////////////////
-//
-//	SD_PositionSound() - Sets up a stereo imaging location for the next
-//		sound to be played. Each channel ranges from 0 to 15.
-//
-///////////////////////////////////////////////////////////////////////////
-static void SD_PositionSound(int leftvol, int rightvol)
-{
-}
-
-static void SD_SetPosition(int leftpos, int rightpos)
-{
-}
-
-/*
-==========================
-=
 = SetSoundLocGlobal - Sets up globalsoundx & globalsoundy and then calls
 =	UpdateSoundLoc() to transform that into relative channel volumes. Those
 =	values are then passed to the Sound Manager so that they'll be used for
@@ -285,20 +173,9 @@ static void SD_SetPosition(int leftpos, int rightpos)
 */
 void PlaySoundLocGlobal(word s,fixed gx,fixed gy)
 {
-	SetSoundLoc(gx,gy);
-	SD_PositionSound(leftchannel,rightchannel);
-
 	SD_PlaySound(s);
-	
-	globalsoundx = gx;
-	globalsoundy = gy;
 }
 
 void UpdateSoundLoc(fixed x, fixed y, int angle)
 {
-	if (SoundPositioned)
-	{
-		SetSoundLoc(globalsoundx,globalsoundy);
-		SD_SetPosition(leftchannel,rightchannel);
-	}
 }

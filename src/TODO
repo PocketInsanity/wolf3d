@@ -22,6 +22,8 @@ SD_StartMusic((MusicGroup *)audiosegs[STARTMUSIC + chunk]);
 =>
 SD_StartMusic(chunk);
 
+* refresh rate under svgalib is horrible. the screen keeps getting updated
+midframe.  it's due to the way CalcTics works
 * rewrite hw (sound, input) code, remove stuff like SD_SetSoundMode
 * proper left/right sound
 * adlib sounds seem like they play at twice the freq
@@ -63,12 +65,11 @@ function with same parameters, only difference is the name)
 * fix wl_debug.c, lots of junk code..
 * change the current parameter handling code to something like getopt
 * rename goobers to debugmode, then remove debugmode for things...
-* retrace problems (esp. with svgalib).
 * look for places where gfx needs to be redrawn, like back to game etc 
 * fizzlefade is hackish, stipple buf would work ok in opengl, maybe only
 update once per frame or such...
-and where is that stray pixel coming from (when using end game with largest
-window size) in svgalib -- is that another bug with my geforce?
+and where is that stray pixel coming from (during fizzlefade with largest
+window size, for example) in svgalib -- is that another bug with my geforce?
 no idea how to do fizzlefade in TrueColor X
 * check filehandling (ex, file missing, bad file type, and such)
 PlayDemoFromFile specifically
@@ -84,7 +85,8 @@ but palette fades will still need it!
 * the higher depths are a hack since a palette lookup has to be done
 for every byte when transferring to the pixmap, palette fades require a
 screen update
-* make sure none of the code tries to handle gfx/sound data directly
+* make sure none of the non-loader code tries to handle gfx/sound data 
+directly
 * when window loses focus, it should clear the keys
 * clean up vi_xlib.c: fix vid mode changing, fix dga for non8bit modes and
 the nonpalette setting stuff... lots of if statements
