@@ -274,24 +274,29 @@ void VW_Plot(int x, int y, int color)
 	VL_Plot(x, y, color);
 }
 
+/* 
+font is:
+height is a word
+256 word offsets from start
+256 byte widths
+data
+*/
 void VW_DrawPropString(char *string)
 {
-	fontstruct *font;
+	byte *font;
 	int width, step, height, x, xs, y;
 	byte *source, *ptrs;
-	/* byte *dest, *ptrd; */
 	byte ch;
 
-	font = (fontstruct *)grsegs[STARTFONT+fontnumber];
-	height = font->height;
+	font = grsegs[STARTFONT+fontnumber];
+	height = font[0] | (font[1] << 8);
 
 	xs = 0;
 	
 	while ((ch = *string++) != 0) {
-		width = step = font->width[ch];
-		source = ((byte *)font)+font->location[ch];
+		width = step = font[2 + 512 + ch];
+		source = font+font[2+ch*2+0]+(font[2+ch*2+1]<<8);
 		for (x = 0; x < width; x++) {
-			height = font->height;
 			ptrs = source;
 			for (y = 0; y < height; y++) {
 				if (*ptrs)
@@ -302,45 +307,24 @@ void VW_DrawPropString(char *string)
 			source++;
 		}
 	}
-/*
-	dest = gfxbuf + py * vwidth + px;
-
-	while ((ch = *string++) != 0) {
-		width = step = font->width[ch];
-		source = ((byte *)font)+font->location[ch];
-		while (width--) {
-			height = font->height;
-			ptrs = source;
-			ptrd = dest;
-			while (height--) {
-				if (*ptrs)
-					*ptrd = fontcolor;
-				ptrs += step;
-				ptrd += vwidth;
-			}
-			source++;
-			dest++;
-		}
-	}
-*/
 }
 
-void VWL_MeasureString(char *string, word *width, word *height, fontstruct *font)
+static void VWL_MeasureString(char *string, word *width, word *height, byte *font)
 {
 	int w, mw;
 	
 	w = 0;
 	mw = 0;
-	*height = font->height;
+	*height = font[0] | (font[1] << 8);
 	for (;*string; string++) {
 		if (*string == '\n') {
 			if (mw < w)
 				mw = w;
 
 			w = 0;
-			*height += font->height;
+			*height += font[0] | (font[1] << 8);
 		} else {
-			w += font->width[*((byte *)string)]; 
+			w += font[2 + 512 + *(byte *)string]; 
 		}
 	}
 	if (mw < w)
@@ -351,7 +335,7 @@ void VWL_MeasureString(char *string, word *width, word *height, fontstruct *font
 
 void VW_MeasurePropString(char *string, word *width, word *height)
 {
-	VWL_MeasureString(string,width,height,(fontstruct *)grsegs[STARTFONT+fontnumber]);
+	VWL_MeasureString(string,width,height,grsegs[STARTFONT+fontnumber]);
 }
 
 void VWB_DrawTile8(int x, int y, int tile)

@@ -630,42 +630,46 @@ void CheckKeys()
 		scan == sc_F7 ||
 		scan == sc_F8)			// pop up quit dialog
 	{
-		ClearMemory ();
-		ClearSplitVWB ();
+		ClearMemory();
+		ClearSplitVWB();
 		US_ControlPanel(scan);
 	
-		DrawPlayBorderSides ();
+		DrawPlayBorderSides();
 		VW_UpdateScreen();
 		
 		if (scan == sc_F9)
-		  StartMusic ();
+			StartMusic();
 
 		SETFONTCOLOR(0,15);
 		IN_ClearKeysDown();
+		
+		lasttimecount = get_TimeCount();
+		
 		return;
 	}
 
 	if ( (scan >= sc_F1 && scan <= sc_F9) || scan == sc_Escape)
 	{
-		StopMusic ();
-		ClearMemory ();
-		VW_FadeOut ();
+		StopMusic();
+		ClearMemory();
+		VW_FadeOut();
 
 		US_ControlPanel(scan);
 
 		SETFONTCOLOR(0,15);
 		IN_ClearKeysDown();
-		DrawPlayScreen ();
+		DrawPlayScreen();
 		VW_UpdateScreen();
 		
 		if (!startgame && !loadedgame)
 		{
-			VW_FadeIn ();
-			StartMusic ();
+			VW_FadeIn();
+			StartMusic();
 		}
 		if (loadedgame)
 			playstate = ex_abort;
 		lasttimecount = get_TimeCount();
+		
 		return;
 	}
 

@@ -4,21 +4,10 @@
 #define WHITE			15
 #define BLACK			0
 
-/* ======================================================================== */
-
 typedef struct
 {
 	int width, height;
 } pictabletype;
-
-typedef struct
-{
-	word height;
-	word location[256];
-	byte width[256];
-} __attribute__((packed)) fontstruct;
-
-/* ======================================================================== */
 
 extern pictabletype pictable[NUMPICS];
 

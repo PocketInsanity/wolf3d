@@ -258,6 +258,10 @@ int XKeysymToScancode(unsigned int keysym)
 			return sc_B;
 		case SDLK_c:
 			return sc_C;
+		case SDLK_e:
+			return sc_E;
+		case SDLK_g:
+			return sc_G;
 		case SDLK_h:
 			return sc_H;
 		case SDLK_i:
@@ -268,10 +272,18 @@ int XKeysymToScancode(unsigned int keysym)
 			return sc_M;
 		case SDLK_n:
 			return sc_N;
+		case SDLK_r:
+			return sc_R;
 		case SDLK_t:
 			return sc_T;
+		case SDLK_v:
+			return sc_V;
 		case SDLK_y:
 			return sc_Y;
+		case SDLK_F8:
+			return sc_F8;
+		case SDLK_F9:
+			return sc_F9;
 		case SDLK_LEFT:
 		case SDLK_KP4:
 			return sc_LeftArrow;
