@@ -127,6 +127,4 @@ extern	byte		fontcolor,backcolor;
 
 #define SETFONTCOLOR(f,b) fontcolor=f;backcolor=b;
 
-#else
-#error "fix me: TODO"
 #endif

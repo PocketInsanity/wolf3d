@@ -4,6 +4,8 @@
 
 #include <GL/gl.h>
 
+#error "This code is out of date/broken"
+
 // the door is the last picture before the sprites
 #define DOORWALL	(PMSpriteStart-8)
 

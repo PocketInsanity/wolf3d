@@ -1,12 +1,10 @@
 #ifndef __ID_CA_H__
 #define __ID_CA_H__
 
-//===========================================================================
+/* ======================================================================== */
 
 #define NUMMAPS		60
 #define MAPPLANES	2
-
-#define UNCACHEGRCHUNK CA_UnCacheGrChunk
 
 //===========================================================================
 
@@ -75,41 +73,34 @@ void CA_ClearAllMarks (void);
 
 #define CA_MarkGrChunk(chunk)	grneeded[chunk]|=ca_levelbit
 
-void CA_CacheMarks (void);
+void CA_CacheMarks();
 */
 
-void CA_CacheScreen (int chunk);
+void CA_CacheScreen(int chunk);
 
 //==========================================================================
 
-void MM_Startup (void);
-void MM_Shutdown (void);
+void MM_Startup();
+void MM_Shutdown();
 
-void MM_GetPtr (memptr *baseptr, unsigned long size);
-void MM_FreePtr (memptr *baseptr);
+void MM_GetPtr(memptr *baseptr, unsigned long size);
+void MM_FreePtr(memptr *baseptr);
 
-void MM_SetPurge (memptr *baseptr, int purge);
-void MM_SetLock (memptr *baseptr, boolean locked);
-void MM_SortMem (void);
+void MM_SetPurge(memptr *baseptr, int purge);
+void MM_SetLock(memptr *baseptr, boolean locked);
+void MM_SortMem();
 
-#define PMPageSize              4096
-
-typedef	enum
-		{
-			pml_Unlocked,
-			pml_Locked
-		} PMLockType;
+#define PMPageSize	4096
 
 typedef	struct {
 	longword offset;		// Offset of chunk into file
 	word length;		// Length of the chunk
-	PMLockType locked;	// If set, this page cannot be purged
 	memptr addr;
 	longword lastHit;	// Last frame number of hit
 } PageListStruct;
 
-extern	word			ChunksInFile,
-						PMSpriteStart,PMSoundStart;
+extern	word ChunksInFile, PMSpriteStart, PMSoundStart;
+
 extern	PageListStruct *PMPages;
 
 #define	PM_GetSoundPage(v)	PM_GetPage(PMSoundStart + (v))
@@ -123,11 +114,7 @@ void	PM_Startup(void),
 				PM_Reset(void),
 				PM_Preload(boolean (*update)(word current,word total)),
 				PM_NextFrame(void),
-				PM_SetPageLock(int pagenum,PMLockType lock),
-				PM_SetMainPurge(int level),
-				PM_CheckMainMem(void);
+				PM_SetMainPurge(int level);
 memptr	PM_GetPageAddress(int pagenum), PM_GetPage(int pagenum);
 
-#else 
-#error "fix me TODO"
 #endif

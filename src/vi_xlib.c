@@ -459,7 +459,7 @@ void VW_UpdateScreen()
 	word *ptrs;
 	byte *ptrb, *ptrbd;
 	
-	int i, j;
+	int i;
 
 	if (dga) {
 		switch(vi->depth) {

@@ -5,6 +5,8 @@
 #include <dinput.h>
 #include <direct.h>
 
+#error "This code is out of date/broken"
+
 byte *gfxbuf = NULL;
 
 HWND win;

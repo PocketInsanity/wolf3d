@@ -1134,6 +1134,4 @@ void SpawnHitler (int tilex, int tiley);
 extern	void	HelpScreens(void);
 extern	void	EndText(void);
 
-#else
-#error "fix me TODO"
 #endif

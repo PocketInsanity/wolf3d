@@ -42,6 +42,4 @@ int				US_RndT();
 
 void	USL_PrintInCenter(char *s,Rect r);
 
-#else
-#error "fix me: TODO"
 #endif

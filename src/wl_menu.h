@@ -223,6 +223,4 @@ extern LRstruct LevelRatios[];
 void Write (int x,int y,char *string);
 int GetYorN(int x,int y,int pic);
 
-#else
-#error "fix me TODO"
 #endif

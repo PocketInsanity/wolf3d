@@ -41,6 +41,4 @@
 #error "please edit version.h and fix WMODE"
 #endif
 
-#else
-#error "fix me: TODO"
 #endif

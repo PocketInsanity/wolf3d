@@ -187,6 +187,4 @@ void INL_GetJoyDelta(word joy,int *dx,int *dy);
 void IN_StartAck(void);
 boolean IN_CheckAck (void);
 
-#else
-#error "fix me TODO"
 #endif

@@ -848,7 +848,6 @@ void PlayDemo(int demonumber)
 
 	CA_CacheGrChunk(dems[demonumber]);
 	demoptr = grsegs[dems[demonumber]];
-	MM_SetLock (&grsegs[dems[demonumber]],true);
 
 	NewGame (1,0);
 	gamestate.mapon = *demoptr++;
@@ -874,7 +873,7 @@ void PlayDemo(int demonumber)
 
 	PlayLoop ();
 
-	UNCACHEGRCHUNK(dems[demonumber]);
+	CA_UnCacheGrChunk(dems[demonumber]);
 
 	demoplayback = false;
 

@@ -24,6 +24,4 @@ char *ultoa(unsigned long value, char *string, int radix);
 
 #endif /* DOSISM */
 
-#else 
-#error "fix me TODO"
 #endif

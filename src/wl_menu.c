@@ -318,17 +318,17 @@ void US_ControlPanel(byte scancode)
 
 			CA_CacheGrChunk (IDGUYS1PIC);
 			VWB_DrawPic(0,0,IDGUYS1PIC);
-			UNCACHEGRCHUNK(IDGUYS1PIC);
+			CA_UnCacheGrChunk(IDGUYS1PIC);
 
 			CA_CacheGrChunk (IDGUYS2PIC);
 			VWB_DrawPic(0,80,IDGUYS2PIC);
-			UNCACHEGRCHUNK(IDGUYS2PIC);
+			CA_UnCacheGrChunk(IDGUYS2PIC);
 
 			VW_UpdateScreen();
 
 			CA_CacheGrChunk (IDGUYSPALETTE);
 			VL_FadeIn(0,255,grsegs[IDGUYSPALETTE],30);
-			UNCACHEGRCHUNK(IDGUYSPALETTE);
+			CA_UnCacheGrChunk(IDGUYSPALETTE);
 
 			while (Keyboard[sc_I] || Keyboard[sc_D]) IN_CheckAck();
 			IN_ClearKeysDown();
@@ -570,12 +570,12 @@ int CP_CheckQuick(unsigned scancode)
 
 
 				#ifndef SPEAR
-				UNCACHEGRCHUNK(C_CURSOR1PIC);
-				UNCACHEGRCHUNK(C_CURSOR2PIC);
-				UNCACHEGRCHUNK(C_DISKLOADING1PIC);
-				UNCACHEGRCHUNK(C_DISKLOADING2PIC);
-				UNCACHEGRCHUNK(C_SAVEGAMEPIC);
-				UNCACHEGRCHUNK(C_MOUSELBACKPIC);
+				CA_UnCacheGrChunk(C_CURSOR1PIC);
+				CA_UnCacheGrChunk(C_CURSOR2PIC);
+				CA_UnCacheGrChunk(C_DISKLOADING1PIC);
+				CA_UnCacheGrChunk(C_DISKLOADING2PIC);
+				CA_UnCacheGrChunk(C_SAVEGAMEPIC);
+				CA_UnCacheGrChunk(C_MOUSELBACKPIC);
 				#else
 				UnCacheLump (BACKDROP_LUMP_START,BACKDROP_LUMP_END);
 				#endif
@@ -639,12 +639,12 @@ int CP_CheckQuick(unsigned scancode)
 				lasttimecount = get_TimeCount();
 
 				#ifndef SPEAR
-				UNCACHEGRCHUNK(C_CURSOR1PIC);
-				UNCACHEGRCHUNK(C_CURSOR2PIC);
-				UNCACHEGRCHUNK(C_DISKLOADING1PIC);
-				UNCACHEGRCHUNK(C_DISKLOADING2PIC);
-				UNCACHEGRCHUNK(C_LOADGAMEPIC);
-				UNCACHEGRCHUNK(C_MOUSELBACKPIC);
+				CA_UnCacheGrChunk(C_CURSOR1PIC);
+				CA_UnCacheGrChunk(C_CURSOR2PIC);
+				CA_UnCacheGrChunk(C_DISKLOADING1PIC);
+				CA_UnCacheGrChunk(C_DISKLOADING2PIC);
+				CA_UnCacheGrChunk(C_LOADGAMEPIC);
+				CA_UnCacheGrChunk(C_MOUSELBACKPIC);
 				#else
 				UnCacheLump (BACKDROP_LUMP_START,BACKDROP_LUMP_END);
 				#endif

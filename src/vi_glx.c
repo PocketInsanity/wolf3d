@@ -14,6 +14,8 @@
 #include <GL/gl.h>
 #include <GL/glx.h>
 
+#error "This code is out of date/broken"
+
 byte *gfxbuf = NULL;
 
 Display *dpy;

@@ -42,6 +42,17 @@ long	xstep,ystep;
 void AsmRefresh (void);
 void xBuildCompScale(int height, byte *source, int x);
 
+#ifndef NOASM
+#define FixedByFrac(x, y) \
+ ({ unsigned long z; \
+  asm("imull %2; shrdl $16, %%edx, %%eax" : "=a" (z) : "a" (x), "q" (y) : "%edx"); \
+  z; \
+ })
+#endif
+
+#define xpartialbyystep() FixedByFrac(xpartial, ystep)
+#define ypartialbyxstep() FixedByFrac(ypartial, xstep)
+ 
 //==========================================================================
 
 /*
@@ -193,7 +204,7 @@ boolean TransformTile (int tx, int ty, int *dispx, int *dispheight)
 */
 
 
-int CalcHeight (void)
+int CalcHeight()
 {
 	fixed gxt,gyt,nx,gx,gy;
 
@@ -298,10 +309,9 @@ void HitVertDoor()
 
 	wallheight[pixx] = CalcHeight();
 
-		postx = pixx;
+	postx = pixx;
 
-		switch (doorobjlist[doornum].lock)
-		{
+	switch (doorobjlist[doornum].lock) {
 		case dr_normal:
 			doorpage = DOORWALL;
 			break;
@@ -314,15 +324,15 @@ void HitVertDoor()
 		case dr_elevator:
 			doorpage = DOORWALL+4;
 			break;
-		}
+	}
 
- wall = PM_GetPage (doorpage);
- ScalePost (wall, texture);
+	wall = PM_GetPage(doorpage);
+	ScalePost(wall, texture);
 }
 
-//==========================================================================
+/* ======================================================================== */
 
-unsigned Ceiling[]=
+unsigned int Ceiling[]=
 {
 #ifndef SPEAR
  0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0xbfbf,
@@ -348,11 +358,11 @@ unsigned Ceiling[]=
 
 void ClearScreen()
 {
-    unsigned ceiling = Ceiling[gamestate.episode*10+mapon] & 0xFF;
-    unsigned floor = 0x19;
+	unsigned int ceiling = Ceiling[gamestate.episode*10+mapon] & 0xFF;
+	unsigned int floor = 0x19;
 
-   VL_Bar(xoffset, yoffset, viewwidth, viewheight / 2, ceiling);
-   VL_Bar(xoffset, yoffset + viewheight / 2, viewwidth, viewheight / 2, floor);
+	VL_Bar(xoffset, yoffset, viewwidth, viewheight / 2, ceiling);
+	VL_Bar(xoffset, yoffset + viewheight / 2, viewwidth, viewheight / 2, floor);
 }
 
 //==========================================================================
@@ -411,9 +421,9 @@ typedef struct
 		shapenum;
 } visobj_t;
 
-visobj_t	vislist[MAXVISABLE],*visptr,*visstep,*farthest;
+visobj_t vislist[MAXVISABLE],*visptr,*visstep,*farthest;
 
-void DrawScaleds (void)
+void DrawScaleds()
 {
 	int 		i,least,numvisable,height;
 	byte		*tilespot,*visspot;
@@ -649,14 +659,12 @@ void ThreeDRefresh()
 
 //===========================================================================
 
-/* xpartial = 16 bit fraction
+/* 
+   xpartial = 16 bit fraction
    ystep = 32 bit fixed 32,16
-   */
+*/
 
-#define xpartialbyystep() FixedByFrac(xpartial, ystep)
-#define ypartialbyxstep() FixedByFrac(ypartial, xstep)
-
-int samex (int intercept, int tile)
+static int samex(int intercept, int tile)
 {
     if (xtilestep > 0) {
 	if ((intercept>>16) >= tile)
@@ -671,7 +679,7 @@ int samex (int intercept, int tile)
     }
 }
 
-int samey (int intercept, int tile)
+static int samey(int intercept, int tile)
 {
     if (ytilestep > 0) {
 	if ((intercept>>16) >= tile)

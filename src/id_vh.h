@@ -54,6 +54,4 @@ void VL_FadeIn(int start, int end, const byte *palette, int steps);
 void LatchDrawPic(unsigned x, unsigned y, unsigned picnum);
 void LoadLatchMem(void);
 
-#else
-#error "fix me: TODO"
 #endif

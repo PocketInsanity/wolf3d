@@ -131,14 +131,15 @@ void CalcTics()
 ====================
 */
 
-void ReadConfig(void)
+void ReadConfig()
 {
-	int                     file;
-	SDMode          sd;
-	SMMode          sm;
-	SDSMode         sds;
+	SDMode sd;
+	SMMode sm;
+	SDSMode sds;
 
 #if 0 /* TODO */
+	int file;
+	
 	if ( (file = open(configname,O_BINARY | O_RDONLY)) != -1)
 	{
 	//
@@ -1078,7 +1079,7 @@ void InitGame(void)
 //
 	InitDigiMap ();
 
-	for (i=0;i<MAPSIZE;i++)
+	for (i = 0;i < MAPSIZE; i++)
 	{
 		farmapylookup[i] = i*64;
 	}
@@ -1100,11 +1101,10 @@ void InitGame(void)
 //
 
 	CA_CacheGrChunk(STARTFONT);
-	MM_SetLock (&grsegs[STARTFONT],true);
 
-	LoadLatchMem ();
-	BuildTables ();          // trig tables
-	SetupWalls ();
+	LoadLatchMem();
+	BuildTables();          // trig tables
+	SetupWalls();
 
 	NewViewSize(viewsize);
 
@@ -1232,15 +1232,15 @@ void DemoLoop (void)
 
 			CA_CacheGrChunk (TITLE1PIC);
 			VWB_DrawPic (0,0,TITLE1PIC);
-			UNCACHEGRCHUNK (TITLE1PIC);
+			CA_UnCacheGrChunk (TITLE1PIC);
 
 			CA_CacheGrChunk (TITLE2PIC);
 			VWB_DrawPic (0,80,TITLE2PIC);
-			UNCACHEGRCHUNK (TITLE2PIC);
+			CA_UnCacheGrChunk (TITLE2PIC);
 			VW_UpdateScreen ();
 			VL_FadeIn(0,255,grsegs[TITLEPALETTE],30);
 
-			UNCACHEGRCHUNK (TITLEPALETTE);
+			CA_UnCacheGrChunk (TITLEPALETTE);
 #else
 			CA_CacheScreen (TITLEPIC);
 			VW_UpdateScreen ();

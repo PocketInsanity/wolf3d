@@ -1,30 +1,31 @@
 Just some random facts/thoughts/ideas/musings:
-http://www.warzone.com/fullnews/902317374.shtml
+
 * Wolfenstein 3D for: 
   - PC (released, of course) [May 5, 1992]
-  - PC Spear of Destiny 1992
+  - PC (Spear of Destiny) [Late 1992]
   - SNES
   - Macintosh
   - Jaguar
   - Apple IIGS
-  - 3DO (? - not mentioned in apogee faq, but you can find cheatcodes for it)
+  - 3DO
 
 * Rumored/Never Released?
   - Atari Lynx
-  - Sega Genesis
+  - Sega Genesis (was cancelled after a month)
   - Japanese PC Version
   - Spanish PC Version
   - Japanese Mac Version
 
 * Unofficial ports:
   - Linux (this, xwolf, wolfgl)
+  - Amiga (port of my first pc wolf3d linux port)
   - Windows (wolfgl)
   - Acorn/Archemedes
  
 * PC source released on:
   - now many ports, projects, etc
   - urls
-* Mac source released January 22(?), 2000
+* Macintosh source released January 22(?), 2000
   - url
 * TED source (editor used for tons of games including wolf3d)
 
@@ -32,5 +33,5 @@ Wolfenstein 3D was originally planned to be a much more complex game. ...
 ... lots of unused code ... possibly from previous projects and incarnations
 of wolf3d.
 
-1.4 of Wolfenstein 3D (full) had a Read Me! option. The text still exists in
-the data file, but all the graphics are off.
+Version 1.4 of Wolfenstein 3D (full) had a Read Me! option. The text still 
+exists in the data files, but all the graphics are incorrect.

@@ -2,90 +2,41 @@
 
 #include "id_heads.h"
 
-//	Global variables
-	boolean		SoundSourcePresent,
-				AdLibPresent,
-				SoundBlasterPresent,SBProPresent,
-				NeedsDigitized,NeedsMusic,
-				SoundPositioned;
-	SDMode		SoundMode;
-	SMMode		MusicMode;
-	SDSMode		DigiMode;
-	word		*SoundTable;	
-	word		ssPort = 2;
-	int			DigiMap[LASTSOUND];
+boolean SoundSourcePresent, AdLibPresent, SoundBlasterPresent, 
+	SoundPositioned;
+	
+SDMode SoundMode, MusicMode;
+SDSMode DigiMode;
 
-//	Internal variables
-static	boolean			SD_Started;
-		boolean			nextsoundpos;
+int DigiMap[LASTSOUND];
 
-		soundnames		SoundNumber,DigiNumber;
-		word			SoundPriority,DigiPriority;
-		int				LeftPosition,RightPosition;
 
-		word			NumDigi,DigiLeft,DigiPage;
-		word			*DigiList;
-		word			DigiLastStart,DigiLastEnd;
-		boolean			DigiPlaying;
-static	boolean			DigiMissed,DigiLastSegment;
-static	memptr			DigiNextAddr;
-static	word			DigiNextLen;
+static boolean SD_Started;
 
-//	SoundBlaster variables
-static	boolean					sbNoCheck,sbNoProCheck;
-static	byte					sbOldIntMask = -1;
-static	byte			*sbNextSegPtr;
-static	longword		sbNextSegLen;
+boolean nextsoundpos;
 
-//	SoundSource variables
-		boolean				ssNoCheck;
-		boolean				ssActive;
-		word				ssControl,ssStatus,ssData;
-		byte				ssOn,ssOff;
-		byte		*ssSample;
-		longword	ssLengthLeft;
+int LeftPosition, RightPosition;
 
-//	PC Sound variables
-		volatile byte	pcLastSample, *pcSound;
-		longword		pcLengthLeft;
-		word			pcSoundLookup[255];
+word NumDigi;
+word *DigiList;
+boolean DigiPlaying;
 
-//	AdLib variables
-		boolean			alNoCheck;
-		byte			*alSound;
-		word			alBlock;
-		longword		alLengthLeft;
-		Instrument		alZeroInst;
+boolean sqActive;
 
-//	Sequencer variables
-		boolean			sqActive;
-static	word			alFXReg;
-static	ActiveTrack		*tracks[sqMaxTracks],
-						mytracks[sqMaxTracks];
-static	word			sqMode,sqFadeStep;
-		word			*sqHack, *sqHackPtr,sqHackLen,sqHackSeqLen;
-		long			sqHackTime;
 
-//	Internal routines
-		void			SDL_DigitizedDone(void);
-
-void SD_StopDigitized(void)
+void SD_StopDigitized()
 {
 }
 
-void SD_Poll(void)
+void SD_Poll()
 {
 }
 
-void SD_SetPosition(int leftpos,int rightpos)
+void SD_SetPosition(int leftpos, int rightpos)
 {
 }
 
-void SD_PlayDigitized(word which,int leftpos,int rightpos)
-{
-}
-
-void SDL_DigitizedDone(void)
+void SD_PlayDigitized(word which, int leftpos, int rightpos)
 {
 }
 

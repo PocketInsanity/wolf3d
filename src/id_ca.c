@@ -887,7 +887,7 @@ void CAL_ExpandGrChunk(int chunk, byte *source)
 //
 // allocate final space and decompress it
 //
-	MM_GetPtr(&grsegs[chunk], expanded);
+	MM_GetPtr((void *)&grsegs[chunk], expanded);
 	CAL_HuffExpand(source, grsegs[chunk], expanded, grhuffman);
 	if (width && height) {
 		if (tilecount) {
@@ -912,18 +912,17 @@ void CAL_ExpandGrChunk(int chunk, byte *source)
 
 void CA_CacheGrChunk(int chunk)
 {
-	long	pos,compressed;
-	byte	*source;
-	int		next;
+	long pos, compressed;
+	byte *source;
+	int next;
 
 	/* this is due to Quit wanting to cache the error screen before this has been set up! */
 	if ( (grhandle == 0) || (grhandle == -1) ) /* make sure this works ok */
 		return;
 		
 	grneeded[chunk] |= ca_levelbit;	/* make sure it doesn't get removed */
-	if (grsegs[chunk])
-	{
-		MM_SetPurge (&grsegs[chunk], 0);
+	
+	if (grsegs[chunk]) {
 		return;
 	}
 
@@ -957,7 +956,7 @@ void CA_UnCacheGrChunk(int chunk)
 		return;
 	}
 	
-	MM_FreePtr(&grsegs[chunk]);
+	MM_FreePtr((void *)&grsegs[chunk]);
 	grneeded[chunk] &= ~ca_levelbit;
 	
 	/* Or should MM_FreePtr set it to zero? */
@@ -1568,19 +1567,6 @@ memptr PM_GetPage(int pagenum)
 }
 
 //
-//	PM_SetPageLock() - Sets the lock type on a given page
-//		pml_Unlocked: Normal, page can be purged
-//		pml_Locked: Cannot be purged
-//
-void PM_SetPageLock(int pagenum,PMLockType lock)
-{
-	if (pagenum < PMSoundStart)
-		Quit("PM_SetPageLock: Locking/unlocking non-sound page");
-
-	PMPages[pagenum].locked = lock;
-}
-
-//
 //	PM_Preload() - Loads as many pages as possible into all types of memory.
 //		Calls the update function after each load, indicating the current
 //		page, and the total pages that need to be loaded (for thermometer).
@@ -1616,16 +1602,15 @@ void PM_NextFrame(void)
 //
 //	PM_Reset() - Sets up caching structures
 //
-void PM_Reset(void)
+void PM_Reset()
 {
 	int i;
 	PageListStruct *page;
 
 	// Initialize page list
-	for (i = 0,page = PMPages;i < PMNumBlocks;i++,page++)
+	for (i = 0, page = PMPages; i < PMNumBlocks; i++, page++)
 	{
 		page->addr = NULL;
-		page->locked = false;
 	}
 }
 

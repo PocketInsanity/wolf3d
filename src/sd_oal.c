@@ -5,67 +5,29 @@
 #include <AL/al.h>
 #include <AL/alc.h>
 
+#error "This code is out of date/broken"
+
 //	Global variables
 	boolean		SoundSourcePresent,
 				AdLibPresent,
-				SoundBlasterPresent,SBProPresent,
-				NeedsDigitized,NeedsMusic,
+				SoundBlasterPresent,
 				SoundPositioned;
 	SDMode		SoundMode;
 	SMMode		MusicMode;
 	SDSMode		DigiMode;
-	word		*SoundTable;	
-	word		ssPort = 2;
 	int			DigiMap[LASTSOUND];
 
 //	Internal variables
 static	boolean			SD_Started;
 		boolean			nextsoundpos;
 
-		soundnames		SoundNumber,DigiNumber;
-		word			SoundPriority,DigiPriority;
 		int				LeftPosition,RightPosition;
 
-		word			NumDigi,DigiLeft,DigiPage;
+		word			NumDigi;
 		word			*DigiList;
-		word			DigiLastStart,DigiLastEnd;
 		boolean			DigiPlaying;
-static	boolean			DigiMissed,DigiLastSegment;
-static	memptr			DigiNextAddr;
-static	word			DigiNextLen;
 
-//	SoundBlaster variables
-static	boolean					sbNoCheck,sbNoProCheck;
-static	byte					sbOldIntMask = -1;
-static	byte			*sbNextSegPtr;
-static	longword		sbNextSegLen;
-
-//	SoundSource variables
-		boolean				ssNoCheck;
-		boolean				ssActive;
-		word				ssControl,ssStatus,ssData;
-		byte				ssOn,ssOff;
-		byte		*ssSample;
-		longword	ssLengthLeft;
-
-//	PC Sound variables
-		volatile byte	pcLastSample, *pcSound;
-		longword		pcLengthLeft;
-		word			pcSoundLookup[255];
-
-//	AdLib variables
-		boolean			alNoCheck;
-		byte			*alSound;
-		word			alBlock;
-		longword		alLengthLeft;
-		Instrument		alZeroInst;
-
-//	Sequencer variables
 		boolean			sqActive;
-static	word			alFXReg;
-static	ActiveTrack		*tracks[sqMaxTracks],
-						mytracks[sqMaxTracks];
-static	word			sqMode,sqFadeStep;
 
 /* ------------------------------------------------------------------------ */
 

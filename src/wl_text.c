@@ -673,20 +673,18 @@ int helpextern = T_HELPART;
 =
 =================
 */
-void HelpScreens (void)
+void HelpScreens()
 {
 	int artnum;
 	char *text;
 
-	CA_UpLevel ();
-	MM_SortMem ();
+	CA_UpLevel();
 
 	artnum = helpextern;
-	CA_CacheGrChunk (artnum);
+	CA_CacheGrChunk(artnum);
 	text = (char *)grsegs[artnum];
-	MM_SetLock (&grsegs[artnum], true);
 
-	ShowArticle (text);
+	ShowArticle(text);
 
 	CA_UnCacheGrChunk(artnum);
 	
@@ -694,28 +692,25 @@ void HelpScreens (void)
 
 	FreeMusic();
 	CA_DownLevel();
-	MM_SortMem();
 }
 
 //
 // END ARTICLES
 //
-void EndText (void)
+void EndText()
 {
 	int artnum;
 	char *text;
 
-	ClearMemory ();
+	ClearMemory();
 
-	CA_UpLevel ();
-	MM_SortMem ();
+	CA_UpLevel();
 
 	artnum = endextern+gamestate.episode;
 	CA_CacheGrChunk (artnum);
 	text = (char *)grsegs[artnum];
-	MM_SetLock (&grsegs[artnum], true);
 
-	ShowArticle (text);
+	ShowArticle(text);
 
 	CA_UnCacheGrChunk(artnum);
 	
@@ -725,7 +720,6 @@ void EndText (void)
 
 	FreeMusic();
 	CA_DownLevel();
-	MM_SortMem();
 }
 
 #endif

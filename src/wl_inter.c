@@ -12,7 +12,7 @@
 ==================
 */
 
-void ClearSplitVWB (void)
+void ClearSplitVWB()
 {
 	WindowX = 0;
 	WindowY = 0;
@@ -37,7 +37,7 @@ void EndScreen (int palette, int screen)
 	VW_UpdateScreen ();
 	CA_CacheGrChunk (palette);
 	VL_FadeIn(0,255,grsegs[palette],30);
-	UNCACHEGRCHUNK (palette);
+	CA_UnCacheGrChunk (palette);
 	IN_ClearKeysDown ();
 	IN_Ack ();
 	VW_FadeOut ();
@@ -52,7 +52,7 @@ void EndSpear(void)
 	VW_UpdateScreen ();
 	CA_CacheGrChunk (END3PALETTE);
 	VL_FadeIn(0,255,grsegs[END3PALETTE],30);
-	UNCACHEGRCHUNK (END3PALETTE);
+	CA_UnCacheGrChunk (END3PALETTE);
 	fontnumber = 0;
 	fontcolor = 0xd0;
 	WindowX = 0;
@@ -138,10 +138,10 @@ void Victory (void)
 	VW_UpdateScreen ();
 	VW_WaitVBL(3*70);
 
-	UNCACHEGRCHUNK(BJCOLLAPSE1PIC);
-	UNCACHEGRCHUNK(BJCOLLAPSE2PIC);
-	UNCACHEGRCHUNK(BJCOLLAPSE3PIC);
-	UNCACHEGRCHUNK(BJCOLLAPSE4PIC);
+	CA_UnCacheGrChunk(BJCOLLAPSE1PIC);
+	CA_UnCacheGrChunk(BJCOLLAPSE2PIC);
+	CA_UnCacheGrChunk(BJCOLLAPSE3PIC);
+	CA_UnCacheGrChunk(BJCOLLAPSE4PIC);
 	VL_FadeOut (0,255,0,17,17,5);
 #endif
 
@@ -261,7 +261,7 @@ void PG13 (void)
 	VWB_DrawPic (216,110,PG13PIC);
 	VW_UpdateScreen ();
 
-	UNCACHEGRCHUNK (PG13PIC);
+	CA_UnCacheGrChunk (PG13PIC);
 
 	VW_FadeIn();
 	IN_UserInput(TickBase*7);
@@ -825,7 +825,7 @@ void LevelCompleted()
 				 "of Spear of Destiny! Now,\n"
 				 "go to your local software\n"
 				 "store and buy it!");
-		UNCACHEGRCHUNK (STARTFONT+1);
+		CA_UnCacheGrChunk (STARTFONT+1);
 
 		IN_ClearKeysDown();
 		IN_Ack();
@@ -910,31 +910,32 @@ void PreloadGraphics()
 
 void DrawHighScores()
 {
-	char		buffer[16],*str,buffer1[5];
-	word		i,w,h;
-	HighScore	*s;
-
-	MM_SortMem ();
-
+	char buffer[16];
+	char buffer1[16], *str;
+	word i, w, h;
+	HighScore *s;
+	
+	buffer1[0] = 0;
+	str = 0;
+	
 #ifndef SPEAR
-	CA_CacheGrChunk (HIGHSCORESPIC);
-	CA_CacheGrChunk (STARTFONT);
-	CA_CacheGrChunk (C_LEVELPIC);
-	CA_CacheGrChunk (C_SCOREPIC);
-	CA_CacheGrChunk (C_NAMEPIC);
+	CA_CacheGrChunk(HIGHSCORESPIC);
+	CA_CacheGrChunk(STARTFONT);
+	CA_CacheGrChunk(C_LEVELPIC);
+	CA_CacheGrChunk(C_SCOREPIC);
+	CA_CacheGrChunk(C_NAMEPIC);
 
 	ClearMScreen();
 	DrawStripes(10);
 
 	VWB_DrawPic(48,0,HIGHSCORESPIC);
-	UNCACHEGRCHUNK (HIGHSCORESPIC);
+	CA_UnCacheGrChunk(HIGHSCORESPIC);
 
 	VWB_DrawPic(4*8,68,C_NAMEPIC);
 	VWB_DrawPic(20*8,68,C_LEVELPIC);
 	VWB_DrawPic(28*8,68,C_SCOREPIC);
 
-	fontnumber=0;
-
+	fontnumber = 0;
 #else
 	CacheLump (BACKDROP_LUMP_START,BACKDROP_LUMP_END);
 	ClearMScreen();
@@ -948,14 +949,13 @@ void DrawHighScores()
 	fontnumber = 1;
 #endif
 
-
 #ifndef SPEAR
 	SETFONTCOLOR(15,0x29);
 #else
 	SETFONTCOLOR(HIGHLIGHT,0x29);
 #endif
 
-	for (i = 0,s = Scores;i < MaxScores;i++,s++)
+	for (i = 0, s = Scores; i < MaxScores; i++, s++)
 	{
 		PrintY = 76 + (16 * i);
 
@@ -1003,21 +1003,20 @@ void DrawHighScores()
 		//
 		// score
 		//
-		ultoa(s->score,buffer,10);
+		ultoa(s->score, buffer1, 10);
 #ifndef SPEAR
-		for (str = buffer;*str;str++)
+		for (str = buffer; *str; str++)
 			*str = *str + (129 - '0');	// Used fixed-width numbers (129...)
-		USL_MeasureString(buffer,&w,&h);
+		USL_MeasureString(buffer, &w, &h);
 		PrintX = (34 * 8) - 8 - w;
 #else
-		USL_MeasureString(buffer,&w,&h);
+		USL_MeasureString(buffer, &w, &h);
 		PrintX = 292 - w;
 #endif
 		US_Print(buffer);
-
 	}
 
-	VW_UpdateScreen ();
+	VW_UpdateScreen();
 
 #ifdef SPEAR
 	UnCacheLump (HIGHSCORES_LUMP_START,HIGHSCORES_LUMP_END);
@@ -1467,8 +1466,8 @@ void CopyProtection(void)
 
 			SD_PlaySound(BONUS1UPSND);
 			SD_WaitSoundDone();
-			UNCACHEGRCHUNK (STARTFONT+1);
-			UNCACHEGRCHUNK (C_BACKDROPPIC);
+			CA_UnCacheGrChunk (STARTFONT+1);
+			CA_UnCacheGrChunk (C_BACKDROPPIC);
 			UnCacheLump (COPYPROT_LUMP_START,COPYPROT_LUMP_END);
 
 			switch(SoundMode)
