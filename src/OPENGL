@@ -1,0 +1,6 @@
+* Notes on the OpenGL Port Implementation:
+
+First just draw the world as a display list heh, except doors and pushwalls
+then draw everything else
+
+Textures which are not usable will have to be specially drawn

@@ -4,11 +4,147 @@
 
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
+#include <X11/Xutil.h>
+#include <X11/Xos.h>
+#include <X11/cursorfont.h>
+#include <X11/keysym.h>
+#include <X11/keysymdef.h>
+#include <X11/Xatom.h>
+
+#include <GL/gl.h>
+#include <GL/glx.h>
 
 byte *gfxbuf = NULL;
 
+Display *dpy;
+int screen;
+Window root, win;
+XVisualInfo *vi;
+XImage *img;
+Colormap cmap;
+Atom wmDeleteWindow;
+GLXContext ctx;
+
+int attrib[] = {
+	GLX_RGBA,
+	GLX_RED_SIZE,           5,
+	GLX_GREEN_SIZE,         5,
+	GLX_BLUE_SIZE,          5,
+	GLX_DEPTH_SIZE,         16,
+	GLX_DOUBLEBUFFER,
+        None
+};
+
+int main(int argc, char *argv[])
+{
+	/* TODO: move this to the proper functions */
+	
+	XSetWindowAttributes attr;
+	XVisualInfo vitemp;
+	XSizeHints sizehints;	
+	XGCValues gcvalues;
+	
+	char *disp, *ext;
+	int attrmask, numVisuals, i;
+	int major, minor;
+		
+	disp = getenv("DISPLAY");
+	dpy = XOpenDisplay(disp);
+	if (dpy == NULL) {
+		/* TODO: quit function with vsnprintf */
+		fprintf(stderr, "Unable to open display %s!\n", XDisplayName(disp));
+		exit(EXIT_FAILURE);
+	}
+	
+	screen = DefaultScreen(dpy);
+	
+	root = RootWindow(dpy, screen);
+	
+	if (glXQueryExtension(dpy, NULL, NULL) == False) {
+		fprintf(stderr, "X server %s does not support GLX\n", XDisplayName(disp));
+		exit(EXIT_FAILURE);
+	}
+	
+	if (glXQueryVersion(dpy, &major, &minor) == False) {
+		fprintf(stderr, "glXQueryVersion returned False?\n");
+		exit(EXIT_FAILURE);
+	} else {
+		printf("GLX Version %d.%d\n", major, minor);
+		printf("GLX Client:\n");
+		printf("GLX_VENDOR: %s\n", glXGetClientString(dpy, GLX_VENDOR));
+		printf("GLX_VERSION: %s\n", glXGetClientString(dpy, GLX_VERSION));
+		printf("GLX_EXTENSIONS: %s\n", glXGetClientString(dpy, GLX_EXTENSIONS));
+		printf("GLX Server:\n");
+		printf("GLX_VENDOR: %s\n", glXQueryServerString(dpy, DefaultScreen(dpy), GLX_VENDOR));
+		printf("GLX_VERSION: %s\n", glXQueryServerString(dpy, DefaultScreen(dpy), GLX_VERSION));
+		printf("GLX_EXTENSIONS: %s\n", glXQueryServerString(dpy, DefaultScreen(dpy), GLX_EXTENSIONS));
+		printf("Both:\n");
+		printf("GLX_EXTENSIONS: %s\n", glXQueryExtensionsString(dpy, DefaultScreen(dpy)));
+	}
+	
+	vi = glXChooseVisual(dpy, DefaultScreen(dpy), attrib);
+	
+	if (vi == NULL) {
+		Quit("No suitable GL visual found!");
+	}
+
+	ctx = glXCreateContext(dpy, vi, NULL, True);	
+	
+	if (ctx == NULL) {
+		Quit("glx context create failed");
+	}
+	
+	cmap = XCreateColormap(dpy, root, vi->visual, AllocNone);
+	                      	
+	attr.colormap = cmap;		   
+	attr.event_mask = KeyPressMask | KeyReleaseMask | ExposureMask |
+			  StructureNotifyMask;
+	attrmask = CWColormap | CWEventMask;
+	win = XCreateWindow(dpy, root, 0, 0, 320, 200, 0, CopyFromParent, 
+			    InputOutput, vi->visual, attrmask, &attr);
+	
+	if (win == None) {
+		Quit("Unable to create window!");
+	}
+		
+	sizehints.min_width = 320;
+	sizehints.min_height = 200;
+	/*
+	sizehints.max_width = 320;
+	sizehints.max_height = 200;
+	sizehints.base_width = 320;
+	sizehints.base_height = 200;
+	sizehints.flags = PMinSize | PMaxSize | PBaseSize;
+	*/
+	sizehints.flags = PMinSize;
+	
+	XSetWMProperties(dpy, win, NULL, NULL, argv, argc, &sizehints, None, None); 
+	
+	/* TODO: have some global identifier for each game type */
+	XStoreName(dpy, win, GAMENAME);
+	XSetIconName(dpy, win, GAMENAME);
+	
+	wmDeleteWindow = XInternAtom(dpy, "WM_DELETE_WINDOW", False);
+	XSetWMProtocols(dpy, win, &wmDeleteWindow, 1);
+
+	XFlush(dpy);
+	
+	glXMakeCurrent(dpy, win, ctx);
+	
+	printf("GL Library:\n");
+	printf("GL_VENDOR: %s\n", glGetString(GL_VENDOR));
+	printf("GL_RENDERER: %s\n", glGetString(GL_RENDERER));
+	printf("GL_VERSION: %s\n", glGetString(GL_VERSION));
+	printf("GL_EXTENSIONS: %s\n", glGetString(GL_EXTENSIONS));
+	
+	return WolfMain(argc, argv);
+}
+
 void VL_WaitVBL(int vbls)
 {
+	/* hack - but it works for me */
+	long last = get_TimeCount() + 1;
+	while (last > get_TimeCount()) ;
 }
 
 void VW_UpdateScreen()
@@ -23,10 +159,23 @@ void VW_UpdateScreen()
 =======================
 */
 
-void VL_Startup (void)
+void VL_Startup()
 {
 	if (gfxbuf == NULL) 
 		gfxbuf = malloc(320 * 200 * 1);
+	
+	img = XCreateImage(dpy, vi->visual, 8, ZPixmap, 0, (char *)gfxbuf, 320, 200,
+			   8, 320);
+			   
+	XMapWindow(dpy, win);
+	
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+		
 }
 
 /*
@@ -84,6 +233,7 @@ void VL_ClearVideo(byte color)
 void VL_FillPalette(int red, int green, int blue)
 {
 	int i;
+
 }	
 
 //===========================================================================
@@ -126,6 +276,8 @@ void VL_GetColor(int color, int *red, int *green, int *blue)
 
 void VL_SetPalette(byte *palette)
 {
+	int i;
+	
 }
 
 
@@ -140,14 +292,9 @@ void VL_SetPalette(byte *palette)
 */
 
 void VL_GetPalette(byte *palette)
-{
-	int i, r, g, b;
+{	
+	int i;
 	
-	for (i = 0; i < 256; i++) {
-		palette[i*3+0] = r;
-		palette[i*3+1] = g;
-		palette[i*3+2] = b;
-	}
 }
 
 /*
@@ -358,13 +505,53 @@ static	char			*ParmStrings[] = {"nojoys","nomouse",nil};
 
 //	Internal routines
 
+int XKeysymToScancode(unsigned int keysym)
+{
+	switch (keysym) {
+		case XK_Left:
+		case XK_KP_Left:
+			return sc_LeftArrow;
+		case XK_Right:
+		case XK_KP_Right:
+			return sc_RightArrow;
+		case XK_Up:
+		case XK_KP_Up:
+			return sc_UpArrow;
+		case XK_Down:
+		case XK_KP_Down:
+			return sc_DownArrow;
+		case XK_Control_L:
+			return sc_Control;
+		case XK_Alt_L:
+			return sc_Alt;
+		case XK_Shift_L:
+			return sc_LShift;
+		case XK_Shift_R:
+			return sc_RShift;
+		case XK_Escape:
+			return sc_Escape;
+		case XK_space:
+		case XK_KP_Space:
+			return sc_Space;
+		case XK_KP_Enter:
+		case XK_Return:
+			return sc_Enter;
+		case XK_y:
+			return sc_Y;
+		case XK_n:
+			return sc_N;
+		default:
+			printf("unknown: %s\n", XKeysymToString(keysym));
+			return sc_None;
+	}
+}
+
+			
 void keyboard_handler(int code, int press)
 {
 	static boolean special;
-	byte k, c, temp;
-	int i;
+	byte k, c;
 
-	/* k = inportb(0x60);	// Get the scan code */
 	k = code;
 
 	if (k == 0xe0)		// Special key prefix
@@ -631,7 +818,7 @@ void IN_ReadControl(int player,ControlInfo *info)
 	mx = my = motion_None;
 	buttons = 0;
 
-//keyboard_update();
+IN_CheckAck();
 
 		switch (type = Controls[player])
 		{
@@ -696,7 +883,6 @@ void IN_ReadControl(int player,ControlInfo *info)
 	info->button2 = buttons & (1 << 2);
 	info->button3 = buttons & (1 << 3);
 	info->dir = DirTable[((my + 1) * 3) + (mx + 1)];
-
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -727,20 +913,38 @@ void IN_StartAck(void)
 			btnstate[i] = true;
 }
 
-int flipz;
-
-boolean IN_CheckAck (void)
+boolean IN_CheckAck()
 {
-	unsigned	i,buttons;
-
-	if (flipz == 1) {
-		flipz = 0;
-		return false;
-	}
-	flipz++;
+	XEvent event;
 	
-//while (keyboard_update()) ; /* get all events */
-
+	unsigned i, buttons;
+	
+	if (XPending(dpy)) {
+		do {
+			XNextEvent(dpy, &event);
+			switch(event.type) {
+				case KeyPress:
+					keyboard_handler(XKeysymToScancode(XKeycodeToKeysym(dpy, event.xkey.keycode, 0)), 1);
+					break;
+				case KeyRelease:
+					keyboard_handler(XKeysymToScancode(XKeycodeToKeysym(dpy, event.xkey.keycode, 0)), 0);
+					break;
+				case Expose:
+					VW_UpdateScreen();
+					break;
+				case ConfigureNotify:
+					glViewport(0, 0, event.xconfigure.width, event.xconfigure.height);
+					break;
+				case ClientMessage:
+					if (event.xclient.data.l[0] == wmDeleteWindow)
+						Quit(NULL);
+					break;
+				default:
+					break;
+			}
+		} while (XPending(dpy));
+	}
+	
 	if (LastScan)
 		return true;
 
@@ -760,12 +964,11 @@ boolean IN_CheckAck (void)
 	return false;
 }
 
-void IN_Ack (void)
+void IN_Ack()
 {
-	IN_StartAck ();
+	IN_StartAck();
 
-//	return; /* TODO: fix when keyboard implemented */
-	while (!IN_CheckAck ()) ;
+	while(!IN_CheckAck()) ;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -782,7 +985,7 @@ boolean IN_UserInput(longword delay)
 
 	lasttime = get_TimeCount();
 	
-	IN_StartAck ();
+	IN_StartAck();
 	do {
 		if (IN_CheckAck())
 			return true;
@@ -817,9 +1020,4 @@ byte IN_MouseButtons (void)
 byte IN_JoyButtons (void)
 {
 	return 0;
-}
-
-int main(int argc, char *argv[])
-{
-	return WolfMain(argc, argv);
 }

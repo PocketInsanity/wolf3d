@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
 	dpy = XOpenDisplay(disp);
 	if (dpy == NULL) {
 		/* TODO: quit function with vsnprintf */
-		printf("Unable to open display %s!\n", XDisplayName(disp));
+		fprintf(stderr, "Unable to open display %s!\n", XDisplayName(disp));
 		exit(EXIT_FAILURE);
 	}
 	
