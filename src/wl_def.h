@@ -859,12 +859,6 @@ void PicturePause (void);
 
 extern	long 	lasttimecount;
 extern	long 	frameon;
-extern	boolean	fizzlein;
-
-extern	unsigned	wallheight[MAXVIEWWIDTH];
-
-extern	fixed	tileglobal;
-extern	fixed	focallength;
 
 //
 // derived constants
@@ -915,18 +909,6 @@ void	DamageActor (objtype *ob, unsigned damage);
 
 boolean CheckLine (objtype *ob);
 boolean	CheckSight (objtype *ob);
-
-
-/*
-=============================================================================
-
-						 WL_SCALE DEFINITIONS
-
-=============================================================================
-*/
-
-void ScaleShape(int xcenter, int shapenum, unsigned height);
-void SimpleScaleShape(int xcenter, int shapenum, unsigned height);
 
 /*
 =============================================================================

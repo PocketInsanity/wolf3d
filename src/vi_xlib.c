@@ -293,9 +293,9 @@ void VL_Startup()
 		}		
 	}
 	
-	//attr.colormap = cmap;		   
+	attr.colormap = cmap;		   
 	attr.event_mask = KeyPressMask | KeyReleaseMask | ExposureMask;
-	attrmask = /*CWColormap |*/ CWEventMask;
+	attrmask = CWColormap | CWEventMask;
 	
 	if (fullscreen || dga) {
 		attrmask |= CWOverrideRedirect;
@@ -309,7 +309,7 @@ void VL_Startup()
 		Quit("Unable to create window!");
 	}
 	
-	if (dga) {
+	if (fullscreen || dga) {
 		XMapWindow(dpy, win);
 		XRaiseWindow(dpy, win);
 		XGrabKeyboard(dpy, win, True, GrabModeAsync, GrabModeAsync, CurrentTime);
@@ -542,17 +542,6 @@ void VW_UpdateScreen()
 	else
 		XPutImage(dpy, win, gc, img, 0, 0, 0, 0, 320, 200);
 }
-
-/*
-=============================================================================
-
-						PALETTE OPS
-
-		To avoid snow, do a WaitVBL BEFORE calling these
-
-=============================================================================
-*/
-
 
 /*
 =================

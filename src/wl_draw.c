@@ -7,7 +7,7 @@
 
 #define ACTORSIZE	0x4000
 
-unsigned wallheight[MAXVIEWWIDTH];
+static unsigned wallheight[MAXVIEWWIDTH];
 
 //
 // refresh variables
@@ -44,6 +44,9 @@ static void AsmRefresh();
   z; \
  })
 #endif
+
+void ScaleShape(int xcenter, int shapenum, unsigned height);
+void SimpleScaleShape(int xcenter, int shapenum, unsigned height);
  
 /* ======================================================================== */
 
@@ -892,19 +895,19 @@ static int CalcHeight()
 {
 	fixed gxt,gyt,nx,gx,gy;
 
-	gx = xintercept-viewx;
-	gxt = FixedByFrac(gx,viewcos);
+	gx = xintercept - viewx;
+	gxt = FixedByFrac(gx, viewcos);
 
-	gy = yintercept-viewy;
-	gyt = FixedByFrac(gy,viewsin);
+	gy = yintercept - viewy;
+	gyt = FixedByFrac(gy, viewsin);
 
 	nx = gxt-gyt;
 
   //
   // calculate perspective ratio (heightnumerator/(nx>>8))
   //
-	if (nx<MINDIST)
-		nx=MINDIST;			/* don't let divide overflow */
+	if (nx < MINDIST)
+		nx = MINDIST;			/* don't let divide overflow */
 
 	return heightnumerator/(nx>>8);
 }
