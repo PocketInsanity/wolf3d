@@ -449,6 +449,9 @@ void RenderView(void)
 	viewsin = sintable[gamestate.viewangle];	/* Get the basic sine */
 	viewcos = costable[gamestate.viewangle];	/* Get the basic cosine */
 	memset(areavis, 0, sizeof(areavis));	/* No areas are visible */
+	
+	StartRenderView(); /* Marker to let GL code know */
+	
 	ClearClipSegs();			/* Clip first seg only to sides of screen */	
 	IO_ClearViewBuffer();		/* Erase to ceiling / floor colors*/
 	

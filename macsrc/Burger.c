@@ -27,18 +27,6 @@ LongWord YTable[480];
 
 #define BRGR 0x42524752
 
-/**********************************
-
-	Graphics subsystem
-
-**********************************/
-
-/**********************************
-
-	Draw a masked shape
-
-**********************************/
-
 void InitYTable(void)
 {
 	Word i;
@@ -50,110 +38,6 @@ void InitYTable(void)
 		YTable[i] = Offset;
 		Offset+=VideoWidth;
 	} while (++i<480);
-}
-
-/**********************************
-
-	Draw a shape
-
-**********************************/
-
-void DrawShape(Word x,Word y,void *ShapePtr)
-{
-	unsigned char *ScreenPtr;
-	unsigned char *Screenad;
-	unsigned char *ShapePtr2;
-	unsigned short *ShapePtr3;
-	Word Width;
-	Word Height;
-	Word Width2;
-
-	ShapePtr3 = ShapePtr;
-	Width = sMSB(ShapePtr3[0]);		/* 16 bit width */
-	Height = sMSB(ShapePtr3[1]);		/* 16 bit height */
-	ShapePtr2 = (unsigned char *) &ShapePtr3[2];
-	ScreenPtr = (unsigned char *) &VideoPointer[YTable[y]+x];
-	
-	
-	do {
-		Width2 = Width;
-		Screenad = ScreenPtr;
-		do {
-			*Screenad++ = *ShapePtr2++;
-		} while (--Width2);
-		ScreenPtr +=VideoWidth;
-	} while (--Height);
-}
-
-/**********************************
-
-	Draw a masked shape
-
-**********************************/
-
-void DrawMShape(Word x,Word y,void *ShapePtr)
-{
-	unsigned char *ScreenPtr;
-	unsigned char *Screenad;
-	unsigned char *MaskPtr;
-	unsigned char *ShapePtr2;
-	Word Width;
-	Word Height;
-	Word Width2;
-
-	ShapePtr2 = ShapePtr;
-	Width = ShapePtr2[1]; 
-	Height = ShapePtr2[3];
-
-	ShapePtr2 +=4;
-	MaskPtr = &ShapePtr2[Width*Height];
-	ScreenPtr = (unsigned char *) &VideoPointer[YTable[y]+x];
-	do {
-		Width2 = Width;
-		Screenad = ScreenPtr;
-		do {
-			*Screenad = (*Screenad & *MaskPtr++) | *ShapePtr2++;
-			++Screenad;
-		} while (--Width2);
-		ScreenPtr +=VideoWidth;
-	} while (--Height);
-}
-
-/**********************************
-
-	Draw a masked shape with an offset
-
-**********************************/
-
-void DrawXMShape(Word x,Word y,void *ShapePtr)
-{
-	unsigned short *ShapePtr2;
-	ShapePtr2 = ShapePtr;
-	x += sMSB(ShapePtr2[0]);
-	y += sMSB(ShapePtr2[1]);
-	DrawMShape(x,y,&ShapePtr2[2]);
-}
-
-/**********************************
-
-	Clear the screen to a specific color
-
-**********************************/
-
-void ClearTheScreen(Word Color)
-{
-	Word x,y;
-	unsigned char *TempPtr;
-
-	TempPtr = VideoPointer;
-	y = SCREENHEIGHT;		/* 200 lines high */
-	do {
-		x = 0;
-		do {
-			TempPtr[x] = Color;	/* Fill color */
-		} while (++x<SCREENWIDTH);
-		TempPtr += VideoWidth;	/* Next line down */
-	} while (--y);
 }
 
 /**********************************

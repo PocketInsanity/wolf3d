@@ -19,9 +19,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 /*
-This is NOT the OpenGL version!
-This is a COPY of vi_xlib.c as a placeholder!
-(with minor changes)
+This is a NON-WORKING OpenGL version!
+A WORKING version will be ready once I write it!
 */
 
 #include <stdio.h>
@@ -42,14 +41,13 @@ Display *dpy;
 int screen;
 Window win, root;
 XVisualInfo *vi;
-GC gc;
-XImage *img;
-Colormap cmap;
+GLXContext ctx;
 Atom wmDeleteWindow;
 
 XColor clr[256];
 
 Byte *gfxbuf;
+Byte Pal[768];
 
 int attrib[] = {
 	GLX_RGBA,
@@ -64,15 +62,14 @@ int attrib[] = {
 int main(int argc, char *argv[])
 {
 	XSetWindowAttributes attr;
-	XVisualInfo vitemp;
-	XGCValues gcvalues;
+	Colormap cmap;
 	Pixmap bitmap;
 	Cursor cursor;
 	XColor bg = { 0 };
 	XColor fg = { 0 };
 	char data[8] = { 0x01 };
 	char *display;
-	int mask, i;
+	int mask, i, major, minor, verbose = 0;
 	
 	if (argc != 2) {
 		fprintf(stderr, "usage: %s <mac wolf3d resource fork>\n", argv[0]);
@@ -95,23 +92,41 @@ int main(int argc, char *argv[])
 	
 	root = RootWindow(dpy, screen);
 	
-	vitemp.screen = screen;
-	vitemp.depth = 8;
-	vitemp.class = PseudoColor;
-	mask = VisualScreenMask | VisualDepthMask | VisualClassMask;
-	
-	vi = XGetVisualInfo(dpy, mask, &vitemp, &i);
-	
-	if ( !(vi && i) ) {
-		fprintf(stderr, "Unable to get a depth 8 PseudoColor visual on screen %d\n", screen);
+	if (glXQueryExtension(dpy, NULL, NULL) == False) {
+		fprintf(stderr, "Display %s does not support the GLX Extension\n", XDisplayName(display));
 		exit(EXIT_FAILURE);
 	}
 	
-	cmap = XCreateColormap(dpy, root, vi->visual, AllocAll);
-	for (i = 0; i < 256; i++) {
-		clr[i].pixel = i;
-		clr[i].flags = DoRed | DoGreen | DoBlue;
+	if (glXQueryVersion(dpy, &major, &minor) == False) {
+		fprintf(stderr, "glXQueryVersion returned False?\n");
+		exit(EXIT_FAILURE);
+	} else if (verbose) {
+		printf("GLX Version %d.%d\n", major, minor);
+		printf("GLX Client:\n");
+		printf("GLX_VENDOR: %s\n", glXGetClientString(dpy, GLX_VENDOR));
+		printf("GLX_VERSION: %s\n", glXGetClientString(dpy, GLX_VERSION));
+		printf("GLX_EXTENSIONS: %s\n", glXGetClientString(dpy, GLX_EXTENSIONS));
+		printf("GLX Server:\n");
+		printf("GLX_VENDOR: %s\n", glXQueryServerString(dpy, screen, GLX_VENDOR));
+		printf("GLX_VERSION: %s\n", glXQueryServerString(dpy, screen, GLX_VERSION));
+		printf("GLX_EXTENSIONS: %s\n", glXQueryServerString(dpy, screen, GLX_EXTENSIONS));
+		printf("Both:\n");
+		printf("GLX_EXTENSIONS: %s\n", glXQueryExtensionsString(dpy, screen));
 	}
+	
+	vi = glXChooseVisual(dpy, screen, attrib);
+	if (vi == NULL) {
+		fprintf(stderr, "No usable GL visual found on %s:%d\n", XDisplayName(display), screen);
+		exit(EXIT_FAILURE);
+	}
+		
+	ctx = glXCreateContext(dpy, vi, NULL, True);
+	if (ctx == NULL) {
+		fprintf(stderr, "glx context create failed\n");
+		exit(EXIT_FAILURE);
+	}
+	
+	cmap = XCreateColormap(dpy, root, vi->visual, AllocNone);
 	
 	attr.colormap = cmap;
 	attr.event_mask = KeyPressMask | KeyReleaseMask | ExposureMask;
@@ -125,12 +140,6 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 	
-	gcvalues.foreground = BlackPixel(dpy, screen);
-	gcvalues.background = WhitePixel(dpy, screen);
-	mask = GCForeground | GCBackground;
-	
-	gc = XCreateGC(dpy, win, mask, &gcvalues);
-	
 	XSetWMProperties(dpy, win, NULL, NULL, argv, argc, None, None, None);
 	
 	XStoreName(dpy, win, "Wolfenstein 3D");
@@ -142,6 +151,16 @@ int main(int argc, char *argv[])
 	bitmap = XCreateBitmapFromData(dpy, win, data, 8, 8);
 	cursor = XCreatePixmapCursor(dpy, bitmap, bitmap, &fg, &bg, 0, 0);
 	XDefineCursor(dpy, win, cursor);
+	
+	glXMakeCurrent(dpy, win, ctx);
+	
+	if (verbose) {
+		printf("GL Library:\n");
+		printf("GL_VENDOR: %s\n", glGetString(GL_VENDOR));
+		printf("GL_RENDERER: %s\n", glGetString(GL_RENDERER));
+		printf("GL_VERSION: %s\n", glGetString(GL_VERSION));
+		printf("GL_EXTENSIONS: %s\n", glGetString(GL_EXTENSIONS));
+	}
 	
 	XMapWindow(dpy, win);
 	XFlush(dpy);
@@ -161,8 +180,7 @@ void Quit(char *str)
 {	
 	FreeResources();
 	
-	if (img)
-		XDestroyImage(img);
+	glXDestroyContext(dpy, ctx);
 	
 	if (str && *str) {
 		fprintf(stderr, "%s\n", str);
@@ -174,14 +192,7 @@ void Quit(char *str)
 
 void SetPalette(Byte *pal)
 {
-	int i;
-	
-	for (i = 0; i < 256; i++) {
-		clr[i].red = pal[i*3+0] << 8;
-		clr[i].green = pal[i*3+1] << 8;
-		clr[i].blue = pal[i*3+2] << 8;
-	}
-	XStoreColors(dpy, cmap, clr, 256);
+	memcpy(Pal, pal, 768);
 }
 	
 void BlastScreen2(Rect *BlastRect)
@@ -196,7 +207,18 @@ int VidWidth, VidHeight, ViewHeight;
 
 void BlastScreen()
 {
-	XPutImage(dpy, win, gc, img, 0, 0, 0, 0, w, h);
+	GLint error;
+	
+	glXSwapBuffers(dpy, win);
+	
+	error = glGetError();
+	if (error != GL_NO_ERROR) {
+		do {
+			fprintf(stderr, "GL Error: %d\n", error);
+			error = glGetError();
+		} while (error != GL_NO_ERROR);
+		exit(EXIT_FAILURE);
+	}
 }
 
 Word VidXs[] = {320,512,640,640};       /* Screen sizes to play with */
@@ -228,27 +250,15 @@ Word NewGameWindow(Word NewVidSize)
 		exit(EXIT_FAILURE);
 	}
 	
-	if (img) {
-		XDestroyImage(img);
-		/* free(gfxbuf); */
-	}
-	
 	sizehints.min_width = sizehints.max_width = sizehints.base_width = w;
 	sizehints.min_height = sizehints.max_height = sizehints.base_height = h;
 	sizehints.flags = PMinSize | PMaxSize | PBaseSize;
 	XSetWMNormalHints(dpy, win, &sizehints);
 	XResizeWindow(dpy, win, w, h);
+	glViewport(0, 0, w, h);
 	
 	gfxbuf = (Byte *)malloc(w * h);
-	
-	img = XCreateImage(dpy, vi->visual, vi->depth, ZPixmap, 0, 
-			   (char *)gfxbuf, w, h, 8, w);
-	
-	if (img == NULL) {
-		fprintf(stderr, "XCreateImage returned NULL, Unable to create an XImage\n");
-		exit(EXIT_FAILURE);
-	}
-	
+		
 	VideoPointer = gfxbuf;
 	VideoWidth = w;
 	InitYTable();
@@ -256,7 +266,7 @@ Word NewGameWindow(Word NewVidSize)
 	ClearTheScreen(BLACK);
 	BlastScreen();
 	
-	LongPtr = (LongWord *) LoadAResource(VidPics[NewVidSize]);
+	LongPtr = (LongWord *)LoadAResource(VidPics[NewVidSize]);
 
 	if (GameShapes)
 		FreeSomeMem(GameShapes);

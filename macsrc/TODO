@@ -9,18 +9,17 @@ TODO:
 - If SVGAlib does not support 512x384x256, allow the user to pan around 
   with the keypad arrow keys.
 * Finish moving all 2D code to SoftDraw.c
+* Compile with -Wall -ansi -pedantic (shouldn't be much in the way)
 
 BUGS:
 * Drawing seems like its imprecise, stationary sprites move back and forth,
   and walls 'swim' when you move around, or sprites pop into different sizes
   when are far enough and get closer/farther away
-- Possibly caused by 8.8 fixed?
+- Possibly caused by 8.8 imprecision?
 * it crashes somewhere, no reason why...
 #0  0x804fa55 in DrawXMShape (x=128, y=96, ShapePtr=0x8c8c8c8c) at
 Burger.c:198
 But what is trashing GameShapes's memory?
-I don't think GameShapes itself is being ran over, just the memory allocated
-to it...
 * added an 'and' hack to lines 33 and 50 in RefBsp.c  Not sure if this causes
 any problems (value was overflowing finetangent...)
 
