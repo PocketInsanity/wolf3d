@@ -14,7 +14,7 @@ void Intro(void)
 	LongWord PackLength;
 	Byte *ShapePtr;
 	
-	NewGameWindow(1);	/* Set to 512 mode */
+	NewGameWindow(1);	/* Set to 512 mode */ 
 
 	FadeToBlack();		/* Fade out the video */
 	PackPtr = LoadAResource(rMacPlayPic);

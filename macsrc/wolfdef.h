@@ -533,8 +533,6 @@ extern Boolean	rw_downside;		/* True for dir_east and dir_south*/
 extern Byte *ArtData[64];
 extern Byte textures[MAPSIZE*2+5][MAPSIZE]; /* 0-63 is horizontal, 64-127 is vertical*/
 
-/* TODO - these were in Mac.c etc */										/* 128 - 132 are doors*/
-/*
 extern void InitTools(void);
 extern void BlastScreen(void);
 extern void BlastScreen2(Rect *BlastRect);
@@ -549,7 +547,7 @@ extern void EndGetPsyched(void);
 extern Word ChooseGameDiff(void);
 extern void ShareWareEnd(void);
 extern void FinishLoadGame(void);
-*/
+
 
 /* In StateDef.c */
 

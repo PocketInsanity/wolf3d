@@ -637,7 +637,7 @@ static Boolean LoadWallShape(Word Index,Byte *DarkPtr)
 	if (!Buffer) {
 		return FALSE;
 	}
-	WallVal = WallListPtr[Index+1];		/* Which resource is it? */
+	WallVal = sMSB(WallListPtr[Index+1]);		/* Which resource is it? */
 	WallPtr = LoadAResource(WallVal&0x3fff);	/* Load the shape */
 	if (!WallPtr) {
 		FreeSomeMem(Buffer);

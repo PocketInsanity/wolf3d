@@ -1,4 +1,17 @@
+#include <sys/time.h>
+#include <unistd.h>
+
 #include "wolfdef.h"
+
+LongWord LastTick; 
+
+unsigned short int sMSB(unsigned short int x)
+{
+	int x1 = (x & 0x00FF) << 8;
+	int x2 = (x & 0xFF00) >> 8;
+	
+	return x1 | x2;
+}
 
 unsigned long lMSB(unsigned long x)
 {
@@ -10,23 +23,6 @@ unsigned long lMSB(unsigned long x)
 	return x1 | x2 | x3 | x4;
 }
 	
-void IO_ScaleWallColumn(Word x,Word scale,Word tile,Word column)
-{
-}
-
-void IO_ScaleMaskedColumn(Word x,Word scale,unsigned short *sprite,Word column)
-{
-}
-
-Boolean SetupScalers(void)
-{
-	return 1;
-}
-
-void ReleaseScalers()
-{
-}
-
 void MakeSmallFont(void)
 {
 }
@@ -41,14 +37,35 @@ void DrawSmall(Word x,Word y,Word tile)
 
 void ShowGetPsyched(void)
 {
+	LongWord *PackPtr;
+	Byte *ShapePtr;
+	LongWord PackLength;
+	Word X,Y;
+                                
+	ClearTheScreen(BLACK);
+	BlastScreen();
+	PackPtr = LoadAResource(rGetPsychPic);
+	PackLength = lMSB(PackPtr[0]);
+	ShapePtr = AllocSomeMem(PackLength);
+	DLZSS(ShapePtr,(Byte *) &PackPtr[1],PackLength);
+	X = 100; /* TODO */
+	Y = 100;
+	DrawShape(X,Y,ShapePtr);
+	FreeSomeMem(ShapePtr);
+	ReleaseAResource(rGetPsychPic);
+	BlastScreen();
+	SetAPalette(rGamePal);
+	
 }
 
 void DrawPsyched(Word Index)
 {
+	/* TODO: blah */
 }
 
 void EndGetPsyched(void)
 {
+	SetAPalette(rBlackPal);
 }
 
 void FlushKeys(void)
@@ -70,24 +87,69 @@ void ShareWareEnd(void)
 
 Word WaitEvent(void)
 {
+	WaitTicks(240);
 	return 0;
 }
 
+static struct timeval t0;
+
 LongWord ReadTick()
 {
-	return 0;
+	struct timeval t1;
+	long secs, usecs;
+	
+	if (t0.tv_sec == 0) {
+		gettimeofday(&t0, NULL);
+		printf("RESET?\n");
+		return 0;
+	}
+	
+	gettimeofday(&t1, NULL);
+	
+	secs  = t1.tv_sec - t0.tv_sec;
+	usecs = t1.tv_usec - t0.tv_usec;
+	if (usecs < 0) {
+		usecs += 1000000;
+		secs--;
+	}
+	
+	return secs * 60 + usecs * 60 / 1000000;
 }
 
 void WaitTick()
 {
+	do {
+		/* TODO: get events */
+	} while (ReadTick() == LastTick);
+	LastTick = ReadTick();
 }
 
 void WaitTicks(Word Count)
 {
+	LongWord TickMark;
+	
+	do {
+		/* TODO: get events */
+		TickMark = ReadTick();
+	} while ((TickMark-LastTick)<=Count);
+	LastTick = TickMark;
 }
 
 Word WaitTicksEvent(Word Time)
 {
+	LongWord TickMark;
+	LongWord NewMark;
+	
+	TickMark = ReadTick();
+	for (;;) {
+		/* TODO: get events */
+		NewMark = ReadTick();
+		//if (Time) {
+			if ((NewMark-TickMark)>=Time) {
+				break;
+			}
+		//}
+	}	
 	return 0;
 }
 
@@ -119,18 +181,6 @@ void PurgeAllSounds(unsigned long minMemory)
 {
 }
 
-void BlastScreen2(Rect *BlastRect)
-{
-}
-
-void BlastScreen(void)
-{
-}
-
-Word NewGameWindow(Word NewVidSize)
-{
-}
-
 void BailOut()
 {
 	printf("BailOut()\n");
@@ -139,6 +189,7 @@ void BailOut()
 
 Word ChooseGameDiff(void)
 {
+	SetAPalette(rGamePal);
 }
 
 void FinishLoadGame(void)

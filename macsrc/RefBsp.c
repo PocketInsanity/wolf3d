@@ -55,7 +55,7 @@ void RenderWallLoop(Word x1,Word x2,Word distance)
 			texturecolumn = rw_maxtex-1;
 		}
 		tile = rw_texture[texturecolumn>>8];	/* Get the tile to use */
-		if (!(WallListPtr[tile+1] & 0x4000)) {
+		if (!(sMSB(WallListPtr[tile+1]) & 0x4000)) {
 			texturecolumn^=0xff;	/* Reverse the tile for N,W walls */
 		}
 		IO_ScaleWallColumn(x1,scaler,tile,(texturecolumn>>1)&127);	/* Draw the line */

@@ -104,6 +104,7 @@ void *LoadAResource2(Word RezNum, LongWord Type)
 	}
 	
 	fprintf(stderr, "ERROR: %d/%d was not found!\n", Type, RezNum);
+	AllocSomeMem(666666666);
 	exit(EXIT_FAILURE);
 }
 

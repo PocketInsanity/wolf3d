@@ -135,10 +135,12 @@ void DrawShape(Word x,Word y,void *ShapePtr)
 	Word Width2;
 
 	ShapePtr3 = ShapePtr;
-	Width = ShapePtr3[0];		/* 16 bit width */
-	Height = ShapePtr3[1];		/* 16 bit height */
+	Width = sMSB(ShapePtr3[0]);		/* 16 bit width */
+	Height = sMSB(ShapePtr3[1]);		/* 16 bit height */
 	ShapePtr2 = (unsigned char *) &ShapePtr3[2];
 	ScreenPtr = (unsigned char *) &VideoPointer[YTable[y]+x];
+	
+	
 	do {
 		Width2 = Width;
 		Screenad = ScreenPtr;
@@ -166,8 +168,9 @@ void DrawMShape(Word x,Word y,void *ShapePtr)
 	Word Width2;
 
 	ShapePtr2 = ShapePtr;
-	Width = ShapePtr2[1];
+	Width = ShapePtr2[1]; 
 	Height = ShapePtr2[3];
+
 	ShapePtr2 +=4;
 	MaskPtr = &ShapePtr2[Width*Height];
 	ScreenPtr = (unsigned char *) &VideoPointer[YTable[y]+x];
@@ -192,8 +195,8 @@ void DrawXMShape(Word x,Word y,void *ShapePtr)
 {
 	unsigned short *ShapePtr2;
 	ShapePtr2 = ShapePtr;
-	x += ShapePtr2[0];
-	y += ShapePtr2[1];
+	x += sMSB(ShapePtr2[0]);
+	y += sMSB(ShapePtr2[1]);
 	DrawMShape(x,y,&ShapePtr2[2]);
 }
 
@@ -215,8 +218,8 @@ void EraseMBShape(Word x,Word y, void *ShapePtr, void *BackPtr)
 	Word Width2;
 
 	MaskPtr = ShapePtr;		/* Get the pointer to the mask */
-	Width = MaskPtr[1];		/* Get the width of the shape */
-	Height = MaskPtr[3];	/* Get the height of the shape */
+	Width = sMSB(MaskPtr[1]);		/* Get the width of the shape */
+	Height = sMSB(MaskPtr[3]);	/* Get the height of the shape */
 	MaskPtr = &MaskPtr[(Width*Height)+4];	/* Index to the mask */
 							/* Point to the screen */
 	ScreenPtr = (unsigned char *) &VideoPointer[YTable[y]+x];
@@ -255,8 +258,8 @@ Word TestMShape(Word x,Word y,void *ShapePtr)
 	Word Width2;
 
 	ShapePtr2 = ShapePtr;
-	Width = ShapePtr2[0];
-	Height = ShapePtr2[1];
+	Width = sMSB(ShapePtr2[0]);
+	Height = sMSB(ShapePtr2[1]);
 	ShapePtr2 +=2;
 	MaskPtr = &ShapePtr2[Width*Height];
 	ScreenPtr = (unsigned char *) &VideoPointer[YTable[y]+x];
@@ -295,8 +298,8 @@ Word TestMBShape(Word x,Word y,void *ShapePtr,void *BackPtr)
 	Word Width2;
 
 	MaskPtr = ShapePtr;		/* Get the pointer to the mask */
-	Width = MaskPtr[0];		/* Get the width of the shape */
-	Height = MaskPtr[1];	/* Get the height of the shape */
+	Width = sMSB(MaskPtr[0]);		/* Get the width of the shape */
+	Height = sMSB(MaskPtr[1]);	/* Get the height of the shape */
 	MaskPtr = &MaskPtr[(Width*Height)+2];	/* Index to the mask */
 							/* Point to the screen */
 	ScreenPtr = (unsigned char *) &VideoPointer[YTable[y]+x];
@@ -530,6 +533,8 @@ Byte CurrentPal[768];
 
 void SetAPalettePtr(unsigned char *PalPtr)
 {
+	memcpy(&CurrentPal, PalPtr, 768);
+	SetPalette(PalPtr);
 }
 
 /**********************************
@@ -715,8 +720,15 @@ void DLZSS(Byte *Dest,Byte *Src,LongWord Length)
 
 **********************************/
 
+/* TODO */
+       #include <sys/types.h>
+              #include <signal.h>
+              
 void *AllocSomeMem(LongWord Size)
 {
+	if (Size > 5000000)
+		kill(getpid(), SIGSEGV);
+		
 	return (void *)malloc(Size);
 }
 
