@@ -43,7 +43,7 @@ void VL_FadeOut(int start, int end, int red, int green, int blue, int steps)
 	byte *origptr, *newptr;
 
 	VL_GetPalette(&palette1[0][0]);
-	memcpy(palette2,palette1,768);
+	memcpy(palette2, palette1, 768);
 
 /* fade through intermediate frames */
 	for (i = 0; i < steps; i++)

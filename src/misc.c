@@ -284,33 +284,29 @@ int ReadLength(int fp)
 
 int8_t ReadInt8(int fp)
 {
-	int8_t d;
+	byte d[1];
 	
-	read(fp, &d, 1);
+	read(fp, d, 1);
 	
-	return d;
+	return d[0];
 }
 
 int16_t ReadInt16(int fp)
 {
-	int16_t d;
+	byte d[2];
 	
-	read(fp, &d, 2);
+	read(fp, d, 2);
 	
-	d = SwapInt16L(d);
-	
-	return d;
+	return (d[0]) | (d[1] << 8);
 }
 
 int32_t ReadInt32(int fp)
 {
-	int32_t d;
+	byte d[4];
 	
-	read(fp, &d, 4);
+	read(fp, d, 4);
 	
-	d = SwapInt32L(d);
-	
-	return d;
+	return (d[0]) | (d[1] << 8) | (d[2] << 16) | (d[3] << 24);
 }
 
 int ReadBytes(int fp, byte *d, int len)

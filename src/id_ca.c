@@ -118,7 +118,7 @@ boolean CA_LoadFile(char *filename, memptr *ptr)
 	size = ReadLength(handle);
 	MM_GetPtr(ptr, size);
 	
-	l = ReadBytes(handle, (byte *)ptr, size);
+	l = ReadBytes(handle, (byte *)(*ptr), size);
 	
 	if (l == -1) {
 		perror("CA_FarRead");

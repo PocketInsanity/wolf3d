@@ -851,14 +851,14 @@ int PlayDemoFromFile(char *demoname)
 		return 0;
 	}
 		
-	MM_SetLock(&demobuffer,true);
+	MM_SetLock(&demobuffer, true);
 	demoptr = (byte *)demobuffer;
 
 	NewGame(1,0);
-	gamestate.mapon = *demoptr++;
+	gamestate.mapon = demoptr[0];
 	gamestate.difficulty = gd_hard;
-	length = demoptr[0] | (demoptr[1] << 8);
-	demoptr += 3;
+	length = demoptr[1] | (demoptr[2] << 8);
+	demoptr += 4;
 	lastdemoptr = demoptr-4+length;
 
 	VW_FadeOut();
