@@ -3387,6 +3387,8 @@ void CheckForEpisodes()
 
 	strcat(configname, extension);
 	strcat(SaveName, extension);
+	
+	globfree(&globbuf);
 #endif
 
 }
