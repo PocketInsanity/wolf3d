@@ -1,8 +1,21 @@
 TODO: I still need to write this file
 
-NOTE: save games and configuration files now have version fields. Version
-0xFFFFFFFF is only for non-release/debug/snapshot versions (in other words, 
-the file formats may change at any time).
+Save game and configuration file formats are not yet "solid" (files created
+with an older version may not work with a new binary), but they probably
+won't have to change.
+
+Sound support is still "experiemental."  Currently requires OSS support.
+Edit the Makefile and change:
+ OBJS += sd_null.o
+ #OBJS += sd_oss.o fmopl.o
+ #CFLAGS += -D_REENTRANT
+ #LFLAGS += -lpthread
+to:
+ #OBJS += sd_null.o
+ OBJS += sd_oss.o fmopl.o
+ CFLAGS += -D_REENTRANT
+ LFLAGS += -lpthread
+and recompile.  Hopefully it doesn't sound too terrible...
 
 NOTE: This requires SDL 1.2 (http://www.libsdl.org)
 
@@ -26,4 +39,3 @@ Thanks:
 -----
 Steven Fuller
 relnev@icculus.org
-
