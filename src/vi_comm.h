@@ -8,8 +8,6 @@ extern byte *gfxbuf;
 void VL_Startup();
 void VL_Shutdown();
 
-void VL_ClearVideo(byte color);
-
 void VL_WaitVBL(int vbls);
 void VW_UpdateScreen();
 
@@ -17,7 +15,7 @@ void VL_FillPalette(int red, int green, int blue);
 void VL_SetPalette(const byte *palette);
 void VL_GetPalette(byte *palette);
 
-void VL_Plot(int x, int y, int color);
+void VW_Plot(int x, int y, int color);
 void VL_Hlin(unsigned x, unsigned y, unsigned width, unsigned color);
 void VL_Vlin(int x, int y, int height, int color);
 void VL_Bar(int x, int y, int width, int height, int color);
@@ -27,6 +25,7 @@ void VL_MemToScreen(const byte *source, int width, int height, int x, int y);
 void VL_DeModeXize(byte *buf, int width, int height);
 
 void VL_DirectPlot(int x1, int y1, int x2, int y2);
+
 
 #define	MaxPlayers	4
 #define	MaxJoys		2

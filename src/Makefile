@@ -52,7 +52,7 @@ sdlwolf3d: $(DOBJS)
 	gcc -o sdlwolf3d $(DOBJS) $(DLFLAGS)
 
 clean:
-	rm -rf swolf3d xwolf3d *.o
+	rm -rf swolf3d xwolf3d sdlwolf3d *.o
 
 distclean: clean
 	rm -rf *~ DEADJOE

@@ -12,43 +12,27 @@
 =============================================================================
 */
 
-/*
-=============================================================================
-
-						 LOCAL CONSTANTS
-
-=============================================================================
-*/
-
-
 #define FOCALLENGTH     (0x5700l)               // in global coordinates
 #define VIEWGLOBAL      0x10000                 // globals visable flush to wall
 
-/*
-=============================================================================
-
-						 GLOBAL VARIABLES
-
-=============================================================================
-*/
-
 char str[80], str2[20];
 
-//
-// projection variables
-//
-fixed           focallength;
-int             viewwidth;
-int             viewheight;
-int             centerx;
-int             shootdelta;                     // pixels away from centerx a target can be
-fixed           scale;
-long            heightnumerator;
+fixed focallength;
 
-boolean         startgame,loadedgame;
-int             mouseadjustment;
+int viewwidth, viewheight;
+int viewwidthwin, viewheightwin; /* for borders */
+int xoffset, yoffset;
+int vwidth, vheight; /* size of screen */
+int viewsize;
 
-/* These are refugees from wl_draw.c */
+int centerx;
+int shootdelta;                     // pixels away from centerx a target can be
+fixed scale;
+long heightnumerator;
+
+boolean startgame,loadedgame;
+int mouseadjustment;
+
 long frameon;
 long lasttimecount;
 fixed viewsin, viewcos;
@@ -60,8 +44,6 @@ int horizwall[MAXWALLTILES], vertwall[MAXWALLTILES];
 char configname[13] = "config.";
 
 fixed sintable[ANGLES+ANGLES/4+1], *costable = sintable+(ANGLES/4);
-
-unsigned xoffset, yoffset;
 
 int _argc;
 char **_argv;
@@ -184,7 +166,6 @@ void ReadConfig()
 	//
 	// no config file, so select by hardware
 	//
-		/* max viewsize is 20 */
 		viewsize = 15;
 	}
 	
@@ -501,214 +482,6 @@ boolean LoadTheGame(int file,int x,int y)
 	return true;
 }
 
-/* ======================================================================== */
-
-/*
-==========================
-=
-= ShutdownId
-=
-= Shuts down all ID_?? managers
-=
-==========================
-*/
-
-void ShutdownId()
-{
-	US_Shutdown();
-	SD_Shutdown();
-	IN_Shutdown();
-	VW_Shutdown();
-	CA_Shutdown();
-	PM_Shutdown();
-	MM_Shutdown();
-}
-
-
-/* ======================================================================== */
-
-/*
-==================
-=
-= BuildTables
-=
-= Calculates:
-=
-= scale                 projection constant
-= sintable/costable     overlapping fractional tables
-=
-==================
-*/
-
-static const float radtoint = (float)FINEANGLES/2.0f/PI;
-
-void BuildTables()
-{
-  int           i;
-  float         angle,anglestep;
-  double        tang;
-  fixed         value;
-
-
-//
-// calculate fine tangents
-//
-
-	for (i=0;i<FINEANGLES/8;i++)
-	{
-		tang = tan( (i+0.5)/radtoint);
-		finetangent[i] = tang*TILEGLOBAL;
-		finetangent[FINEANGLES/4-1-i] = 1/tang*TILEGLOBAL;
-	}
-
-//
-// costable overlays sintable with a quarter phase shift
-// ANGLES is assumed to be divisable by four
-//
-
-  angle = 0;
-  anglestep = PI/2/ANGLEQUAD;
-  for (i=0;i<=ANGLEQUAD;i++)
-  {
-	value=GLOBAL1*sin(angle);
-	sintable[i]=
-	  sintable[i+ANGLES]=
-	  sintable[ANGLES/2-i] = value;
-	sintable[ANGLES-i]=
-	  sintable[ANGLES/2+i] = -value;
-	angle += anglestep;
-  }
-
-}
-
-/*
-====================
-=
-= CalcProjection
-=
-= Uses focallength
-=
-====================
-*/
-
-void CalcProjection(long focal)
-{
-	int     i;
-	long    intang;
-	float   angle;
-	double  tang;
-	int     halfview;
-	double  facedist;
-
-	focallength = focal;
-	facedist = focal+MINDIST;
-	halfview = viewwidth/2;                                 // half view in pixels
-
-//
-// calculate scale value for vertical height calculations
-// and sprite x calculations
-//
-	scale = halfview*facedist/(VIEWGLOBAL/2);
-
-//
-// divide heightnumerator by a posts distance to get the posts height for
-// the heightbuffer.  The pixel height is height>>2
-//
-	heightnumerator = (TILEGLOBAL*scale)>>6;
-
-//
-// calculate the angle offset from view angle of each pixel's ray
-//
-
-	for (i=0;i<halfview;i++)
-	{
-	// start 1/2 pixel over, so viewangle bisects two middle pixels
-		tang = (long)i*VIEWGLOBAL/viewwidth/facedist;
-		angle = atan(tang);
-		intang = angle*radtoint;
-		pixelangle[halfview-1-i] = intang;
-		pixelangle[halfview+i] = -intang;
-	}
-}
-
-/*
-===================
-=
-= SetupWalls
-=
-= Map tile values to scaled pics
-=
-===================
-*/
-
-void SetupWalls()
-{
-	int     i;
-
-	for (i=1;i<MAXWALLTILES;i++)
-	{
-		horizwall[i]=(i-1)*2;
-		vertwall[i]=(i-1)*2+1;
-	}
-}
-
-//===========================================================================
-
-/*
-==========================
-=
-= SignonScreen
-=
-==========================
-*/
-
-void SignonScreen()
-{
-	VL_SetPalette(gamepal);
-	VL_MemToScreen(introscn, 320, 200, 0, 0);
-	VW_UpdateScreen();
-}
-
-
-/*
-==========================
-=
-= FinishSignon
-=
-==========================
-*/
-
-void FinishSignon()
-{
-#ifndef SPEAR
-	VW_Bar(0, 189, 300, 11, introscn[0]);
-	WindowX = 0;
-	WindowW = 320;
-	PrintY = 190;
-
-	SETFONTCOLOR(14,4);
-
-	US_CPrint("Press a key");
-	VW_UpdateScreen();
-	
-	if (!NoWait)
-		IN_Ack ();
-
-	VW_Bar(0, 189, 300, 11, introscn[0]);
-
-	PrintY = 190;
-	SETFONTCOLOR(10,4);
-
-	US_CPrint("Working...");
-	VW_UpdateScreen();
-	
-	SETFONTCOLOR(0,15);
-#else
-	if (!NoWait)
-		VW_WaitVBL(3*70);
-#endif
-}
-
 //===========================================================================
 
 /*
@@ -721,21 +494,19 @@ void FinishSignon()
 
 int MS_CheckParm(char *check)
 {
-	int             i;
-	char    *parm;
+	int i;
+	char *parm;
 
-	for (i = 1;i<_argc;i++)
-	{
+	for (i = 1; i < _argc; i++) {
 		parm = _argv[i];
 
-		while ( !isalpha(*parm) )       // skip - / \ etc.. in front of parm
+		while (!isalpha(*parm))       // skip - / \ etc.. in front of parm
 			if (!*parm++)
 				break;          // hit end of string without an alphanum
 
-		if ( !stricmp(check,parm) )
+		if (!stricmp(check, parm))
 			return i;
 	}
-
 	return 0;
 }
 
@@ -864,6 +635,185 @@ void InitDigiMap()
 		DigiMap[map[0]] = map[1];
 }
 
+//===========================================================================
+
+/*
+==================
+=
+= BuildTables
+=
+= Calculates:
+=
+= scale                 projection constant
+= sintable/costable     overlapping fractional tables
+=
+==================
+*/
+
+static const float radtoint = (float)FINEANGLES/2.0f/PI;
+
+void BuildTables()
+{
+  int           i;
+  float         angle,anglestep;
+  double        tang;
+  fixed         value;
+
+
+//
+// calculate fine tangents
+//
+
+	for (i=0;i<FINEANGLES/8;i++)
+	{
+		tang = tan((i+0.5)/radtoint);
+		finetangent[i] = tang*TILEGLOBAL;
+		finetangent[FINEANGLES/4-1-i] = 1/tang*TILEGLOBAL;
+	}
+
+//
+// costable overlays sintable with a quarter phase shift
+// ANGLES is assumed to be divisable by four
+//
+
+  angle = 0;
+  anglestep = PI/2/ANGLEQUAD;
+  for (i=0;i<=ANGLEQUAD;i++)
+  {
+	value=GLOBAL1*sin(angle);
+	sintable[i]=
+	  sintable[i+ANGLES]=
+	  sintable[ANGLES/2-i] = value;
+	sintable[ANGLES-i]=
+	  sintable[ANGLES/2+i] = -value;
+	angle += anglestep;
+  }
+
+}
+
+/*
+====================
+=
+= CalcProjection
+=
+====================
+*/
+
+void CalcProjection(long focal)
+{
+	int     i;
+	long    intang;
+	float   angle;
+	double  tang;
+	int     halfview;
+	double  facedist;
+
+	focallength = focal;
+	facedist = focal+MINDIST;
+	halfview = viewwidth/2;               // half view in pixels
+
+//
+// calculate scale value for vertical height calculations
+// and sprite x calculations
+//
+	scale = halfview*facedist/(VIEWGLOBAL/2);
+
+//
+// divide heightnumerator by a posts distance to get the posts height for
+// the heightbuffer.  The pixel height is height>>2
+//
+	heightnumerator = (TILEGLOBAL*scale)>>6;
+
+//
+// calculate the angle offset from view angle of each pixel's ray
+//
+
+	for (i=0;i<halfview;i++)
+	{
+	// start 1/2 pixel over, so viewangle bisects two middle pixels
+		tang = (long)i*VIEWGLOBAL/viewwidth/facedist;
+		angle = atan(tang);
+		intang = angle*radtoint;
+		pixelangle[halfview-1-i] = intang;
+		pixelangle[halfview+i] = -intang;
+	}
+}
+
+/*
+===================
+=
+= SetupWalls
+=
+= Map tile values to scaled pics
+=
+===================
+*/
+
+void SetupWalls()
+{
+	int i;
+
+	for (i=1;i<MAXWALLTILES;i++)
+	{
+		horizwall[i]=(i-1)*2;
+		vertwall[i]=(i-1)*2+1;
+	}
+}
+
+void ShowViewSize(int width)
+{
+	int oldwidth,oldheight;
+
+	oldwidth = viewwidthwin;
+	oldheight = viewheightwin;
+
+	viewwidthwin = width*16;
+	viewheightwin = width*16*HEIGHTRATIO;
+	DrawPlayBorder();
+
+	viewheightwin = oldheight;
+	viewwidthwin = oldwidth;
+}
+
+void NewViewSize(int width)
+{
+	if (width > 20)
+		width = 20;
+	if (width < 4)
+		width = 4;	
+	
+	width *= vwidth / 320;
+	
+	if ((width*16) > vwidth)
+		width = vwidth / 16;
+	
+	if ((width*16*HEIGHTRATIO) > (vheight - 40*vheight/200))
+		width = (vheight - 40*vheight/200)/8;
+	
+	viewwidthwin = width*16*320/vwidth;
+	viewheightwin = width*16*HEIGHTRATIO*320/vwidth;
+	viewsize = width*320/vwidth;
+	
+	viewwidth = width*16;
+	viewheight = width*16*HEIGHTRATIO;
+	
+	centerx = viewwidth/2-1;
+	shootdelta = viewwidth/10;
+	
+	yoffset = (vheight-STATUSLINES*vheight/200-viewheight)/2;
+	xoffset = (vwidth-viewwidth)/2;
+	
+//
+// calculate trace angles and projection constants
+//
+	CalcProjection(FOCALLENGTH);
+
+}
+
+//===========================================================================
+
+#ifndef SPEARDEMO
+
 #ifndef SPEAR
 CP_iteminfo MusicItems={CTL_X,CTL_Y,6,0,32};
 CP_itemtype MusicMenu[]=
@@ -905,7 +855,6 @@ CP_itemtype MusicMenu[]=
 };
 #endif
 
-#ifndef SPEARDEMO
 static int songs[]=
 {
 #ifndef SPEAR
@@ -1017,6 +966,85 @@ void DoJukebox()
 }
 #endif
 
+/* ======================================================================== */
+
+/*
+==========================
+=
+= SignonScreen
+=
+==========================
+*/
+
+void SignonScreen()
+{
+	VL_SetPalette(gamepal);
+	VL_MemToScreen(introscn, 320, 200, 0, 0);
+	VW_UpdateScreen();
+}
+
+
+/*
+==========================
+=
+= FinishSignon
+=
+==========================
+*/
+
+void FinishSignon()
+{
+#ifndef SPEAR
+	VW_Bar(0, 189, 300, 11, introscn[0]);
+	WindowX = 0;
+	WindowW = 320;
+	PrintY = 190;
+
+	SETFONTCOLOR(14,4);
+
+	US_CPrint("Press a key");
+	VW_UpdateScreen();
+	
+	if (!NoWait)
+		IN_Ack ();
+
+	VW_Bar(0, 189, 300, 11, introscn[0]);
+
+	PrintY = 190;
+	SETFONTCOLOR(10,4);
+
+	US_CPrint("Working...");
+	VW_UpdateScreen();
+	
+	SETFONTCOLOR(0,15);
+#else
+	if (!NoWait)
+		VW_WaitVBL(3*70);
+#endif
+}
+
+/* ======================================================================== */
+
+/*
+==========================
+=
+= ShutdownId
+=
+= Shuts down all ID_?? managers
+=
+==========================
+*/
+
+void ShutdownId()
+{
+	US_Shutdown();
+	SD_Shutdown();
+	IN_Shutdown();
+	VW_Shutdown();
+	CA_Shutdown();
+	PM_Shutdown();
+	MM_Shutdown();
+}
 
 /*
 ==========================
@@ -1083,64 +1111,6 @@ void InitGame()
 
 //	FinishSignon();
 }
-
-//===========================================================================
-
-/*
-==========================
-=
-= SetViewSize
-=
-==========================
-*/
-
-boolean SetViewSize(unsigned width, unsigned height)
-{
-	viewwidth = width&~15;                  // must be divisable by 16
-	viewheight = height&~1;                 // must be even
-	centerx = viewwidth/2-1;
-	shootdelta = viewwidth/10;
-	
-	yoffset = (200-STATUSLINES-viewheight)/2;
-	xoffset = (320-viewwidth)/2;
-	
-//
-// calculate trace angles and projection constants
-//
-	CalcProjection(FOCALLENGTH);
-
-	return true;
-}
-
-
-void ShowViewSize(int width)
-{
-	int oldwidth,oldheight;
-
-	oldwidth = viewwidth;
-	oldheight = viewheight;
-
-	viewwidth = width*16;
-	viewheight = width*16*HEIGHTRATIO;
-	DrawPlayBorder();
-
-	viewheight = oldheight;
-	viewwidth = oldwidth;
-}
-
-
-void NewViewSize(int width)
-{
-	CA_UpLevel();
-	MM_SortMem();
-	viewsize = width;
-	SetViewSize(width*16,width*16*HEIGHTRATIO);
-	CA_DownLevel();
-}
-
-
-
-//===========================================================================
 
 /*
 =====================

@@ -84,46 +84,6 @@ void VL_Shutdown()
 /*
 =================
 =
-= VL_ClearVideo
-=
-= Fill the entire video buffer with a given color
-=
-=================
-*/
-
-void VL_ClearVideo(byte color)
-{
-	memset(gfxbuf, color, 64000);
-}
-
-/*
-=============================================================================
-
-						PALETTE OPS
-
-		To avoid snow, do a WaitVBL BEFORE calling these
-
-=============================================================================
-*/
-
-
-/*
-=================
-=
-= VL_FillPalette
-=
-=================
-*/
-
-void VL_FillPalette(int red, int green, int blue)
-{
-}
-
-//===========================================================================
-
-/*
-=================
-=
 = VL_SetPalette
 =
 =================
@@ -132,8 +92,6 @@ void VL_FillPalette(int red, int green, int blue)
 void VL_SetPalette(const byte *palette)
 {
 }
-
-//===========================================================================
 
 /*
 =================
@@ -145,102 +103,6 @@ void VL_SetPalette(const byte *palette)
 
 void VL_GetPalette(byte *palette)
 {
-}
-
-/*
-=============================================================================
-
-							PIXEL OPS
-
-=============================================================================
-*/
-
-/*
-=================
-=
-= VL_Plot
-=
-=================
-*/
-
-void VL_Plot(int x, int y, int color)
-{
-	*(gfxbuf + 320 * y + x) = color;
-}
-
-/*
-=================
-=
-= VL_Hlin
-=
-=================
-*/
-
-void VL_Hlin(unsigned x, unsigned y, unsigned width, unsigned color)
-{
-	memset(gfxbuf + 320 * y + x, color, width);
-}
-
-/*
-=================
-=
-= VL_Vlin
-=
-=================
-*/
-
-void VL_Vlin (int x, int y, int height, int color)
-{
-	byte *ptr = gfxbuf + 320 * y + x;
-	while (height--) {
-		*ptr = color;
-		ptr += 320;
-	}
-}
-
-/*
-=================
-=
-= VL_Bar
-=
-=================
-*/
-
-void VL_Bar(int x, int y, int width, int height, int color)
-{
-	byte *ptr = gfxbuf + 320 * y + x;
-	while (height--) {
-		memset(ptr, color, width);
-		ptr += 320;
-	}
-}
-
-/*
-============================================================================
-
-							MEMORY OPS
-
-============================================================================
-*/
-
-/*
-=================
-=
-= VL_MemToScreen
-=
-= Draws a block of data to the screen.
-=
-=================
-*/
-
-void VL_MemToScreen(const byte *source, int width, int height, int x, int y)
-{
-	byte *ptr = gfxbuf + 320 * y + x;
-	while(height--) {
-		memcpy(ptr, source, width);
-		source += width;
-		ptr += 320;
-	}
 }
 
 void VL_DirectPlot(int x1, int y1, int x2, int y2)

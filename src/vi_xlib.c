@@ -12,8 +12,6 @@
 #include <X11/keysymdef.h>
 #include <X11/Xatom.h>
 #include <X11/extensions/XShm.h>
-#include <X11/extensions/xf86vmode.h>
-#include <X11/extensions/xf86dga.h>
 
 byte *gfxbuf = NULL;
 byte *disbuf = NULL;
@@ -28,16 +26,10 @@ Colormap cmap;
 Atom wmDeleteWindow;
 
 XShmSegmentInfo shminfo;
-XF86VidModeModeInfo vidmode;
-XF86VidModeModeInfo **vmmi;
 XColor clr[256];
 
 int indexmode;
 int shmmode;
-int fullscreen;
-int dga;
-byte *dgabuf;
-int dgawidth, dgabank, dgamem, vwidth, vheight;
 
 static byte cpal[768];
 static word spal[768];
@@ -177,7 +169,7 @@ void VL_Startup()
 	char data[8] = { 0x01 };
 	
 	char *disp;
-	int attrmask, eventn, errorn, i, vmc;
+	int attrmask;
 	
 	disp = getenv("DISPLAY");
 	
@@ -198,11 +190,6 @@ void VL_Startup()
 	attr.event_mask = KeyPressMask | KeyReleaseMask | ExposureMask 
 		| FocusChangeMask | StructureNotifyMask;
 	attrmask = CWColormap | CWEventMask;
-	
-	if (fullscreen || dga) {
-		attrmask |= CWOverrideRedirect;
-		attr.override_redirect = True;	
-	}
 	
 	win = XCreateWindow(dpy, root, 0, 0, 320, 200, 0, CopyFromParent, 
 			    InputOutput, vi->visual, attrmask, &attr);
@@ -236,11 +223,9 @@ void VL_Startup()
 	cursor = XCreatePixmapCursor(dpy, bitmap, bitmap, &fg, &bg, 0, 0);
 	XDefineCursor(dpy, win, cursor);
 	
-	fullscreen = 0;
-	dga = 0;	
 	shmmode = 0;
 	
-	if (!MS_CheckParm("noshm") && !dga && (XShmQueryExtension(dpy) == True)) {
+	if (!MS_CheckParm("noshm") && (XShmQueryExtension(dpy) == True)) {
 		img = XShmCreateImage(dpy, vi->visual, vi->depth, ZPixmap, 
 				      NULL, &shminfo, 320, 200);
 
@@ -252,7 +237,7 @@ void VL_Startup()
 		if (indexmode)
 			gfxbuf = disbuf;
 		else
-			gfxbuf = malloc(320 * 200 * 1);
+			gfxbuf = malloc(vwidth * vheight * 1);
 			
 		if (XShmAttach(dpy, &shminfo) == True) {
 			printf("Using XShm Extension...\n");
@@ -264,7 +249,7 @@ void VL_Startup()
 		}
 	}
 				
-	if (!dga && (img == NULL)) {
+	if (img == NULL) {
 		XImage *imgtmp;
 		char *gb;
 		
@@ -276,14 +261,14 @@ void VL_Startup()
 				gfxbuf, 16, 1, 8, 16*4);
 		
 		if (gfxbuf == NULL) 
-			gfxbuf = malloc(320 * 200 * 1);
+			gfxbuf = malloc(vwidth * vheight * 1);
 		if (indexmode) 
 			disbuf = gfxbuf;
 		else 
-			disbuf = malloc(320 * 200 * (imgtmp->bits_per_pixel / 8));
+			disbuf = malloc(vwidth * vheight * (imgtmp->bits_per_pixel / 8));
 		
 		img = XCreateImage(dpy, vi->visual, vi->depth, ZPixmap, 0,
-			(char *)disbuf, 320, 200, 8, 320 * (imgtmp->bits_per_pixel / 8));
+			(char *)disbuf, vwidth, vheight, 8, 0 * (imgtmp->bits_per_pixel / 8));
 	
 		if (img == NULL) {
 			Quit("XCreateImage returned NULL");
@@ -299,101 +284,8 @@ void VL_Startup()
 	XMapRaised(dpy, win);
 }
 
-#if 0
-
-	
-	fullscreen = 0;
-	if (MS_CheckParm("fullscreen") && XF86VidModeQueryExtension(dpy, &eventn, &errorn)) {
-				
-		XF86VidModeGetAllModeLines(dpy, screen, &vmc, (XF86VidModeModeInfo ***)&vmmi);
-		
-		printf("VidMode: eventn = %d, error = %d, vmc = %d\n", eventn, errorn, vmc);
-		
-		for (i = 0; i < vmc; i++) {
-			if ( (vmmi[i]->hdisplay == 320) && (vmmi[i]->vdisplay == 200) ) {
-				//XF86VidModeGetModeLine(dpy, screen, &errorn, (XF86VidModeModeLine *)&vidmode); /* TODO: 3rd parm? */
-				//memcpy(&vidmode, vmmi[0], sizeof(XF86VidModeModeInfo)); /* TODO: bah, why doesn't above work? */
-				//printf("%d, %d, %d\n", vidmode.hdisplay, vidmode.vdisplay, errorn);
-				if (XF86VidModeSwitchToMode(dpy, screen, vmmi[i]) == True)  {
-					XF86VidModeLockModeSwitch(dpy, screen, True);
-					printf("Using VidMode!\n");
-					fullscreen = 1;
-					break;
-				}
-			}
-		}
-		
-		dga = 0;
-		if (fullscreen && MS_CheckParm("dga") && XF86DGAQueryExtension(dpy, &eventn, &errorn)) {
-			if (geteuid()) {
-				fprintf(stderr, "must be root to use dga\n");
-			} else {
-				printf("DGA %d %d\n", eventn, errorn);
-				XF86DGAQueryVersion(dpy, &eventn, &errorn);
-				printf("DGA Version %d.%d\n", eventn, errorn);
-				
-				XF86DGAQueryDirectVideo(dpy, screen, &i);
-			
-				if (i & XF86DGADirectPresent) {
-					XF86DGAGetVideo(dpy, screen, (char **)&dgabuf, &dgawidth, &dgabank, &dgamem);
-					printf("addr = %p, width = %d, bank = %d, mem = %d\n", dgabuf, dgawidth, dgabank, dgamem);
-					gfxbuf = disbuf = dgabuf;
-					XF86DGAGetViewPortSize(dpy, screen, &vwidth, &vheight);
-					printf("width = %d, height = %d\n", vwidth, vheight);
-
-					gfxbuf = (byte *)malloc(320 * 200);
-					if (!indexmode)
-						disbuf = (byte *)malloc(320 * 4);
-					dga = 1;
-				}
-			}		
-		}		
-	}
-	XSetWindowColormap(dpy, win, cmap);
-
-	if (fullscreen || dga) {
-		XMapWindow(dpy, win);
-		XRaiseWindow(dpy, win);
-		//XGrabKeyboard(dpy, win, True, GrabModeAsync, GrabModeAsync, CurrentTime);
-	}				   
-	//XMapWindow(dpy, win);
-
-	if (fullscreen) {
-		//XMoveWindow(dpy, win, 0, 0);
-		XRaiseWindow(dpy, win);
-		XWarpPointer(dpy, None, win, 0, 0, 0, 0, 0, 0);
-		//XF86VidModeSetViewPort(dpy, screen, 0, 0);
-		//XSetInputFocus(dpy, win, RevertToNone, CurrentTime);
-	}
-
-	if (dga) {
-		XF86DGADirectVideo(dpy, screen, XF86DGADirectGraphics | XF86DGADirectKeyb);
-		XF86DGASetViewPort(dpy, screen, 0, 0);
-	}
-	
-	printf("Mode: %s %s %s %s\n", fullscreen ? "Fullscreen" : "Windowed", dga ? "DGA" : "Standard", shmmode ? "Shm" : "NoShm", indexmode ? "Palette" : "TrueColor");
-	
-	
-	XFlush(dpy);
-#endif
-
 void VL_Shutdown()
 {
-	if (fullscreen) {
-		XF86VidModeLockModeSwitch(dpy, screen, False);
-		//printf("%d, %d\n", vidmode.hdisplay, vidmode.vdisplay);
-		//XF86VidModeSwitchToMode(dpy, screen, &vidmode);
-		XF86VidModeSwitchToMode(dpy, screen, vmmi[0]);
-	}
-	
-	if (dga) {
-		XF86DGADirectVideo(dpy, screen, 0);
-		XUngrabKeyboard(dpy, CurrentTime);
-		free(gfxbuf);
-		free(disbuf);
-		gfxbuf = disbuf = NULL;
-	}
-
 	if ( !shmmode && (gfxbuf != NULL) ) {
 		free(gfxbuf);
 		gfxbuf = NULL;
@@ -424,70 +316,19 @@ void VL_WaitVBL(int vbls)
 
 void VW_UpdateScreen()
 {
+	dword *ptri;
 	word *ptrs;
-	byte *ptrb, *ptrbd;
+	byte *ptrb;
 	
 	int i;
 
-	if (dga) {
-		switch(vi->depth) {
-			case 8:
-				ptrb = dgabuf;
-			 	ptrbd = gfxbuf;
-				for(i = 0; i < 200; i++) {
-					memcpy(ptrb, ptrbd, 320);
-					ptrb += dgawidth;
-					ptrbd += 320;
-				}
-				return;
-			#if 0 
-			case 15:
-				ptrs = (word *)disbuf;
-				for (i = 0; i < 64000; i++) {
-					*ptrs = (cpal[gfxbuf[i]*3+0] >> 1) << 10 |
-						(cpal[gfxbuf[i]*3+1] >> 1) << 5  |
-						(cpal[gfxbuf[i]*3+2] >> 1);
-					ptrs++;
-				}
-				break;
-			case 16:
-				ptrs = (word *)disbuf;
-				for (i = 0; i < 64000; i++) {
-					*ptrs = (cpal[gfxbuf[i]*3+0] >> 1) << 11 |
-						(cpal[gfxbuf[i]*3+1] >> 0) << 5  |
-						(cpal[gfxbuf[i]*3+2] >> 1);
-					ptrs++;
-				}
-				break;
-			case 24: /* not correct size */
-				ptrb = disbuf;
-				for (i = 0; i < 64000; i++) {
-					*ptrb = cpal[gfxbuf[i]*3+2] << 2; ptrb++;
-					*ptrb = cpal[gfxbuf[i]*3+1] << 2; ptrb++;
-					*ptrb = cpal[gfxbuf[i]*3+0] << 2; ptrb++;
-					ptrb++;
-				}
-				break;
-			#endif
-		} 	
-	}
 	if (indexmode == 0) {
 		switch(MyDepth) {
 		case 15:
-			ptrs = (word *)disbuf;
-			for (i = 0; i < 64000; i++) {
-				*ptrs = (cpal[gfxbuf[i]*3+0] >> 1) << 10 |
-					(cpal[gfxbuf[i]*3+1] >> 1) << 5  |
-					(cpal[gfxbuf[i]*3+2] >> 1);
-				ptrs++;
-			}
-			break;
 		case 16:
 			ptrs = (word *)disbuf;
 			for (i = 0; i < 64000; i++) {
-				*ptrs = (cpal[gfxbuf[i]*3+0] >> 1) << 11 |
-					(cpal[gfxbuf[i]*3+1] >> 0) << 5  |
-					(cpal[gfxbuf[i]*3+2] >> 1);
+				*ptrs = spal[gfxbuf[i]];
 				ptrs++;
 			}
 			break;
@@ -500,14 +341,11 @@ void VW_UpdateScreen()
 			}
 			break;
 		case 32:
-			ptrb = disbuf;
+			ptri = (dword *)disbuf;
 			for (i = 0; i < 64000; i++) {
-				*ptrb = cpal[gfxbuf[i]*3+2] << 2; ptrb++;
-				*ptrb = cpal[gfxbuf[i]*3+1] << 2; ptrb++;
-				*ptrb = cpal[gfxbuf[i]*3+0] << 2; ptrb++;
-				ptrb++;
+				*ptri = ipal[gfxbuf[i]];
+				ptri++;
 			}
-			break;
 		}
 	}
 
@@ -559,36 +397,6 @@ static void HandleXEvents()
 /*
 =================
 =
-= VL_FillPalette
-=
-=================
-*/
-
-void VL_FillPalette(int red, int green, int blue)
-{
-	int i;
-	
-	if (indexmode) {
-		for (i = 0; i < 256; i++) {
-			clr[i].red = red << 10;
-			clr[i].green = green << 10;
-			clr[i].blue = blue << 10;
-		}
-	
-		XStoreColors(dpy, cmap, clr, 256);	
-		if (dga) XF86DGAInstallColormap(dpy, screen, cmap); 
-	} else {
-		for (i = 0; i < 256; i++) {
-			cpal[i*3+0] = red;
-			cpal[i*3+1] = green;
-			cpal[i*3+2] = blue;
-		}
-	}
-}
-
-/*
-=================
-=
 = VL_SetPalette
 =
 =================
@@ -605,9 +413,23 @@ void VL_SetPalette(const byte *palette)
 			clr[i].blue = palette[i*3+2] << 10;
 		}
 		XStoreColors(dpy, cmap, clr, 256);
-		if (dga) XF86DGAInstallColormap(dpy, screen, cmap);
 	} else {
 		memcpy(cpal, palette, 768);
+		for (i = 0; i < 256; i++) {
+			switch(MyDepth) {
+				case 8:
+					break;
+				case 15:
+					spal[i] = ((palette[i*3+0] >> 1) << 10) | ((palette[i*3+1] >> 1) << 5) | ((palette[i*3+2] >> 1) << 0);
+					break;
+				case 16:
+					spal[i] = ((palette[i*3+0] >> 1) << 11) | ((palette[i*3+1] >> 0) << 5) | ((palette[i*3+2] >> 1) << 0);
+					break;
+				case 32:
+					ipal[i] = (palette[i*3+0] << 18) | (palette[i*3+1] << 10) | (palette[i*3+2] << 2);
+					break;
+			}
+		}
 		VW_UpdateScreen();
 	}		
 }
@@ -637,6 +459,9 @@ void VL_GetPalette(byte *palette)
 
 int main(int argc, char *argv[])
 {
+	vwidth = 320;
+	vheight = 200;
+	
 	return WolfMain(argc, argv);
 }
 
@@ -680,127 +505,8 @@ void Quit(char *error)
 	exit(EXIT_SUCCESS);
 }
 
-/*
-=============================================================================
-
-							PIXEL OPS
-
-=============================================================================
-*/
-
-/*
-=================
-=
-= VL_ClearVideo
-=
-= Fill the entire video buffer with a given color
-=
-=================
-*/
-
-void VL_ClearVideo(byte color)
-{
-	memset(gfxbuf, color, 64000);
-}
-
-/*
-=================
-=
-= VL_Plot
-=
-=================
-*/
-
-void VL_Plot(int x, int y, int color)
-{
-	*(gfxbuf + 320 * y + x) = color;
-}
-
-/*
-=================
-=
-= VL_Hlin
-=
-=================
-*/
-
-void VL_Hlin(unsigned x, unsigned y, unsigned width, unsigned color)
-{
-	memset(gfxbuf + 320 * y + x, color, width);
-}
-
-/*
-=================
-=
-= VL_Vlin
-=
-=================
-*/
-
-void VL_Vlin (int x, int y, int height, int color)
-{
-	byte *ptr = gfxbuf + 320 * y + x;
-	while (height--) {
-		*ptr = color;
-		ptr += 320;
-	}
-}
-
-/*
-=================
-=
-= VL_Bar
-=
-=================
-*/
-
-void VL_Bar(int x, int y, int width, int height, int color)
-{
-	byte *ptr = gfxbuf + 320 * y + x;
-	while (height--) {
-		memset(ptr, color, width);
-		ptr += 320;
-	}
-}
-
-/*
-============================================================================
-
-							MEMORY OPS
-
-============================================================================
-*/
-
-/*
-=================
-=
-= VL_MemToScreen
-=
-= Draws a block of data to the screen.
-=
-=================
-*/
-
-void VL_MemToScreen(const byte *source, int width, int height, int x, int y)
-{
-	byte *ptr = gfxbuf + 320 * y + x;
-	while(height--) {
-		memcpy(ptr, source, width);
-		source += width;
-		ptr += 320;
-	}
-}
-
 void VL_DirectPlot(int x1, int y1, int x2, int y2)
 {
-	if (dga) {
-		switch(vi->depth) {
-			case 8:
-				*(dgabuf + x2 + y2 * dgawidth) = *(gfxbuf + x1 + y1 * 320);
-				return;
-		}
-		return;
-	}
 	if (indexmode) {
 		XSetForeground(dpy, gc, *(gfxbuf + x1 + y1 * 320));
 		XDrawPoint(dpy, win, gc, x2, y2);

@@ -1,6 +1,4 @@
-#include "id_heads.h"
-
-/* ======================================================================== */
+#include "wl_def.h"
 
 pictabletype *pictable;
 
@@ -13,68 +11,6 @@ boolean	screenfaded;
 static byte palette1[256][3], palette2[256][3];
 
 /* ======================================================================== */
-
-void VW_DrawPropString(char *string)
-{
-	fontstruct *font;
-	int width, step, height;
-	byte *source, *dest, *ptrs, *ptrd;
-	byte ch;
-
-	font = (fontstruct *)grsegs[STARTFONT+fontnumber];
-	height = font->height;
-	dest = gfxbuf + py * 320 + px;
-
-	while ((ch = *string++) != 0) {
-		width = step = font->width[ch];
-		source = ((byte *)font)+font->location[ch];
-		while (width--) {
-			height = font->height;
-			ptrs = source;
-			ptrd = dest;
-			while (height--) {
-				if (*ptrs)
-					*ptrd = fontcolor;
-				ptrs += step;
-				ptrd += 320;
-			}
-			source++;
-			dest++;
-		}
-	}
-}
-
-void VWL_MeasureString(char *string, word *width, word *height, 
-	fontstruct *font)
-{
-	/* proportional width */
-	*height = font->height;
-	for (*width = 0;*string;string++)
-		*width += font->width[*((byte *)string)]; 
-}
-
-void VW_MeasurePropString (char *string, word *width, word *height)
-{
-	VWL_MeasureString(string,width,height,(fontstruct *)grsegs[STARTFONT+fontnumber]);
-}
-
-void VWB_DrawTile8(int x, int y, int tile)
-{
-	VL_MemToScreen(grsegs[STARTTILE8]+(tile*64), 8, 8, x, y);
-}
-
-void VWB_DrawPic(int x, int y, int chunknum)
-{
-	int picnum = chunknum - STARTPICS;
-	unsigned width,height;
-
-	x &= ~7;
-
-	width = pictable[picnum].width;
-	height = pictable[picnum].height;
-
-	VL_MemToScreen(grsegs[chunknum],width,height,x,y);
-}
 
 /*
 ===================
@@ -108,7 +44,7 @@ void LoadLatchMem()
 ===================
 */
 
-boolean FizzleFade(unsigned xx, unsigned yy, unsigned width,unsigned height, unsigned frames, boolean abortable)
+boolean FizzleFade(unsigned xx, unsigned yy, unsigned width, unsigned height, unsigned frames, boolean abortable)
 {
 	int pixperframe;
 	unsigned x, y, p, frame;
@@ -117,13 +53,13 @@ boolean FizzleFade(unsigned xx, unsigned yy, unsigned width,unsigned height, uns
 	rndval = 1;
 	pixperframe = 64000/frames;
 	
-	IN_StartAck ();
+	IN_StartAck();
 
-	frame=0;
+	frame = 0;
 	set_TimeCount(0);
 	
 	do {
-		if (abortable && IN_CheckAck ())
+		if (abortable && IN_CheckAck())
 			return true;
 		for (p = 0; p < pixperframe; p++) {
 			y = (rndval & 0x00FF) - 1;
@@ -135,7 +71,7 @@ boolean FizzleFade(unsigned xx, unsigned yy, unsigned width,unsigned height, uns
 			} else
 				rndval >>= 1;
 				
-			if ((x>width) || (y>height))
+			if ((x > width) || (y > height))
 				continue;
 
 			VL_DirectPlot(xx+x, yy+y, xx+x, yy+y);
@@ -145,8 +81,21 @@ boolean FizzleFade(unsigned xx, unsigned yy, unsigned width,unsigned height, uns
 
 		}
 		frame++;
-		while (get_TimeCount() < frame)	;
+		while (get_TimeCount() < frame);
 	} while (1);
+}
+
+void VL_FillPalette(int red, int green, int blue)
+{
+	char pal[768];
+	int i;
+	
+	for (i = 0; i < 256; i++) {
+		pal[i*3+0] = red;
+		pal[i*3+1] = green;
+		pal[i*3+2] = blue;
+	}
+	VL_SetPalette(pal);
 }
 
 /*
@@ -199,7 +148,6 @@ void VL_FadeOut(int start, int end, int red, int green, int blue, int steps)
 	screenfaded = true;
 }
 
-
 /*
 =================
 =
@@ -212,7 +160,7 @@ void VL_FadeIn(int start, int end, const byte *palette, int steps)
 {
 	int		i,j,delta;
 
-	VL_GetPalette (&palette1[0][0]);
+	VL_GetPalette(&palette1[0][0]);
 	memcpy(&palette2[0][0],&palette1[0][0],sizeof(palette1));
 
 	start *= 3;
@@ -271,4 +219,237 @@ void VL_DeModeXize(byte *buf, int width, int height)
 
 	memcpy(buf, mem, width * height);
 	free(mem);
+}
+
+/*
+=================
+=
+= VL_Plot
+=
+=================
+*/
+
+static void VL_Plot(int x, int y, int color)
+{
+	int xend, yend, xfrac, yfrac, xs, ys;
+	
+	xend = x + 1;
+	yend = y + 1;
+
+	xfrac = (vwidth << 16) / 320;
+	yfrac = (vheight << 16) / 200;
+	
+	x *= xfrac;
+	y *= yfrac;
+	xend *= xfrac;
+	yend *= yfrac;
+	xfrac = (320 << 16) / vwidth;
+	yfrac = (200 << 16) / vheight;
+
+	for (xs = x; xs < xend; xs += xfrac)
+		for (ys = y; ys < yend; ys += yfrac)
+			*(gfxbuf + (ys >> 16) * vwidth + (xs >> 16)) = color;
+/*	
+	*(gfxbuf + vwidth * y + x) = color;
+*/
+}
+
+void VW_Plot(int x, int y, int color)
+{
+	*(gfxbuf + vwidth * y + x) = color;
+}
+
+void VW_DrawPropString(char *string)
+{
+	fontstruct *font;
+	int width, step, height, x, xs, y;
+	byte *source, *ptrs;
+	/* byte *dest, *ptrd; */
+	byte ch;
+
+	font = (fontstruct *)grsegs[STARTFONT+fontnumber];
+	height = font->height;
+
+	xs = 0;
+	
+	while ((ch = *string++) != 0) {
+		width = step = font->width[ch];
+		source = ((byte *)font)+font->location[ch];
+		for (x = 0; x < width; x++) {
+			height = font->height;
+			ptrs = source;
+			for (y = 0; y < height; y++) {
+				if (*ptrs)
+					VL_Plot(px+xs, py+y, fontcolor);
+				ptrs += step;
+			}
+			xs++;
+			source++;
+		}
+	}
+/*
+	dest = gfxbuf + py * vwidth + px;
+
+	while ((ch = *string++) != 0) {
+		width = step = font->width[ch];
+		source = ((byte *)font)+font->location[ch];
+		while (width--) {
+			height = font->height;
+			ptrs = source;
+			ptrd = dest;
+			while (height--) {
+				if (*ptrs)
+					*ptrd = fontcolor;
+				ptrs += step;
+				ptrd += vwidth;
+			}
+			source++;
+			dest++;
+		}
+	}
+*/
+}
+
+void VWL_MeasureString(char *string, word *width, word *height, 
+	fontstruct *font)
+{
+	/* proportional width */
+	*height = font->height;
+	for (*width = 0;*string;string++)
+		*width += font->width[*((byte *)string)]; 
+}
+
+void VW_MeasurePropString (char *string, word *width, word *height)
+{
+	VWL_MeasureString(string,width,height,(fontstruct *)grsegs[STARTFONT+fontnumber]);
+}
+
+void VWB_DrawTile8(int x, int y, int tile)
+{
+	VL_MemToScreen(grsegs[STARTTILE8]+(tile*64), 8, 8, x, y);
+}
+
+void VWB_DrawPic(int x, int y, int chunknum)
+{
+	int picnum = chunknum - STARTPICS;
+	unsigned width,height;
+
+	x &= ~7;
+
+	width = pictable[picnum].width;
+	height = pictable[picnum].height;
+
+	VL_MemToScreen(grsegs[chunknum],width,height,x,y);
+}
+
+/*
+=================
+=
+= VL_Hlin
+=
+=================
+*/
+
+void VL_Hlin(unsigned x, unsigned y, unsigned width, unsigned color)
+{
+	int w;
+	
+	for (w = 0; w < width; w++)
+		VL_Plot(x+w, y, color);
+		
+/*	
+	memset(gfxbuf + vwidth * y + x, color, width);
+*/
+}
+
+/*
+=================
+=
+= VL_Vlin
+=
+=================
+*/
+
+void VL_Vlin(int x, int y, int height, int color)
+{
+	int h;
+	
+	for (h = 0; h < height; h++)
+		VL_Plot(x, y+h, color);
+/*
+	byte *ptr = gfxbuf + vwidth * y + x;
+	while (height--) {
+		*ptr = color;
+		ptr += vwidth;
+	}
+*/
+}
+
+/*
+=================
+=
+= VL_Bar
+=
+=================
+*/
+
+void VW_Bar(int x, int y, int width, int height, int color)
+{
+	int w, h;
+	
+	for (w = 0; w < width; w++)
+		for (h = 0; h < height; h++)
+			VL_Plot(x+w, y+h, color);
+	
+/*	
+	byte *ptr;
+	width *= vwidth / 320;
+	height *= vheight / 200;
+	
+	x *= vwidth / 320;
+	y *= vheight / 200;
+	
+	ptr = gfxbuf + vwidth * y + x;
+	
+	while (height--) {
+		memset(ptr, color, width);
+		ptr += vwidth;
+	}
+*/	
+}
+
+void VL_Bar(int x, int y, int width, int height, int color)
+{
+	byte *ptr = gfxbuf + vwidth * y + x;
+	while (height--) {
+		memset(ptr, color, width);
+		ptr += vwidth;
+	}
+}
+
+/*
+=================
+=
+= VL_MemToScreen
+=
+= Draws a block of data to the screen.
+=
+=================
+*/
+
+void VL_MemToScreen(const byte *source, int width, int height, int x, int y)
+{
+	int w, h;
+	
+	for (w = 0; w < width; w++)
+		for (h = 0; h < height; h++)
+			VL_Plot(x+w, y+h, source[h*width+w]);
+/*
+	byte *ptr = gfxbuf + vwidth * y + x;
+	while(height--) {
+		memcpy(ptr, source, width);
+		source += width;
+		ptr += vwidth;
+	}
+*/
 }

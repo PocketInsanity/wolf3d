@@ -6,6 +6,8 @@
 #include "wl_menu.h"
 #include "foreign.h"
 
+extern int vwidth, vheight; /* size of screen */
+
 /*
 =============================================================================
 
@@ -55,9 +57,7 @@
 
 #define MINDIST		(0x5800l)
 
-#define	MAXSCALEHEIGHT	512 /* largest scale on largest view */
-
-#define MAXVIEWWIDTH		320
+#define MAXVIEWWIDTH		1280
 
 #define MAPSIZE		64					// maps are 64*64 max
 
@@ -676,14 +676,16 @@ extern	char str[80], str2[20];
 
 extern	fixed		focallength;
 extern	unsigned	viewangles;
-extern	int		    viewwidth;
-extern	int viewheight;
+
+extern int viewwidth, viewheight;
+extern int viewwidthwin, viewheightwin;
+extern int xoffset, yoffset;
+
 extern	int			centerx;
 extern	int			shootdelta;
 
 extern	boolean         startgame,loadedgame;
 extern	int		mouseadjustment;
-extern unsigned xoffset, yoffset;
 
 //
 // math tables
@@ -695,7 +697,6 @@ extern fixed sintable[], *costable;
 extern	char	configname[13];
 
 void 		CalcProjection (long focal);
-boolean		SetViewSize (unsigned width, unsigned height);
 void		NewGame (int difficulty,int episode);
 void 		NewViewSize (int width);
 boolean 	LoadTheGame(int file,int x,int y);
@@ -726,7 +727,6 @@ extern	unsigned	spearangle;
 extern	boolean		spearflag;
 
 
-void 	DrawPlayBorder (void);
 void 	ScanInfoPlane (void);
 void	SetupGameLevel (void);
 void 	DrawPlayScreen (void);
@@ -735,10 +735,10 @@ void 	GameLoop (void);
 void ClearMemory (void);
 void PlayDemo(int demonumber);
 int PlayDemoFromFile(char *demoname);
-void RecordDemo (void);
-void DrawPlayBorder (void);
-void	DrawHighScores(void);
-void DrawPlayBorderSides (void);
+void RecordDemo();
+void DrawHighScores();
+void DrawPlayBorder();
+void DrawPlayBorderSides();
 
 #define	PlaySoundLocTile(s,tx,ty)	PlaySoundLocGlobal(s,(((long)(tx) << TILESHIFT) + (1L << (TILESHIFT - 1))),(((long)ty << TILESHIFT) + (1L << (TILESHIFT - 1))))
 #define	PlaySoundLocActor(s,ob)		PlaySoundLocGlobal(s,(ob)->x,(ob)->y)
@@ -782,7 +782,7 @@ extern	int			buttonjoy[4];
 
 extern	boolean		buttonheld[NUMBUTTONS];
 
-extern	int			viewsize;
+extern	int viewsize;
 
 //
 // curent user input

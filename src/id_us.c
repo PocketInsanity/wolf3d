@@ -1,4 +1,4 @@
-#include "id_heads.h"
+#include "wl_def.h"
 
 //	Global variables
 boolean		NoWait;

@@ -38,8 +38,6 @@ int			buttonscan[NUMBUTTONS] =
 int			buttonmouse[4]={bt_attack,bt_strafe,bt_use,bt_nobutton};
 int			buttonjoy[4]={bt_attack,bt_strafe,bt_use,bt_run};
 
-int			viewsize;
-
 boolean		buttonheld[NUMBUTTONS];
 
 boolean		demorecord,demoplayback;

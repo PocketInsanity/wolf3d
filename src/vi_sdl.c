@@ -1,5 +1,3 @@
-/* id_vl.c */
-
 #include "wl_def.h"
 
 #include "SDL.h"
@@ -17,6 +15,9 @@ SDL_Surface *surface;
 
 int main (int argc, char *argv[])
 {
+	vwidth = 320;
+	vheight = 200;	
+	
 	return WolfMain(argc, argv);
 }
 
@@ -38,8 +39,6 @@ void Quit(char *error)
 	ShutdownId();
 	
 	if (screen) {
-		printf("TODO: spiffy ansi screen goes here..\n");
-		/* doesn't look too good on console at the moment ...*/
 		//DisplayTextSplash(screen);
 	}
 	
@@ -59,8 +58,8 @@ void VL_WaitVBL(int vbls)
 void VW_UpdateScreen()
 {
 	//VL_WaitVBL(1); 
-	memcpy(surface->pixels, gfxbuf, 64000);
-	SDL_UpdateRect(surface,0,0,0,0);
+	memcpy(surface->pixels, gfxbuf, vwidth*vheight);
+	SDL_UpdateRect(surface, 0, 0, 0, 0);
 }
 
 /*
@@ -74,19 +73,18 @@ void VW_UpdateScreen()
 void VL_Startup()
 {
 	if (gfxbuf == NULL) 
-		gfxbuf = malloc(320 * 200 * 1);
+		gfxbuf = malloc(vwidth * vheight * 1);
 		
-	if (SDL_Init (SDL_INIT_VIDEO) < 0) {
+	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 		Quit("Couldn't init SDL");
 	}
 
 	if (MS_CheckParm("fullscreen"))
-		surface = SDL_SetVideoMode (320,200,8, SDL_SWSURFACE|SDL_HWPALETTE| SDL_FULLSCREEN);
+		surface = SDL_SetVideoMode(vwidth, vheight, 8, SDL_SWSURFACE|SDL_HWPALETTE|SDL_FULLSCREEN);
 	else
-		surface = SDL_SetVideoMode (320,200,8, SDL_SWSURFACE|SDL_HWPALETTE);
+		surface = SDL_SetVideoMode(vwidth, vheight, 8, SDL_SWSURFACE|SDL_HWPALETTE);
 		
-	if (surface == NULL)
-	{
+	if (surface == NULL) {
 		SDL_Quit();
 		Quit ("Couldn't set 320x200 mode");
 	}
@@ -118,56 +116,6 @@ void VL_Shutdown()
 /*
 =================
 =
-= VL_ClearVideo
-=
-= Fill the entire video buffer with a given color
-=
-=================
-*/
-
-void VL_ClearVideo(byte color)
-{
-	memset(gfxbuf, color, 64000);
-}
-
-/*
-=============================================================================
-
-						PALETTE OPS
-
-		To avoid snow, do a WaitVBL BEFORE calling these
-
-=============================================================================
-*/
-
-
-/*
-=================
-=
-= VL_FillPalette
-=
-=================
-*/
-
-void VL_FillPalette(int red, int green, int blue)
-{
-	SDL_Color colors[256];
-	int i;
-	
-	for (i = 0; i < 256; i++)
-	{
-		colors[i].r = red << 2;
-		colors[i].g = green << 2;
-		colors[i].b = blue << 2;
-	}
-	SDL_SetColors (surface, colors, 0, 256);
-}
-
-//===========================================================================
-
-/*
-=================
-=
 = VL_SetPalette
 =
 =================
@@ -184,7 +132,7 @@ void VL_SetPalette(const byte *palette)
 		colors[i].g = palette[i*3+1] << 2;
 		colors[i].b = palette[i*3+2] << 2;
 	}
-	SDL_SetColors (surface, colors, 0, 256);
+	SDL_SetColors(surface, colors, 0, 256);
 }
 
 
@@ -209,105 +157,9 @@ void VL_GetPalette(byte *palette)
 	}
 }
 
-/*
-=============================================================================
-
-							PIXEL OPS
-
-=============================================================================
-*/
-
-/*
-=================
-=
-= VL_Plot
-=
-=================
-*/
-
-void VL_Plot(int x, int y, int color)
-{
-	*(gfxbuf + 320 * y + x) = color;
-}
-
-/*
-=================
-=
-= VL_Hlin
-=
-=================
-*/
-
-void VL_Hlin(unsigned x, unsigned y, unsigned width, unsigned color)
-{
-	memset(gfxbuf + 320 * y + x, color, width);
-}
-
-/*
-=================
-=
-= VL_Vlin
-=
-=================
-*/
-
-void VL_Vlin (int x, int y, int height, int color)
-{
-	byte *ptr = gfxbuf + 320 * y + x;
-	while (height--) {
-		*ptr = color;
-		ptr += 320;
-	}
-}
-
-/*
-=================
-=
-= VL_Bar
-=
-=================
-*/
-
-void VL_Bar(int x, int y, int width, int height, int color)
-{
-	byte *ptr = gfxbuf + 320 * y + x;
-	while (height--) {
-		memset(ptr, color, width);
-		ptr += 320;
-	}
-}
-
-/*
-============================================================================
-
-							MEMORY OPS
-
-============================================================================
-*/
-
-/*
-=================
-=
-= VL_MemToScreen
-=
-= Draws a block of data to the screen.
-=
-=================
-*/
-
-void VL_MemToScreen(const byte *source, int width, int height, int x, int y)
-{
-	byte *ptr = gfxbuf + 320 * y + x;
-	while(height--) {
-		memcpy(ptr, source, width);
-		source += width;
-		ptr += 320;
-	}
-}
-
 void VL_DirectPlot(int x1, int y1, int x2, int y2)
 {
-	*(((Uint8 *)surface->pixels) + x1 + y1 * 320) = *(gfxbuf + x2 + y2 * 320);
+	*(((Uint8 *)surface->pixels) + x1 + y1 * vwidth) = *(gfxbuf + x2 + y2 * vwidth);
 	//SDL_UpdateRect(surface, x1,y1,x1,y1);
 }
 
@@ -875,7 +727,7 @@ boolean IN_UserInput(longword delay)
 ===================
 */
 
-byte IN_MouseButtons (void)
+byte IN_MouseButtons()
 {
 	return 0;
 }
@@ -888,7 +740,7 @@ byte IN_MouseButtons (void)
 ===================
 */
 
-byte IN_JoyButtons (void)
+byte IN_JoyButtons()
 {
 	return 0;
 }

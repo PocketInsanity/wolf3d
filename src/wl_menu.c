@@ -2417,24 +2417,21 @@ void DrawCustKeys(int hilight)
 // CHANGE SCREEN VIEWING SIZE
 //
 ////////////////////////////////////////////////////////////////////
-void CP_ChangeView(void)
+void CP_ChangeView()
 {
-	int exit=0,oldview,newview;
+	int exit = 0, oldview, newview;
 	ControlInfo ci;
-
 
 	WindowX=WindowY=0;
 	WindowW=320;
 	WindowH=200;
-	newview=oldview=viewwidth/16;
+	newview=oldview=viewsize;
 	DrawChangeView(oldview);
 
-	do
-	{
+	do {
 		CheckPause();
 		ReadAnyControl(&ci);
-		switch(ci.dir)
-		{
+		switch(ci.dir) {
 		case dir_South:
 		case dir_West:
 			newview--;
@@ -2464,20 +2461,16 @@ void CP_ChangeView(void)
 			PicturePause();
 
 		if (ci.button0 || IN_KeyDown(sc_Enter))
-			exit=1;
+			exit = 1;
 		else if (ci.button1 || IN_KeyDown(sc_Escape)) {
-			viewwidth=oldview*16;
 			SD_PlaySound(ESCPRESSEDSND);
 			MenuFadeOut();
 			return;
 		}
-
 	} while(!exit);
 
-
-	if (oldview!=newview)
-	{
-		SD_PlaySound (SHOOTSND);
+	if (oldview != newview) {
+		SD_PlaySound(SHOOTSND);
 		Message(STR_THINK"...");
 		NewViewSize(newview);
 	}

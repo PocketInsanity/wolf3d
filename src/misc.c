@@ -1,4 +1,4 @@
-#include "id_heads.h"
+#include "wl_def.h"
 
 #ifdef DOSISM /* TODO: bad name.. since djgpp code would use interrupt (maybe uclock?) most likely */
 

@@ -35,8 +35,6 @@ extern boolean screenfaded;
 
 #define VW_Startup		VL_Startup
 #define VW_Shutdown		VL_Shutdown
-#define VW_Bar			VL_Bar
-#define VW_Plot			VL_Plot
 #define VW_Hlin(x,z,y,c)	VL_Hlin(x,y,(z)-(x)+1,c)
 #define VW_Vlin(y,z,x,c)	VL_Vlin(x,y,(z)-(y)+1,c)
 #define VW_WaitVBL		VL_WaitVBL
@@ -54,5 +52,7 @@ void VL_FadeIn(int start, int end, const byte *palette, int steps);
 void LoadLatchMem();
 
 void VL_CacheScreen(int chunk);
+
+void VW_Bar(int x, int y, int width, int height, int color);
 
 #endif

@@ -15,56 +15,13 @@ Sound Menu:
 - 44100
 - 22050
 ------------------------------------------------------------------------------
-[Indexed?]:
-Yes:
-- palette (8bit)
-No:
-- truecolor (15, 16, 24, 32)
-
-[Shm?]:
-Yes:
-- XShmImage
-No:
-- XImage
-
-[Windowed]:
-- [Indexed?]
-- [Shm?]
-
-[DGA1?]:
-Yes:
-- YES
-No:
-- NO
-
-[DGA2?]:
-Yes:
-- YES
-No:
-- [DGA1?]
-
-[DGA?]:
-- [DGA2?]
-Yes:
-- [Indexed?]
-No:
-- [Windowed]	
-
-[Fullscreen?]:
-Yes:
-- [DGA?]
-No:
-- [Windowed]
-
-[Init]:
-- [Fullscreen?]
-
-------------------------------------------------------------------------------
 *
 SD_StartMusic((MusicGroup *)audiosegs[STARTMUSIC + chunk]);
 =>
 SD_StartMusic(chunk);
 ------------------------------------------------------------------------------
+* fix fix fix different size stuff
+* add ylookup
 * remove farmapylookup?
 * would be nice if Quit() used vsnprintf, etc
 * actor walking through door is drawn in front of door: near end of E1M1 for
