@@ -7,6 +7,10 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
+
+/* TODO: this code is seriously braindead.  Needs to be rewritten.
+   Debug adlib sound issue with intel compiler
+ */
                      
 #include "fmopl.h"
 

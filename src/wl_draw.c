@@ -29,17 +29,6 @@ static long heightnumerator;
 
 static void AsmRefresh();
 
-#define NOASM
-
-#ifndef NOASM
-#define FixedByFrac(x, y) \
-__extension__  \
-({ unsigned long z; \
- asm("imull %2; shrdl $16, %%edx, %%eax" : "=a" (z) : "a" (x), "q" (y) : "%edx"); \
- z; \
-})
-#endif
-
 void ScaleShape(int xcenter, int shapenum, unsigned height);
 void SimpleScaleShape(int xcenter, int shapenum, unsigned height);
  
@@ -335,7 +324,7 @@ static void DrawScaleds()
 		|| (*(visspot+64) && !*(tilespot+64))
 		|| (*(visspot+63) && !*(tilespot+63))) 
 		{
-			obj->active = true;
+			obj->active = ac_yes;
 			TransformActor(obj);
 			if (!obj->viewheight)
 				continue;						// too close or far away
@@ -803,14 +792,25 @@ static void DeCompileSprite(int shapenum)
 void ScaleShape(int xcenter, int shapenum, unsigned height)
 {
 	unsigned int scaler = (64 << 16) / (height >> 2);
-	unsigned int x, p;
+	unsigned int x;
+	int p;
 
 	if (spritegfx[shapenum] == NULL)
 		DeCompileSprite(shapenum);
 	
-	for (p = xcenter - (height >> 3), x = 0; x < (64 << 16); x += scaler, p++) {
-		if ((p < 0) || (p >= viewwidth) || (wallheight[p] >= height))
+	p = xcenter - (height >> 3);
+	if (p < 0) {
+		x = (-p)*scaler;
+		p = 0;
+	} else {
+		x = 0;
+	}
+	for (; x < (64 << 16); x += scaler, p++) {
+		if (p >= viewwidth)
+			break;
+		if (wallheight[p] >= height)
 			continue;
+
 		ScaleLineTrans(height >> 2, spritegfx[shapenum] + ((x >> 16) << 6), p);
 	}	
 }
@@ -818,14 +818,23 @@ void ScaleShape(int xcenter, int shapenum, unsigned height)
 void SimpleScaleShape(int xcenter, int shapenum, unsigned height)
 {
 	unsigned int scaler = (64 << 16) / height;
-	unsigned int x, p;
+	unsigned int x;
+	int p;
 	
 	if (spritegfx[shapenum] == NULL)
 		DeCompileSprite(shapenum);
 	
-	for (p = xcenter - (height / 2), x = 0; x < (64 << 16); x += scaler, p++) {
-		if ((p < 0) || (p >= viewwidth))
-			continue;
+	p = xcenter - (height / 2);
+	if (p < 0) {
+		x = (-p)*scaler;
+		p = 0;
+	} else {
+		x = 0;
+	}
+	for (; x < (64 << 16); x += scaler, p++) {
+		if (p >= viewwidth)
+			break;	
+
 		ScaleLineTrans(height, spritegfx[shapenum] + ((x >> 16) << 6), p);
 	}
 }

@@ -8,6 +8,8 @@
 
 extern int vwidth, vheight; /* size of screen */
 
+#define NOASM
+
 /*
 =============================================================================
 
@@ -853,7 +855,7 @@ extern fixed viewsin, viewcos;
 
 extern int horizwall[], vertwall[];
 
-fixed FixedByFrac(fixed a, fixed b);
+
 void BuildTables();
 void CalcTics();
 void ThreeDRefresh();
@@ -1004,5 +1006,17 @@ extern void HelpScreens();
 extern void EndText();
 
 #include "wl_act3.h"
+
+/* FixedByFrac */
+fixed FixedByFrac(fixed a, fixed b);
+
+#ifndef NOASM
+#define FixedByFrac(x, y) \
+__extension__  \
+({ unsigned long z; \
+ asm("imull %2; shrdl $16, %%edx, %%eax" : "=a" (z) : "a" (x), "q" (y) : "%edx"); \
+ z; \
+})
+#endif
 
 #endif

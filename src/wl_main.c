@@ -52,7 +52,10 @@ char **_argv;
 =
 ========================
 */
-
+#ifdef NOASM
+#if defined(__INTEL_COMPILER)
+typedef _int64 int64_t;
+#endif
 fixed FixedByFrac(fixed a, fixed b)
 {
 	int64_t ra = a;
@@ -63,6 +66,7 @@ fixed FixedByFrac(fixed a, fixed b)
 	r >>= TILESHIFT;
 	return (fixed)r;
 }
+#endif
 
 /*
 =====================
