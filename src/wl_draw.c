@@ -11,12 +11,8 @@
 static unsigned wallheight[MAXVIEWWIDTH];
 
 /* refresh variables */
-fixed viewx,viewy;		/* the focal point */
+fixed viewx, viewy;		/* the focal point */
 
-/* ray casting variables */
-static int focaltx, focalty;
-
-static unsigned xpartial, ypartial;
 static int viewangle;
 
 static unsigned tilehit;
@@ -24,7 +20,6 @@ static unsigned tilehit;
 static int xtile, ytile;
 static int xtilestep, ytilestep;
 static long xintercept, yintercept;
-static long xstep, ystep;
 
 static unsigned postx;
 
@@ -219,16 +214,12 @@ static int CalcRotate(objtype *ob)
 =
 = DrawScaleds
 =
-= Draws all objects that are visable
+= Draws all objects that are visible
 =
 =====================
 */
 
-#ifdef DUMBTEST
-#define MAXVISABLE	640
-#else
 #define MAXVISABLE      64
-#endif
 
 typedef struct {
 	int viewx;
@@ -249,16 +240,14 @@ static void DrawScaleds()
 
 	visptr = &vislist[0];
 
-//
-// place static objects
-//
+/* place static objects */
 	for (statptr = &statobjlist[0]; statptr != laststatobj; statptr++)
 	{
 		if ((visptr->shapenum = statptr->shapenum) == -1)
-			continue;						// object has been deleted
+			continue;			/* object has been deleted */
 
 		if (!*statptr->visspot)
-			continue;						// not visable
+			continue;			/* not visable */
 
 		if (TransformTile(statptr->tilex, statptr->tiley
 			,&visptr->viewx,&visptr->viewheight) && statptr->flags & FL_BONUS)
@@ -268,7 +257,7 @@ static void DrawScaleds()
 		}
 
 		if (!visptr->viewheight)
-			continue;						// to close to the object
+			continue;			/* too close to the object */
 
 		if (visptr < &vislist[MAXVISABLE-1])	/* don't let it overflow */
 			visptr++;
@@ -397,18 +386,12 @@ static void DrawPlayerWeapon()
 
 static void WallRefresh()
 {
-/*
- set up variables for this view
-*/
 	viewangle = player->angle;
 	
 	viewsin = sintable[viewangle];
 	viewcos = costable[viewangle];
-	viewx = player->x - FixedByFrac(focallength,viewcos);
-	viewy = player->y + FixedByFrac(focallength,viewsin);
-
-	focaltx = viewx>>TILESHIFT;
-	focalty = viewy>>TILESHIFT;
+	viewx = player->x - FixedByFrac(focallength, viewcos);
+	viewy = player->y + FixedByFrac(focallength, viewsin);
 
 	AsmRefresh();
 }
@@ -450,10 +433,6 @@ static void MapRow()
 		//mr_yfrac += mr_ystep;
 		//mr_xfrac += mr_xstep;
 		
-	/*	
-		mr_dest[0] = planepics[0x1F00|(planepics[(ebx&0x1FFE)+0]&0xFF)];
-		mr_dest[mr_rowofs] = planepics[0x1F00|(planepics[(ebx&0x1FFE)+1]&0xFF)];
-	*/
 		mr_dest[0] = planepics[ebx+0];
 		mr_dest[mr_rowofs] = planepics[ebx+1];
 		mr_dest++;
@@ -633,9 +612,6 @@ void ThreeDRefresh()
 /* clear out the traced array */
 	memset(spotvis, 0, sizeof(spotvis));
 
-/* follow the walls from there to the right, drawing as we go */
-	
-	/* DrawPlayBorder(); */
 #ifndef DRAWCEIL	
 	ClearScreen();
 #endif	
@@ -734,15 +710,15 @@ static void ScaleLineTrans(unsigned int height, byte *source, int x)
 	}
 }
 
-static unsigned char *spritegfx[SPR_TOTAL];
+static byte *spritegfx[SPR_TOTAL];
 
 static void DeCompileSprite(int shapenum)
 {
-	unsigned char *ptr;
-	unsigned char *buf;
-	unsigned char *cmdptr;
-	unsigned char *pixels;
-	short int yoff; /* int16_t */
+	byte *ptr;
+	byte *buf;
+	byte *cmdptr;
+	byte *pixels;
+	int yoff;
 	int y, y0, y1;
 	int x, left, right;
 	int cmd;
@@ -768,7 +744,7 @@ static void DeCompileSprite(int shapenum)
 		while (ptr[cmd+0]) {
 			/* y1 = (ptr[cmd+0] | (ptr[cmd+1] << 8)) / 2; */
 			y1 = ptr[cmd+0] / 2;
-			yoff = ptr[cmd+2] | (ptr[cmd+3] << 8);
+			yoff = (int16_t)(ptr[cmd+2] | (ptr[cmd+3] << 8));
 			/* y0 = (ptr[cmd+4] | (ptr[cmd+5] << 8)) / 2; */
 			y0 = ptr[cmd+4] / 2;
 			
@@ -1047,32 +1023,37 @@ static int samex(int intercept, int tile)
 
 static int samey(int intercept, int tile)
 {
-    if (ytilestep > 0) {
-	if ((intercept>>16) >= tile)
-	    return 0;
-	else
-	    return 1;
-    } else {
-	if ((intercept>>16) <= tile)
-	    return 0;
-	else
-	    return 1;
-    }
- }
+	if (ytilestep > 0) {
+		if ((intercept>>16) >= tile)
+			return 0;
+		else
+			return 1;
+	} else {
+		if ((intercept>>16) <= tile)
+			return 0;
+		else
+			return 1;
+	}
+}
 
 static void AsmRefresh()
 {
-	fixed doorxhit, dooryhit;
-	long xtemp, ytemp;
 	unsigned xpartialup, xpartialdown, ypartialup, ypartialdown;
+	unsigned xpartial, ypartial;
+	int doorhit;
 	int angle;    /* ray angle through postx */
 	int midangle;
+	int focaltx, focalty;
+	int xstep, ystep;
 	
 	midangle = viewangle*(FINEANGLES/ANGLES);
 	xpartialdown = viewx&(TILEGLOBAL-1);
 	xpartialup = TILEGLOBAL-xpartialdown;
 	ypartialdown = viewy&(TILEGLOBAL-1);
 	ypartialup = TILEGLOBAL-ypartialdown;
+
+	focaltx = viewx>>TILESHIFT;
+	focalty = viewy>>TILESHIFT;
 
 for (postx = 0; postx < viewwidth; postx++) {
 	angle = midangle + pixelangle[postx];
@@ -1120,6 +1101,7 @@ for (postx = 0; postx < viewwidth; postx++) {
 		goto entry90;
 	}
 	
+	
 	yintercept = viewy + xpartialbyystep();
 	xtile = focaltx + xtilestep;
 
@@ -1128,40 +1110,40 @@ for (postx = 0; postx < viewwidth; postx++) {
 
 /* CORE LOOP */
 
-#define TILE(n) (n>>16)
+#define TILE(n) ((n)>>16)
 
 	/* check intersections with vertical walls */
-vertcheck:
+ vertcheck:
 	if (!samey(yintercept, ytile))
 		goto horizentry;
 		
 vertentry:
 	tilehit = tilemap[xtile][TILE(yintercept)];
 
-	if (tilehit != 0) {
+	if (tilehit) {
 		if (tilehit & 0x80) {
 			if (tilehit & 0x40) {
 				/* vertpushwall */
-				ytemp = yintercept + (signed)((signed)pwallpos * ystep) / 64;
+				doorhit = yintercept + (signed)((signed)pwallpos * ystep) / 64;
 			
-				if (TILE(ytemp) != TILE(yintercept)) 
+				if (TILE(doorhit) != TILE(yintercept)) 
 					goto passvert;
 					
-				yintercept = ytemp;
+				yintercept = doorhit;
 				xintercept = xtile << 16;
 				HitVertPWall();
 			} else {
 				/* vertdoor */
-				dooryhit = yintercept + ystep / 2;
-	
-				if (TILE(dooryhit) != TILE(yintercept))
+				doorhit = yintercept + ystep / 2;
+
+				if (TILE(doorhit) != TILE(yintercept))
 					goto passvert;
 				
 				/* check door position */
-				if ((dooryhit&0xFFFF) < doorposition[tilehit&0x7f])
+				if ((doorhit&0xFFFF) < doorposition[tilehit&0x7f])
 					goto passvert;
 				
-				yintercept = dooryhit;
+				yintercept = doorhit;
 				xintercept = (xtile << 16) + 32768;
 				HitVertDoor();
 			}
@@ -1186,29 +1168,29 @@ horizcheck:
 horizentry:
 	tilehit = tilemap[TILE(xintercept)][ytile];
 
-	if (tilehit != 0) {
+	if (tilehit) {
 		if (tilehit & 0x80) {
 			if (tilehit & 0x40) {
-				xtemp = xintercept + (signed)((signed)pwallpos * xstep) / 64;
+				doorhit = xintercept + (signed)((signed)pwallpos * xstep) / 64;
 		    	
 				/* horizpushwall */
-				if (TILE(xtemp) != TILE(xintercept))
+				if (TILE(doorhit) != TILE(xintercept))
 					goto passhoriz;
 				
-				xintercept = xtemp;
+				xintercept = doorhit;
 				yintercept = ytile << 16; 
 				HitHorizPWall();
 			} else {
-				doorxhit = xintercept + xstep / 2;
+				doorhit = xintercept + xstep / 2;
 				
-				if (TILE(doorxhit) != TILE(xintercept))
+				if (TILE(doorhit) != TILE(xintercept))
 					goto passhoriz;
 				
 				/* check door position */
-				if ((doorxhit&0xFFFF) < doorposition[tilehit&0x7f])
+				if ((doorhit&0xFFFF) < doorposition[tilehit&0x7f])
 					goto passhoriz;
 				
-				xintercept = doorxhit;
+				xintercept = doorhit;
 				yintercept = (ytile << 16) + 32768;
 				HitHorizDoor();
 			}
@@ -1224,7 +1206,4 @@ passhoriz:
 	xintercept += xstep;
 	goto horizcheck;
 }
-#ifdef DUMBTEST
-	memset(spotvis, 1, sizeof(spotvis));
-#endif
 }

@@ -32,9 +32,8 @@ void Quit(char *error)
 	ShutdownId();
 	
 	if (screen) {
-		printf("TODO: spiffy ansi screen goes here..\n");
 		/* doesn't look too good on console at the moment ...*/
-		//DisplayTextSplash(screen);
+		/* DisplayTextSplash(screen); */
 	}
 	
 	if (error && *error) {

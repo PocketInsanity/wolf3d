@@ -881,53 +881,47 @@ void InitDigiMap()
 =
 = BuildTables
 =
-= Calculates:
-=
-= scale                 projection constant
-= sintable/costable     overlapping fractional tables
-=
 ==================
 */
 
-static const float radtoint = (float)FINEANGLES/2.0f/PI;
+static const double radtoint = (double)FINEANGLES/2.0/PI;
 
 void BuildTables()
 {
-  int           i;
-  float         angle,anglestep;
-  double        tang;
-  fixed         value;
+	int i;
+	double tang, angle, anglestep;
+	fixed value;
 
+/* calculate fine tangents */
 
-//
-// calculate fine tangents
-//
-
-	for (i=0;i<FINEANGLES/8;i++)
-	{
-		tang = tan((i+0.5)/radtoint);
+	for (i = 0; i < FINEANGLES/8; i++) {
+		tang = tan((double)i/radtoint);
 		finetangent[i] = tang*TILEGLOBAL;
 		finetangent[FINEANGLES/4-1-i] = 1/tang*TILEGLOBAL;
 	}
-
+	
+	/* fight off asymptotic behaviour at 90 degrees */
+	finetangent[FINEANGLES/4-1] = finetangent[FINEANGLES/4-2];
+	
 //
 // costable overlays sintable with a quarter phase shift
 // ANGLES is assumed to be divisable by four
 //
 
-  angle = 0;
-  anglestep = PI/2/ANGLEQUAD;
-  for (i=0;i<=ANGLEQUAD;i++)
-  {
-	value=GLOBAL1*sin(angle);
-	sintable[i]=
-	  sintable[i+ANGLES]=
-	  sintable[ANGLES/2-i] = value;
-	sintable[ANGLES-i]=
-	  sintable[ANGLES/2+i] = -value;
-	angle += anglestep;
-  }
-
+	angle = 0.0;
+	anglestep = PI/2.0/ANGLEQUAD;
+	for (i = 0; i <= ANGLEQUAD; i++) {
+		value = GLOBAL1*sin(angle);
+		
+		sintable[i] = 
+		sintable[i+ANGLES] =  
+		sintable[ANGLES/2-i] = value;
+		
+		sintable[ANGLES-i] =
+		sintable[ANGLES/2+i] = -value;
+		
+		angle += anglestep;
+	}
 }
 
 /*
@@ -942,10 +936,8 @@ void CalcProjection(long focal)
 {
 	int     i;
 	long    intang;
-	float   angle;
-	double  tang;
+	double angle, tang, facedist;
 	int     halfview;
-	double  facedist;
 
 	focallength = focal;
 	facedist = focal+MINDIST;
@@ -967,10 +959,8 @@ void CalcProjection(long focal)
 // calculate the angle offset from view angle of each pixel's ray
 //
 
-	for (i=0;i<halfview;i++)
-	{
-	// start 1/2 pixel over, so viewangle bisects two middle pixels
-		tang = (long)i*VIEWGLOBAL/viewwidth/facedist;
+	for (i = 0; i < halfview; i++) {
+		tang = ((double)i)*VIEWGLOBAL/viewwidth/facedist;
 		angle = atan(tang);
 		intang = angle*radtoint;
 		pixelangle[halfview-1-i] = intang;
