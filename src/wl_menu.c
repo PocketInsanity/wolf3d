@@ -547,8 +547,11 @@ int CP_CheckQuick(unsigned scancode)
 
 				if (loadedgame)
 					playstate = ex_abort;
+
 				lasttimecount = get_TimeCount();
 
+				IN_GetMouseDelta(NULL, NULL); // Clear accumulated mouse movement
+				
 				#ifndef SPEAR
 				CA_UnCacheGrChunk(C_CURSOR1PIC);
 				CA_UnCacheGrChunk(C_CURSOR2PIC);
@@ -615,6 +618,8 @@ int CP_CheckQuick(unsigned scancode)
 
 				lasttimecount = get_TimeCount();
 
+				IN_GetMouseDelta(NULL, NULL); // Clear accumulated mouse movement
+				
 				#ifndef SPEAR
 				CA_UnCacheGrChunk(C_CURSOR1PIC);
 				CA_UnCacheGrChunk(C_CURSOR2PIC);

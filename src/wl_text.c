@@ -696,6 +696,8 @@ void EndText()
 	SETFONTCOLOR(0,15);
 	IN_ClearKeysDown();
 
+	IN_GetMouseDelta(NULL, NULL); // Clear accumulated mouse movement
+	
 	FreeMusic();
 }
 

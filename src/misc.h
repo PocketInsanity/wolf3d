@@ -12,8 +12,14 @@ unsigned long get_TimeCount();
 
 long filelength(int handle);
 
+#ifndef stricmp
 #define stricmp strcasecmp
+#endif
+
+#ifndef strnicmp
 #define strnicmp strncasecmp
+#endif
+
 char *strlwr(char *s);
 
 char *itoa(int value, char *string, int radix);

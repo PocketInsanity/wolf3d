@@ -2,7 +2,8 @@
 
 boolean AdLibPresent, SoundBlasterPresent;
 
-SDMode SoundMode, MusicMode;
+SDMode SoundMode;
+SMMode MusicMode;
 SDSMode DigiMode;
 
 static boolean SD_Started;
