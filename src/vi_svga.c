@@ -214,6 +214,63 @@ void IN_GetMouseDelta(int *dx, int *dy)
 {
 }
 
+/*
+===================
+=
+= IN_JoyButtons
+=
+===================
+*/
+
+byte IN_JoyButtons()
+{
+	return 0;
+}
+
+///////////////////////////////////////////////////////////////////////////
+//
+//	IN_GetJoyAbs() - Reads the absolute position of the specified joystick
+//
+///////////////////////////////////////////////////////////////////////////
+void IN_GetJoyAbs(word joy,word *xp,word *yp)
+{
+	*xp = 0;
+	*yp = 0;
+}
+
+///////////////////////////////////////////////////////////////////////////
+//
+//	INL_GetJoyDelta() - Returns the relative movement of the specified
+//		joystick (from +/-127)
+//
+///////////////////////////////////////////////////////////////////////////
+void INL_GetJoyDelta(word joy,int *dx,int *dy)
+{
+	*dx = 0;
+	*dy = 0;
+}
+
+///////////////////////////////////////////////////////////////////////////
+//
+//	INL_GetJoyButtons() - Returns the button status of the specified
+//		joystick
+//
+///////////////////////////////////////////////////////////////////////////
+word INL_GetJoyButtons(word joy)
+{
+	return 0;
+}
+
+///////////////////////////////////////////////////////////////////////////
+//
+//      IN_SetupJoy() - Sets up thresholding values and calls INL_SetJoyScale()
+//              to set up scaling values
+//
+///////////////////////////////////////////////////////////////////////////
+void IN_SetupJoy(word joy,word minx,word maxx,word miny,word maxy)
+{
+}
+
 void INL_Update()
 {
 	while (keyboard_update()) ; /* get all events */

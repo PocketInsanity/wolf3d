@@ -1032,8 +1032,8 @@ void DoJukebox()
 	unsigned start;
 
 	IN_ClearKeysDown();
-//	if (!AdLibPresent && !SoundBlasterPresent)
-//		return;
+	if (!AdLibPresent && !SoundBlasterPresent)
+		return;
 	
 	MenuFadeOut();
 

@@ -1336,7 +1336,7 @@ void SpawnGhosts (int which, int tilex, int tiley)
 
 void SpawnSchabbs(int tilex, int tiley)
 { 
-	if (DigiMode != sds_Off) /* TODO: what? */
+	if (DigiMode != sds_Off)
 		gamestates[s_schabbdie2].tictime = 140;
 	else
 		gamestates[s_schabbdie2].tictime = 5;
