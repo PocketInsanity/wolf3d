@@ -6,7 +6,7 @@
 /* SDM = 2 */
 /* SOD = 3 */
 #ifndef WMODE
-#define WMODE 0
+#define WMODE 3
 #endif
 
 #if WMODE == 0

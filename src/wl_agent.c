@@ -63,19 +63,9 @@ struct atkinf
 
 void DrawWeapon (void);
 void GiveWeapon (int weapon);
-void	GiveAmmo (int ammo);
+void GiveAmmo (int ammo);
 
 //===========================================================================
-
-//----------
-
-void Attack (void);
-void Use (void);
-void Search (objtype *ob);
-void SelectWeapon (void);
-void SelectItem (void);
-
-//----------
 
 boolean TryMove (objtype *ob);
 void T_Player (objtype *ob);
@@ -102,7 +92,7 @@ void ClipMove (objtype *ob, long xmove, long ymove);
 
 void CheckWeaponChange (void)
 {
-	int	i,buttons;
+	int i;
 
 	if (!gamestate.ammo)		// must use knife with no ammo
 		return;
@@ -134,9 +124,8 @@ void CheckWeaponChange (void)
 
 void ControlMovement (objtype *ob)
 {
-	int		angle,maxxmove;
+	int		angle;
 	int		angleunits;
-	long	speed;
 
 	thrustspeed = 0;
 //
@@ -162,9 +151,7 @@ void ControlMovement (objtype *ob)
 				angle -= ANGLES;
 			Thrust (angle,-controlx*MOVESCALE);	// move to right
 		}
-	}
-	else
-	{
+	} else {
 	//
 	// not strafing
 	//
@@ -216,14 +203,9 @@ void ControlMovement (objtype *ob)
 ==================
 */
 
-void StatusDrawPic (unsigned x, unsigned y, unsigned picnum)
+void StatusDrawPic(unsigned x, unsigned y, unsigned picnum)
 {
-/* TODO hmm */
 	LatchDrawPic (x,y,picnum);
-/* 
-	LatchDrawPic (x,y,picnum);
-	LatchDrawPic (x,y,picnum);
-*/
 }
 
 
@@ -972,12 +954,10 @@ void Cmd_Fire (void)
 ===============
 */
 
-void Cmd_Use (void)
+void Cmd_Use()
 {
-	objtype 	*check;
 	int			checkx,checky,doornum,dir;
 	boolean		elevatorok;
-
 
 //
 // find which cardinal direction the player is facing
@@ -1149,6 +1129,8 @@ void	GunAttack (objtype *ob)
 		break;
 	case wp_chaingun:
 		SD_PlaySound (ATKGATLINGSND);
+		break;
+	default:
 		break;
 	}
 

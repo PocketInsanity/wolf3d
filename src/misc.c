@@ -1,12 +1,4 @@
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <ctype.h>
-#include <sys/time.h>
-                     
-#include "misc.h"
+#include "id_heads.h"
 
 static struct timeval t0;
 static long tc0;

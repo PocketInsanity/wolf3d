@@ -174,6 +174,8 @@ void SpawnStatic (int tilex, int tiley, int type)
 		laststatobj->flags = FL_BONUS;
 		laststatobj->itemnumber = statinfo[type].type;
 		break;
+	default: 
+		break;
 	}
 
 	laststatobj++;
@@ -614,7 +616,7 @@ void DoorOpening (int door)
 
 void DoorClosing (int door)
 {
-	int		area1,area2,move;
+	int		area1,area2;
 	word *map;
 	long	position;
 	int		tilex,tiley;
@@ -701,6 +703,8 @@ void MoveDoors (void)
 
 		case dr_closing:
 			DoorClosing(door);
+			break;
+		default:
 			break;
 		}
 }

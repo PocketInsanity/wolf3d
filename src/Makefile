@@ -1,7 +1,7 @@
 CC = gcc
 #CFLAGS = -O6 -fomit-frame-pointer -ffast-math -funroll-loops -mpentiumpro -mcpu=pentiumpro -march=pentiumpro 
-#CFLAGS = -g -Wall
-CFLAGS = -g
+CFLAGS = -g -Wall
+#CFLAGS = -g
 #CFLAGS = -Os
 OBJS = objs.o misc.o id_ca.o id_sd.o id_vh.o id_us.o \
 	wl_act1.o wl_act2.o wl_agent.o wl_game.o \

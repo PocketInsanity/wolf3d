@@ -42,6 +42,7 @@ long	xstep,ystep;
 extern unsigned xoffset, yoffset;
 
 void AsmRefresh (void);
+void xBuildCompScale(int height, byte *source, int x);
 
 //==========================================================================
 
@@ -709,9 +710,7 @@ void AsmRefresh (void)
 
     for (pixx = 0; pixx < viewwidth; pixx++) {
 	angle = midangle + pixelangle[pixx];
-#ifdef DEBUGx
- printf ("tracing angle = %d\n", angle);
-#endif
+
 	if (angle < 0) {
 	    /* -90 - -1 degree arc */
 	    angle += FINEANGLES;
@@ -755,16 +754,12 @@ void AsmRefresh (void)
 			    goto entry90;
 			}
 
-    initvars:
 	yintercept = viewy + xpartialbyystep ();
 	xtile = focaltx + xtilestep;
 
 	xintercept = viewx + ypartialbyxstep ();
 	ytile = focalty + ytilestep;
-#ifdef DEBUGx
- printf ("xintercept = %d, ytile = %d\n", xintercept, ytile);
- printf ("xtile = %d, yintercept = %d\n", xtile, yintercept);
-#endif
+
 /* CORE LOOP */
 
 #define TILE(n) (n>>16)
@@ -775,9 +770,7 @@ void AsmRefresh (void)
 		goto horizentry;
 	vertentry:
 	    tilehit = tilemap [xtile][TILE(yintercept)];
-#if DEBUGx
-	    printf ("vert: %d  %x %d, %d\n", pixx, tilehit, xtile, TILE(yintercept));
-#endif
+
 	    if (tilehit != 0) {
 		if (tilehit & 0x80) {
 		    if (tilehit & 0x40) {
@@ -820,9 +813,7 @@ void AsmRefresh (void)
 		goto vertentry;
 	horizentry:
 	    tilehit = tilemap [TILE(xintercept)][ytile];
-#if DEBUGx
-	    printf ("horiz: %d  %x %d, %d\n", pixx, tilehit, TILE(xintercept), ytile);
-#endif
+
 	    if (tilehit != 0) {
 		if (tilehit & 0x80) {
 		    /* horizdoor */
@@ -870,10 +861,6 @@ void HitVertWall (void)
 	unsigned	texture;
 	byte *wall;
 
-#ifdef DEBUGx
-  printf ("HitVertWall: xtile = %d, TILE(yintercept) = %d\n",
-	  xtile, TILE(yintercept));
-#endif
 	texture = (yintercept>>4)&0xfc0;
 	if (xtilestep == -1)
 	{
@@ -906,10 +893,6 @@ void HitHorizWall (void)
 	unsigned	texture;
 	byte *wall;
 
-#ifdef DEBUGx
-   printf ("HitHorizWall: ytile = %d, TILE(xintercept) = %d\n",
-	   ytile, TILE(xintercept));
-#endif
 	texture = (xintercept>>4)&0xfc0;
 	if (ytilestep == -1)
 		yintercept += TILEGLOBAL;

@@ -33,8 +33,6 @@ HighScore	Scores[MaxScores] = {
 ///////////////////////////////////////////////////////////////////////////
 void US_Startup()
 {
-	int	i,n;
-
 	if (US_Started)
 		return;
 

@@ -580,10 +580,7 @@ void CenterWindow(word w,word h)
 
 void CheckKeys (void)
 {
-	int		i;
 	byte	scan;
-	unsigned	temp;
-
 
 	if (screenfaded || demoplayback)	// don't do anything with a faded screen
 		return;
@@ -883,10 +880,8 @@ void GetNewActor (void)
 =========================
 */
 
-void RemoveObj (objtype *gone)
+void RemoveObj(objtype *gone)
 {
-	objtype **spotat;
-
 	if (gone == player)
 		Quit ("RemoveObj: Tried to remove the player!");
 
@@ -1287,13 +1282,11 @@ think:
 =
 ===================
 */
+
 long funnyticount;
 
-
-void PlayLoop (void)
+void PlayLoop()
 {
-	int		give;
-
 	playstate = lasttimecount = 0;
 	set_TimeCount(0);
 	
@@ -1374,4 +1367,3 @@ void PlayLoop (void)
 	if (playstate != ex_died)
 		FinishPaletteShifts ();
 }
-

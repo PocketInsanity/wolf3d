@@ -5,15 +5,6 @@
 /*
 =============================================================================
 
-						 LOCAL CONSTANTS
-
-=============================================================================
-*/
-
-
-/*
-=============================================================================
-
 						 GLOBAL VARIABLES
 
 =============================================================================
@@ -37,7 +28,6 @@ dirtype diagonal[9][9] =
 };
 
 
-
 void	SpawnNewObj (unsigned tilex, unsigned tiley, statetype *state);
 void	NewState (objtype *ob, statetype *state);
 
@@ -51,18 +41,7 @@ boolean CheckLine (objtype *ob);
 void FirstSighting (objtype *ob);
 boolean	CheckSight (objtype *ob);
 
-/*
-=============================================================================
-
-						 LOCAL VARIABLES
-
-=============================================================================
-*/
-
-
-
 //===========================================================================
-
 
 /*
 ===================
@@ -179,7 +158,7 @@ void NewState (objtype *ob, statetype *state)
 
 boolean TryWalk (objtype *ob)
 {
-	int			doornum;
+	int		doornum;
 	unsigned	temp;
 
 	doornum = -1;
@@ -222,6 +201,9 @@ boolean TryWalk (objtype *ob)
 		case northwest:
 			ob->tilex--;
 			ob->tiley--;
+			break;
+			
+		default:
 			break;
 		}
 	}
@@ -471,9 +453,9 @@ void SelectDodgeDir (objtype *ob)
 ============================
 */
 
-void SelectChaseDir (objtype *ob)
+void SelectChaseDir(objtype *ob)
 {
-	int deltax,deltay,i;
+	int deltax,deltay;
 	dirtype d[3];
 	dirtype tdir, olddir, turnaround;
 
@@ -583,9 +565,9 @@ void SelectChaseDir (objtype *ob)
 
 void SelectRunDir (objtype *ob)
 {
-	int deltax,deltay,i;
+	int deltax, deltay;
 	dirtype d[3];
-	dirtype tdir, olddir, turnaround;
+	dirtype tdir;
 
 
 	deltax=player->tilex - ob->tilex;
@@ -937,6 +919,8 @@ void KillActor (objtype *ob)
 		PlaceItemType (bo_key1,tilex,tiley);
 		break;
 #endif
+	default:
+		break;
 	}
 
 	gamestate.killcount++;
@@ -1009,7 +993,8 @@ void DamageActor (objtype *ob, unsigned damage)
 				NewState (ob,&s_sspain1);
 
 			break;
-
+		default:
+			break;
 		}
 	}
 }
@@ -1038,11 +1023,10 @@ boolean CheckLine (objtype *ob)
 	int	x1,y1,xt1,yt1,x2,y2,xt2,yt2;
 	int	x,y;
 	int	xdist,ydist,xstep,ystep;
-	int	temp;
 	int	partial,delta;
 	long	ltemp;
 	int	xfrac,yfrac,deltafrac;
-	unsigned	value,intercept;
+	word	value,intercept;
 
 	x1 = ob->x >> UNSIGNEDSHIFT;		// 1/256 tile precision
 	y1 = ob->y >> UNSIGNEDSHIFT;
@@ -1227,16 +1211,15 @@ boolean CheckSight (objtype *ob)
 		if (deltax > 0)
 			return false;
 		break;
+	default:
+		break;
 	}
 
 //
 // trace a line to check for blocking tiles (corners)
 //
 	return CheckLine (ob);
-
 }
-
-
 
 /*
 ===============
@@ -1382,6 +1365,8 @@ void FirstSighting (objtype *ob)
 		break;
 
 #endif
+	default:
+		break;
 	}
 
 	if (ob->distance < 0)
@@ -1472,6 +1457,8 @@ boolean SightPlayer (objtype *ob)
 		case willobj:
 		case deathobj:
 			ob->temp2 = 1;
+			break;
+		default:
 			break;
 		}
 		return false;

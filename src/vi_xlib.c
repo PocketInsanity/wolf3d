@@ -35,11 +35,10 @@ int indexmode;
 int shmmode;
 unsigned char mypal[768];
 
-Colormap GetVisual()
+void GetVisual()
 {
 	XVisualInfo vitemp;
-	Colormap cmap;
-	
+		
 	int i, numVisuals;
 		
 	vitemp.screen = screen;
@@ -57,8 +56,8 @@ Colormap GetVisual()
 			clr[i].pixel = i;
 			clr[i].flags = DoRed|DoGreen|DoBlue;
 		}
-	
-		return cmap;
+		
+		return;	
 	}
 	
 	vitemp.depth = 15;
@@ -72,13 +71,13 @@ Colormap GetVisual()
 	if (vi && (numVisuals > 0)) {
 		indexmode = 0;
 		
-		printf("15: rm:%04X gm:%04X bm:%04X cs:%04X bpr:%04X\n", vi->red_mask,
+		printf("15: rm:%04lX gm:%04lX bm:%04lX cs:%04X bpr:%04X\n", vi->red_mask,
 			vi->green_mask, vi->blue_mask, vi->colormap_size,
 			vi->bits_per_rgb);
 			
 		cmap = XCreateColormap(dpy, root, vi->visual, AllocNone);
 		
-		return cmap;
+		return;
 	} 
 	
 	vitemp.depth = 16;
@@ -91,13 +90,13 @@ Colormap GetVisual()
 	if (vi && (numVisuals > 0)) {
 		indexmode = 0;
 
-		printf("16: rm:%04X gm:%04X bm:%04X cs:%04X bpr:%04X\n", vi->red_mask,
+		printf("16: rm:%04lX gm:%04lX bm:%04lX cs:%04X bpr:%04X\n", vi->red_mask,
 			vi->green_mask, vi->blue_mask, vi->colormap_size,
 			vi->bits_per_rgb);
 		
 		cmap = XCreateColormap(dpy, root, vi->visual, AllocNone);
 		
-		return cmap;
+		return;
 	}
 	
 	vitemp.depth = 24;
@@ -110,13 +109,13 @@ Colormap GetVisual()
 	if (vi && (numVisuals > 0)) {
 		indexmode = 0;
 
-		printf("24: rm:%04X gm:%04X bm:%04X cs:%04X bpr:%04X\n", vi->red_mask,
+		printf("24: rm:%04lX gm:%04lX bm:%04lX cs:%04X bpr:%04X\n", vi->red_mask,
 			vi->green_mask, vi->blue_mask, vi->colormap_size,
 			vi->bits_per_rgb);
 		
 		cmap = XCreateColormap(dpy, root, vi->visual, AllocNone);
 		
-		return cmap;
+		return;
 	}
 
 #if 0	
@@ -129,18 +128,17 @@ Colormap GetVisual()
 	if (vi && (numVisuals > 0)) {
 		indexmode = 0;
 
-		printf("32: rm:%04X gm:%04X bm:%04X cs:%04X bpr:%04X\n", vi->red_mask,
+		printf("32: rm:%04lX gm:%04lX bm:%04lX cs:%04X bpr:%04X\n", vi->red_mask,
 			vi->green_mask, vi->blue_mask, vi->colormap_size,
 			vi->bits_per_rgb);
 		
 		cmap = XCreateColormap(dpy, root, vi->visual, AllocNone);
 		
-		return cmap;
+		return;
 	}
-	
-	Quit("No usable visual found!");
-#endif
-		
+#endif	
+
+	Quit("No usable visual found!");		
 }
 
 int main(int argc, char *argv[])
@@ -148,7 +146,6 @@ int main(int argc, char *argv[])
 	/* TODO: move these to proper functions */
 	
 	XSetWindowAttributes attr;
-	XVisualInfo vitemp;
 	XSizeHints sizehints;	
 	XGCValues gcvalues;
 	Pixmap bitmap;
@@ -158,7 +155,7 @@ int main(int argc, char *argv[])
 	char data[8] = { 0x01 };
 	
 	char *disp;
-	int attrmask, numVisuals, i;
+	int attrmask;
 	
 	disp = getenv("DISPLAY");
 	dpy = XOpenDisplay(disp);
@@ -172,7 +169,7 @@ int main(int argc, char *argv[])
 	
 	root = RootWindow(dpy, screen);
 	
-	cmap = GetVisual(); /* GetVisual will quit for us if no visual.. */                      	
+	GetVisual(); /* GetVisual will quit for us if no visual.. */                      	
 	attr.colormap = cmap;		   
 	attr.event_mask = KeyPressMask | KeyReleaseMask | ExposureMask;
 	attrmask = CWColormap | CWEventMask;
@@ -282,11 +279,13 @@ int BPP(int d)
 		case 16:
 			return 2;
 		case 24: /* TODO: ??? the nvidia xserver really gave me AGBR? */
+			/* need to check what the image says */
 			return 4;
 		case 32:
 			return 4;
 		default:
 			Quit("Sorry, BPP doesn't like that...");
+			return 0; /* heh */
 	}
 }
 	
@@ -304,7 +303,7 @@ void VL_Startup()
 			shminfo.shmid = shmget(IPC_PRIVATE, img->bytes_per_line * img->height, IPC_CREAT | 0777);
 			shminfo.shmaddr = img->data = shmat(shminfo.shmid, 0, 0);	
 			shminfo.readOnly = False;
-			disbuf = img->data;
+			disbuf = (byte *)img->data;
 			
 			if (indexmode)
 				gfxbuf = disbuf;

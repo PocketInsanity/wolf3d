@@ -134,14 +134,12 @@ void LatchDrawPic(unsigned x, unsigned y, unsigned picnum)
 ===================
 */
 
-void LoadLatchMem(void)
+void LoadLatchMem()
 {
 	int i;
 
-/* tile 8s */
 	CA_CacheGrChunk (STARTTILE8);
 
-/* pics */
 	for (i = LATCHPICS_LUMP_START; i <= LATCHPICS_LUMP_END; i++) {
 		/* TODO: this just caches them for eternity */
 		CA_CacheGrChunk (i);
@@ -218,9 +216,8 @@ void VL_FadeOut(int start, int end, int red, int green, int blue, int steps)
 	int i,j,orig,delta;
 	byte *origptr, *newptr;
 
-	VL_WaitVBL(1);
-	VL_GetPalette (&palette1[0][0]);
-	memcpy (palette2,palette1,768);
+	VL_GetPalette(&palette1[0][0]);
+	memcpy(palette2,palette1,768);
 
 //
 // fade through intermediate frames
@@ -267,9 +264,8 @@ void VL_FadeIn(int start, int end, byte *palette, int steps)
 {
 	int		i,j,delta;
 
-	VL_WaitVBL(1);
 	VL_GetPalette (&palette1[0][0]);
-	memcpy (&palette2[0][0],&palette1[0][0],sizeof(palette1));
+	memcpy(&palette2[0][0],&palette1[0][0],sizeof(palette1));
 
 	start *= 3;
 	end = end*3+2;
@@ -292,6 +288,6 @@ void VL_FadeIn(int start, int end, byte *palette, int steps)
 //
 // final color
 //
-	VL_SetPalette (palette);
+	VL_SetPalette(palette);
 	screenfaded = false;
 }

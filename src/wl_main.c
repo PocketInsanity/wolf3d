@@ -1096,10 +1096,6 @@ void InitGame(void)
 	  DoJukebox();
 	else
 #endif
-//
-// draw intro screen stuff
-//
-	IntroScreen ();
 
 //
 // load in and lock down some basic chunks

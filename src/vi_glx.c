@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
 	char data[8] = { 0x01 };
 		
 	char *disp, *ext;
-	int attrmask, i;
+	int attrmask;
 	int major, minor;
 		
 	disp = getenv("DISPLAY");
@@ -237,8 +237,6 @@ void VL_ClearVideo(byte color)
 
 void VL_FillPalette(int red, int green, int blue)
 {
-	int i;
-
 }	
 
 //===========================================================================
@@ -253,10 +251,7 @@ void VL_FillPalette(int red, int green, int blue)
 
 void VL_SetPalette(byte *palette)
 {
-	int i;
-	
 }
-
 
 //===========================================================================
 
@@ -270,8 +265,6 @@ void VL_SetPalette(byte *palette)
 
 void VL_GetPalette(byte *palette)
 {	
-	int i;
-	
 }
 
 /*

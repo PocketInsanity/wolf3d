@@ -182,9 +182,9 @@ void ClearMemory (void)
 
 void ScanInfoPlane (void)
 {
-	unsigned	x,y,i,j;
-	int			tile;
-	word	*start;
+	unsigned x,y;
+	int tile;
+	word *start;
 
 	start = mapsegs[1];
 	for (y=0;y<mapheight;y++)
@@ -586,9 +586,8 @@ void ScanInfoPlane (void)
 
 void SetupGameLevel (void)
 {
-	int	x,y,i;
-	word *map,tile,spot;
-
+	int x,y;
+	word *map,tile;
 
 	if (!loadedgame)
 	{
@@ -641,7 +640,7 @@ void SetupGameLevel (void)
 //
 // spawn doors
 //
-	InitActorList();			// start spawning things with a clean slate
+	InitActorList();	/* start spawning things with a clean slate */
 	InitDoorList();
 	InitStaticList();
 
@@ -806,10 +805,8 @@ void DrawPlayBorder (void)
 ===================
 */
 
-void DrawPlayScreen (void)
+void DrawPlayScreen()
 {
-	int	i,j,p,m;
-
 	VW_FadeOut ();
 
 	CA_CacheGrChunk(STATUSBARPIC);
@@ -819,14 +816,14 @@ void DrawPlayScreen (void)
 
 	CA_UnCacheGrChunk(STATUSBARPIC);
 
-	DrawFace ();
-	DrawHealth ();
-	DrawLives ();
-	DrawLevel ();
-	DrawAmmo ();
-	DrawKeys ();
-	DrawWeapon ();
-	DrawScore ();
+	DrawFace();
+	DrawHealth();
+	DrawLives();
+	DrawLevel();
+	DrawAmmo();
+	DrawKeys();
+	DrawWeapon();
+	DrawScore();
 }
 
 
@@ -1208,10 +1205,8 @@ void Died()
 ===================
 */
 
-void GameLoop (void)
+void GameLoop()
 {
-	int i,xl,yl,xh,yh;
-	char num[20];
 	boolean	died;
 
 restartgame:
@@ -1219,7 +1214,7 @@ restartgame:
 	SETFONTCOLOR(0,15);
 	DrawPlayScreen ();
 	died = false;
-restart:
+
 	do
 	{
 		if (!loadedgame)
@@ -1250,7 +1245,9 @@ restart:
 		fizzlein = true;
 		DrawLevel ();
 
+#ifdef SPEAR
 startplayloop:
+#endif
 		PlayLoop ();
 
 #ifdef SPEAR

@@ -3,45 +3,6 @@
 #include "wl_def.h"
 
 /*
-=============================================================================
-
-						 LOCAL CONSTANTS
-
-=============================================================================
-*/
-
-#define VIEWTILEX	(viewwidth/16)
-#define VIEWTILEY	(viewheight/16)
-
-/*
-=============================================================================
-
-						 GLOBAL VARIABLES
-
-=============================================================================
-*/
-
-
-int DebugKeys (void);
-
-/*
-=============================================================================
-
-						 LOCAL VARIABLES
-
-=============================================================================
-*/
-
-
-int	maporgx;
-int	maporgy;
-enum {mapview,tilemapview,actoratview,visview}	viewtype;
-
-void ViewMap (void);
-
-//===========================================================================
-
-/*
 ==================
 =
 = CountObjects
@@ -102,25 +63,15 @@ void CountObjects (void)
 
 void PicturePause (void)
 {
-	int			i;
-	byte		p;
-	unsigned	x;
-	byte		*dest, *src;
-	memptr		buffer;
 
 	FinishPaletteShifts ();
 
-	LastScan = 0;
-	while (!LastScan)
-	;
+	IN_Ack();
+	
 	if (LastScan != sc_Enter)
 	{
 		return;
 	}
-
-//
-// vga stuff...
-//
 
 	/* TODO: save picture to file */
 	
@@ -326,7 +277,7 @@ static	char	buf[10];
 int DebugKeys()
 {
 	boolean esc;
-	int level,i;
+	int level;
 
 	if (Keyboard[sc_C])		// C = count objects
 	{
@@ -399,13 +350,6 @@ int DebugKeys()
 		IN_Ack ();
 		return 1;
 	}
-#if 0
-	else if (Keyboard[sc_O])			// O = overhead
-	{
-		ViewMap();
-		return 1;
-	}
-#endif
 	else if (Keyboard[sc_P])			// P = pause with no screen disruptioon
 	{
 		PicturePause ();
@@ -452,6 +396,8 @@ int DebugKeys()
 	/* TODO: wouldn't work on sod demo etc */
 #ifndef SPEAR
 		US_Print("  Warp to which level(1-10):");
+#elif defined(SPEARDEMO)
+		US_Print("  Warp to which level(1-2):");
 #else
 		US_Print("  Warp to which level(1-21):");
 #endif
@@ -462,6 +408,8 @@ int DebugKeys()
 			level = atoi (str);
 #ifndef SPEAR
 			if (level>0 && level<11)
+#elif defined(SPEARDEMO)
+			if (level>0 && level<2)
 #else
 			if (level>0 && level<22)
 #endif
@@ -475,128 +423,3 @@ int DebugKeys()
 
 	return 0;
 }
-
-
-#if 0
-/*
-===================
-=
-= OverheadRefresh
-=
-===================
-*/
-
-void OverheadRefresh (void)
-{
-	unsigned	x,y,endx,endy,sx,sy;
-	unsigned	tile;
-
-
-	endx = maporgx+VIEWTILEX;
-	endy = maporgy+VIEWTILEY;
-
-	for (y=maporgy;y<endy;y++)
-		for (x=maporgx;x<endx;x++)
-		{
-			sx = (x-maporgx)*16;
-			sy = (y-maporgy)*16;
-
-			switch (viewtype)
-			{
-#if 0
-			case mapview:
-				tile = *(mapsegs[0]+farmapylookup[y]+x);
-				break;
-
-			case tilemapview:
-				tile = tilemap[x][y];
-				break;
-
-			case visview:
-				tile = spotvis[x][y];
-				break;
-#endif
-			case actoratview:
-				tile = (unsigned)actorat[x][y];
-				break;
-			}
-#define LatchDrawChar(x,y,p) VL_LatchToScreen(latchpics[0]+(p)*16,2,8,x,y)
-#define LatchDrawTile(x,y,p) VL_LatchToScreen(latchpics[1]+(p)*64,4,16,x,y)
-
-			if (tile<MAXWALLTILES)
-				LatchDrawTile(sx,sy,tile);
-			else
-			{
-				LatchDrawChar(sx,sy,NUMBERCHARS+((tile&0xf000)>>12));
-				LatchDrawChar(sx+8,sy,NUMBERCHARS+((tile&0x0f00)>>8));
-				LatchDrawChar(sx,sy+8,NUMBERCHARS+((tile&0x00f0)>>4));
-				LatchDrawChar(sx+8,sy+8,NUMBERCHARS+(tile&0x000f));
-			}
-		}
-
-}
-#endif
-
-#if 0
-/*
-===================
-=
-= ViewMap
-=
-===================
-*/
-
-void ViewMap (void)
-{
-	boolean		button0held;
-
-	viewtype = actoratview;
-//	button0held = false;
-
-
-	maporgx = player->tilex - VIEWTILEX/2;
-	if (maporgx<0)
-		maporgx = 0;
-	if (maporgx>MAPSIZE-VIEWTILEX)
-		maporgx=MAPSIZE-VIEWTILEX;
-	maporgy = player->tiley - VIEWTILEY/2;
-	if (maporgy<0)
-		maporgy = 0;
-	if (maporgy>MAPSIZE-VIEWTILEY)
-		maporgy=MAPSIZE-VIEWTILEY;
-
-	do
-	{
-//
-// let user pan around
-//
-		PollControls ();
-		if (controlx < 0 && maporgx>0)
-			maporgx--;
-		if (controlx > 0 && maporgx<mapwidth-VIEWTILEX)
-			maporgx++;
-		if (controly < 0 && maporgy>0)
-			maporgy--;
-		if (controly > 0 && maporgy<mapheight-VIEWTILEY)
-			maporgy++;
-
-#if 0
-		if (c.button0 && !button0held)
-		{
-			button0held = true;
-			viewtype++;
-			if (viewtype>visview)
-				viewtype = mapview;
-		}
-		if (!c.button0)
-			button0held = false;
-#endif
-
-		OverheadRefresh ();
-
-	} while (!Keyboard[sc_Escape]);
-
-	IN_ClearKeysDown ();
-}
-#endif
-

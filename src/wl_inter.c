@@ -323,7 +323,7 @@ void Write(int x,int y,char *string)
 	   break;
 
 	 default:
-	   VWB_DrawPic(nx,ny,alpha[ch]);
+	   VWB_DrawPic(nx,ny,alpha[(int)ch]);
 	}
 	nx+=16;
    }
@@ -369,7 +369,7 @@ LRstruct LevelRatios[8];
 LRstruct LevelRatios[20];
 #endif
 
-void LevelCompleted (void)
+void LevelCompleted()
 {
 	#define VBLWAIT	30
 	#define PAR_AMOUNT	500
@@ -380,7 +380,7 @@ void LevelCompleted (void)
 			} times;
 
 	int	x,i,min,sec,ratio,kr,sr,tr;
-	unsigned	temp;
+
 	char tempstr[10];
 	long bonus,timeleft=0;
 	times parTimes[]=
@@ -908,15 +908,11 @@ void PreloadGraphics()
 ==================
 */
 
-void	DrawHighScores(void)
+void DrawHighScores()
 {
 	char		buffer[16],*str,buffer1[5];
-	byte		temp,temp1,temp2,temp3;
-	word		i,j,
-				w,h,
-				x,y;
+	word		i,w,h;
 	HighScore	*s;
-
 
 	MM_SortMem ();
 
@@ -1019,36 +1015,6 @@ void	DrawHighScores(void)
 #endif
 		US_Print(buffer);
 
-		#if 0
-#ifndef UPLOAD
-#ifndef SPEAR
-		//
-		// verification #
-		//
-		if (!i)
-		{
-		 temp=(((s->score >> 28)& 0xf)^
-			  ((s->score >> 24)& 0xf))+'A';
-		 temp1=(((s->score >> 20)& 0xf)^
-			   ((s->score >> 16)& 0xf))+'A';
-		 temp2=(((s->score >> 12)& 0xf)^
-			   ((s->score >> 8)& 0xf))+'A';
-		 temp3=(((s->score >> 4)& 0xf)^
-			   ((s->score >> 0)& 0xf))+'A';
-
-		 SETFONTCOLOR(0x49,0x29);
-		 PrintX = 35*8;
-		 buffer[0]=temp;
-		 buffer[1]=temp1;
-		 buffer[2]=temp2;
-		 buffer[3]=temp3;
-		 buffer[4]=0;
-		 US_Print(buffer);
-		 SETFONTCOLOR(15,0x29);
-		}
-#endif
-#endif
-		#endif
 	}
 
 	VW_UpdateScreen ();

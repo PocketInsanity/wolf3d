@@ -232,7 +232,7 @@ static byte
 ////////////////////////////////////////////////////////////////////
 void US_ControlPanel(byte scancode)
 {
-	int which,i,start;
+	int which;
 
 	if (ingame)
 		if (CP_CheckQuick(scancode))
@@ -360,6 +360,7 @@ void US_ControlPanel(byte scancode)
 				#ifdef SPEAR
 				if (!ingame)
 				{
+					int start, i;
 					//
 					// DEALLOCATE ALL SOUNDS!
 					//
@@ -370,6 +371,8 @@ void US_ControlPanel(byte scancode)
 							break;
 						case sdm_AdLib:
 							start = STARTADLIBSOUNDS;
+							break;
+						default:
 							break;
 					}
 
@@ -927,8 +930,7 @@ void DrawNewGameDiff(int w)
 ////////////////////////////////////////////////////////////////////
 void CP_Sound(void)
 {
-	int which,i;
-
+	int which;
 
 #ifdef SPEAR
 	UnCacheLump (OPTIONS_LUMP_START,OPTIONS_LUMP_END);
@@ -1529,10 +1531,8 @@ int CalibrateJoystick(void)
 ////////////////////////////////////////////////////////////////////
 void CP_Control(void)
 {
-	#define CTL_SPC	70
 	enum {MOUSEENABLE,JOYENABLE,USEPORT2,PADENABLE,MOUSESENS,CUSTOMIZE};
-	int i,which;
-
+	int which;
 
 #ifdef SPEAR
 	UnCacheLump (OPTIONS_LUMP_START,OPTIONS_LUMP_END);
@@ -2095,6 +2095,8 @@ void EnterCtrlData(int index,CustomCtrls *cust,void (*DrawRtn)(int),void (*Print
    case dir_North:
    case dir_South:
 	 exit=1;
+   default:
+   	break;
   }
  } while(!exit);
 
@@ -2452,6 +2454,8 @@ void CP_ChangeView(void)
 			SD_PlaySound(HITWALLSND);
 			TicDelay(10);
 			break;
+		default:
+			break;
 		}
 
 		if (Keyboard[sc_Tab] && Keyboard[sc_P] && MS_CheckParm("debugmode"))
@@ -2514,9 +2518,6 @@ void DrawChangeView(int view)
 ////////////////////////////////////////////////////////////////////
 void CP_Quit(void)
 {
-	int i;
-
-
 	if (Confirm(endStrings[(US_RndT()&0x7)+(US_RndT()&1)]))
 	{
 		VW_UpdateScreen();
@@ -2528,17 +2529,6 @@ void CP_Quit(void)
 
 	DrawMainMenu();
 }
-
-
-////////////////////////////////////////////////////////////////////
-//
-// HANDLE INTRO SCREEN (SYSTEM CONFIG)
-//
-////////////////////////////////////////////////////////////////////
-void IntroScreen(void)
-{
-}
-
 
 ////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
@@ -2568,22 +2558,21 @@ void ClearMScreen(void)
 // Un/Cache a LUMP of graphics
 //
 ////////////////////////////////////////////////////////////////////
-void CacheLump(int lumpstart,int lumpend)
+void CacheLump(int lumpstart, int lumpend)
 {
- int i;
+	int i;
 
- for (i=lumpstart;i<=lumpend;i++)
-   CA_CacheGrChunk(i);
+	for (i=lumpstart;i<=lumpend;i++)
+		CA_CacheGrChunk(i);
 }
 
 
-void UnCacheLump(int lumpstart,int lumpend)
+void UnCacheLump(int lumpstart, int lumpend)
 {
- int i;
+	int i;
 
- for (i=lumpstart;i<=lumpend;i++)
-	if (grsegs[i])
-		UNCACHEGRCHUNK(i);
+	for (i=lumpstart;i<=lumpend;i++)
+		CA_UnCacheGrChunk(i);
 }
 
 
@@ -2597,7 +2586,6 @@ void DrawWindow(int x,int y,int w,int h,int wcolor)
 	VWB_Bar(x,y,w,h,wcolor);
 	DrawOutline(x,y,w,h,BORD2COLOR,DEACTIVE);
 }
-
 
 void DrawOutline(int x,int y,int w,int h,int color1,int color2)
 {
@@ -2617,9 +2605,7 @@ void SetupControlPanel(void)
 {
 #if 0 /* DOS VERSION */
 	struct ffblk f;
-	char name[13];
-	int which,i;
-
+	int which;
 
 	//
 	// CACHE GRAPHICS & SOUNDS
@@ -2662,8 +2648,7 @@ void SetupControlPanel(void)
 		} while(!findnext(&f));
 #else 
 	glob_t globbuf;
-	char name[13];
-	int which, i, x;
+	int which, x;
 	
 	CA_CacheGrChunk(STARTFONT+1);
 #ifndef SPEAR
@@ -2907,6 +2892,9 @@ int HandleMenu(CP_iteminfo *item_i,CP_itemtype *items,void (*routine)(int w))
 			//
 			TicDelay(20);
 			break;
+			
+			default:
+				break;
 		}
 
 		if (ci.button0 ||
@@ -3128,7 +3116,7 @@ void ReadAnyControl(ControlInfo *ci)
 ////////////////////////////////////////////////////////////////////
 int Confirm(char *string)
 {
-	int xit=0,i,x,y,tick=0,time,whichsnd[2]={ESCPRESSEDSND,SHOOTSND};
+	int xit=0,x,y,tick=0,whichsnd[2]={ESCPRESSEDSND,SHOOTSND};
 
 
 	Message(string);

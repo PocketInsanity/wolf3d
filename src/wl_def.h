@@ -49,9 +49,6 @@
 #define AMBUSHTILE		106
 #define	ALTELEVATORTILE	107
 
-#define NUMBERCHARS	9
-
-
 #define HEIGHTRATIO            0.50
 
 //----------------
@@ -59,8 +56,6 @@
 #define EXTRAPOINTS		40000
 
 #define RUNSPEED   		6000
-
-#define SCREENBWIDE		80
 
 #define PLAYERSIZE		MINDIST			// player radius
 #define MINACTORDIST	0x10000l		// minimum dist from player center
@@ -636,7 +631,7 @@ enum	{
 };
 
 
-#define NUMWEAPONS	5
+#define NUMWEAPONS	4
 typedef enum	{
 	wp_knife,
 	wp_pistol,
@@ -832,6 +827,7 @@ extern	char		*demoptr, *lastdemoptr;
 extern	memptr		demobuffer;
 
 
+void StatusDrawPic(unsigned x, unsigned y, unsigned picnum);
 
 void	InitRedShifts (void);
 void 	FinishPaletteShifts (void);
@@ -1113,6 +1109,10 @@ extern	statetype s_schabbdeathcam2;
 extern	statetype s_hitlerdeathcam2;
 extern	statetype s_giftdeathcam2;
 extern	statetype s_fatdeathcam2;
+
+void A_DeathScream(objtype *ob);
+
+void SpawnBJVictory(void);
 
 void SpawnStand (enemy_t which, int tilex, int tiley, int dir);
 void SpawnPatrol (enemy_t which, int tilex, int tiley, int dir);

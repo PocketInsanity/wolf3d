@@ -15,17 +15,6 @@
 #define BJRUNSPEED	2048
 #define BJJUMPSPEED	680
 
-
-/*
-=============================================================================
-
-						 GLOBAL VARIABLES
-
-=============================================================================
-*/
-
-
-
 /*
 =============================================================================
 
@@ -156,7 +145,6 @@ int	starthitpoints[4][NUMENEMIES] =
 
 void	A_StartDeathCam (objtype *ob);
 
-
 void	T_Path (objtype *ob);
 void	T_Shoot (objtype *ob);
 void	T_Bite (objtype *ob);
@@ -164,8 +152,6 @@ void	T_DogChase (objtype *ob);
 void	T_Chase (objtype *ob);
 void	T_Projectile (objtype *ob);
 void	T_Stand (objtype *ob);
-
-void A_DeathScream (objtype *ob);
 
 extern	statetype s_rocket;
 extern	statetype s_smoke1;
@@ -264,9 +250,8 @@ void A_Smoke (objtype *ob)
 
 boolean ProjectileTryMove (objtype *ob)
 {
-	int			xl,yl,xh,yh,x,y;
+	int		xl,yl,xh,yh,x,y;
 	objtype		*check;
-	long		deltax,deltay;
 
 	xl = (ob->x-PROJSIZE) >>TILESHIFT;
 	yl = (ob->y-PROJSIZE) >>TILESHIFT;
@@ -274,9 +259,7 @@ boolean ProjectileTryMove (objtype *ob)
 	xh = (ob->x+PROJSIZE) >>TILESHIFT;
 	yh = (ob->y+PROJSIZE) >>TILESHIFT;
 
-//
-// check for solid walls
-//
+/* check for solid walls */
 	for (y=yl;y<=yh;y++)
 		for (x=xl;x<=xh;x++)
 		{
@@ -356,6 +339,8 @@ void T_Projectile (objtype *ob)
 			break;
 		case fireobj:
 			damage = (US_RndT() >>3);
+			break;
+		default:
 			break;
 		}
 
@@ -878,6 +863,8 @@ void SpawnStand (enemy_t which, int tilex, int tiley, int dir)
 		if (!loadedgame)
 		  gamestate.killtotal++;
 		break;
+	default:
+		break;
 	}
 
 
@@ -936,8 +923,6 @@ void SpawnDeadGuard (int tilex, int tiley)
 
 void SpawnBoss (int tilex, int tiley)
 {
-	word *map,tile;
-
 	SpawnNewObj (tilex,tiley,&s_bossstand);
 	new->speed = SPDPATROL;
 
@@ -959,8 +944,6 @@ void SpawnBoss (int tilex, int tiley)
 
 void SpawnGretel (int tilex, int tiley)
 {
-	word *map,tile;
-
 	SpawnNewObj (tilex,tiley,&s_gretelstand);
 	new->speed = SPDPATROL;
 
@@ -1018,6 +1001,8 @@ void SpawnPatrol (enemy_t which, int tilex, int tiley, int dir)
 		new->speed = SPDDOG;
 		if (!loadedgame)
 		  gamestate.killtotal++;
+		break;
+	default:
 		break;
 	}
 
@@ -1078,6 +1063,8 @@ void A_DeathScream (objtype *ob)
 	  case dogobj:
 		PlaySoundLocActor(DEATHSCREAM6SND,ob);
 		return;
+	  default:
+	  	break;
 	 }
 	}
 #endif
@@ -1162,6 +1149,8 @@ void A_DeathScream (objtype *ob)
 		SD_PlaySound(KNIGHTDEATHSND);
 		break;
 #endif
+	default:
+		break;
 	}
 }
 
@@ -1248,8 +1237,6 @@ statetype s_transshoot8 	= {false,SPR_TRANS_SHOOT1,10,NULL,NULL,&s_transchase1};
 
 void SpawnTrans (int tilex, int tiley)
 {
-	word *map,tile;
-
 	if (SoundBlasterPresent && DigiMode != sds_Off)
 		s_transdie01.tictime = 105;
 
@@ -1260,7 +1247,6 @@ void SpawnTrans (int tilex, int tiley)
 	if (!loadedgame)
 	  gamestate.killtotal++;
 }
-
 
 //
 // uber
@@ -1329,8 +1315,6 @@ statetype s_ubershoot7 	= {false,SPR_UBER_SHOOT1,12,NULL,NULL,&s_uberchase1};
 
 void SpawnUber (int tilex, int tiley)
 {
-	word *map,tile;
-
 	if (SoundBlasterPresent && DigiMode != sds_Off)
 		s_uberdie01.tictime = 70;
 
@@ -1341,7 +1325,6 @@ void SpawnUber (int tilex, int tiley)
 	if (!loadedgame)
 	  gamestate.killtotal++;
 }
-
 
 /*
 ===============
@@ -1428,8 +1411,6 @@ statetype s_willshoot6 	= {false,SPR_WILL_SHOOT4,10,NULL,T_Shoot,&s_willchase1};
 
 void SpawnWill (int tilex, int tiley)
 {
-	word *map,tile;
-
 	if (SoundBlasterPresent && DigiMode != sds_Off)
 		s_willdie2.tictime = 70;
 
@@ -1440,7 +1421,6 @@ void SpawnWill (int tilex, int tiley)
 	if (!loadedgame)
 	  gamestate.killtotal++;
 }
-
 
 /*
 ================
@@ -1603,8 +1583,6 @@ statetype s_deathshoot5 	= {false,SPR_DEATH_SHOOT4,10,NULL,T_Shoot,&s_deathchase
 
 void SpawnDeath (int tilex, int tiley)
 {
-	word *map,tile;
-
 	if (SoundBlasterPresent && DigiMode != sds_Off)
 		s_deathdie2.tictime = 105;
 
@@ -1774,14 +1752,14 @@ statetype s_spark3 	= {false,SPR_SPARK3,6,T_Projectile,NULL,&s_spark4};
 statetype s_spark4 	= {false,SPR_SPARK4,6,T_Projectile,NULL,&s_spark1};
 
 
-void A_Slurpie (objtype *ob)
+void A_Slurpie(objtype *ob)
 {
- SD_PlaySound(SLURPIESND);
+	SD_PlaySound(SLURPIESND);
 }
 
-void A_Breathing (objtype *ob)
+void A_Breathing(objtype *ob)
 {
- SD_PlaySound(ANGELTIREDSND);
+	SD_PlaySound(ANGELTIREDSND);
 }
 
 /*
@@ -1794,9 +1772,6 @@ void A_Breathing (objtype *ob)
 
 void SpawnAngel (int tilex, int tiley)
 {
-	word *map,tile;
-
-
 	if (SoundBlasterPresent && DigiMode != sds_Off)
 		s_angeldie11.tictime = 105;
 
@@ -1912,8 +1887,6 @@ statetype s_spectrewake	= {false,SPR_SPECTRE_F4,10,NULL,A_Dormant,&s_spectrewake
 
 void SpawnSpectre (int tilex, int tiley)
 {
-	word *map,tile;
-
 	SpawnNewObj (tilex,tiley,&s_spectrewait1);
 	new->obclass = spectreobj;
 	new->hitpoints = starthitpoints[gamestate.difficulty][en_spectre];
@@ -1993,8 +1966,6 @@ moveok:
 
 void SpawnGhosts (int which, int tilex, int tiley)
 {
-	word *map,tile;
-
 	switch(which)
 	{
 	 case en_blinky:
@@ -2019,8 +1990,6 @@ void SpawnGhosts (int which, int tilex, int tiley)
 	if (!loadedgame)
 	  gamestate.killtotal++;
 }
-
-
 
 void	T_Gift (objtype *ob);
 void	T_GiftThrow (objtype *ob);
@@ -2209,11 +2178,9 @@ statetype s_fatshoot6 	= {false,SPR_FAT_SHOOT4,10,NULL,T_Shoot,&s_fatchase1};
 ===============
 */
 
-void SpawnSchabbs (int tilex, int tiley)
-{
-	word *map,tile;
-
-	if (DigiMode != sds_Off)
+void SpawnSchabbs(int tilex, int tiley)
+{ 
+	if (DigiMode != sds_Off) /* TODO: what? */
 		s_schabbdie2.tictime = 140;
 	else
 		s_schabbdie2.tictime = 5;
@@ -2240,8 +2207,6 @@ void SpawnSchabbs (int tilex, int tiley)
 
 void SpawnGift (int tilex, int tiley)
 {
-	word *map,tile;
-
 	if (DigiMode != sds_Off)
 	  s_giftdie2.tictime = 140;
 	else
@@ -2269,8 +2234,6 @@ void SpawnGift (int tilex, int tiley)
 
 void SpawnFat (int tilex, int tiley)
 {
-	word *map,tile;
-
 	if (DigiMode != sds_Off)
 	  s_fatdie2.tictime = 140;
 	else
@@ -2829,9 +2792,6 @@ statetype s_hitlershoot6 	= {false,SPR_HITLER_SHOOT2,10,NULL,T_Shoot,&s_hitlerch
 
 void SpawnFakeHitler (int tilex, int tiley)
 {
-	word *map,tile;
-
-
 	if (DigiMode != sds_Off)
 	  s_hitlerdie2.tictime = 140;
 	else
@@ -2859,8 +2819,6 @@ void SpawnFakeHitler (int tilex, int tiley)
 
 void SpawnHitler (int tilex, int tiley)
 {
-	word *map,tile;
-
 	if (DigiMode != sds_Off)
 		s_hitlerdie2.tictime = 140;
 	else
@@ -2889,8 +2847,7 @@ void SpawnHitler (int tilex, int tiley)
 
 void A_HitlerMorph (objtype *ob)
 {
-	word *map,tile,hitpoints[4]={500,700,800,900};
-
+	word hitpoints[4]={500,700,800,900};
 
 	SpawnNewObj (ob->tilex,ob->tiley,&s_hitlerchase1);
 	new->speed = SPDPATROL*5;
@@ -2979,8 +2936,6 @@ void T_FakeFire (objtype *ob)
 void T_Fake (objtype *ob)
 {
 	long move;
-	int	dx,dy,dist;
-	boolean	dodge;
 
 	if (CheckLine(ob))			// got a shot at player?
 	{
@@ -3140,6 +3095,8 @@ void T_Chase (objtype *ob)
 				NewState (ob,&s_deathshoot1);
 				break;
 #endif
+			default:
+				break;
 			}
 			return;
 		}
@@ -3262,7 +3219,6 @@ void T_Ghosts (objtype *ob)
 void T_DogChase (objtype *ob)
 {
 	long 	move;
-	int		dist,chance;
 	long	dx,dy;
 
 
@@ -3372,7 +3328,6 @@ void SelectPathDir (objtype *ob)
 void T_Path (objtype *ob)
 {
 	long 	move;
-	long 	deltax,deltay,size;
 
 	if (SightPlayer (ob))
 		return;
@@ -3422,7 +3377,7 @@ void T_Path (objtype *ob)
 		SelectPathDir (ob);
 
 		if (ob->dir == nodir)
-			return;					// all movement is blocked
+			return;			/* all movement is blocked */
 	}
 }
 
@@ -3539,8 +3494,6 @@ void T_Shoot (objtype *ob)
 void T_Bite (objtype *ob)
 {
 	long	dx,dy;
-	int	hitchance,damage;
-
 
 	PlaySoundLocActor(DOGATTACKSND,ob);	// JAB
 
@@ -3629,8 +3582,6 @@ statetype s_deathcam = {false,0,0,NULL,NULL,NULL};
 
 void SpawnBJVictory (void)
 {
-	word *map,tile;
-
 	SpawnNewObj (player->tilex,player->tiley+1,&s_bjrun1);
 	new->x = player->x;
 	new->y = player->y;
@@ -3776,7 +3727,6 @@ void	A_StartDeathCam (objtype *ob)
 	float	fangle;
 	long    xmove,ymove;
 	long	dist;
-	int		temp,i;
 
 	FinishPaletteShifts ();
 
@@ -3795,7 +3745,6 @@ void	A_StartDeathCam (objtype *ob)
 	CA_UpLevel ();
 	CacheLump(LEVELEND_LUMP_START,LEVELEND_LUMP_END);
 
-	/* TODO: does this also show the deathcam sprite? */
 	Write(0,7,STR_SEEAGAIN);
 
 	CA_DownLevel ();
@@ -3861,7 +3810,9 @@ void	A_StartDeathCam (objtype *ob)
 	case fatobj:
 		NewState (ob,&s_fatdeathcam);
 		break;
-#endif
+#endif	
+	default:
+		break;
 	}
 
 }
