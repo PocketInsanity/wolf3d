@@ -167,12 +167,6 @@ void MM_BombOnError (boolean bomb);
 
 void MML_UseSpace (unsigned segstart, unsigned seglength);
 
-//
-//	ID_PM.H
-//	Header file for Id Engine's Page Manager
-//
-
-//	NOTE! PMPageSize must be an even divisor of EMSPageSize, and >= 1024
 #define	EMSPageSize		16384
 #define	EMSPageSizeSeg	(EMSPageSize >> 4)
 #define	EMSPageSizeKB	(EMSPageSize >> 10)
@@ -201,19 +195,13 @@ typedef	enum
 			pmba_Allocated = 2
 		} PMBlockAttr;
 
-typedef	struct
-		{
-			longword	offset;		// Offset of chunk into file
-			word		length;		// Length of the chunk
-
-			int			xmsPage;	// If in XMS, (xmsPage * PMPageSize) gives offset into XMS handle
-
-			PMLockType	locked;		// If set, this page can't be purged
-			int			emsPage;	// If in EMS, logical page/offset into page
-			int			mainPage;	// If in Main, index into handle array
-
-			longword	lastHit;	// Last frame number of hit
-		} PageListStruct;
+typedef	struct {
+	longword offset;		// Offset of chunk into file
+	word length;		// Length of the chunk
+	PMLockType locked;		// If set, this page can't be purged
+	memptr addr;
+	longword lastHit;	// Last frame number of hit
+} PageListStruct;
 
 typedef	struct
 		{
@@ -238,7 +226,7 @@ extern	PageListStruct *PMPages;
 extern	char	PageFileName[13];
 
 
-extern	void	PM_Startup(void),
+void	PM_Startup(void),
 				PM_Shutdown(void),
 				PM_Reset(void),
 				PM_Preload(boolean (*update)(word current,word total)),
@@ -246,7 +234,7 @@ extern	void	PM_Startup(void),
 				PM_SetPageLock(int pagenum,PMLockType lock),
 				PM_SetMainPurge(int level),
 				PM_CheckMainMem(void);
-extern	memptr	PM_GetPageAddress(int pagenum),
+memptr	PM_GetPageAddress(int pagenum),
 				PM_GetPage(int pagenum);		// Use this one to cache page
 
 void PM_SetMainMemPurge(int level);

@@ -98,7 +98,7 @@ long GRFILEPOS(int c)
 		value = -1;
 
 	return value;
-};
+}
 
 /*
 =============================================================================
@@ -149,7 +149,7 @@ boolean CA_FarRead(int handle, byte *dest, long length)
 		fprintf(stderr, "CA_FarRead hit EOF?\n");
 		return false;
 	} else if (l != length) {
-		fprintf(stderr, "CA_FarRead only read %d out of %d\n", l, length);
+		fprintf(stderr, "CA_FarRead only read %d out of %ld\n", l, length);
 		return false;
 	}
 	return true;
@@ -177,7 +177,7 @@ boolean CA_FarWrite (int handle, byte *source, long length)
 		fprintf(stderr, "CA_FarWrite hit EOF?\n");
 		return false;
 	} else if (l != length) {
-		fprintf(stderr, "CA_FarWrite only wrote %d out of %d\n", l, length);
+		fprintf(stderr, "CA_FarWrite only wrote %d out of %ld\n", l, length);
 		return false;
 	}
 	return true;
@@ -193,7 +193,7 @@ boolean CA_FarWrite (int handle, byte *source, long length)
 ==========================
 */
 
-boolean CA_ReadFile (char *filename, memptr *ptr)
+boolean CA_ReadFile(char *filename, memptr *ptr)
 {
 	int handle;
 	long size;
@@ -201,13 +201,13 @@ boolean CA_ReadFile (char *filename, memptr *ptr)
 	if ((handle = open(filename, O_RDONLY | O_BINARY, S_IREAD)) == -1)
 		return false;
 
-	size = filelength (handle);
-	if (!CA_FarRead (handle,*ptr,size))
-	{
-		close (handle);
+	size = filelength(handle);
+	if (!CA_FarRead (handle, *ptr, size)) {
+		close(handle);
 		return false;
 	}
-	close (handle);
+
+	close(handle);
 	return true;
 }
 
@@ -221,23 +221,22 @@ boolean CA_ReadFile (char *filename, memptr *ptr)
 ==========================
 */
 
-boolean CA_WriteFile (char *filename, void *ptr, long length)
+boolean CA_WriteFile(char *filename, void *ptr, long length)
 {
 	int handle;
-	long size;
 
-	handle = open(filename,O_CREAT | O_BINARY | O_WRONLY, 
+	handle = open(filename, O_CREAT | O_BINARY | O_WRONLY, 
 			S_IREAD | S_IWRITE | S_IFREG);
 
 	if (handle == -1)
 		return false;
 
-	if (!CA_FarWrite (handle,ptr,length))
-	{
-		close (handle);
+	if (!CA_FarWrite(handle, ptr, length)) {
+		close(handle);
 		return false;
 	}
-	close (handle);
+	
+	close(handle);
 	return true;
 }
 
@@ -259,14 +258,14 @@ boolean CA_LoadFile (char *filename, memptr *ptr)
 	if ((handle = open(filename,O_RDONLY | O_BINARY, S_IREAD)) == -1)
 		return false;
 
-	size = filelength (handle);
+	size = filelength(handle);
 	MM_GetPtr (ptr,size);
-	if (!CA_FarRead (handle,*ptr,size))
+	if (!CA_FarRead(handle,*ptr,size))
 	{
 		close (handle);
 		return false;
 	}
-	close (handle);
+	close(handle);
 	return true;
 }
 
@@ -296,12 +295,12 @@ void CAL_HuffExpand(byte *source, byte *dest, long length, huffnode *htable)
 	huffnode *nodeon;           // for trailing down node trees...
 	byte      mask = 0x0001;    // for bitwise testing.
 	word      path;             // stores branch of huffman node.
-	byte     *endoff = (dest + length);    // ptr to where uncompressed ends.
+	byte     *endoff = dest + length;    // ptr to where uncompressed ends.
 
 	nodeon = headptr = htable + 254;  // head node is always node 254.
 
 	do {
-		if ((*source) & mask)
+		if (*source & mask)
 			path = nodeon->bit1;
 	        else
 			path = nodeon->bit0;
@@ -599,7 +598,7 @@ void CAL_SetupMapFile (void)
 	for (i=0;i<NUMMAPS;i++)
 	{
 		pos = ((mapfiletype *)tinf)->headeroffsets[i];
-		if (pos<0)	// $FFFFFFFF start is a sparse map
+		if (pos<0)	/* $FFFFFFFF start is a sparse map */
 			continue;
 
 		MM_GetPtr((memptr)&mapheaderseg[i],sizeof(maptype));
@@ -884,7 +883,7 @@ void CA_CacheGrChunk (int chunk)
 	byte	*source;
 	int		next;
 
-	grneeded[chunk] |= ca_levelbit;		// make sure it doesn't get removed
+	grneeded[chunk] |= ca_levelbit;	/* make sure it doesn't get removed */
 	if (grsegs[chunk])
 	{
 		MM_SetPurge (&grsegs[chunk],0);
@@ -896,7 +895,7 @@ void CA_CacheGrChunk (int chunk)
 // a larger buffer
 //
 	pos = GRFILEPOS(chunk);
-	if (pos<0)							// $FFFFFFFF start is a sparse tile
+	if (pos<0) /* $FFFFFFFF start is a sparse tile */
 	  return;
 
 	next = chunk +1;
@@ -1064,7 +1063,7 @@ void CA_UpLevel (void)
 
 	for (i=0;i<NUMCHUNKS;i++)
 		if (grsegs[i])
-			MM_SetPurge (&(memptr)grsegs[i],3);
+			MM_SetPurge ((memptr)&grsegs[i],3);
 	ca_levelbit<<=1;
 	ca_levelnum++;
 }
@@ -1126,7 +1125,7 @@ void CA_ClearMarks (void)
 
 void CA_ClearAllMarks (void)
 {
-	_fmemset (grneeded,0,sizeof(grneeded));
+	memset (grneeded,0,sizeof(grneeded));
 	ca_levelbit = 1;
 	ca_levelnum = 0;
 }
@@ -1155,7 +1154,7 @@ void CA_SetGrPurge (void)
 
 	for (i=0;i<NUMCHUNKS;i++)
 		if (grsegs[i])
-			MM_SetPurge (&(memptr)grsegs[i],3);
+			MM_SetPurge ((memptr)&grsegs[i],3);
 }
 
 
@@ -1530,8 +1529,9 @@ void MM_DumpData (void)
 ======================
 */
 
-long MM_UnusedMemory (void)
+long MM_UnusedMemory(void)
 {
+	return 0;
 }
 
 /*
@@ -1546,6 +1546,7 @@ long MM_UnusedMemory (void)
 
 long MM_TotalFree (void)
 {
+	return 0;
 }
 
 /*
@@ -1556,17 +1557,10 @@ long MM_TotalFree (void)
 =====================
 */
 
-void MM_BombOnError (boolean bomb)
+void MM_BombOnError(boolean bomb)
 {
 	bombonerror = bomb;
 }
-
-
-//
-//	ID_PM.C
-//	Id Engine's Page Manager v1.0
-//	Primary coder: Jason Blochowiak
-//
 
 //	Main Mem specific variables
 	boolean			MainPresent;
@@ -1602,56 +1596,6 @@ void MM_BombOnError (boolean bomb)
 					PMNumBlocks;
 	long			PMFrameCount;
 	PageListStruct *PMPages, *PMSegPages;
-
-/////////////////////////////////////////////////////////////////////////////
-//
-//	Main memory code
-//
-/////////////////////////////////////////////////////////////////////////////
-
-//
-//	PM_SetMainMemPurge() - Sets the purge level for all allocated main memory
-//		blocks. This shouldn't be called directly - the PM_LockMainMem() and
-//		PM_UnlockMainMem() macros should be used instead.
-//
-void PM_SetMainMemPurge(int level)
-{
-}
-
-//
-//	PM_CheckMainMem() - If something besides the Page Mgr makes requests of
-//		the Memory Mgr, some of the Page Mgr's blocks may have been purged,
-//		so this function runs through the block list and checks to see if
-//		any of the blocks have been purged. If so, it marks the corresponding
-//		page as purged & unlocked, then goes through the block list and
-//		tries to reallocate any blocks that have been purged.
-//	This routine now calls PM_LockMainMem() to make sure that any allocation
-//		attempts made during the block reallocation sweep don't purge any
-//		of the other blocks. Because PM_LockMainMem() is called,
-//		PM_UnlockMainMem() needs to be called before any other part of the
-//		program makes allocation requests of the Memory Mgr.
-//
-void PM_CheckMainMem(void)
-{
-}
-
-//
-//	PML_StartupMainMem() - Allocates as much main memory as is possible for
-//		the Page Mgr. The memory is allocated as non-purgeable, so if it's
-//		necessary to make requests of the Memory Mgr, PM_UnlockMainMem()
-//		needs to be called.
-//
-void PML_StartupMainMem(void)
-{
-}
-
-//
-//	PML_ShutdownMainMem() - Frees all of the main memory blocks used by the
-//		Page Mgr.
-//
-void PML_ShutdownMainMem(void)
-{
-}
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -1744,17 +1688,6 @@ void PML_ClosePageFile(void)
 /////////////////////////////////////////////////////////////////////////////
 
 //
-//	PML_GetEMSAddress()
-//
-// 		Page is in EMS, so figure out which EMS physical page should be used
-//  		to map our page in. If normal page, use EMS physical page 3, else
-//  		use the physical page specified by the lock type
-//
-memptr PML_GetEMSAddress(int page,PMLockType lock)
-{
-}
-
-//
 //	PM_GetPageAddress() - Returns the address of a given page
 //		Maps in EMS if necessary
 //		Returns nil if block isn't cached into Main Memory or EMS
@@ -1765,107 +1698,8 @@ memptr PM_GetPageAddress(int pagenum)
 	PageListStruct *page;
 
 	page = &PMPages[pagenum];
-	if (page->mainPage != -1)
-		return(MainMemPages[page->mainPage]);
-	else if (page->emsPage != -1)
-		return(PML_GetEMSAddress(page->emsPage,page->locked));
-	else
-		return(nil);
-}
-
-//
-//	PML_GiveLRUPage() - Returns the page # of the least recently used
-//		present & unlocked main/EMS page (or main page if mainonly is true)
-//
-int PML_GiveLRUPage(boolean mainonly)
-{
-	int				i,lru;
-	long			last;
-	PageListStruct *page;
-
-	for (i = 0,page = PMPages,lru = -1,last = MAXLONG;i < ChunksInFile;i++,page++)
-	{
-		if
-		(
-			(page->lastHit < last)
-		&&	((page->emsPage != -1) || (page->mainPage != -1))
-		&& 	(page->locked == pml_Unlocked)
-		&&	(!(mainonly && (page->mainPage == -1)))
-		)
-		{
-			last = page->lastHit;
-			lru = i;
-		}
-	}
-
-	if (lru == -1)
-		Quit("PML_GiveLRUPage: LRU Search failed");
-	return(lru);
-}
-
-//
-//	PML_GiveLRUXMSPage() - Returns the page # of the least recently used
-//		(and present) XMS page.
-//	This routine won't return the XMS page protected (by XMSProtectPage)
-//
-int PML_GiveLRUXMSPage(void)
-{
-}
-
-//
-//	PML_PutPageInXMS() - If page isn't in XMS, find LRU XMS page and replace
-//		it with the main/EMS page
-//
-void PML_PutPageInXMS(int pagenum)
-{
-}
-
-//
-//	PML_TransferPageSpace() - A page is being replaced, so give the new page
-//		the old one's address space. Returns the address of the new page.
-//
-memptr PML_TransferPageSpace(int orig,int new)
-{
-}
-
-//
-//	PML_GetAPageBuffer() - A page buffer is needed. Either get it from the
-//		main/EMS free pool, or use PML_GiveLRUPage() to find which page to
-//		steal the buffer from. Returns a far pointer to the page buffer, and
-//		sets the fields inside the given page structure appropriately.
-//		If mainonly is true, free EMS will be ignored, and only main pages
-//		will be looked at by PML_GiveLRUPage().
-//
-byte *PML_GetAPageBuffer(int pagenum,boolean mainonly)
-{
-}
-
-//
-//	PML_GetPageFromXMS() - If page is in XMS, find LRU main/EMS page and
-//		replace it with the page from XMS. If mainonly is true, will only
-//		search for LRU main page.
-//	XMSProtectPage is set to the page to be retrieved from XMS, so that if
-//		the page from which we're stealing the main/EMS from isn't in XMS,
-//		it won't copy over the page that we're trying to get from XMS.
-//		(pages that are being purged are copied into XMS, if possible)
-//
-memptr PML_GetPageFromXMS(int pagenum,boolean mainonly)
-{
-}
-
-//
-//	PML_LoadPage() - A page is not in main/EMS memory, and it's not in XMS.
-//		Load it into either main or EMS. If mainonly is true, the page will
-//		only be loaded into main.
-//
-void PML_LoadPage(int pagenum, boolean mainonly)
-{
-	byte *addr;
-	PageListStruct *page;
-
-	addr = PML_GetAPageBuffer(pagenum, mainonly);
-	page = &PMPages[pagenum];
-	PML_ReadFromFile(addr, page->offset, page->length);
+	
+	return page->addr;
 }
 
 //
@@ -1876,24 +1710,19 @@ void PML_LoadPage(int pagenum, boolean mainonly)
 //
 memptr PM_GetPage(int pagenum)
 {
-	memptrresult;
-
+	PageListStruct *page;
+	
 	if (pagenum >= ChunksInFile)
 		Quit("PM_GetPage: Invalid page request");
 
-	if (!(result = PM_GetPageAddress(pagenum)))
-	{
-		boolean mainonly = (pagenum >= PMSoundStart);
-		
-		if (!PMPages[pagenum].offset)	// JDC: sparse page
-			Quit ("Tried to load a sparse page!");
-
-		PML_LoadPage(pagenum, mainonly);
-		result = PM_GetPageAddress(pagenum);
+	page = &PMPages[pagenum];
+	if (page->addr == NULL) {
+		page->lastHit = 0;
+		MM_GetPtr(page->addr, PMPageSize);
+		PML_ReadFromFile(page->addr, page->offset, page->length);
 	}
-	PMPages[pagenum].lastHit = PMFrameCount;
-
-	return result;
+	page->lastHit++;
+	return page->addr;
 }
 
 //
@@ -1918,111 +1747,7 @@ void PM_SetPageLock(int pagenum,PMLockType lock)
 //
 void PM_Preload(boolean (*update)(word current,word total))
 {
-	int				i,j,
-					page,oogypage;
-	word			current,total,
-					totalnonxms,totalxms,
-					mainfree,maintotal,
-					emsfree,emstotal,
-					xmsfree,xmstotal;
-	memptr			addr;
-	PageListStruct *p;
-
-	mainfree = (MainPagesAvail - MainPagesUsed) + (EMSPagesAvail - EMSPagesUsed);
-	xmsfree = (XMSPagesAvail - XMSPagesUsed);
-
-	xmstotal = maintotal = 0;
-
-	for (i = 0;i < ChunksInFile;i++)
-	{
-		if (!PMPages[i].offset)
-			continue;			// sparse
-
-		if ( PMPages[i].emsPage != -1 || PMPages[i].mainPage != -1 )
-			continue;			// already in main mem
-
-		if ( mainfree )
-		{
-			maintotal++;
-			mainfree--;
-		}
-		else if ( xmsfree && (PMPages[i].xmsPage == -1) )
-		{
-			xmstotal++;
-			xmsfree--;
-		}
-	}
-
-
-	total = maintotal + xmstotal;
-
-	if (!total)
-		return;
-
-	page = 0;
-	current = 0;
-
-//
-// cache main/ems blocks
-//
-	while (maintotal)
-	{
-		while ( !PMPages[page].offset || PMPages[page].mainPage != -1
-			||	PMPages[page].emsPage != -1 )
-			page++;
-
-		if (page >= ChunksInFile)
-			Quit ("PM_Preload: Pages>=ChunksInFile");
-
-		PM_GetPage(page);
-
-		page++;
-		current++;
-		maintotal--;
-		update(current,total);
-	}
-
-//
-// load stuff to XMS
-//
-	if (xmstotal)
-	{
-		for (oogypage = 0 ; PMPages[oogypage].mainPage == -1 ; oogypage++)
-		;
-		addr = PM_GetPage(oogypage);
-		if (!addr)
-			Quit("PM_Preload: XMS buffer failed");
-
-		while (xmstotal)
-		{
-			while ( !PMPages[page].offset || PMPages[page].xmsPage != -1 )
-				page++;
-
-			if (page >= ChunksInFile)
-				Quit ("PM_Preload: Pages>=ChunksInFile");
-
-			p = &PMPages[page];
-
-			p->xmsPage = XMSPagesUsed++;
-			if (XMSPagesUsed > XMSPagesAvail)
-				Quit("PM_Preload: Exceeded XMS pages");
-			if (p->length > PMPageSize)
-				Quit("PM_Preload: Page too long");
-
-			PML_ReadFromFile((byte *)addr,p->offset,p->length);
-			PML_CopyToXMS((byte *)addr,p->xmsPage,p->length);
-
-			page++;
-			current++;
-			xmstotal--;
-			update(current,total);
-		}
-
-		p = &PMPages[oogypage];
-		PML_ReadFromFile((byte *)addr,p->offset,p->length);
-	}
-
-	update(total,total);
+	update(1, 1);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -2052,18 +1777,6 @@ void PM_NextFrame(void)
 		PMFrameCount = 0;
 	}
 
-#if 0
-	for (i = 0;i < PMSoundStart;i++)
-	{
-		if (PMPages[i].locked)
-		{
-			char buf[40];
-			sprintf(buf,"PM_NextFrame: Page %d is locked",i);
-			Quit(buf);
-		}
-	}
-#endif
-
 }
 
 //
@@ -2077,9 +1790,7 @@ void PM_Reset(void)
 	// Initialize page list
 	for (i = 0,page = PMPages;i < PMNumBlocks;i++,page++)
 	{
-		page->mainPage = -1;
-		page->emsPage = -1;
-		page->xmsPage = -1;
+		page->addr = NULL;
 		page->locked = false;
 	}
 }
@@ -2089,13 +1800,10 @@ void PM_Reset(void)
 //
 void PM_Startup(void)
 {
-	int		i;
-
 	if (PMStarted)
 		return;
 
 	PML_OpenPageFile();
-	PML_StartupMainMem();
 
 	PM_Reset();
 
@@ -2111,6 +1819,4 @@ void PM_Shutdown(void)
 		return;
 
 	PML_ClosePageFile();
-
-	PML_ShutdownMainMem();
 }

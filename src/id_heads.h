@@ -1,6 +1,7 @@
 #ifndef __ID_HEADS_H__
 #define __ID_HEADS_H__
 
+#include <unistd.h>
 #include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -9,6 +10,9 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <values.h>
+#include <sys/types.h>
+
+#include "misc.h"
 
 #include "version.h"
 
