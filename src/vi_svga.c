@@ -347,8 +347,6 @@ static	Direction	DirTable[] =		// Quick lookup for total direction
 						dir_SouthWest,	dir_South,	dir_SouthEast
 					};
 
-static	char			*ParmStrings[] = {"nojoys","nomouse",nil};
-
 //	Internal routines
 
 void keyboard_handler(int code, int press)
@@ -552,19 +550,12 @@ void IN_Startup(void)
 
 	checkjoys = true;
 	checkmouse = true;
-	for (i = 1;i < _argc;i++)
-	{
-		switch (US_CheckParm(_argv[i],ParmStrings))
-		{
-		case 0:
-			checkjoys = false;
-			break;
-		case 1:
-			checkmouse = false;
-			break;
-		}
-	}
-
+	
+	if (MS_CheckParm("nojoy"))
+		checkjoys = false;
+	if (MS_CheckParm("nomouse"))
+		checkmouse = false;
+		
 	INL_StartKbd();
 	MousePresent = checkmouse ? INL_StartMouse() : false;
 

@@ -1119,7 +1119,7 @@ void	CheckHighScore (long score,word other)
 		PrintX = 4*8;
 		backcolor = BORDCOLOR;
 		fontcolor = 15;
-		US_LineInput(PrintX,PrintY,Scores[n].name,nil,true,MaxHighName,100);
+		US_LineInput(PrintX,PrintY,Scores[n].name,NULL,true,MaxHighName,100);
 #else
 		PrintX = 16;
 		fontnumber = 1;
@@ -1127,7 +1127,7 @@ void	CheckHighScore (long score,word other)
 		VW_UpdateScreen ();
 		backcolor = 0x9c;
 		fontcolor = 15;
-		US_LineInput(PrintX,PrintY,Scores[n].name,nil,true,MaxHighName,130);
+		US_LineInput(PrintX,PrintY,Scores[n].name,NULL,true,MaxHighName,130);
 #endif
 	}
 	else
@@ -1376,7 +1376,7 @@ void CopyProtection(void)
 				inputbuffer[0] = 0;
 				PrintY = TYPEBOX_Y;
 				fontnumber = 1;
-				US_LineInput(PrintX,PrintY,inputbuffer,nil,true,20,100);
+				US_LineInput(PrintX,PrintY,inputbuffer,NULL,true,20,100);
 
 				match = 0;
 				for (i=0;i<strlen(bossstrs[whichboss]);i++)
@@ -1410,7 +1410,7 @@ void CopyProtection(void)
 				backcolor = TYPEBOX_BKGD;
 				inputbuffer[0] = 0;
 				PrintY = TYPEBOX_Y;
-				US_LineInput(PrintX,PrintY,inputbuffer,nil,true,6,100);
+				US_LineInput(PrintX,PrintY,inputbuffer,NULL,true,6,100);
 
 				strlwr(inputbuffer);
 				match = 1-(strcmp(inputbuffer,WordCorrect[whichword])!=0);
@@ -1436,7 +1436,7 @@ void CopyProtection(void)
 				backcolor = TYPEBOX_BKGD;
 				inputbuffer[0] = 0;
 				PrintY = TYPEBOX_Y;
-				US_LineInput(PrintX,PrintY,inputbuffer,nil,true,20,120);
+				US_LineInput(PrintX,PrintY,inputbuffer,NULL,true,20,120);
 
 				strlwr(inputbuffer);
 				match = 0;
@@ -1467,7 +1467,7 @@ void CopyProtection(void)
 				backcolor = TYPEBOX_BKGD;
 				inputbuffer[0] = 0;
 				PrintY = TYPEBOX_Y;
-				US_LineInput(PrintX,PrintY,inputbuffer,nil,true,6,100);
+				US_LineInput(PrintX,PrintY,inputbuffer,NULL,true,6,100);
 
 				strlwr(inputbuffer);
 				match = 1-(strcmp(inputbuffer,MiscCorrect[whichone])!=0);

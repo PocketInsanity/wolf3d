@@ -30,7 +30,6 @@ and right (happens at any view basically, except this version of source does
 not leave any artifacts after a few screen redraws)
 * remove GOODTIMES (the piracy message is somewhat worthless)
 * then consider removing the SOD manual check
-* Use either US_CheckParm or MS_CheckParm.
 * perhaps rename UPLOAD
 * TOO MANY #IFDEFs
 * and upload builds with lots of wl6 code anyway (sound references were just
@@ -70,10 +69,12 @@ PlayDemoFromFile specifically
 * make sure all infinite loops are found (looping around Keyboard)
 * deathcam went by too fast, and right before the fizzlefade was being done
 on the border
+same with the spear of destiny animation part of ending
 * move all references to gfxbuf to vi_* only (gl will need this anyway,
 since it deprecates: id_vh, wl_draw, wl_scale)
 by putting in code from id_vh (either by using Plot or just copying it in)
 we can stop the large conversion before each UpdateScreen
+but palette fades will still need it!
 * pause key
 * what are special keys... ?
 * no fizzlefade in 15-24bit

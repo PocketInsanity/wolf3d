@@ -702,8 +702,6 @@ typedef	enum	{
 =============================================================================
 */
 
-int MS_CheckParm(char *string);
-
 extern	char		str[80],str2[20];
 
 extern	fixed		focallength;

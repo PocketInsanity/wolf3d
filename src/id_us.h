@@ -38,10 +38,9 @@ void US_Startup(void),
 				US_PrintUnsigned(longword n);
 boolean	US_LineInput(int x,int y,char *buf,char *def,boolean escok,
 				int maxchars,int maxwidth);
-int		US_CheckParm(char *parm,char **strings),
-				US_RndT(void);
+int				US_RndT();
 
-		void	USL_PrintInCenter(char *s,Rect r);
+void	USL_PrintInCenter(char *s,Rect r);
 
 #else
 #error "fix me: TODO"

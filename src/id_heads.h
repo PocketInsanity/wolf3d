@@ -24,8 +24,6 @@
 #define O_BINARY 0
 #endif
 
-int WolfMain(int argc, char *argv[]);
-
 /* ------------------------------------------------------------------------ */
 
 #ifndef SPEAR
@@ -54,9 +52,8 @@ int WolfMain(int argc, char *argv[]);
 
 typedef	enum	{false,true}	boolean;
 typedef	unsigned	char		byte;
-typedef	unsigned	short int		word;
+typedef	unsigned	short int	word;
 typedef	unsigned	long		longword;
-typedef	byte *					Ptr;
 
 typedef void * memptr;
 
@@ -69,8 +66,6 @@ typedef	struct
 			Point	ul,lr;
 		} Rect;
 
-#define	nil	((void *)0)
-
 #include "vi_comm.h"
 
 #include "id_ca.h"
@@ -82,7 +77,9 @@ extern byte signon[];
 
 #define	introscn signon
 
-void	Quit (char *error);		// defined in user program
+int MS_CheckParm(char *string);
+int WolfMain(int argc, char *argv[]);
+void Quit(char *error);
 
 #define	MAXTICS				10
 #define DEMOTICS			4

@@ -9,7 +9,6 @@ word		WindowX,WindowY,WindowW,WindowH;
 
 //	Internal variables
 
-static	char		*ParmStrings[] = {"nowait"};
 static	boolean		US_Started;
 
 void		(*USL_MeasureString)(char *,word *,word *) = VW_MeasurePropString,
@@ -32,25 +31,17 @@ HighScore	Scores[MaxScores] = {
 //	US_Startup() - Starts the User Mgr
 //
 ///////////////////////////////////////////////////////////////////////////
-void US_Startup(void)
+void US_Startup()
 {
 	int	i,n;
 
 	if (US_Started)
 		return;
 
-	US_InitRndT(true);		// Initialize the random number generator
+	US_InitRndT(true);
 
-	for (i = 1;i < _argc;i++)
-	{
-		n = US_CheckParm(_argv[i],ParmStrings);
-		switch(n)
-		{
-		 case 0:
-		   NoWait = true;
-		   break;
-		}
-	}
+	if (MS_CheckParm("nowait"))
+		NoWait = true;
 
 	US_Started = true;
 }
@@ -67,40 +58,6 @@ void US_Shutdown(void)
 		return;
 
 	US_Started = false;
-}
-
-///////////////////////////////////////////////////////////////////////////
-//
-//	US_CheckParm() - checks to see if a string matches one of a set of
-//		strings. The check is case insensitive. The routine returns the
-//		index of the string that matched, or -1 if no matches were found
-//
-///////////////////////////////////////////////////////////////////////////
-int US_CheckParm(char *parm,char **strings)
-{
-	char	cp,cs,
-			*p,*s;
-	int		i;
-
-	while (!isalpha(*parm))	// Skip non-alphas
-		parm++;
-
-	for (i = 0;*strings && **strings;i++)
-	{
-		for (s = *strings++,p = parm,cs = cp = 0;cs == cp;)
-		{
-			cs = *s++;
-			if (!cs)
-				return(i);
-			cp = *p++;
-
-			if (isupper(cs))
-				cs = tolower(cs);
-			if (isupper(cp))
-				cp = tolower(cp);
-		}
-	}
-	return -1;
 }
 
 //	Window/Printing routines

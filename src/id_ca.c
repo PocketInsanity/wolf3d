@@ -1535,7 +1535,7 @@ void PML_ClosePageFile(void)
 
 //
 //	PM_GetPageAddress() - Returns the address of a given page
-//		Returns nil if block is not loaded
+//		Returns NULL if block is not loaded
 //
 memptr PM_GetPageAddress(int pagenum)
 {
