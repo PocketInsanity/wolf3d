@@ -47,7 +47,7 @@ void ClearMemory()
 ==========================
 */
 
-void ScanInfoPlane (void)
+void ScanInfoPlane()
 {
 	unsigned x,y;
 	int tile;
@@ -451,7 +451,7 @@ void ScanInfoPlane (void)
 ==================
 */
 
-void SetupGameLevel (void)
+void SetupGameLevel()
 {
 	int x,y;
 	word *map,tile;
@@ -579,7 +579,7 @@ void SetupGameLevel (void)
 // have the caching manager load and purge stuff to make sure all marks
 // are in memory
 //
-	CA_LoadAllSounds ();
+	CA_LoadAllSounds();
 
 }
 
@@ -597,7 +597,7 @@ void SetupGameLevel (void)
 ===================
 */
 
-void DrawPlayBorderSides (void)
+void DrawPlayBorderSides()
 {
 	int	xl,yl;
 
@@ -620,9 +620,9 @@ void DrawPlayBorderSides (void)
 ===================
 */
 
-void DrawAllPlayBorderSides (void)
+void DrawAllPlayBorderSides()
 {
-	DrawPlayBorderSides ();
+	DrawPlayBorderSides();
 }
 
 /*
@@ -632,9 +632,9 @@ void DrawAllPlayBorderSides (void)
 =
 ===================
 */
-void DrawAllPlayBorder (void)
+void DrawAllPlayBorder()
 {
-	DrawPlayBorder ();
+	DrawPlayBorder();
 }
 
 /*
@@ -645,9 +645,9 @@ void DrawAllPlayBorder (void)
 ===================
 */
 
-void DrawPlayBorder (void)
+void DrawPlayBorder()
 {
-	int	xl,yl;
+	int xl, yl;
 
 	VW_Bar (0,0,320,200-STATUSLINES,127);
 
@@ -662,8 +662,6 @@ void DrawPlayBorder (void)
 	VW_Plot (xl-1,yl+viewheight,124);
 }
 
-
-
 /*
 ===================
 =
@@ -674,7 +672,7 @@ void DrawPlayBorder (void)
 
 void DrawPlayScreen()
 {
-	VW_FadeOut ();
+	VW_FadeOut();
 
 	CA_CacheGrChunk(STATUSBARPIC);
 
@@ -705,10 +703,10 @@ void DrawPlayScreen()
 
 #define MAXDEMOSIZE	8192
 
-void StartDemoRecord (int levelnumber)
+void StartDemoRecord(int levelnumber)
 {
-	MM_GetPtr (&demobuffer,MAXDEMOSIZE);
-	MM_SetLock (&demobuffer,true);
+	MM_GetPtr(&demobuffer,MAXDEMOSIZE);
+	MM_SetLock(&demobuffer,true);
 	demoptr = (char *)demobuffer;
 	lastdemoptr = demoptr+MAXDEMOSIZE;
 
@@ -716,7 +714,6 @@ void StartDemoRecord (int levelnumber)
 	demoptr += 4;				// leave space for length
 	demorecord = true;
 }
-
 
 /*
 ==================
@@ -728,9 +725,9 @@ void StartDemoRecord (int levelnumber)
 
 char demoname[13] = "demo?.dem";
 
-void FinishDemoRecord (void)
+void FinishDemoRecord()
 {
-	long	length,level;
+	long length, level;
 
 	demorecord = false;
 
@@ -770,7 +767,7 @@ void FinishDemoRecord (void)
 ==================
 */
 
-void RecordDemo(void)
+void RecordDemo()
 {
 	int level,esc;
 
@@ -902,29 +899,29 @@ int PlayDemoFromFile(char *demoname)
 	demoptr++;
 	lastdemoptr = demoptr-4+length;
 
-	VW_FadeOut ();
+	VW_FadeOut();
 
 	SETFONTCOLOR(0,15);
-	DrawPlayScreen ();
+	DrawPlayScreen();
 	VW_UpdateScreen(); /* force redraw */
 	
-	VW_FadeIn ();
+	VW_FadeIn();
 
 	startgame = false;
 	demoplayback = true;
 
-	SetupGameLevel ();
-	StartMusic ();
+	SetupGameLevel();
+	StartMusic();
 	fizzlein = true;
 
-	PlayLoop ();
+	PlayLoop();
 
 	MM_FreePtr(&demobuffer);
 
 	demoplayback = false;
 
-	StopMusic ();
-	ClearMemory ();	
+	StopMusic();
+	ClearMemory();	
 
 	return 1;
 }
@@ -960,18 +957,15 @@ void Died()
 	}
 	
 	fangle = atan2(dy,dx);			// returns -pi to pi
-	if (fangle<0)
+	if (fangle < 0)
 		fangle = PI*2+fangle;
 
 	iangle = fangle/(PI*2)*ANGLES;
 
-	if (player->angle > iangle)
-	{
+	if (player->angle > iangle) {
 		counter = player->angle - iangle;
 		clockwise = ANGLES-player->angle + iangle;
-	}
-	else
-	{
+	} else {
 		clockwise = iangle - player->angle;
 		counter = player->angle + ANGLES-iangle;
 	}
@@ -985,8 +979,7 @@ void Died()
 	//
 		if (curangle>iangle)
 			curangle -= ANGLES;
-		do
-		{
+		do {
 			change = tics*DEATHROTATE;
 			if (curangle + change > iangle)
 				change = iangle-curangle;
@@ -996,8 +989,8 @@ void Died()
 			if (player->angle >= ANGLES)
 				player->angle -= ANGLES;
 
-			ThreeDRefresh ();
-			CalcTics ();
+			ThreeDRefresh();
+			CalcTics();
 		} while (curangle != iangle);
 	}
 	else
