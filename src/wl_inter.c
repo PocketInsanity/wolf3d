@@ -252,7 +252,7 @@ void Victory (void)
 ==================
 */
 
-void PG13 (void)
+void PG13()
 {
 	VW_FadeOut();
 	VW_Bar(0,0,320,200,0x82);			// background
@@ -972,7 +972,7 @@ void DrawHighScores()
 		//
 		// level
 		//
-		ultoa(s->completed,buffer,10);
+		ultoa(s->completed, buffer, 10);
 #ifndef SPEAR
 		for (str = buffer;*str;str++)
 			*str = *str + (129 - '0');	// Used fixed-width numbers (129...)
@@ -1003,7 +1003,7 @@ void DrawHighScores()
 		//
 		// score
 		//
-		ultoa(s->score, buffer1, 10);
+		ultoa(s->score, buffer, 10);
 #ifndef SPEAR
 		for (str = buffer; *str; str++)
 			*str = *str + (129 - '0');	// Used fixed-width numbers (129...)

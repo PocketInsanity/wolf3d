@@ -487,7 +487,7 @@ static void DrawScaleds()
 				visptr->shapenum = obj->temp1;	// special shape
 
 			if (obj->state->rotate)
-				visptr->shapenum += CalcRotate (obj);
+				visptr->shapenum += CalcRotate(obj);
 
 			if (visptr < &vislist[MAXVISABLE-1])	/* don't let it overflow */
 				visptr++;
