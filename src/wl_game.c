@@ -194,7 +194,6 @@ void ClearMemory (void)
 	MM_SortMem ();
 }
 
-
 /*
 ==========================
 =
@@ -647,22 +646,17 @@ void SetupGameLevel (void)
 //
 // copy the wall data to a data segment array
 //
-	memset (tilemap,0,sizeof(tilemap));
-	memset (actorat,0,sizeof(actorat));
+	memset(tilemap,0,sizeof(tilemap));
+	memset(actorat,0,sizeof(actorat));
 	map = mapsegs[0];
 	for (y=0;y<mapheight;y++)
 		for (x=0;x<mapwidth;x++)
 		{
 			tile = *map++;
-			if (tile<AREATILE)
-			{
-			// solid wall
+			if (tile<AREATILE) { // solid wall
 				tilemap[x][y] = tile;
 				(unsigned)actorat[x][y] = tile;
-			}
-			else
-			{
-			// area floor
+			} else { // area floor
 				tilemap[x][y] = 0;
 				(unsigned)actorat[x][y] = 0;
 			}
@@ -671,9 +665,9 @@ void SetupGameLevel (void)
 //
 // spawn doors
 //
-	InitActorList ();			// start spawning things with a clean slate
-	InitDoorList ();
-	InitStaticList ();
+	InitActorList();			// start spawning things with a clean slate
+	InitDoorList();
+	InitStaticList();
 
 	map = mapsegs[0];
 	for (y=0;y<mapheight;y++)
@@ -919,7 +913,7 @@ void StartDemoRecord (int levelnumber)
 ==================
 */
 
-char	demoname[13] = "DEMO?.";
+char demoname[13] = "demo?.";
 
 void FinishDemoRecord (void)
 {
