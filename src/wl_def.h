@@ -6,10 +6,6 @@
 #include "wl_menu.h"
 #include "foreign.h"
 
-#ifdef SPEAR
-#include "f_spear.h"
-#endif
-
 /*
 =============================================================================
 

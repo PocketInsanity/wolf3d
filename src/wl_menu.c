@@ -11,16 +11,10 @@
 //
 void CP_ReadThis(void);
 
-#ifdef SPEAR
-#define STARTITEM	newgame
-
-#else
-#ifdef GOODTIMES
-#define STARTITEM	newgame
-
-#else
+#ifdef UPLOAD
 #define STARTITEM	readthis
-#endif
+#else
+#define STARTITEM	newgame
 #endif
 
 char endStrings[9][80]=
@@ -49,7 +43,7 @@ char endStrings[9][80]=
 };
 
 CP_iteminfo
-#if !defined(GOODTIMES) && !defined(SPEAR)
+#ifdef UPLOAD
 	MainItems={MENU_X,MENU_Y,10,STARTITEM,24},
 #else
 	MainItems={MENU_X,MENU_Y, 9,STARTITEM,24},
@@ -70,7 +64,7 @@ MainMenu[]=
 	{1,STR_LG,(void *)CP_LoadGame},
 	{0,STR_SG,(void *)CP_SaveGame},
 	{1,STR_CV,(void *)CP_ChangeView},
-#if !defined(GOODTIMES) && !defined(SPEAR)
+#ifdef UPLOAD
 	{2,"Read This!",(void *)CP_ReadThis},
 #endif
 	{1,STR_VS,(void *)CP_ViewScores},
@@ -284,14 +278,10 @@ void US_ControlPanel(byte scancode)
 	switch(scancode)
 	{
 		case sc_F1:
-			#ifdef SPEAR
-			BossKey();
-			#else
-			#ifdef GOODTIMES
-			BossKey();
-			#else
+			#ifdef UPLOAD
 			HelpScreens();
-			#endif
+			#else
+			BossKey();
 			#endif
 			goto finishup;
 
@@ -394,6 +384,7 @@ void US_ControlPanel(byte scancode)
 
 			case backtodemo:
 				#ifdef SPEAR
+				/* TODO: why was this added for spear only? */
 				if (!ingame)
 				{
 					int start, i;
@@ -409,6 +400,7 @@ void US_ControlPanel(byte scancode)
 							start = STARTADLIBSOUNDS;
 							break;
 						default:
+							start = 0;
 							break;
 					}
 
@@ -502,8 +494,7 @@ void DrawMainMenu(void)
 	VW_UpdateScreen();
 }
 
-#ifndef GOODTIMES
-#ifndef SPEAR
+#ifdef UPLOAD
 ////////////////////////////////////////////////////////////////////
 //
 // READ THIS!
@@ -515,10 +506,7 @@ void CP_ReadThis(void)
 	HelpScreens();
 	StartCPMusic(MENUSONG);
 }
-#endif
-#endif
-
-#if defined(SPEAR) || defined(GOODTIMES)
+#else
 ////////////////////////////////////////////////////////////////////
 //
 // BOSS KEY
@@ -875,10 +863,8 @@ firstpart:
 	//
 	// CHANGE "READ THIS!" TO NORMAL COLOR
 	//
-	#ifndef SPEAR
-	#ifndef GOODTIMES
+	#ifdef UPLOAD
 	MainMenu[readthis].active=1;
-	#endif
 	#endif
 
 	pickquick = 0;
@@ -1258,10 +1244,8 @@ int CP_LoadGame(int quick)
 			// CHANGE "READ THIS!" TO NORMAL COLOR
 			//
 
-			#ifndef SPEAR
-			#ifndef GOODTIMES
+			#ifdef UPLOAD
 			MainMenu[readthis].active=1;
-			#endif
 			#endif
 
 			exit=1;

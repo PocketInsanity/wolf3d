@@ -1,3 +1,6 @@
+#ifndef __FOREIGN_H__
+#define __FOREIGN_H__
+
 #define QUITSUR	"Are you sure you want\n"\
 		"to quit this great game?"
 
@@ -107,3 +110,22 @@
 #define STR_SAVECHT4	"play anyway...."
 
 #define	STR_SEEAGAIN	"Let's see that again!"
+
+#ifdef SPEAR
+#define ENDSTR1	"Heroes don't quit, but\ngo ahead and press Y\nif you aren't one."
+#define ENDSTR2	"Press Y to quit,\nor press N to enjoy\nmore violent diversion."
+#define ENDSTR3	"Depressing the Y key means\nyou must return to the\nhumdrum workday world."
+#define ENDSTR4	"Hey, quit or play,\nY or N:\nit's your choice."
+#define ENDSTR5	"Sure you don't want to\nwaste a few more\nproductive hours?"
+#define ENDSTR6	"I think you had better\nplay some more. Please\npress N...please?"
+#define ENDSTR7	"If you are tough, press N.\nIf not, press Y daintily."
+#define ENDSTR8	"I'm thinkin' that\nyou might wanna press N\nto play more. You do it."
+#define ENDSTR9	"Sure. Fine. Quit.\nSee if we care.\nGet it over with.\nPress Y."
+
+#define STR_ENDGAME1	"We owe you a great debt, Mr. Blazkowicz."
+#define STR_ENDGAME2	"You have served your country well."
+#define STR_ENDGAME3	"With the spear gone, the Allies will finally"
+#define STR_ENDGAME4	"by able to destroy Hitler..."
+#endif
+
+#endif

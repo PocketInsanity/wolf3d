@@ -20,7 +20,9 @@ boolean		spearflag;
 //
 // ELEVATOR BACK MAPS - REMEMBER (-1)!!
 //
+#ifndef SPEAR
 static int ElevatorBackTo[]={ 1, 1, 7, 3, 5, 3};
+#endif
 
 //===========================================================================
 

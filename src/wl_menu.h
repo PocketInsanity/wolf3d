@@ -45,7 +45,7 @@
 #define MENU_X	76
 #define MENU_Y	55
 #define MENU_W	178
-#if defined(UPLOAD) || (!defined(GOODTIMES) && !defined(SPEAR))
+#if defined(UPLOAD)
 #define MENU_H	13*10+6
 #else
 #define MENU_H	13*9+6
@@ -200,7 +200,7 @@ enum
 	loadgame,
 	savegame,
 	changeview,
-#if !defined(GOODTIMES) && !defined(SPEAR)
+#ifdef UPLOAD
 	readthis,
 #endif
 	viewscores,

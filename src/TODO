@@ -22,6 +22,7 @@ SD_StartMusic((MusicGroup *)audiosegs[STARTMUSIC + chunk]);
 =>
 SD_StartMusic(chunk);
 
+* getenv so that you can point an env. var to the proper dir
 * merge wl_scale with wl_draw?
 * refresh rate under svgalib is horrible. the screen keeps getting updated
 midframe.  it's due to the way CalcTics works
@@ -58,15 +59,13 @@ key type, and for everything not scancode-based, have a function to
 translate
 * wl_menu uses specific scancodes for names, config file will have to use
 metaname like sc_Left etc or something
-* remove GOODTIMES?
-* Remove the SOD manual check?
 * perhaps rename UPLOAD
 * add a ViewMap? (could be done similar to mac version)
 * find and remove any function stubs (functions which just call another
 function with same parameters, only difference is the name)
 * fix wl_debug.c, lots of junk code..
 * change the current parameter handling code to something like getopt
-* rename goobers to debugmode, then remove debugmode for things...
+* remove check for debugmode?
 * look for places where gfx needs to be redrawn, like back to game etc 
 * fizzlefade is hackish, stipple buf would work ok in opengl, maybe only
 update once per frame or such...

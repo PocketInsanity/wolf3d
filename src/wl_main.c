@@ -917,6 +917,7 @@ CP_itemtype MusicMenu[]=
 };
 #endif
 
+#ifndef SPEARDEMO
 static int songs[]=
 {
 #ifndef SPEAR
@@ -953,7 +954,6 @@ static int songs[]=
 #endif
 };
 		
-#ifndef SPEARDEMO
 void DoJukebox()
 {
 	int which,lastsong=-1;
@@ -1173,10 +1173,6 @@ void DemoLoop()
 
 	LastDemo = 0;
 	
-	#if !defined(GOODTIMES) && defined(SPEAR) && !defined(SPEARDEMO)
-		CopyProtection();
-	#endif
-
 	StartCPMusic(INTROSONG);
 
 	if (!NoWait)
