@@ -91,3 +91,9 @@ at a time
 cleanups for c++
 either that or use extern "C" { ... } in the header files
 * change wl_scale to use mac wolf3d's version of scaling
+* check in wolftools and add mac wolftools (currently the res dumping stuff)
+
+Things to try:
+* Any speed gain with comparing values in screen before writing?
+* Convert to a 320x200xWhatever screen first then draw all at once
+* Create a native palette format instead of doing conversions each frame

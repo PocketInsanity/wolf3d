@@ -47,6 +47,7 @@ unsigned long get_TimeCount()
 		secs--;
 	}
 	tc = tc0 + secs * 70 + usecs * 70 / 1000000;
+	
 	return tc;
 }
 
