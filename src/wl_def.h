@@ -61,9 +61,6 @@
 #define MINACTORDIST	0x10000l		// minimum dist from player center
 						// to any actor center
 						
-#undef PI
-#define PI	3.141592657
-
 #define GLOBAL1		(1l<<16)
 #define TILEGLOBAL  GLOBAL1
 #define TILESHIFT		16l
@@ -422,8 +419,6 @@ enum	{
 =============================================================================
 */
 
-typedef long fixed;
-
 typedef enum {
 	di_north,
 	di_east,
@@ -768,9 +763,6 @@ void DrawAllPlayBorderSides (void);
 
 #define	PlaySoundLocTile(s,tx,ty)	PlaySoundLocGlobal(s,(((long)(tx) << TILESHIFT) + (1L << (TILESHIFT - 1))),(((long)ty << TILESHIFT) + (1L << (TILESHIFT - 1))))
 #define	PlaySoundLocActor(s,ob)		PlaySoundLocGlobal(s,(ob)->x,(ob)->y)
-void	PlaySoundLocGlobal(word s,fixed gx,fixed gy);
-void UpdateSoundLoc(void);
-
 
 /*
 =============================================================================

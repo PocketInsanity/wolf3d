@@ -643,7 +643,7 @@ void CheckKeys (void)
 				STR_CHEATER4"\n"
 				STR_CHEATER5);
 
-		UNCACHEGRCHUNK(STARTFONT+1);
+		CA_UnCacheGrChunk(STARTFONT+1);
 		IN_ClearKeysDown();
 		IN_Ack();
 
@@ -663,7 +663,7 @@ void CheckKeys (void)
 	 ClearSplitVWB ();
 
 	 Message("Debugging keys are\nnow available!");
-	 UNCACHEGRCHUNK(STARTFONT+1);
+	 CA_UnCacheGrChunk(STARTFONT+1);
 	 IN_ClearKeysDown();
 	 IN_Ack();
 
@@ -687,7 +687,7 @@ void CheckKeys (void)
 			 "then, you already know\n"
 			 "that - right, Cheatmeister?!");
 
-	 UNCACHEGRCHUNK(STARTFONT+1);
+	 CA_UnCacheGrChunk(STARTFONT+1);
 	 IN_ClearKeysDown();
 	 IN_Ack();
 
@@ -1333,8 +1333,7 @@ void PlayLoop()
 
 		gamestate.TimeCount += tics;
 
-		SD_Poll ();
-		UpdateSoundLoc();	// JAB
+ 		UpdateSoundLoc(player->x, player->y, player->angle);
 
 		if (screenfaded)
 			VW_FadeIn ();

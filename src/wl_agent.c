@@ -254,11 +254,12 @@ void DrawFace (void)
 
 int	facecount;
 
-void	UpdateFace (void)
+void UpdateFace (void)
 {
 
-	if (SD_SoundPlaying() == GETGATLINGSND)
-	  return;
+	/* TODO: GETGATLINGSND is an adlib sound... :( */ 
+	//if (SD_SoundPlaying() == GETGATLINGSND)
+	//  return;
 
 	facecount += tics;
 	if (facecount > US_RndT())

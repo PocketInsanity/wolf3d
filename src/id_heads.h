@@ -56,17 +56,17 @@ typedef	enum	{false,true}	boolean;
 typedef	unsigned	char		byte;
 typedef	unsigned	short int	word;
 typedef	unsigned	long		longword;
+typedef long fixed;
 
 typedef void * memptr;
 
-typedef	struct
-		{
-			int	x,y;
-		} Point;
-typedef	struct
-		{
-			Point	ul,lr;
-		} Rect;
+typedef	struct {
+	int x, y;
+} Point;
+
+typedef	struct {
+	Point ul, lr;
+} Rect;
 
 #include "vi_comm.h"
 #include "sd_comm.h"
@@ -75,13 +75,14 @@ typedef	struct
 #include "id_vh.h"
 #include "id_us.h"
 
-extern byte signon[];
-
-#define	introscn signon
+extern byte introscn[];
 
 int MS_CheckParm(char *string);
 int WolfMain(int argc, char *argv[]);
 void Quit(char *error);
+
+#undef PI
+#define PI      3.141592657
 
 #define	MAXTICS				10
 #define DEMOTICS			4

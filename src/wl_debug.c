@@ -258,7 +258,6 @@ static	char	buf[10];
 			break;
 		}
 	}
-	SD_StopDigitized();
 #endif
 }
 

@@ -39,7 +39,6 @@ static	boolean					sbNoCheck,sbNoProCheck;
 static	byte					sbOldIntMask = -1;
 static	byte			*sbNextSegPtr;
 static	longword		sbNextSegLen;
-static	SampledSound *sbSamples;
 
 //	SoundSource variables
 		boolean				ssNoCheck;
@@ -74,24 +73,13 @@ ALuint *sources;
 ALuint *buffers;
 void *cc;
 
-void SD_StopDigitized(void)
-{
-}
-
 void SD_Poll(void)
-{
-}
-
-void SD_SetPosition(int leftpos,int rightpos)
 {
 }
 
 void SD_SetDigiDevice(SDSMode mode)
 {
 }
-
-
-//	Public routines
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -186,7 +174,9 @@ void SD_Startup(void)
 				memcpy(dat+z, PM_GetPage(w + PMSoundStart), page->length);
 				z += page->length;
 			}
-			alBufferData(buffers[x], AL_FORMAT_MONO8, dat, y, 6896);
+			/* TODO: openal bug! */
+			//alBufferData(buffers[x], AL_FORMAT_MONO8, dat, y, 6896);
+			alBufferData(buffers[x], AL_FORMAT_MONO8, dat, y, 22050/4);
 			
 			if(alGetError() != AL_NO_ERROR) {
 				printf("AL error\n");
@@ -196,8 +186,8 @@ void SD_Startup(void)
 			x++;
 		}
 		
-		sources = (ALuint *)malloc(sizeof(ALuint) * 1);
-		alGenSources(1, sources);
+		sources = (ALuint *)malloc(sizeof(ALuint) * 4);
+		alGenSources(4, sources);
 			
 	}	
 	SD_Started = true;
@@ -227,45 +217,74 @@ void SD_Shutdown(void)
 
 ///////////////////////////////////////////////////////////////////////////
 //
-//	SD_PositionSound() - Sets up a stereo imaging location for the next
-//		sound to be played. Each channel ranges from 0 to 15.
-//
-///////////////////////////////////////////////////////////////////////////
-void SD_PositionSound(int leftvol,int rightvol)
-{
-	LeftPosition = leftvol;
-	RightPosition = rightvol;
-	nextsoundpos = true;
-}
-
-///////////////////////////////////////////////////////////////////////////
-//
 //	SD_PlaySound() - plays the specified sound on the appropriate hardware
 //
 ///////////////////////////////////////////////////////////////////////////
-boolean SD_PlaySound(soundnames sound)
-{
-	boolean		ispos;
-	int	lp,rp;
 
-	printf("Playing sound %d, digimap %d\n", sound, DigiMap[sound]);
-	fflush(stdout);
+ALfloat gval[6], pval[6];
+
+void SD_PlaySound(soundnames sound)
+{
+	int i;
+
+	//printf("Playing sound %d, digimap %d\n", sound, DigiMap[sound]);
+	//fflush(stdout);
 	
 	if (DigiMap[sound] != -1) {
-		alSourceStop(*sources);
-		alSourcei(*sources, AL_BUFFER, buffers[DigiMap[sound]]);
-		alSourcePlay(*sources);
+		/* TODO: openal bug? (need to stop before play) */
+		for (i = 0; i < 4; i++) {
+			if (alSourceIsPlaying(sources[i]) == AL_FALSE) {
+				//alSourceStop(*sources);
+				alSourcefv(sources[i], AL_POSITION, gval);
+				alSource3f(sources[i], AL_DIRECTION, -pval[0], 0.0f, -pval[2]);
+				alSourcei(sources[i], AL_BUFFER, buffers[DigiMap[sound]]);
+				alSourcePlay(sources[i]);
+				break;
+			}
+		}
 	}
+}
+
+/* TODO: velocity ?! */
+void UpdateSoundLoc(fixed x, fixed y, int angle)
+{		
+	pval[0] = gval[0] = x >> 15;
+	pval[1] = 0.0f;
+	pval[2] = gval[2] = y >> 15;
+	alListenerfv(AL_POSITION, pval);
 	
-	lp = LeftPosition;
-	rp = RightPosition;
-	LeftPosition = 0;
-	RightPosition = 0;
+	pval[3] = 0.0f;
+	pval[4] = 1.0f;
+	pval[5] = 0.0f;
+	
+	pval[0] *= sin(angle * PI / 180.0f);
+	pval[2] *= cos(angle * PI / 180.0f);
+	alListenerfv(AL_ORIENTATION, pval);
+}
 
-	ispos = nextsoundpos;
-	nextsoundpos = false;
-
-	return false;
+void PlaySoundLocGlobal(word sound, fixed x, fixed y)
+{
+	ALfloat val[3];
+	int i;
+			
+	//printf("Playing sound %d, digimap %d\n", sound, DigiMap[sound]);
+	//fflush(stdout);
+	
+	if (DigiMap[sound] != -1) {
+		/* TODO: openal bug? (need to stop before play) */
+		for (i = 0; i < 4; i++) {
+			if (alSourceIsPlaying(sources[i]) == AL_FALSE) {
+				//alSourceStop(*sources);
+				val[0] = x >> 15;
+				val[1] = 0.0f;
+				val[2] = y >> 15;
+				alSourcefv(sources[i], AL_POSITION, val);
+				alSourcei(sources[i], AL_BUFFER, buffers[DigiMap[sound]]);
+				alSourcePlay(sources[i]);
+				break;
+			}
+		}
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -274,8 +293,21 @@ boolean SD_PlaySound(soundnames sound)
 //		no sound is playing
 //
 ///////////////////////////////////////////////////////////////////////////
+/* TODO: SD_IsSoundPlaying or something? */
 word SD_SoundPlaying(void)
 {
+	int i;
+	
+	/* Watch out for any looped sounds */
+	for (i = 0; i < 4; i++) {
+		if (alSourceIsPlaying(sources[i]) == AL_TRUE) {
+			ALint ret;
+			
+			alGetSourcei(sources[i], AL_LOOPING, &ret);
+			if (ret == AL_FALSE)
+				return true;
+		}
+	}
 	return false;
 }
 
@@ -284,8 +316,14 @@ word SD_SoundPlaying(void)
 //	SD_StopSound() - if a sound is playing, stops it
 //
 ///////////////////////////////////////////////////////////////////////////
-void SD_StopSound(void)
+void SD_StopSound()
 {
+	//int i;
+	
+	/* TODO: this crashes for some reason... */
+	//for (i = 0; i < 4; i++)
+	//	if (alSourceIsPlaying(sources[i]) == AL_TRUE)
+	//		alSourceStop(sources[i]);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -295,8 +333,7 @@ void SD_StopSound(void)
 ///////////////////////////////////////////////////////////////////////////
 void SD_WaitSoundDone(void)
 {
-	while (SD_SoundPlaying())
-		;
+	while (SD_SoundPlaying());
 }
 
 ///////////////////////////////////////////////////////////////////////////

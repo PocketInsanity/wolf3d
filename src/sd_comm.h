@@ -27,15 +27,6 @@ typedef	struct
 
 typedef	struct
 		{
-			SoundCommon	common;
-			word		hertz;
-			byte		bits,
-						reference,
-						data[1];
-		} SampledSound;
-
-typedef	struct
-		{
 			byte	mChar,cChar,
 					mScale,cScale,
 					mAttack,cAttack,
@@ -113,30 +104,26 @@ extern	boolean		DigiPlaying;
 extern	int			DigiMap[];
 
 // Function prototypes
-extern	void	SD_Startup(void),
-				SD_Shutdown(void),
-				SD_Default(boolean gotit,SDMode sd,SMMode sm),
+extern	void	SD_Startup(void), SD_Shutdown(void);
 
-				SD_PositionSound(int leftvol,int rightvol);
-extern	boolean	SD_PlaySound(soundnames sound);
-extern	void	SD_SetPosition(int leftvol,int rightvol),
-				SD_StopSound(void),
+extern	void	SD_PlaySound(soundnames sound);
+extern	void	SD_StopSound(void),
 				SD_WaitSoundDone(void),
-
 				SD_StartMusic(MusicGroup *music),
 				SD_MusicOn(void),
 				SD_MusicOff(void),
-				SD_FadeOutMusic(void),
+				SD_FadeOutMusic(void);
 
-				SD_SetUserHook(void (*hook)(void));
 extern	boolean	SD_MusicPlaying(void),
 				SD_SetSoundMode(SDMode mode),
 				SD_SetMusicMode(SMMode mode);
 extern	word	SD_SoundPlaying(void);
 
 extern	void	SD_SetDigiDevice(SDSMode),
-				SD_StopDigitized(void),
 				SD_Poll(void);
+
+void PlaySoundLocGlobal(word s, fixed gx, fixed gy);
+void UpdateSoundLoc(fixed x, fixed y, int angle);
 
 #else
 #error "fix me TODO"

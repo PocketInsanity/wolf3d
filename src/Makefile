@@ -4,7 +4,7 @@ CC = gcc
 #CFLAGS = -g -Wall
 #CFLAGS = -g
 #CFLAGS = -Os
-CFLAGS = -g -Wall -I/usr/local/openal/include
+CFLAGS = -g -Wall -I/home/relnev/cvs/oal/include
 
 OBJS = objs.o misc.o id_ca.o id_vh.o id_us.o \
 	wl_act1.o wl_act2.o wl_agent.o wl_game.o \
@@ -16,7 +16,7 @@ XOBJS = $(OBJS) $(ROBJS) vi_xlib.o
 GOBJS = $(OBJS) vi_ogl.o vi_glx.o
 
 #LFLAGS = -lm 
-LFLAGS = -lm -L/usr/local/openal/lib -lopenal -lpthread -ldl
+LFLAGS = -lm -L/home/relnev/cvs/oal/linux/src -lopenal -lpthread -ldl
 
 SLFLAGS = $(LFLAGS) -lvga
 XLFLAGS = $(LFLAGS) -L/usr/X11R6/lib -lX11 -lXext
