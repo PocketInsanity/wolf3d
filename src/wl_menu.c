@@ -234,7 +234,6 @@ void US_ControlPanel(byte scancode)
 {
 	int which,i,start;
 
-
 	if (ingame)
 		if (CP_CheckQuick(scancode))
 			return;
@@ -331,7 +330,7 @@ void US_ControlPanel(byte scancode)
 			VL_FadeIn(0,255,grsegs[IDGUYSPALETTE],30);
 			UNCACHEGRCHUNK(IDGUYSPALETTE);
 
-			while (Keyboard[sc_I] || Keyboard[sc_D]);
+			while (Keyboard[sc_I] || Keyboard[sc_D]) IN_CheckAck();
 			IN_ClearKeysDown();
 			IN_Ack();
 
@@ -421,7 +420,7 @@ void US_ControlPanel(byte scancode)
 	}
 
 	// RETURN/START GAME EXECUTION
-
+		
 #ifdef SPEAR
 	UnCacheLump (OPTIONS_LUMP_START,OPTIONS_LUMP_END);
 	MM_SortMem ();
@@ -1468,12 +1467,12 @@ int CalibrateJoystick(void)
 	do
 	{
 		jb=IN_JoyButtons();
+		IN_CheckAck(); /* TODO: force update */
 		if (Keyboard[sc_Escape])
 			return 0;
-		#ifndef SPEAR
+		
 		if (Keyboard[sc_Tab] && Keyboard[sc_P] && MS_CheckParm("goobers"))
 			PicturePause();
-		#endif
 
 	} while(!(jb&1));
 
@@ -1499,12 +1498,11 @@ int CalibrateJoystick(void)
 	do
 	{
 		jb=IN_JoyButtons();
+		IN_CheckAck(); /* TODO: force update */
 		if (Keyboard[sc_Escape])
 			return 0;
-		#ifndef SPEAR
 		if (Keyboard[sc_Tab] && Keyboard[sc_P] && MS_CheckParm("goobers"))
 			PicturePause();
-		#endif
 	} while(!(jb&2));
 
 	IN_GetJoyAbs(joystickport,&xmax,&ymax);
@@ -1654,7 +1652,7 @@ void MouseSensitivity(void)
 					VWB_Bar(61+20*mouseadjustment,98,19,9,READHCOLOR);
 					VW_UpdateScreen();
 					SD_PlaySound(MOVEGUN1SND);
-					while(Keyboard[sc_LeftArrow]);
+					while(Keyboard[sc_LeftArrow]) IN_CheckAck();
 					WaitKeyUp();
 				}
 				break;
@@ -1670,7 +1668,7 @@ void MouseSensitivity(void)
 					VWB_Bar(61+20*mouseadjustment,98,19,9,READHCOLOR);
 					VW_UpdateScreen();
 					SD_PlaySound(MOVEGUN1SND);
-					while(Keyboard[sc_RightArrow]);
+					while(Keyboard[sc_RightArrow]) IN_CheckAck();
 					WaitKeyUp();
 				}
 				break;
@@ -1678,11 +1676,7 @@ void MouseSensitivity(void)
 				break;
 		}
 
-		#ifndef SPEAR
-		if (Keyboard[sc_Tab] && Keyboard[sc_P] && MS_CheckParm("goobers"))
-		#else
 		if (Keyboard[sc_Tab] && Keyboard[sc_P] && MS_CheckParm("debugmode"))
-		#endif
 			PicturePause();
 
 		if (ci.button0 || Keyboard[sc_Space] || Keyboard[sc_Enter])
@@ -1942,7 +1936,8 @@ void EnterCtrlData(int index,CustomCtrls *cust,void (*DrawRtn)(int),void (*Print
    do
    {
 	int button,result=0;
-
+	
+	IN_CheckAck(); /* force update */
 
 	if (type==KEYBOARDBTNS||type==KEYBOARDMOVE)
 	  IN_ClearKeysDown();
@@ -2459,11 +2454,7 @@ void CP_ChangeView(void)
 			break;
 		}
 
-		#ifndef SPEAR
-		if (Keyboard[sc_Tab] && Keyboard[sc_P] && MS_CheckParm("goobers"))
-		#else
 		if (Keyboard[sc_Tab] && Keyboard[sc_P] && MS_CheckParm("debugmode"))
-		#endif
 			PicturePause();
 
 		if (ci.button0 || Keyboard[sc_Enter])
@@ -3152,6 +3143,7 @@ int Confirm(char *string)
 
 	do
 	{
+		IN_CheckAck(); /* TODO: force update */
 		if (get_TimeCount() >= 10)
 		{
 			switch(tick)
@@ -3169,10 +3161,8 @@ int Confirm(char *string)
 			set_TimeCount(0);
 		}
 
-		#ifndef SPEAR
 		if (Keyboard[sc_Tab] && Keyboard[sc_P] && MS_CheckParm("goobers"))
 			PicturePause();
-		#endif
 
 	} while(!Keyboard[sc_Y] && !Keyboard[sc_N] && !Keyboard[sc_Escape]);
 
@@ -3182,7 +3172,7 @@ int Confirm(char *string)
 		ShootSnd();
 	}
 
-	while(Keyboard[sc_Y] || Keyboard[sc_N] || Keyboard[sc_Escape]);
+	while(Keyboard[sc_Y] || Keyboard[sc_N] || Keyboard[sc_Escape]) IN_CheckAck();
 
 	IN_ClearKeysDown();
 	SD_PlaySound(whichsnd[xit]);

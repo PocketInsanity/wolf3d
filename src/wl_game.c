@@ -1090,20 +1090,24 @@ void PlayDemoFromFile(char *demoname)
 
 #define DEATHROTATE 2
 
-void Died (void)
+void Died()
 {
 	float	fangle;
 	long	dx,dy;
 	int		iangle,curangle,clockwise,counter,change;
 
 	gamestate.weapon = -1;			// take away weapon
-	SD_PlaySound (PLAYERDEATHSND);
-//
-// swing around to face attacker
-//
-	dx = killerobj->x - player->x;
-	dy = player->y - killerobj->y;
-
+	SD_PlaySound(PLAYERDEATHSND);
+	
+/* swing around to face attacker (if any) */
+	if (killerobj) {
+		dx = killerobj->x - player->x;
+		dy = player->y - killerobj->y;
+	} else {
+		dx = -player->x;
+		dy = player->y;
+	}
+	
 	fangle = atan2(dy,dx);			// returns -pi to pi
 	if (fangle<0)
 		fangle = M_PI*2+fangle;

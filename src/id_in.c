@@ -151,6 +151,64 @@ static void INL_KeyService(void)
 	}
 }
 
+void keyboard_handler(int code, int press)
+{
+	static boolean special;
+	byte k, c, temp;
+	int i;
+
+	/* k = inportb(0x60);	// Get the scan code */
+	k = code;
+
+	if (k == 0xe0)		// Special key prefix
+		special = true;
+	else if (k == 0xe1)	// Handle Pause key
+		Paused = true;
+	else
+	{
+		if (press == 0)	
+		{
+
+// DEBUG - handle special keys: ctl-alt-delete, print scrn
+
+			Keyboard[k] = false;
+		}
+		else			// Make code
+		{
+			LastCode = CurCode;
+			CurCode = LastScan = k;
+			Keyboard[k] = true;
+
+			if (special)
+				c = SpecialNames[k];
+			else
+			{
+				if (k == sc_CapsLock)
+				{
+					CapsLock ^= true;
+				}
+
+				if (Keyboard[sc_LShift] || Keyboard[sc_RShift])	// If shifted
+				{
+					c = ShiftNames[k];
+					if ((c >= 'A') && (c <= 'Z') && CapsLock)
+						c += 'a' - 'A';
+				}
+				else
+				{
+					c = ASCIINames[k];
+					if ((c >= 'a') && (c <= 'z') && CapsLock)
+						c -= 'a' - 'A';
+				}
+			}
+			if (c)
+				LastASCII = c;
+		}
+
+		special = false;
+	}
+}
+
 ///////////////////////////////////////////////////////////////////////////
 //
 //	INL_GetMouseDelta() - Gets the amount that the mouse has moved from the
@@ -215,6 +273,8 @@ static word INL_GetJoyButtons(word joy)
 ///////////////////////////////////////////////////////////////////////////
 static void INL_StartKbd(void)
 {
+	keyboard_init();
+	keyboard_seteventhandler(keyboard_handler);
 	IN_ClearKeysDown();
 }
 
@@ -225,6 +285,7 @@ static void INL_StartKbd(void)
 ///////////////////////////////////////////////////////////////////////////
 static void INL_ShutKbd(void)
 {
+	keyboard_close();
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -366,6 +427,8 @@ void IN_ReadControl(int player,ControlInfo *info)
 	mx = my = motion_None;
 	buttons = 0;
 
+keyboard_update();
+
 		switch (type = Controls[player])
 		{
 		case ctrl_Keyboard:
@@ -460,13 +523,20 @@ void IN_StartAck(void)
 			btnstate[i] = true;
 }
 
+int flipz;
+
 boolean IN_CheckAck (void)
 {
 	unsigned	i,buttons;
 
-//
-// see if something has been pressed
-//
+	if (flipz == 1) {
+		flipz = 0;
+		return false;
+	}
+	flipz++;
+	
+while (keyboard_update()) ; /* get all events */
+
 	if (LastScan)
 		return true;
 
@@ -490,7 +560,7 @@ void IN_Ack (void)
 {
 	IN_StartAck ();
 
-	return; /* TODO: fix when keyboard implemented */
+//	return; /* TODO: fix when keyboard implemented */
 	while (!IN_CheckAck ()) ;
 }
 

@@ -25,135 +25,135 @@ typedef enum {
 		H_LEFTWINDOWPIC,             // 18
 		H_RIGHTWINDOWPIC,            // 19
 		H_BOTTOMINFOPIC,             // 20
-		H_SPEARINFO, /* TODO: this ruins the numbers :) */
+		H_SPEARINFO, /* TODO: this ruins the numbers :) */ // 21
 		// Lump Start
-		C_OPTIONSPIC,                // 21
-		C_CURSOR1PIC,                // 22
-		C_CURSOR2PIC,                // 23
-		C_NOTSELECTEDPIC,            // 24
-		C_SELECTEDPIC,               // 25
-		C_FXTITLEPIC,                // 26
-		C_DIGITITLEPIC,              // 27
-		C_MUSICTITLEPIC,             // 28
-		C_MOUSELBACKPIC,             // 29
-		C_BABYMODEPIC,               // 30
-		C_EASYPIC,                   // 31
-		C_NORMALPIC,                 // 32
-		C_HARDPIC,                   // 33
-		C_LOADSAVEDISKPIC,           // 34
-		C_DISKLOADING1PIC,           // 35
-		C_DISKLOADING2PIC,           // 36
-		C_CONTROLPIC,                // 37
-		C_CUSTOMIZEPIC,              // 38
-		C_LOADGAMEPIC,               // 39
-		C_SAVEGAMEPIC,               // 40
-		C_EPISODE1PIC,               // 41
-		C_EPISODE2PIC,               // 42
-		C_EPISODE3PIC,               // 43
-		C_EPISODE4PIC,               // 44
-		C_EPISODE5PIC,               // 45
-		C_EPISODE6PIC,               // 46
-		C_CODEPIC,                   // 47
-		C_TIMECODEPIC,
-		C_LEVELPIC,
-		C_NAMEPIC,
-		C_SCOREPIC,
-		C_JOY1PIC,
-		C_JOY2PIC,
+		C_OPTIONSPIC,                // 22
+		C_CURSOR1PIC,                // 23
+		C_CURSOR2PIC,                // 24
+		C_NOTSELECTEDPIC,            // 25
+		C_SELECTEDPIC,               // 26
+		C_FXTITLEPIC,                // 27
+		C_DIGITITLEPIC,              // 28
+		C_MUSICTITLEPIC,             // 29
+		C_MOUSELBACKPIC,             // 30
+		C_BABYMODEPIC,               // 31
+		C_EASYPIC,                   // 32
+		C_NORMALPIC,                 // 33
+		C_HARDPIC,                   // 34
+		C_LOADSAVEDISKPIC,           // 35
+		C_DISKLOADING1PIC,           // 36
+		C_DISKLOADING2PIC,           // 37
+		C_CONTROLPIC,                // 38
+		C_CUSTOMIZEPIC,              // 39
+		C_LOADGAMEPIC,               // 40
+		C_SAVEGAMEPIC,               // 41
+		C_EPISODE1PIC,               // 42
+		C_EPISODE2PIC,               // 43
+		C_EPISODE3PIC,               // 44
+		C_EPISODE4PIC,               // 45
+		C_EPISODE5PIC,               // 46
+		C_EPISODE6PIC,               // 47
+		C_CODEPIC,                   // 48
+		C_TIMECODEPIC,		 	// 49
+		C_LEVELPIC,			// 50
+		C_NAMEPIC,			// 51
+		C_SCOREPIC,			// 52
+		C_JOY1PIC,			// 53
+		C_JOY2PIC,			// 54
 		// Lump Start
-		L_GUYPIC,                    // 48
-		L_COLONPIC,                  // 49
-		L_NUM0PIC,                   // 50
-		L_NUM1PIC,                   // 51
-		L_NUM2PIC,                   // 52
-		L_NUM3PIC,                   // 53
-		L_NUM4PIC,                   // 54
-		L_NUM5PIC,                   // 55
-		L_NUM6PIC,                   // 56
-		L_NUM7PIC,                   // 57
-		L_NUM8PIC,                   // 58
-		L_NUM9PIC,                   // 59
-		L_PERCENTPIC,                // 60
-		L_APIC,                      // 61
-		L_BPIC,                      // 62
-		L_CPIC,                      // 63
-		L_DPIC,                      // 64
-		L_EPIC,                      // 65
-		L_FPIC,                      // 66
-		L_GPIC,                      // 67
-		L_HPIC,                      // 68
-		L_IPIC,                      // 69
-		L_JPIC,                      // 70
-		L_KPIC,                      // 71
-		L_LPIC,                      // 72
-		L_MPIC,                      // 73
-		L_NPIC,                      // 74
-		L_OPIC,                      // 75
-		L_PPIC,                      // 76
-		L_QPIC,                      // 77
-		L_RPIC,                      // 78
-		L_SPIC,                      // 79
-		L_TPIC,                      // 80
-		L_UPIC,                      // 81
-		L_VPIC,                      // 82
-		L_WPIC,                      // 83
-		L_XPIC,                      // 84
-		L_YPIC,                      // 85
-		L_ZPIC,                      // 86
-		L_EXPOINTPIC,                // 87
-		L_APOSTROPHEPIC,
-		L_GUY2PIC,                   // 88
-		L_BJWINSPIC,                 // 89
-		STATUSBARPIC,                // 90
-		TITLEPIC,                    // 91
-		PG13PIC,                     // 92
-		CREDITSPIC,                  // 93
-		HIGHSCORESPIC,               // 94
+		L_GUYPIC,                    // 55
+		L_COLONPIC,                  // 56
+		L_NUM0PIC,                   // 57
+		L_NUM1PIC,                   // 58
+		L_NUM2PIC,                   // 59
+		L_NUM3PIC,                   // 60
+		L_NUM4PIC,                   // 61
+		L_NUM5PIC,                   // 62
+		L_NUM6PIC,                   // 63
+		L_NUM7PIC,                   // 64
+		L_NUM8PIC,                   // 65
+		L_NUM9PIC,                   // 66
+		L_PERCENTPIC,                // 67
+		L_APIC,                      // 68
+		L_BPIC,                      // 69
+		L_CPIC,                      // 70
+		L_DPIC,                      // 71
+		L_EPIC,                      // 72
+		L_FPIC,                      // 73
+		L_GPIC,                      // 74
+		L_HPIC,                      // 75
+		L_IPIC,                      // 76
+		L_JPIC,                      // 77
+		L_KPIC,                      // 78
+		L_LPIC,                      // 79
+		L_MPIC,                      // 80
+		L_NPIC,                      // 81
+		L_OPIC,                      // 82
+		L_PPIC,                      // 83
+		L_QPIC,                      // 84
+		L_RPIC,                      // 85
+		L_SPIC,                      // 86
+		L_TPIC,                      // 87
+		L_UPIC,                      // 88
+		L_VPIC,                      // 89
+		L_WPIC,                      // 90
+		L_XPIC,                      // 91
+		L_YPIC,                      // 92
+		L_ZPIC,                      // 93
+		L_EXPOINTPIC,                // 94
+		L_APOSTROPHEPIC,		// 95
+		L_GUY2PIC,                   // 96
+		L_BJWINSPIC,                 // 97
+		STATUSBARPIC,                // 98
+		TITLEPIC,                    // 99
+		PG13PIC,                     // 100
+		CREDITSPIC,                  // 101
+		HIGHSCORESPIC,               // 102
 		// Lump Start
-		KNIFEPIC,                    // 95
-		GUNPIC,                      // 96
-		MACHINEGUNPIC,               // 97
-		GATLINGGUNPIC,               // 98
-		NOKEYPIC,                    // 99
-		GOLDKEYPIC,                  // 100
-		SILVERKEYPIC,                // 101
-		N_BLANKPIC,                  // 102
-		N_0PIC,                      // 103
-		N_1PIC,                      // 104
-		N_2PIC,                      // 105
-		N_3PIC,                      // 106
-		N_4PIC,                      // 107
-		N_5PIC,                      // 108
-		N_6PIC,                      // 109
-		N_7PIC,                      // 110
-		N_8PIC,                      // 111
-		N_9PIC,                      // 112
-		FACE1APIC,                   // 113
-		FACE1BPIC,                   // 114
-		FACE1CPIC,                   // 115
-		FACE2APIC,                   // 116
-		FACE2BPIC,                   // 117
-		FACE2CPIC,                   // 118
-		FACE3APIC,                   // 119
-		FACE3BPIC,                   // 120
-		FACE3CPIC,                   // 121
-		FACE4APIC,                   // 122
-		FACE4BPIC,                   // 123
-		FACE4CPIC,                   // 124
-		FACE5APIC,                   // 125
-		FACE5BPIC,                   // 126
-		FACE5CPIC,                   // 127
-		FACE6APIC,                   // 128
-		FACE6BPIC,                   // 129
-		FACE6CPIC,                   // 130
-		FACE7APIC,                   // 131
-		FACE7BPIC,                   // 132
-		FACE7CPIC,                   // 133
-		FACE8APIC,                   // 134
-		GOTGATLINGPIC,               // 135
-		MUTANTBJPIC,                 // 136
-		PAUSEDPIC,                   // 137
-		GETPSYCHEDPIC,               // 138
+		KNIFEPIC,                    // 103
+		GUNPIC,                      // 104
+		MACHINEGUNPIC,               // 105
+		GATLINGGUNPIC,               // 106
+		NOKEYPIC,                    // 107
+		GOLDKEYPIC,                  // 108
+		SILVERKEYPIC,                // 109
+		N_BLANKPIC,                  // 110
+		N_0PIC,                      // 111
+		N_1PIC,                      // 112
+		N_2PIC,                      // 113
+		N_3PIC,                      // 114
+		N_4PIC,                      // 115
+		N_5PIC,                      // 116
+		N_6PIC,                      // 117
+		N_7PIC,                      // 118
+		N_8PIC,                      // 119
+		N_9PIC,                      // 120
+		FACE1APIC,                   // 121
+		FACE1BPIC,                   // 122
+		FACE1CPIC,                   // 123
+		FACE2APIC,                   // 124
+		FACE2BPIC,                   // 125
+		FACE2CPIC,                   // 126
+		FACE3APIC,                   // 127
+		FACE3BPIC,                   // 128
+		FACE3CPIC,                   // 129
+		FACE4APIC,                   // 130
+		FACE4BPIC,                   // 131
+		FACE4CPIC,                   // 132
+		FACE5APIC,                   // 133
+		FACE5BPIC,                   // 134
+		FACE5CPIC,                   // 135
+		FACE6APIC,                   // 136
+		FACE6BPIC,                   // 137
+		FACE6CPIC,                   // 138
+		FACE7APIC,                   // 139
+		FACE7BPIC,                   // 140
+		FACE7CPIC,                   // 141
+		FACE8APIC,                   // 142
+		GOTGATLINGPIC,               // 143
+		MUTANTBJPIC,                 // 144
+		PAUSEDPIC,                   // 145
+		GETPSYCHEDPIC,               // 146
 
 		ORDERSCREEN=148,
 		ERRORSCREEN,
@@ -163,26 +163,24 @@ typedef enum {
 		T_DEMO2,
 		T_DEMO3,
 		T_ENDART1,
-		//ORDERSCREEN=554,
-		//ERRORSCREEN,                 // 555
 		ENUMEND
 	     } graphicnums;
 
 //
 // Data LUMPs
 //
-/* TODO */
+
 #define README_LUMP_START		3
-#define README_LUMP_END			20
+#define README_LUMP_END			21
 
-#define CONTROLS_LUMP_START		21
-#define CONTROLS_LUMP_END		47
+#define CONTROLS_LUMP_START		22
+#define CONTROLS_LUMP_END		54
 
-#define LEVELEND_LUMP_START		48
-#define LEVELEND_LUMP_END		89
+#define LEVELEND_LUMP_START		55
+#define LEVELEND_LUMP_END		102
 
-#define LATCHPICS_LUMP_START		95
-#define LATCHPICS_LUMP_END		138
+#define LATCHPICS_LUMP_START		103
+#define LATCHPICS_LUMP_END		146
 
 
 //

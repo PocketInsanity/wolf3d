@@ -49,7 +49,7 @@ int             shootdelta;                     // pixels away from centerx a ta
 fixed           scale,maxslope;
 long            heightnumerator;
 
-void            Quit (char *error);
+void            Quit(char *error);
 
 boolean         startgame,loadedgame;
 int             mouseadjustment;
@@ -644,6 +644,7 @@ void SignonScreen()
 {
 	VL_SetPalette(&gamepal);
 	VL_MemToScreen(&introscn, 320, 200, 0, 0);
+	VW_UpdateScreen();
 }
 
 
@@ -667,7 +668,8 @@ void FinishSignon (void)
 	SETFONTCOLOR(14,4);
 
 	US_CPrint ("Press a key");
-
+	VW_UpdateScreen();
+	
 	if (!NoWait)
 		IN_Ack ();
 
@@ -677,7 +679,8 @@ void FinishSignon (void)
 	SETFONTCOLOR(10,4);
 
 	US_CPrint ("Working...");
-
+	VW_UpdateScreen();
+	
 	SETFONTCOLOR(0,15);
 #else
 	if (!NoWait)
@@ -1147,52 +1150,31 @@ void NewViewSize(int width)
 ==========================
 */
 
-void Quit (char *error)
+void Quit(char *error)
 {
-	memptr screen;
+	memptr screen = NULL;
 
-	if (!*error)
-	{
-	 CA_CacheGrChunk(ORDERSCREEN);
-	 screen = grsegs[ORDERSCREEN];
-	 WriteConfig ();
-	}
-	else
-	{
-	 CA_CacheGrChunk(ERRORSCREEN);
-	 screen = grsegs[ERRORSCREEN];
+	if (error && !*error) {
+		CA_CacheGrChunk(ORDERSCREEN);
+		screen = grsegs[ORDERSCREEN];
+		WriteConfig();
+	} else if (error) {
+		CA_CacheGrChunk(ERRORSCREEN);
+		screen = grsegs[ERRORSCREEN];
 	}
 	
-	ShutdownId ();
+	ShutdownId();
 	
 	if (screen) {
 		/* blah blah */
 	}
 	
-	if (error && *error)
+	if (error && *error) {
 		printf("Quit: %s\n", error);
-	else
-		printf("Quit: Nothing\n");
+		exit(EXIT_FAILURE);
+	}
 		
-#if 0
-	if (error && *error)
-	{
-	  movedata ((unsigned)screen,7,0xb800,0,7*160);
-	  gotoxy (10,4);
-	  puts(error);
-	  gotoxy (1,8);
-	  exit(1);
-	}
-	else
-	if (!error || !(*error))
-	{
-		clrscr();
-		movedata ((unsigned)screen,7,0xb800,0,4000);
-		gotoxy(1,24);
-	}
-#endif
-
-	exit(0);
+	exit(EXIT_SUCCESS);
 }
 
 //===========================================================================

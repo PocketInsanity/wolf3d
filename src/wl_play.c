@@ -479,6 +479,10 @@ void PollControls (void)
 //
 // get button states
 //
+
+	/* Update keys */
+	IN_CheckAck(); /* TODO: better name */
+	
 	PollKeyboardButtons ();
 
 	if (mouseenabled)
@@ -731,9 +735,10 @@ void CheckKeys (void)
 		ClearMemory ();
 		ClearSplitVWB ();
 		US_ControlPanel(scan);
-
+	
 		DrawAllPlayBorderSides ();
-
+		VW_UpdateScreen();
+		
 		if (scan == sc_F9)
 		  StartMusic ();
 
@@ -753,6 +758,8 @@ void CheckKeys (void)
 		SETFONTCOLOR(0,15);
 		IN_ClearKeysDown();
 		DrawPlayScreen ();
+		VW_UpdateScreen();
+		
 		if (!startgame && !loadedgame)
 		{
 			VW_FadeIn ();
@@ -815,8 +822,6 @@ next element.
 =========================
 */
 
-int	objcount;
-
 void InitActorList (void)
 {
 	int	i;
@@ -834,8 +839,6 @@ void InitActorList (void)
 
 	objfreelist = &objlist[0];
 	lastobj = NULL;
-
-	objcount = 0;
 
 //
 // give the player the first free spots
@@ -876,8 +879,6 @@ void GetNewActor (void)
 
 	new->active = false;
 	lastobj = new;
-
-	objcount++;
 }
 
 //===========================================================================
@@ -921,7 +922,6 @@ void RemoveObj (objtype *gone)
 	gone->prev = objfreelist;
 	objfreelist = gone;
 
-	objcount--;
 }
 
 /*

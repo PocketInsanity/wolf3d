@@ -15,6 +15,7 @@
 #include <math.h>
 
 #include <vga.h>
+#include <vgakeyboard.h>
 
 #include "misc.h"
 

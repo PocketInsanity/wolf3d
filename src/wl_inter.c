@@ -496,8 +496,6 @@ void LevelCompleted (void)
 #endif
 	};
 
-
-
 	CacheLump(LEVELEND_LUMP_START,LEVELEND_LUMP_END);
 	ClearSplitVWB ();			// set up for double buffering in split screen
 	VWB_Bar (0,0,320,200-STATUSLINES,127);
@@ -862,10 +860,10 @@ void LevelCompleted (void)
 
 boolean PreloadUpdate(unsigned current, unsigned total)
 {
-	unsigned w = WindowW - 10;
+	int w = WindowW - 10;
 
 	VWB_Bar(WindowX + 5,WindowY + WindowH - 3,w,2,BLACK);
-	w = ((long)w * current) / total;
+	w = (w * current) / total;
 	if (w) {
 		VWB_Bar(WindowX + 5,WindowY + WindowH - 3,w,2,0x37); 
 		VWB_Bar(WindowX + 5,WindowY + WindowH - 3,w-1,1,0x32);
@@ -875,28 +873,28 @@ boolean PreloadUpdate(unsigned current, unsigned total)
 	return false;
 }
 
-void PreloadGraphics(void)
+void PreloadGraphics()
 {
 	DrawLevel();
 	ClearSplitVWB();
 
-	VWB_Bar (0,0,320,200-STATUSLINES,127);
+	VWB_Bar(0,0,320,200-STATUSLINES,127);
 
-	LatchDrawPic (20-14,80-3*8,GETPSYCHEDPIC);
+	VWB_DrawPic(48, 56, GETPSYCHEDPIC);
 
 	WindowX = 160-14*8;
 	WindowY = 80-3*8;
 	WindowW = 28*8;
 	WindowH = 48;
 	VW_UpdateScreen();
-	VW_FadeIn ();
+	VW_FadeIn();
 
 	PM_Preload((void *)PreloadUpdate);
 	IN_UserInput (70);
-	VW_FadeOut ();
+	VW_FadeOut();
 
-	DrawPlayBorder ();
-	VW_UpdateScreen ();
+	DrawPlayBorder();
+	VW_UpdateScreen();
 }
 
 
@@ -923,7 +921,6 @@ void	DrawHighScores(void)
 	MM_SortMem ();
 
 #ifndef SPEAR
-//	CA_CacheGrChunk (C_CODEPIC);
 	CA_CacheGrChunk (HIGHSCORESPIC);
 	CA_CacheGrChunk (STARTFONT);
 	CA_CacheGrChunk (C_LEVELPIC);
@@ -939,9 +936,7 @@ void	DrawHighScores(void)
 	VWB_DrawPic(4*8,68,C_NAMEPIC);
 	VWB_DrawPic(20*8,68,C_LEVELPIC);
 	VWB_DrawPic(28*8,68,C_SCOREPIC);
-#ifndef UPLOAD
-//	VWB_DrawPic(35*8,68,C_CODEPIC);
-#endif
+
 	fontnumber=0;
 
 #else
