@@ -179,9 +179,9 @@ boolean CA_ReadFile(char *filename, memptr *ptr)
 
 	if ((handle = open(filename, O_RDONLY | O_BINARY, S_IREAD)) == -1)
 		return false;
-
 	size = filelength(handle);
-	if (!CA_FarRead (handle, *ptr, size)) {
+	
+	if (!CA_FarRead(handle, *ptr, size)) {
 		close(handle);
 		return false;
 	}

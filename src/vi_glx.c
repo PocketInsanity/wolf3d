@@ -63,7 +63,7 @@ void Quit(char *error)
 	}
 	
 	if (error && *error) {
-		fprintf(stderr, "Quit: %s", error);
+		fprintf(stderr, "Quit: %s\n", error);
 		exit(EXIT_FAILURE);
  	}
 	exit(EXIT_SUCCESS);

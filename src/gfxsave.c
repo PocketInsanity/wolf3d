@@ -73,7 +73,7 @@ void SavePCX256ToFile(unsigned char *buf, int width, int height, unsigned char *
 	}
 #endif
 	
-	fp = fopen(name, "w");	
+	fp = fopen(name, "wb");	
 	fwrite(&ph, sizeof(ph), 1, fp);
 	fwrite(dat, 1, z, fp);
 	fputc(12, fp);
@@ -115,7 +115,7 @@ void SavePCXRGBToFile(unsigned char *buf, int width, int height, char *name)
 		}
 	}
 	
-	fp = fopen(name, "w");	
+	fp = fopen(name, "wb");	
 	fwrite(&ph, sizeof(ph), 1, fp);
 	fwrite(dat, 1, width * height * 2 * 3, fp);
 	fclose(fp);

@@ -13,9 +13,13 @@
 #include <io.h>
 #include <dos.h>
 
+#ifdef __cplusplus
+typedef bool boolean;
+#else
 #define boolean BOOLEAN
 #define false FALSE
 #define true TRUE
+#endif
 
 #define PACKED
 #pragma pack(1) /* TODO: this unfortunately packs every struct... */
@@ -34,7 +38,12 @@
 #define LONGLONG long long
 
 #define O_BINARY 0
-typedef	enum {false,true} boolean;
+
+#ifdef __cplusplus
+typedef bool boolean;
+#else
+typedef       enum {false,true} boolean;
+#endif
 
 #endif
 

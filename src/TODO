@@ -83,3 +83,8 @@ draw loop.. start by cp wl_draw.c vi_ogl.c and just take out the actual
 drawing bits and replace with opengl.
 * rename visable to visible
 * fix up windows port
+* create 'sound channels' with priority.. ie a door can only make one sound
+at a time
+* beos is c++ (and uses gcc as a compiler i think) but wolf3d will need many
+cleanups for c++
+either that or use extern "C" { ... } in the header files
