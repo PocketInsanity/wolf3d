@@ -1,5 +1,13 @@
 #include "wl_def.h"
 
+typedef	struct {
+	int x, y;
+} Point;
+
+typedef	struct {
+	Point ul, lr;
+} Rect;
+
 //	Global variables
 boolean		NoWait;
 word		PrintX,PrintY;
@@ -115,7 +123,7 @@ void US_PrintUnsigned(longword n)
 //	USL_PrintInCenter() - Prints a string in the center of the given rect
 //
 ///////////////////////////////////////////////////////////////////////////
-void USL_PrintInCenter(const char *s, Rect r)
+static void USL_PrintInCenter(const char *s, Rect r)
 {
 	word w, h, rw, rh;
 

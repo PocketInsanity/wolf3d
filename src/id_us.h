@@ -39,6 +39,4 @@ boolean	US_LineInput(int x,int y,char *buf,const char *def,boolean escok,
 				int maxchars,int maxwidth);
 int				US_RndT();
 
-void	USL_PrintInCenter(const char *s,Rect r);
-
 #endif

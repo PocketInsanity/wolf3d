@@ -60,14 +60,6 @@ typedef long fixed;
 
 typedef void * memptr;
 
-typedef	struct {
-	int x, y;
-} Point;
-
-typedef	struct {
-	Point ul, lr;
-} Rect;
-
 #include "misc.h"
 
 #include "vi_comm.h"
