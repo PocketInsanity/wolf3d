@@ -1294,7 +1294,9 @@ int WolfMain(int argc, char *argv[])
 {
 	_argc = argc;
 	_argv = argv;
-	
+
+	printf("Now Loading %s\n", GAMENAME);
+		
 	srand(time(NULL));
 	
 	CheckForEpisodes();

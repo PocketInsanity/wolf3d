@@ -32,7 +32,7 @@ typedef	struct {
 	SoundCommon common;
 	Instrument inst;
 	byte block, data[1];
-} AdLibSound;
+} PACKED AdLibSound;
 
 typedef	struct {
 	word length, values[1];

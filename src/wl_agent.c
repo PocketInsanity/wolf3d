@@ -11,7 +11,7 @@
 */
 
 #define MOVESCALE		150l
-#define BACKMOVESCALE	100l
+#define BACKMOVESCALE		100l
 #define ANGLESCALE		20
 
 /*
@@ -52,7 +52,7 @@ statetype s_attack = {false,0,0,T_Attack,NULL,NULL};
 struct atkinf
 {
 	char	tics,attack,frame;		// attack is 1 for gun, 2 for knife
-} attackinfo[4][14] =
+} static attackinfo[4][14] =
 
 {
 { {6,0,1},{6,2,2},{6,0,3},{6,-1,4} },
@@ -1240,7 +1240,7 @@ void VictorySpin (void)
 ===============
 */
 
-void	T_Attack (objtype *ob)
+void T_Attack(objtype *ob)
 {
 	struct	atkinf	*cur;
 

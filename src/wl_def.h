@@ -71,7 +71,6 @@
 
 #define MINDIST		(0x5800l)
 
-/* xwolf code needs max height to double */
 #define	MAXSCALEHEIGHT	512 /* largest scale on largest view */
 
 #define MAXVIEWWIDTH		320

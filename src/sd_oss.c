@@ -11,8 +11,6 @@ boolean SoundSourcePresent, AdLibPresent, SoundBlasterPresent;
 SDMode SoundMode, MusicMode;
 SDSMode DigiMode;
 
-/* ** */
-
 static volatile boolean sqActive;
 
 static fixed globalsoundx, globalsoundy;
@@ -119,6 +117,7 @@ void *SoundThread(void *data)
 				AdlibBlock = ((AdlibSnd->block & 7) << 2) | 0x20;
 				AdlibData = (byte *)&AdlibSnd->data;
 				AdlibLength = AdlibSnd->common.length*5;
+				//OPLWrite(OPL, 0xB0, AdlibBlock);
 				NewAdlib = -1;
 			}
 			
@@ -144,14 +143,14 @@ void *SoundThread(void *data)
 
 				if (AdlibPlaying != -1) {
 					if (AdlibLength == 0) {
-						OPLWrite(OPL, 0xB0, AdlibBlock);
+						//OPLWrite(OPL, 0xB0, AdlibBlock);
 					} else if (AdlibLength == -1) {
 						OPLWrite(OPL, 0xA0, 00);
 						OPLWrite(OPL, 0xB0, AdlibBlock);
 						AdlibPlaying = -1;
 					} else if ((AdlibLength % 5) == 0) {
 						OPLWrite(OPL, 0xA0, *AdlibData);
-						OPLWrite(OPL, 0xB0, AdlibBlock);
+						OPLWrite(OPL, 0xB0, AdlibBlock & ~2);
 						AdlibData++;
 					}
 					AdlibLength--;
@@ -169,7 +168,6 @@ void *SoundThread(void *data)
 				NextSound = -1;
 			}
 			for (i = 0; i < (sizeof(sndbuf)/sizeof(sndbuf[0])); i += 2) {
-
 				if (SoundPlaying != -1) {
 					if (SoundPositioned) {
 						snd = ((((signed short)((SoundData[(SoundPlayPos >> 16)] << 8)^0x8000))>>1)/(L+1))+musbuf[i/2];
@@ -200,7 +198,8 @@ void *SoundThread(void *data)
 					}
 					SoundPlayPos += 10402; /* 7000 / 44100 * 65536 */
 					if ((SoundPlayPos >> 16) >= SoundPlayLen) {
-						SoundPlayPos = 0;
+						//SoundPlayPos = 0;
+						SoundPlayPos -= (SoundPlayLen << 16);
 						SoundLen -= 4096;
 						SoundPlayLen = (SoundLen < 4096) ? SoundLen : 4096;
 						if (SoundLen <= 0) {
@@ -532,8 +531,6 @@ void UpdateSoundLoc(fixed x, fixed y, int angle)
 		R = rightchannel;
 	}
 }
-
-/* ** */
 
 ///////////////////////////////////////////////////////////////////////////
 //

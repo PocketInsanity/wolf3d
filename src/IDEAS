@@ -2,8 +2,7 @@
 
 
 ------------- Please Disregard the Following Outdated Text: ----------------
-* One binary, any game type. Store certain things in a new file for each
-  dataset?
+* One binary, any game type.
 * A key to change viewsize while playing (note: max == 20, min == 5 or so...)
 * Game able to cope at any virtual resolution in software mode. OpenGL
   handles this transparently (after setting correct glViewport)
@@ -13,16 +12,14 @@
 * Fully compile with no warnings/errors using -Wall -ansi -pedantic and with
   other compilers (would need to turn off warnings about unused parameters)
 * Port to: Linux/SVGAlib, Linux/X (Windowed and DGA), Linux/OpenGL, 
-  DOS/Allegro, Win32/GDI?, Win32/DX, Win32/D3D, Win32/OpenGL, BeOS?, MacOS?,
+  DOS/Allegro?, Win32/GDI?, Win32/DX, Win32/D3D?, Win32/OpenGL, BeOS?, MacOS?,
   QNX?
 * Ease in using demos. Playing demos from files, recording to files, batch
   playing, and so on.
 * Make Wolf3D the game it was originally planned to be...  More strategy...
 * Empty TODO File (TODO states a list of things which need to/should be done
-  regardless of future plans [IDEAS]) and no TODO/FIXME/XXXs in the source 
+  regardless of future plans [IDEAS]) and no TODO/FIXMEs in the source 
   code
-* Have some sort of way of playing both digital and adlib sounds on all
-  platforms [fmopl.c] (if possible)
 * Test with other available mods (that were compatible with the original
   game)
 * Unified input handling

@@ -450,7 +450,7 @@ void VL_Shutdown()
 void VL_WaitVBL(int vbls)
 {
 	/* hack - but it works for me */
-	long last = get_TimeCount() + 1;
+	long last = get_TimeCount() + vbls;
 	while (last > get_TimeCount()) ;
 }
 

@@ -59,10 +59,10 @@ void CountObjects()
 ================
 */
 
-void PicturePause (void)
+void PicturePause()
 {
 
-	FinishPaletteShifts ();
+	FinishPaletteShifts();
 
 	IN_Ack();
 	

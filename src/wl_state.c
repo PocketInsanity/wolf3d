@@ -748,46 +748,6 @@ moveok:
 /*
 ===============
 =
-= DropItem
-=
-= Tries to drop a bonus item somewhere in the tiles surrounding the
-= given tilex/tiley
-=
-===============
-*/
-
-void DropItem (stat_t itemtype, int tilex, int tiley)
-{
-	int	x,y,xl,xh,yl,yh;
-
-//
-// find a free spot to put it in
-//
-	if (!actorat[tilex][tiley])
-	{
-		PlaceItemType (itemtype, tilex,tiley);
-		return;
-	}
-
-	xl = tilex-1;
-	xh = tilex+1;
-	yl = tiley-1;
-	yh = tiley+1;
-
-	for (x=xl ; x<= xh ; x++)
-		for (y=yl ; y<= yh ; y++)
-			if (!actorat[x][y])
-			{
-				PlaceItemType (itemtype, x,y);
-				return;
-			}
-}
-
-
-
-/*
-===============
-=
 = KillActor
 =
 ===============

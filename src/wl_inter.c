@@ -102,7 +102,7 @@ void EndSpear(void)
 ==================
 */
 
-void Victory (void)
+void Victory()
 {
 #ifndef SPEARDEMO
 	long	sec;

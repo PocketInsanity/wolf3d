@@ -1,4 +1,18 @@
+Control Menu:
+* TODO
 
+Sound Menu:
+* Sound Effects:
+- PCM
+- OPL2
+- PC Speaker?
+- None
+* Music:
+- OPL2
+- None
+* Sampling Rate:
+- 44100
+- 22050
 
 
 
@@ -8,22 +22,26 @@ SD_StartMusic((MusicGroup *)audiosegs[STARTMUSIC + chunk]);
 =>
 SD_StartMusic(chunk);
 
-General:
-* convert uses of open() to fopen()
-* half of these things belong in IDEAS; they are not bugs, just random
-musings
-* inconsistancy:
-id_ca.c has code for setting the data filenames' extension
-so does wl_menu.c
+* rewrite hw (sound, input) code, remove stuff like SD_SetSoundMode
+* proper left/right sound
+* adlib sounds seem like they play at twice the freq
+* set up a "build number" system where every time a file is recompiled via
+make (ver.c depends on the source code) the number is incremented and so on
+note: this debug system would have to be disabled for all public releases to
+prevent confusion. OR ver.c would depend on the source, but it does not have
+a version number, just __TIME__.  this version id would be used for
+savegames until they are fixed to not use pointers
+* use static and const where appropriate
+* convert uses of open() to fopen(), etc
 * menu code is a mess, always does things differently than the rest of the
 code, it really needs to be cleaned up
 * id_ca.c cache code: fix/readd/rewrite the "garbage collection" system?
 * clean up header files, especially wl_def.h, where some declarations aren't 
 in the right place
 * every structure that is read/written must be PACKED, with datatypes
-specifially set to correct size!
-* or at least have PACKED versions of read/write structures, and transfer
-to/from just for reading, so only not-packed structures are used during
+specifially set to correct size
+* or have PACKED versions of read/write structures, and transfer
+to/from just for reading, so only non-packed structures are used during
 actual gameplay/etc. 
 * is that memory intro screen needed anymore? probably not, although it
 would be nice to show what version is loaded, but doom just printed text
@@ -39,7 +57,6 @@ metaname like sc_Left etc or something
 * remove GOODTIMES?
 * Remove the SOD manual check?
 * perhaps rename UPLOAD
-* verify if the sounds and graphics are correctly numbered, once again...
 * add a ViewMap? (could be done similar to mac version)
 * find and remove any function stubs (functions which just call another
 function with same parameters, only difference is the name)
@@ -60,7 +77,7 @@ PlayDemoFromFile specifically
 on the border
 same with the spear of destiny animation part of ending
 * move all references to gfxbuf to vi_* only (gl will need this anyway,
-since it deprecates: id_vh, (parts of) wl_draw, wl_scale)
+since it would replace id_vh, (parts of) wl_draw, wl_scale)
 by putting in code from id_vh (either by using Plot or just copying it in)
 we can stop the large conversion before each UpdateScreen
 but palette fades will still need it!
@@ -68,12 +85,11 @@ but palette fades will still need it!
 for every byte when transferring to the pixmap, palette fades require a
 screen update
 * make sure none of the code tries to handle gfx/sound data directly
-* if window loses focus, should it clear the keys? most likely
+* when window loses focus, it should clear the keys
 * clean up vi_xlib.c: fix vid mode changing, fix dga for non8bit modes and
 the nonpalette setting stuff... lots of if statements
 also, it should be able to compile without extensions
 * rename visable to visible
-* fix up windows port
 * create 'sound channels' with priority.. ie a door can only make one sound
 at a time
 * change wl_scale to use mac wolf3d's version of scaling

@@ -2,14 +2,6 @@
 
 #include "id_heads.h"
 
-/*
-=============================================================================
-
-						 LOCAL CONSTANTS
-
-=============================================================================
-*/
-
 typedef struct
 {
 	/* 0-255 is a character, > is a pointer to a node */
@@ -41,14 +33,6 @@ byte		*grsegs[NUMCHUNKS];
 static byte 	grneeded[NUMCHUNKS];
 static byte	ca_levelbit, ca_levelnum;
 
-/*
-=============================================================================
-
-						 LOCAL VARIABLES
-
-=============================================================================
-*/
-
 char extension[5],
      gheadname[10] = "vgahead.",
      gfilename[10] = "vgagraph.",
@@ -74,7 +58,7 @@ SDMode oldsoundmode;
 static long GRFILEPOS(int c)
 {
 	long value;
-	int	offset;
+	int offset;
 
 	offset = c*3;
 
