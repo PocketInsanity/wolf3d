@@ -16,7 +16,7 @@ to/from just for reading, so only not-packed structures are used during
 actual gameplay/etc. 
 * is that memory intro screen needed anymore? probably not, although it
 would be nice to show what version is loaded, but doom just printed text
-and the intro screen which came with wolf3d has copyrighted images
+and the intro screen which came with wolf3d has copyrighted/trademarked images
 maybe make a new intro screen...
 * then, what about PG13? OH NO!!!! -- people would probably want the first
 two screens for nostalga
@@ -25,10 +25,6 @@ work the same, let the input handler do it all instead
 i think its safe for now to go with the scancodes as being the "universal"
 key type, and for everything not scancode-based, have a function to
 translate
-* fix BuildCompScale so that the clipping code is not neccessary in
-BuildCompScale, so you can remove if ((ny+ys) >= viewheight)) ...
-else there are sprite drawing/clipping bugs that will cause it to draw
-outside the viewarea (at least at the bottom), leaving artifacts
 * remove GOODTIMES?
 * Consider removing the SOD manual check
 * perhaps rename UPLOAD
@@ -75,7 +71,7 @@ but palette fades will still need it! damnit
 for every byte when transferring to the pixmap, palette fades require a
 screen update
 * make sure none of the code tries to handle gfx/sound data directly
-* GL_shared_texture_palette for opengl
+* GL_EXT_shared_texture_palette for opengl
 * if window looses focus, should it clear the keys ?
 * clean up vi_xlib.c: fix vid mode changing, fix dga for non8bit modes and
 the nonpalette setting stuff... lots of if statements
@@ -91,7 +87,9 @@ at a time
 cleanups for c++
 either that or use extern "C" { ... } in the header files
 * change wl_scale to use mac wolf3d's version of scaling
+wall drawing is done, just needed to fix sprite code
 * check in wolftools and add mac wolftools (currently the res dumping stuff)
+* have vi_xlib.c compile without the extensions
 
 Things to try:
 * Any speed gain with comparing values in screen before writing?

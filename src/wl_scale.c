@@ -50,9 +50,13 @@ void BuildCompScale(int height)
 
 		if (startpix == endpix || endpix < 0 || startpix >= viewheight || src == 64)
 		    /* source pixel goes off screen */
-		    scaledata [height].desty [src] = -1;
+		    scaledata [height].desty[src] = -1;
 		else
-		    scaledata [height].desty [src] = startpix;
+		    scaledata [height].desty[src] = startpix;
+		
+		/* Clip if needed */    
+		if ( ((signed)scaledata [height].count[src] + (signed)scaledata [height].desty[src]) > viewheight)
+			scaledata [height].count[src] = viewheight - scaledata [height].desty[src];
 	}
 
 }
@@ -96,7 +100,7 @@ void SetupScaling(int maxscaleheight)
 =
 ========================
 */
-
+#if 0
 void xBuildCompScale(int height, byte *source, int x)
 {
 
@@ -136,7 +140,54 @@ void xBuildCompScale(int height, byte *source, int x)
 
 	}
 }
+#endif
 
+/* TODO: this accesses gfxbuf directly! */
+void ScaledDraw(byte *gfx, int scale, byte *vid, unsigned long tfrac, unsigned long tint, unsigned long delta)
+{
+	fixed OldDelta;
+	
+	while (scale--) {
+		*vid = *gfx;
+		vid += 320; /* TODO: compiled in constant! */
+		OldDelta = delta;
+		delta += tfrac;
+		gfx += tint;
+		if (OldDelta > delta)
+			gfx += 1;
+	}
+}
+
+void xBuildCompScale(unsigned int height, byte *source, int x)
+{
+	unsigned long TheFrac;
+	unsigned long TheInt;
+	unsigned long y;
+	
+	if (height) {
+		TheFrac = 0x40000000UL / height;	
+		
+		if (height < viewheight) {
+			y = yoffset + (viewheight - height) / 2;
+			TheInt = TheFrac >> 24;
+			TheFrac <<= 8;
+			
+			ScaledDraw(source, height, gfxbuf + (y * 320) + x + xoffset, 
+			TheFrac, TheInt, 0);
+			
+			return;	
+		} 
+		
+		y = (height - viewheight) / 2;
+		y *= TheFrac;
+		
+		TheInt = TheFrac >> 24;
+		TheFrac <<= 8;
+		
+		ScaledDraw(&source[y >> 24], viewheight, gfxbuf + (yoffset * 320) + x + xoffset, 
+		TheFrac, TheInt, y << 8);
+	}
+}
 
 /*
 =======================
@@ -175,7 +226,6 @@ void ScaleLine()
 	    color = *pixels++;
 	    if (ys >= 0) {
 		for (ny=0; ny<scaledata[linescale].count[y]; ny++) {
-		if ( (ys+ny) >= viewheight ) break; /* TODO: fix BuildCompScale so this isn't necessary */
 		    for (n = 0, x = slinex; n < slinewidth; n++, x++) {
 			VL_Plot(x+xoffset, ys+ny+yoffset, color);
 		    }
