@@ -1,17 +1,5 @@
 /* ID_CA.C */
 
-/*
-=============================================================================
-
-Id Software Caching Manager
----------------------------
-
-Must be started BEFORE the memory manager, because it needs to get the headers
-loaded into the data segment
-
-=============================================================================
-*/
-
 #include "id_heads.h"
 
 /*
@@ -28,13 +16,11 @@ typedef struct
 	unsigned short int bit0,bit1;
 } PACKED huffnode;
 
-
 typedef struct
 {
 	unsigned short int RLEWtag;
 	long headeroffsets[100];
 } PACKED mapfiletype;
-
 
 /*
 =============================================================================
@@ -56,8 +42,6 @@ byte			grneeded[NUMCHUNKS];
 byte		ca_levelbit,ca_levelnum;
 
 int			profilehandle,debughandle;
-
-char		audioname[13]="AUDIO.";
 
 /*
 =============================================================================
@@ -93,8 +77,7 @@ long chunkcomplen, chunkexplen;
 
 SDMode oldsoundmode;
 
-void	CAL_CarmackExpand (unsigned *source, unsigned *dest,
-		unsigned length);
+void CAL_CarmackExpand (word *source, word *dest, word length);
 
 
 #define FILEPOSSIZE	3
@@ -143,7 +126,6 @@ void CAL_GetGrChunkLength (int chunk)
 	chunkcomplen = GRFILEPOS(chunk+1)-GRFILEPOS(chunk)-4;
 }
 
-
 /*
 ==========================
 =
@@ -173,7 +155,6 @@ boolean CA_FarRead(int handle, byte *dest, long length)
 	return true;
 }
 
-
 /*
 ==========================
 =
@@ -201,7 +182,6 @@ boolean CA_FarWrite (int handle, byte *source, long length)
 	}
 	return true;
 }
-
 
 /*
 ==========================
@@ -231,7 +211,6 @@ boolean CA_ReadFile (char *filename, memptr *ptr)
 	return true;
 }
 
-
 /*
 ==========================
 =
@@ -247,8 +226,8 @@ boolean CA_WriteFile (char *filename, void *ptr, long length)
 	int handle;
 	long size;
 
-	handle = open(filename,O_CREAT | O_BINARY | O_WRONLY,
-				S_IREAD | S_IWRITE | S_IFREG);
+	handle = open(filename,O_CREAT | O_BINARY | O_WRONLY, 
+			S_IREAD | S_IWRITE | S_IFREG);
 
 	if (handle == -1)
 		return false;
@@ -261,8 +240,6 @@ boolean CA_WriteFile (char *filename, void *ptr, long length)
 	close (handle);
 	return true;
 }
-
-
 
 /*
 ==========================
@@ -355,10 +332,10 @@ void CAL_HuffExpand(byte *source, byte *dest, long length, huffnode *htable)
 #define NEARTAG	0xa7
 #define FARTAG	0xa8
 
-void CAL_CarmackExpand (unsigned *source, unsigned *dest, unsigned length)
+void CAL_CarmackExpand(word *source, word *dest, word length)
 {
-	unsigned	ch,chhigh,count,offset;
-	unsigned *copyptr, *inptr, *outptr;
+	word ch, chhigh, count, offset;
+	word *copyptr, *inptr, *outptr;
 
 	length/=2;
 
@@ -1011,13 +988,13 @@ void CA_CacheScreen (int chunk)
 ======================
 */
 
-void CA_CacheMap (int mapnum)
+void CA_CacheMap(int mapnum)
 {
 	long	pos,compressed;
-	int		plane;
+	int	plane;
 	memptr	*dest,bigbufferseg;
-	unsigned	size;
-	unsigned	*source;
+	word	size;
+	word	*source;
 	memptr	buffer2seg;
 	long	expanded;
 
@@ -1055,8 +1032,8 @@ void CA_CacheMap (int mapnum)
 		expanded = *source;
 		source++;
 		MM_GetPtr (&buffer2seg,expanded);
-		CAL_CarmackExpand (source, (unsigned *)buffer2seg,expanded);
-		CA_RLEWexpand (((unsigned *)buffer2seg)+1,*dest,size,
+		CAL_CarmackExpand (source, (word *)buffer2seg,expanded);
+		CA_RLEWexpand (((word *)buffer2seg)+1,*dest,size,
 		((mapfiletype *)tinf)->RLEWtag);
 		MM_FreePtr (&buffer2seg);
 
@@ -1411,42 +1388,6 @@ unsigned	numUMBs,UMBbase[MAXUMBS];
 
 //==========================================================================
 
-//
-// local prototypes
-//
-
-/*
-====================
-=
-= MML_ClearBlock
-=
-= We are out of blocks, so free a purgable block
-=
-====================
-*/
-
-void MML_ClearBlock (void)
-{
-	mmblocktype *scan, *last;
-
-	scan = mmhead->next;
-
-	while (scan)
-	{
-		if (!(scan->attributes&LOCKBIT) && (scan->attributes&PURGEBITS) )
-		{
-			MM_FreePtr(scan->useptr);
-			return;
-		}
-		scan = scan->next;
-	}
-
-	Quit ("MM_ClearBlock: No purgable blocks!");
-}
-
-
-//==========================================================================
-
 /*
 ===================
 =
@@ -1460,73 +1401,8 @@ void MML_ClearBlock (void)
 
 void MM_Startup (void)
 {
-	int i;
-	unsigned 	long length;
-	void *start;
-	unsigned 	segstart,seglength,endfree;
-
-	if (mmstarted)
-		MM_Shutdown ();
-
-
-	mmstarted = true;
-	bombonerror = true;
-//
-// set up the linked list (everything in the free list;
-//
-	mmhead = NULL;
-	mmfree = &mmblocks[0];
-	for (i=0;i<MAXBLOCKS-1;i++)
-		mmblocks[i].next = &mmblocks[i+1];
-	mmblocks[i].next = NULL;
-
-//
-// locked block of all memory until we punch out free space
-//
-	GETNEWBLOCK;
-	mmhead = mmnew;				// this will allways be the first node
-	mmnew->start = 0;
-	mmnew->length = 0xffff;
-	mmnew->attributes = LOCKBIT;
-	mmnew->next = NULL;
-	mmrover = mmhead;
-
-
-//
-// get all available near conventional memory segments
-//
-	length=coreleft();
-	start = (void *)(nearheap = malloc(length));
-
-	length -= 16-(FP_OFF(start)&15);
-	length -= SAVENEARHEAP;
-	seglength = length / 16;			// now in paragraphs
-	segstart = FP_SEG(start)+(FP_OFF(start)+15)/16;
-	MML_UseSpace (segstart,seglength);
-	mminfo.nearheap = length;
-
-//
-// get all available far conventional memory segments
-//
-	length=farcoreleft();
-	start = farheap = farmalloc(length);
-	length -= 16-(FP_OFF(start)&15);
-	length -= SAVEFARHEAP;
-	seglength = length / 16;			// now in paragraphs
-	segstart = FP_SEG(start)+(FP_OFF(start)+15)/16;
-	MML_UseSpace (segstart,seglength);
-	mminfo.farheap = length;
-	mminfo.mainmem = mminfo.nearheap + mminfo.farheap;
-
-//
-// allocate the misc buffer
-//
-	mmrover = mmhead;		// start looking for space after low block
-
 	MM_GetPtr (&bufferseg,BUFFERSIZE);
 }
-
-//==========================================================================
 
 /*
 ====================
@@ -1538,17 +1414,11 @@ void MM_Startup (void)
 ====================
 */
 
-void MM_Shutdown (void)
+void MM_Shutdown(void)
 {
-  if (!mmstarted)
-	return;
-
-  farfree (farheap);
-  free (nearheap);
-//  MML_ShutdownXMS ();
+	MM_FreePtr(bufferseg);
+	bufferseg = NULL;
 }
-
-//==========================================================================
 
 /*
 ====================
@@ -1560,118 +1430,11 @@ void MM_Shutdown (void)
 ====================
 */
 
-void MM_GetPtr (memptr *baseptr,unsigned long size)
+void MM_GetPtr(memptr *baseptr, unsigned long size)
 {
-	mmblocktype *scan, *lastscan, *endscan, *purge, *next;
-	int			search;
-	unsigned	needed,startseg;
-
-	needed = (size+15)/16;		// convert size from bytes to paragraphs
-
-	GETNEWBLOCK;				// fill in start and next after a spot is found
-	mmnew->length = needed;
-	mmnew->useptr = baseptr;
-	mmnew->attributes = BASEATTRIBUTES;
-
-tryagain:
-	for (search = 0; search<3; search++)
-	{
-	//
-	// first search:	try to allocate right after the rover, then on up
-	// second search: 	search from the head pointer up to the rover
-	// third search:	compress memory, then scan from start
-		if (search == 1 && mmrover == mmhead)
-			search++;
-
-		switch (search)
-		{
-		case 0:
-			lastscan = mmrover;
-			scan = mmrover->next;
-			endscan = NULL;
-			break;
-		case 1:
-			lastscan = mmhead;
-			scan = mmhead->next;
-			endscan = mmrover;
-			break;
-		case 2:
-			MM_SortMem ();
-			lastscan = mmhead;
-			scan = mmhead->next;
-			endscan = NULL;
-			break;
-		}
-
-		startseg = lastscan->start + lastscan->length;
-
-		while (scan != endscan)
-		{
-			if (scan->start - startseg >= needed)
-			{
-			//
-			// got enough space between the end of lastscan and
-			// the start of scan, so throw out anything in the middle
-			// and allocate the new block
-			//
-				purge = lastscan->next;
-				lastscan->next = mmnew;
-				mmnew->start = *(unsigned *)baseptr = startseg;
-				mmnew->next = scan;
-				while ( purge != scan)
-				{	// free the purgable block
-					next = purge->next;
-					FREEBLOCK(purge);
-					purge = next;		// purge another if not at scan
-				}
-				mmrover = mmnew;
-				return;	// good allocation!
-			}
-
-			//
-			// if this block is purge level zero or locked, skip past it
-			//
-			if ( (scan->attributes & LOCKBIT)
-				|| !(scan->attributes & PURGEBITS) )
-			{
-				lastscan = scan;
-				startseg = lastscan->start + lastscan->length;
-			}
-
-
-			scan=scan->next;		// look at next line
-		}
-	}
-
-	if (bombonerror)
-	{
-
-extern char configname[];
-extern	boolean	insetupscaling;
-extern	int	viewsize;
-boolean SetViewSize (unsigned width, unsigned height);
-#define HEIGHTRATIO		0.50
-//
-// wolf hack -- size the view down
-//
-		if (!insetupscaling && viewsize>10)
-		{
-mmblocktype *savedmmnew;
-			savedmmnew = mmnew;
-			viewsize -= 2;
-			SetViewSize (viewsize*16,viewsize*16*HEIGHTRATIO);
-			mmnew = savedmmnew;
-			goto tryagain;
-		}
-
-//		unlink(configname);
-		Quit ("MM_GetPtr: Out of memory!");
-	}
-	else
-		mmerror = true;
+	/* TODO: add some sort of linked list for purging */
+	*baseptr = malloc(size);
 }
-
-//==========================================================================
 
 /*
 ====================
@@ -1685,27 +1448,10 @@ mmblocktype *savedmmnew;
 
 void MM_FreePtr (memptr *baseptr)
 {
-	mmblocktype *scan, *last;
-
-	last = mmhead;
-	scan = last->next;
-
-	if (baseptr == mmrover->useptr)	// removed the last allocated block
-		mmrover = mmhead;
-
-	while (scan->useptr != baseptr && scan)
-	{
-		last = scan;
-		scan = scan->next;
-	}
-
-	if (!scan)
-		Quit ("MM_FreePtr: Block not found!");
-
-	last->next = scan->next;
-
-	FREEBLOCK(scan);
+	/* TODO: add some sort of linked list for purging, etc */
+	free(*baseptr);
 }
+
 //==========================================================================
 
 /*
@@ -1720,29 +1466,7 @@ void MM_FreePtr (memptr *baseptr)
 
 void MM_SetPurge (memptr *baseptr, int purge)
 {
-	mmblocktype *start;
-
-	start = mmrover;
-
-	do
-	{
-		if (mmrover->useptr == baseptr)
-			break;
-
-		mmrover = mmrover->next;
-
-		if (!mmrover)
-			mmrover = mmhead;
-		else if (mmrover == start)
-			Quit ("MM_SetPurge: Block not found!");
-
-	} while (1);
-
-	mmrover->attributes &= ~PURGEBITS;
-	mmrover->attributes |= purge;
 }
-
-//==========================================================================
 
 /*
 =====================
@@ -1756,29 +1480,7 @@ void MM_SetPurge (memptr *baseptr, int purge)
 
 void MM_SetLock (memptr *baseptr, boolean locked)
 {
-	mmblocktype *start;
-
-	start = mmrover;
-
-	do
-	{
-		if (mmrover->useptr == baseptr)
-			break;
-
-		mmrover = mmrover->next;
-
-		if (!mmrover)
-			mmrover = mmhead;
-		else if (mmrover == start)
-			Quit ("MM_SetLock: Block not found!");
-
-	} while (1);
-
-	mmrover->attributes &= ~LOCKBIT;
-	mmrover->attributes |= locked*LOCKBIT;
 }
-
-//==========================================================================
 
 /*
 =====================
@@ -1792,101 +1494,7 @@ void MM_SetLock (memptr *baseptr, boolean locked)
 
 void MM_SortMem (void)
 {
-	mmblocktype *scan, *last, *next;
-	unsigned	start,length,source,dest;
-	int			playing;
-
-	//
-	// lock down a currently playing sound
-	//
-	playing = SD_SoundPlaying ();
-	if (playing)
-	{
-		switch (SoundMode)
-		{
-		case sdm_PC:
-			playing += STARTPCSOUNDS;
-			break;
-		case sdm_AdLib:
-			playing += STARTADLIBSOUNDS;
-			break;
-		}
-		MM_SetLock((memptr)&audiosegs[playing],true);
-	}
-
-
-	SD_StopSound();
-
-	if (beforesort)
-		beforesort();
-
-	scan = mmhead;
-
-	last = NULL;		// shut up compiler warning
-
-	while (scan)
-	{
-		if (scan->attributes & LOCKBIT)
-		{
-		//
-		// block is locked, so try to pile later blocks right after it
-		//
-			start = scan->start + scan->length;
-		}
-		else
-		{
-			if (scan->attributes & PURGEBITS)
-			{
-			//
-			// throw out the purgable block
-			//
-				next = scan->next;
-				FREEBLOCK(scan);
-				last->next = next;
-				scan = next;
-				continue;
-			}
-			else
-			{
-			//
-			// push the non purgable block on top of the last moved block
-			//
-				if (scan->start != start)
-				{
-					length = scan->length;
-					source = scan->start;
-					dest = start;
-					while (length > 0xf00)
-					{
-						movedata(source,0,dest,0,0xf00*16);
-						length -= 0xf00;
-						source += 0xf00;
-						dest += 0xf00;
-					}
-					movedata(source,0,dest,0,length*16);
-
-					scan->start = start;
-					*(unsigned *)scan->useptr = start;
-				}
-				start = scan->start + scan->length;
-			}
-		}
-
-		last = scan;
-		scan = scan->next;		// go to next block
-	}
-
-	mmrover = mmhead;
-
-	if (aftersort)
-		aftersort();
-
-	if (playing)
-		MM_SetLock((memptr)&audiosegs[playing],false);
 }
-
-
-//==========================================================================
 
 /*
 =====================
@@ -1898,45 +1506,7 @@ void MM_SortMem (void)
 
 void MM_ShowMemory (void)
 {
-	mmblocktype *scan;
-	unsigned color,temp,x,y;
-	long	end,owner;
-	char    scratch[80],str[10];
-
-	temp = bufferofs;
-	bufferofs = displayofs;
-	scan = mmhead;
-
-	end = -1;
-
-	while (scan)
-	{
-		if (scan->attributes & PURGEBITS)
-			color = 5;		// dark purple = purgable
-		else
-			color = 9;		// medium blue = non purgable
-		if (scan->attributes & LOCKBIT)
-			color = 12;		// red = locked
-		if (scan->start<=end)
-			Quit ("MM_ShowMemory: Memory block order currupted!");
-		end = scan->length-1;
-		y = scan->start/320;
-		x = scan->start%320;
-		VW_Hlin(x,x+end,y,color);
-		VW_Plot(x,y,15);
-		if (scan->next && scan->next->start > end+1)
-			VW_Hlin(x+end+1,x+(scan->next->start-scan->start),y,0);	// black = free
-
-		scan = scan->next;
-	}
-
-	VW_FadeIn ();
-	IN_Ack();
-
-	bufferofs = temp;
 }
-
-//==========================================================================
 
 /*
 =====================
@@ -1948,60 +1518,7 @@ void MM_ShowMemory (void)
 
 void MM_DumpData (void)
 {
-	mmblocktype *scan, *best;
-	long	lowest,oldlowest;
-	unsigned	owner;
-	char	lock,purge;
-	FILE	*dumpfile;
-
-
-	free (nearheap);
-	dumpfile = fopen ("MMDUMP.TXT","w");
-	if (!dumpfile)
-		Quit ("MM_DumpData: Couldn't open MMDUMP.TXT!");
-
-	lowest = -1;
-	do
-	{
-		oldlowest = lowest;
-		lowest = 0xffff;
-
-		scan = mmhead;
-		while (scan)
-		{
-			owner = (unsigned)scan->useptr;
-
-			if (owner && owner<lowest && owner > oldlowest)
-			{
-				best = scan;
-				lowest = owner;
-			}
-
-			scan = scan->next;
-		}
-
-		if (lowest != 0xffff)
-		{
-			if (best->attributes & PURGEBITS)
-				purge = 'P';
-			else
-				purge = '-';
-			if (best->attributes & LOCKBIT)
-				lock = 'L';
-			else
-				lock = '-';
-			fprintf (dumpfile,"0x%p (%c%c) = %u\n"
-			,(unsigned)lowest,lock,purge,best->length);
-		}
-
-	} while (lowest != 0xffff);
-
-	fclose (dumpfile);
-	Quit ("MMDUMP.TXT created.");
 }
-
-//==========================================================================
-
 
 /*
 ======================
@@ -2015,23 +1532,7 @@ void MM_DumpData (void)
 
 long MM_UnusedMemory (void)
 {
-	unsigned free;
-	mmblocktype *scan;
-
-	free = 0;
-	scan = mmhead;
-
-	while (scan->next)
-	{
-		free += scan->next->start - (scan->start + scan->length);
-		scan = scan->next;
-	}
-
-	return free*16l;
 }
-
-//==========================================================================
-
 
 /*
 ======================
@@ -2045,24 +1546,7 @@ long MM_UnusedMemory (void)
 
 long MM_TotalFree (void)
 {
-	unsigned free;
-	mmblocktype *scan;
-
-	free = 0;
-	scan = mmhead;
-
-	while (scan->next)
-	{
-		if ((scan->attributes&PURGEBITS) && !(scan->attributes&LOCKBIT))
-			free += scan->length;
-		free += scan->next->start - (scan->start + scan->length);
-		scan = scan->next;
-	}
-
-	return free*16l;
 }
-
-//==========================================================================
 
 /*
 =====================

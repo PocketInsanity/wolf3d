@@ -18,8 +18,6 @@ typedef	struct
 
 //===========================================================================
 
-extern	char		audioname[13];
-
 extern	byte 			*tinf;
 extern	int			mapon;
 
