@@ -3,3 +3,5 @@
 * Game able to cope at any virtual resolution in software mode. OpenGL
   handles this transparently
 * Audio support using OpenAL
+* Add support for the Mac version, if possible
+* Network support!

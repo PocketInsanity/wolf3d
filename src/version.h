@@ -5,7 +5,7 @@
 /* WL6 = 1 */
 /* SDM = 2 */
 /* SOD = 3 */
-#define WMODE 3
+#define WMODE 0
 
 #if WMODE == 0
 /* #define SPEAR */
@@ -15,7 +15,6 @@
 #define GOODTIMES
 #define DEMOSEXTERN
 #define UPLOAD
-#error "wl1 does not work yet"
 
 #elif WMODE == 1
 /* #define SPEAR */
@@ -43,6 +42,11 @@
 #define GOODTIMES
 #define DEMOSEXTERN
 /* #define UPLOAD */
+
+/*
+JAPANDEMO requires UPLOAD
+SPANISH
+*/
 
 #else
 #error "please edit version.h and fix WMODE"

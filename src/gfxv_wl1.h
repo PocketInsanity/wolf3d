@@ -25,6 +25,7 @@ typedef enum {
 		H_LEFTWINDOWPIC,             // 18
 		H_RIGHTWINDOWPIC,            // 19
 		H_BOTTOMINFOPIC,             // 20
+		H_SPEARINFO, /* TODO: this ruins the numbers :) */
 		// Lump Start
 		C_OPTIONSPIC,                // 21
 		C_CURSOR1PIC,                // 22
@@ -53,6 +54,12 @@ typedef enum {
 		C_EPISODE5PIC,               // 45
 		C_EPISODE6PIC,               // 46
 		C_CODEPIC,                   // 47
+		C_TIMECODEPIC,
+		C_LEVELPIC,
+		C_NAMEPIC,
+		C_SCOREPIC,
+		C_JOY1PIC,
+		C_JOY2PIC,
 		// Lump Start
 		L_GUYPIC,                    // 48
 		L_COLONPIC,                  // 49
@@ -94,6 +101,7 @@ typedef enum {
 		L_YPIC,                      // 85
 		L_ZPIC,                      // 86
 		L_EXPOINTPIC,                // 87
+		L_APOSTROPHEPIC,
 		L_GUY2PIC,                   // 88
 		L_BJWINSPIC,                 // 89
 		STATUSBARPIC,                // 90
@@ -147,16 +155,23 @@ typedef enum {
 		PAUSEDPIC,                   // 137
 		GETPSYCHEDPIC,               // 138
 
-
-
-		ORDERSCREEN=554,
-		ERRORSCREEN,                 // 555
+		ORDERSCREEN=148,
+		ERRORSCREEN,
+		T_HELPART,
+		T_DEMO0,
+		T_DEMO1,
+		T_DEMO2,
+		T_DEMO3,
+		T_ENDART1,
+		//ORDERSCREEN=554,
+		//ERRORSCREEN,                 // 555
 		ENUMEND
 	     } graphicnums;
 
 //
 // Data LUMPs
 //
+/* TODO */
 #define README_LUMP_START		3
 #define README_LUMP_END			20
 
@@ -176,16 +191,16 @@ typedef enum {
 #define NUMCHUNKS    556
 #define NUMFONT      2
 #define NUMFONTM     0
-#define NUMPICS      136
+#define NUMPICS      144
 #define NUMPICM      0
 #define NUMSPRITES   0
 #define NUMTILE8     72
 #define NUMTILE8M    0
-#define NUMTILE16    144
-#define NUMTILE16M   270
+#define NUMTILE16    0
+#define NUMTILE16M   0
 #define NUMTILE32    0
 #define NUMTILE32M   0
-#define NUMEXTERNS   2
+#define NUMEXTERNS   8
 //
 // File offsets for data items
 //
@@ -194,15 +209,15 @@ typedef enum {
 #define STARTFONT    1
 #define STARTFONTM   3
 #define STARTPICS    3
-#define STARTPICM    139
-#define STARTSPRITES 139
-#define STARTTILE8   139
-#define STARTTILE8M  140
-#define STARTTILE16  140
-#define STARTTILE16M 284
-#define STARTTILE32  554
-#define STARTTILE32M 554
-#define STARTEXTERNS 554
+#define STARTPICM    147
+#define STARTSPRITES 147
+#define STARTTILE8   147
+#define STARTTILE8M  148
+#define STARTTILE16  148
+#define STARTTILE16M 148
+#define STARTTILE32  148
+#define STARTTILE32M 148
+#define STARTEXTERNS 148
 
 //
 // Thank you for using IGRAB!

@@ -18,3 +18,22 @@ maybe there are clipping bugs that will cause it to fill over the top, left,
 and right
 * if japan versions are not to be found, remove the code 
 * remove DEMOEXTERN, and add ability to play demos from commandline 
+* remove SPANISH code (and spanish.h)? honestly i would rather have a german
+version than a spanish version
+* remove GOODTIMES (the piracy message is somewhat worthless)
+* then consider removing the SOD manual check
+* fix wolf shareware gfx
+* fix status bar gfx junk, and those tiles that do not wish to be extracted
+* Use either US_CheckParm or MS_CheckParm.
+* perhaps rename UPLOAD
+TOO MANY #IFDEF.
+and upload builds with lots of wl6 code anyway (sound references were just
+ifdefed
+* verify if the sounds and graphics are correctly numbered, once again...
+* remove -fwritable-strings
+* find out why shareware version produces these messages:
+CA_FarRead only read 471 out of 1671
+Trying to free null audio chunk 207!
+CA_FarRead hit EOF?
+CA_FarRead hit EOF?
+CA_FarRead hit EOF?

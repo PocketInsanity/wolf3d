@@ -322,6 +322,7 @@ void T_Projectile (objtype *ob)
 
 	if (!ProjectileTryMove (ob))
 	{
+#ifndef UPLOAD
 		if (ob->obclass == rocketobj)
 		{
 			PlaySoundLocActor(MISSILEHITSND,ob);
@@ -335,6 +336,7 @@ void T_Projectile (objtype *ob)
 		}
 #endif
 		else
+#endif
 			ob->state = NULL;		// mark for removal
 
 		return;
@@ -1059,6 +1061,7 @@ void SpawnPatrol (enemy_t which, int tilex, int tiley, int dir)
 
 void A_DeathScream (objtype *ob)
 {
+/* TODO: what are on these maps? */
 #ifndef UPLOAD
 #ifndef SPEAR
 	if (mapon==9 && !US_RndT())
@@ -1082,26 +1085,25 @@ void A_DeathScream (objtype *ob)
 	switch (ob->obclass)
 	{
 	case mutantobj:
-		PlaySoundLocActor(AHHHGSND,ob);
+		PlaySoundLocActor(AHHHGSND, ob);
 		break;
 
 	case guardobj:
 		{
-		 int sounds[9]={ DEATHSCREAM1SND,
-				 DEATHSCREAM2SND,
-				 DEATHSCREAM3SND,
-				 DEATHSCREAM4SND,
-				 DEATHSCREAM5SND,
-				 DEATHSCREAM7SND,
-				 DEATHSCREAM8SND,
-				 DEATHSCREAM9SND
-				 };
-
-		 #ifndef UPLOAD
-		 PlaySoundLocActor(sounds[US_RndT()%8],ob);
-		 #else
-		 PlaySoundLocActor(sounds[US_RndT()%2],ob);
-		 #endif
+#ifndef UPLOAD
+		 int sounds[8]={ DEATHSCREAM1SND, DEATHSCREAM2SND,
+				 DEATHSCREAM3SND, DEATHSCREAM4SND,
+				 DEATHSCREAM5SND, DEATHSCREAM7SND,
+				 DEATHSCREAM8SND, DEATHSCREAM9SND
+		 };
+		 PlaySoundLocActor(sounds[US_RndT()%8], ob);
+#else
+		 int sounds[3]={ DEATHSCREAM1SND, 
+		   		 DEATHSCREAM2SND,
+				 DEATHSCREAM3SND
+		 };
+		 PlaySoundLocActor(sounds[US_RndT()%3],ob);	
+#endif				
 		}
 		break;
 	case officerobj:
@@ -1117,6 +1119,7 @@ void A_DeathScream (objtype *ob)
 	case bossobj:
 		SD_PlaySound(MUTTISND);				// JAB
 		break;
+#ifndef UPLOAD
 	case schabbobj:
 		SD_PlaySound(MEINGOTTSND);
 		break;
@@ -1138,6 +1141,7 @@ void A_DeathScream (objtype *ob)
 	case fatobj:
 		SD_PlaySound(ROSESND);
 		break;
+#endif /* UPLOAD */
 #else
 	case spectreobj:
 		SD_PlaySound(GHOSTFADESND);
@@ -2321,7 +2325,9 @@ void T_SchabbThrow (objtype *ob)
 	new->flags = FL_NONMARK;
 	new->active = true;
 
-	PlaySoundLocActor (SCHABBSTHROWSND,new);
+#ifndef UPLOAD
+	PlaySoundLocActor(SCHABBSTHROWSND, new);
+#endif
 }
 
 /*
@@ -2360,7 +2366,9 @@ void T_GiftThrow (objtype *ob)
 	new->flags = FL_NONMARK;
 	new->active = true;
 
-	PlaySoundLocActor (MISSILEFIRESND,new);
+#ifndef UPLOAD
+	PlaySoundLocActor(MISSILEFIRESND, new);
+#endif
 }
 
 
@@ -2905,16 +2913,18 @@ void A_HitlerMorph (objtype *ob)
 // A_Slurpie
 //
 ////////////////////////////////////////////////////////
-void A_MechaSound (objtype *ob)
+void A_MechaSound(objtype *ob)
 {
+#ifndef UPLOAD
 	if (areabyplayer[ob->areanumber])
-		PlaySoundLocActor (MECHSTEPSND,ob);
+		PlaySoundLocActor(MECHSTEPSND, ob);
+#endif
 }
 
 
-void A_Slurpie (objtype *ob)
+void A_Slurpie(objtype *ob)
 {
- SD_PlaySound(SLURPIESND);
+	SD_PlaySound(SLURPIESND);
 }
 
 /*
@@ -2953,10 +2963,10 @@ void T_FakeFire (objtype *ob)
 	new->flags = FL_NEVERMARK;
 	new->active = true;
 
-	PlaySoundLocActor (FLAMETHROWERSND,new);
+#ifndef UPLOAD
+	PlaySoundLocActor(FLAMETHROWERSND, new);
+#endif
 }
-
-
 
 /*
 =================
@@ -3039,7 +3049,7 @@ void T_Fake (objtype *ob)
 ===============
 */
 
-void T_Stand (objtype *ob)
+void T_Stand(objtype *ob)
 {
 	SightPlayer (ob);
 }
@@ -3493,19 +3503,23 @@ void T_Shoot (objtype *ob)
 #ifndef SPEAR
 	 case giftobj:
 	 case fatobj:
+#ifndef UPLOAD
 	   PlaySoundLocActor(MISSILEFIRESND,ob);
+#endif
 	   break;
 	 case mechahitlerobj:
 	 case realhitlerobj:
 	 case bossobj:
 	   PlaySoundLocActor(BOSSFIRESND,ob);
 	   break;
+#ifndef UPLOAD
 	 case schabbobj:
 	   PlaySoundLocActor(SCHABBSTHROWSND,ob);
 	   break;
 	 case fakeobj:
 	   PlaySoundLocActor(FLAMETHROWERSND,ob);
 	   break;
+#endif
 #endif
 	 default:
 	   PlaySoundLocActor(NAZIFIRESND,ob);

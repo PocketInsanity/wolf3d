@@ -84,6 +84,8 @@ typedef enum {
 		LASTSOUND
 	     } soundnames;
 
+#define YEAHSND NOWAYSND // TODO: YEAHSND not defined in here
+
 //
 // Base offsets
 //
@@ -125,6 +127,9 @@ typedef enum {
 		WARMRCH1_MUS,            // 26
 		LASTMUSIC
 	     } musicnames;
+
+#define WARMARCH_MUS GETOUT_MUS // TODO: correct? 
+#define PACMAN_MUS WARMRCH1_MUS // Just changed the values to correspond to wl6
 
 /////////////////////////////////////////////////
 //

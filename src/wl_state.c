@@ -1293,19 +1293,25 @@ void FirstSighting (objtype *ob)
 		break;
 
 	case gretelobj:
+#ifndef UPLOAD	
 		SD_PlaySound(KEINSND);
+#endif
 		NewState (ob,&s_gretelchase1);
 		ob->speed *= 3;			// go faster when chasing player
 		break;
 
 	case giftobj:
+#ifndef UPLOAD
 		SD_PlaySound(EINESND);
+#endif
 		NewState (ob,&s_giftchase1);
 		ob->speed *= 3;			// go faster when chasing player
 		break;
 
 	case fatobj:
+#ifndef UPLOAD
 		SD_PlaySound(ERLAUBENSND);
+#endif
 		NewState (ob,&s_fatchase1);
 		ob->speed *= 3;			// go faster when chasing player
 		break;
