@@ -374,8 +374,10 @@ void PlayLoop(void)
 		} while ((Timer-LastTicCount) < Delay);
                                                 
 		TicCount = (Timer-LastTicCount);
+
 /*		
-		printf("Timer: %d, Tic = %d\n", Timer, TicCount);
+		if (TicCount > 1)
+			printf("Timer: %d, Tic = %d\n", Timer, TicCount);
 */			
 		gamestate.playtime += TicCount;
 		LastTicCount=Timer;

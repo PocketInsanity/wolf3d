@@ -3,11 +3,12 @@ complete:
 	07/22/01 fix cmap problem at 8bit (Want to change cmaps when going into/from gtk+ menu)
 	07/23/01 New Game
 ------------------
-finished double buffered gtk+ image
+finish double buffered gtk+ image
 Save Game, Load Game
-find keyboard way of changing focus
-fix sprite snapping
+find keyboard way of changing focus (and change focus when keyboard accelerator used)
 all visuals (loader and drawer code will need to be modified)
+fix sprite snapping
+get rid of byteswapping
 check bigendianesss
 choose difficulty (with graphics from game if possible)
 Psyched bar
@@ -37,12 +38,13 @@ try to speed drawing up
 play through testing
 update copyrights where needed
 Documentation
---------- release one anytime after this point ---------
-SDL support (for full screen), optional
-configure (automake, autoconf, etc?)
 website (no sourceforge this time)
-finish opengl version
+--------- release one anytime after this point ---------
+configure (automake, autoconf, etc?)
+SDL support (for full screen), optional
 in game menus instead of gtk+ gui
+finish opengl version
+experiement with software interpolation at truecolor modes
 level editor
 
 TODO:

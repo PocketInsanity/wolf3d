@@ -53,6 +53,22 @@ static int image_focus = 1;
 
 void Quit();
 
+void RestoreColors()
+{
+	int i;
+
+	for (i = 0; i < cmap->size; i++)
+		gdk_color_change(cmap, &default_colors[i]);
+}
+
+void UpdateColors()
+{
+	int i;
+
+	for (i = 0; i < cmap->size; i++)
+		gdk_color_change(cmap, &game_colors[i]);
+}
+
 gint delete_event(GtkWidget *widget, GdkEvent *event, gpointer data)
 {
 	g_print("delete_event\n");
@@ -64,61 +80,59 @@ void destroy(GtkWidget *widget, gpointer data)
 	Quit(NULL);
 }
 
-static void menu_file_quit(GtkWidget *w, gpointer data)
-{
-	destroy(w, data);
-}
-
 static void menu_file_newgame(GtkWidget *w, gpointer data)
 {
 	longjmp(ResetJmp, EX_NEWGAME);
 }
 
-void RestoreColors()
+static void menu_file_savegame(GtkWidget *w, gpointer data)
 {
-	int i;
-
-	for (i = 0; i < cmap->size; i++)
-		gdk_color_change(cmap, &default_colors[i]);
-
 }
 
-void UpdateColors()
+static void menu_file_loadgame(GtkWidget *w, gpointer data)
 {
-	int i;
-
-	for (i = 0; i < cmap->size; i++)
-		gdk_color_change(cmap, &game_colors[i]);
 }
 
+static void menu_file_quit(GtkWidget *w, gpointer data)
+{
+	destroy(w, data);
+}
 
-static void image_focus_in(GtkWidget *widget, GdkEventButton *event, gpointer data)
+static gboolean image_focus_in(GtkWidget *widget, GdkEventButton *event, gpointer data)
 {	
 	UpdateColors();
-	image_focus = 1;		
+	image_focus = 1;
+	
+	return FALSE;
 }
 
-static void image_focus_out(GtkWidget *widget, GdkEventButton *event, gpointer data)
+static gboolean image_focus_out(GtkWidget *widget, GdkEventButton *event, gpointer data)
 {
 	RestoreColors();
 	image_focus = 0;
+	
+	return FALSE;
 }
 
 static int KeyPressed;
 
 void keyboard_handler(int key, int press);
 
-static void key_press(GtkWidget *widget, GdkEventKey *event, gpointer data)
+static gboolean key_press(GtkWidget *widget, GdkEventKey *event, gpointer data)
 {
 	/* g_print("press\n"); */
 	keyboard_handler(event->keyval, 1);
+	
+	return FALSE;
 }
 
-static void key_release(GtkWidget *widget, GdkEventKey *event, gpointer data)
+static gboolean key_release(GtkWidget *widget, GdkEventKey *event, gpointer data)
 {
 	/* g_print("release\n"); */
 	keyboard_handler(event->keyval, 0);
 	KeyPressed = 1;
+	
+	return FALSE;
 }
 
 static void draw(GtkWidget *widget, GdkRectangle *area, gpointer user_data)
@@ -133,7 +147,11 @@ static void draw_default(GtkWidget *widget, gpointer user_data)
 
 static GtkItemFactoryEntry menu_items[] = {
 { "/_File",		NULL,		NULL,			0,	"<Branch>"	},
-{ "/File/New Game",	NULL,		menu_file_newgame,	0,	NULL		},	
+{ "/File/New Game",	NULL,		menu_file_newgame,	0,	NULL		},
+{ "/File/_",		NULL,		NULL,			0,	"<Separator>"	},
+{ "/File/Save Game",	NULL,		menu_file_savegame,	0,	NULL		},
+{ "/File/Load Game",	NULL,		menu_file_loadgame,	0,	NULL		},
+{ "/File/_",		NULL,		NULL,			0,	"<Separator>"	},
 { "/File/Quit",		"<control>Q",	menu_file_quit,		0,	NULL		}
 };
 
