@@ -295,7 +295,7 @@ void VL_Startup()
 	attr.event_mask = KeyPressMask | KeyReleaseMask | ExposureMask;
 	attrmask = /*CWColormap |*/ CWEventMask;
 	
-	if (dga) {
+	if (fullscreen || dga) {
 		attrmask |= CWOverrideRedirect;
 		attr.override_redirect = True;	
 	}

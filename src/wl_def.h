@@ -20,7 +20,6 @@
 
 #define MAPSPOT(x,y,plane)		(*(mapsegs[plane]+farmapylookup[y]+x))
 
-#define ABS(x) 		((int)(x)>0?(x):-(x))
 #define LABS(x) 	((long)(x)>0?(x):-(x))
 
 /*
@@ -716,8 +715,6 @@ extern fixed sintable[], *costable;
 
 extern	char	configname[13];
 
-void		HelpScreens (void);
-void		OrderingInfo (void);
 void 		CalcProjection (long focal);
 boolean		SetViewSize (unsigned width, unsigned height);
 void		NewGame (int difficulty,int episode);
@@ -753,7 +750,6 @@ extern	boolean		spearflag;
 void 	DrawPlayBorder (void);
 void 	ScanInfoPlane (void);
 void	SetupGameLevel (void);
-void 	NormalScreen (void);
 void 	DrawPlayScreen (void);
 void 	FizzleOut (void);
 void 	GameLoop (void);
@@ -776,9 +772,7 @@ void DrawAllPlayBorderSides (void);
 =============================================================================
 */
 
-#ifdef SPEAR
 extern	long		funnyticount;		// FOR FUNNY BJ FACE
-#endif
 
 extern	exit_t		playstate;
 
@@ -1043,8 +1037,6 @@ void InitAreas (void);
 =============================================================================
 */
 
-#define s_nakedbody s_static10
-
 extern	statetype s_grddie1;
 extern	statetype s_dogdie1;
 extern	statetype s_ofcdie1;
@@ -1065,7 +1057,6 @@ extern	statetype s_transdie0;
 extern	statetype s_uberdie0;
 extern	statetype s_willdie1;
 extern	statetype s_deathdie1;
-
 
 extern	statetype s_grdchase1;
 extern	statetype s_dogchase1;

@@ -3,7 +3,7 @@
 
 #ifdef _WIN32
 
-/* TODO: rename dosism, because like djgpp has glob() */
+/* TODO: rename dosism, because for example djgpp has glob() */
 #define DOSISM /* for junk which isn't abstracted (namely stuff in wl_menu.c with glob/findfirst and misc.c) */
 #undef HAVE_FFBLK /* TODO: what to do with hacks like this */
 
@@ -21,7 +21,6 @@
 #pragma pack(1) /* TODO: this unfortunately packs every struct... */
 
 #define ssize_t SSIZE_T
-
 
 #else 
 
@@ -46,15 +45,11 @@ typedef	enum {false,true} boolean;
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-
 #include <sys/stat.h>
-
 #include <sys/types.h>
-
 #include <math.h>
 
 #include "misc.h"
-
 #include "version.h"
 
 /* ------------------------------------------------------------------------ */
@@ -82,7 +77,6 @@ typedef	enum {false,true} boolean;
 #endif /* SPEAR */
 
 /* ---------------- */
-
 
 typedef	unsigned	char		byte;
 typedef	unsigned	short int	word;

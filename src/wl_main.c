@@ -443,7 +443,6 @@ boolean LoadTheGame(int file,int x,int y)
 	CA_FarRead (file,(void *)areabyplayer,sizeof(areabyplayer));
 
 
-
 	InitActorList ();
 	DiskFlopAnim(x,y);
 	CA_FarRead (file,(void *)player,sizeof(*player));
