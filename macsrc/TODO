@@ -1,7 +1,4 @@
 TODO:
-* Correct copyrights
-  - vi_ are mostly mine, with portions based on the original code
-  - move stuff out of stub.c to more proper places
 * Pause key
 * SVGAlib Hack:
   - Require 320x200x256
