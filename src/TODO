@@ -29,6 +29,7 @@ B M - use something like config file or getenv to point at data directories
 P I - finish handling/mapping for all keys in sys. specific code
 B I - add mouse support
 B M - add joystick/gamepad support
+P I - fix or remove fizzlefade
 
 Complete:
 ------------------------------------------------------------------------------

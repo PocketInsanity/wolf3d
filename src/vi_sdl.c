@@ -127,7 +127,7 @@ void VL_Shutdown()
 	SDL_Quit();
 }
 
-//===========================================================================
+/* ======================================================================== */
 
 /*
 =================
@@ -181,6 +181,11 @@ void VL_DirectPlotFlush()
 {
 	//SDL_UpdateRect(surface, 0, 0, 0, 0);
 	SDL_Flip(surface);
+}
+
+void VL_DirectUpdateRect(int x, int y, int w, int h)
+{
+	SDL_UpdateRect(surface, x, y, w, h);
 }
 
 static int XKeysymToScancode(unsigned int keysym)

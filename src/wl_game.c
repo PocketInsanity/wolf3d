@@ -906,7 +906,7 @@ void Died()
 {
 	float	fangle;
 	long	dx,dy;
-	int		iangle,curangle,clockwise,counter,change;
+	int	iangle,curangle,clockwise,counter,change;
 
 	gamestate.weapon = -1;			// take away weapon
 	SD_PlaySound(PLAYERDEATHSND);
@@ -987,10 +987,10 @@ void Died()
 
 	VL_Bar(xoffset, yoffset, viewwidth, viewheight, 4);
 	
-	IN_ClearKeysDown();
 	FizzleFade(xoffset, yoffset, viewwidth, viewheight, 70, false);
+	IN_ClearKeysDown();
 	
-	IN_UserInput(100);
+	IN_UserInput(140);
 	SD_WaitSoundDone();
 
 	gamestate.lives--;
@@ -1059,10 +1059,11 @@ restartgame:
 		StartMusic();
 		if (!died)
 			PreloadGraphics();
-		else
+		else {
+			fizzlein = true;
 			died = false;
-
-		fizzlein = true;
+		}
+		//fizzlein = true;
 		DrawLevel();
 
 #ifdef SPEAR

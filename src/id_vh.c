@@ -30,7 +30,8 @@ boolean FizzleFade(unsigned xx, unsigned yy, unsigned width, unsigned height, un
 	int x, y, p, frame;
 	unsigned int rndval;
 	int retr;
-		
+	int blocksize;
+
 	rndval = 1;
 	pixperframe = 64000/frames;
 	
@@ -38,10 +39,11 @@ boolean FizzleFade(unsigned xx, unsigned yy, unsigned width, unsigned height, un
 
 	frame = 0;
 	set_TimeCount(0);
-	
-	if (vwidth != 320) /* TODO */
+
+	if (vwidth & 3)
 		return false;
-	
+        blocksize = (vwidth / 320);
+
 	retr = -1;
 	
 	/* VL_DirectPlotInit(); */
@@ -51,8 +53,9 @@ boolean FizzleFade(unsigned xx, unsigned yy, unsigned width, unsigned height, un
 			retr = true;
 		else
 		for (p = 0; p < pixperframe; p++) {
-			y = (rndval & 0x00FF) - 1;
-			x = (rndval & 0x00FFFF00) >> 8;
+			y = ((rndval & 0x00FF) - 1) * blocksize;
+                        //y = (rndval & 0x000007FF) - 1;
+			x = ((rndval & 0x00FFFF00) >> 8) * blocksize;
 			
 			if (rndval & 1) {
 				rndval >>= 1;
@@ -63,8 +66,9 @@ boolean FizzleFade(unsigned xx, unsigned yy, unsigned width, unsigned height, un
 			if ((x > width) || (y > height))
 				continue;
 
-			VL_DirectPlot(xx+x, yy+y, xx+x, yy+y);
-			
+			//VL_DirectPlot(xx+x, yy+y, xx+x, yy+y);
+			VL_DirectUpdateRect(xx+x, yy+y, blocksize, blocksize);
+
 			if (rndval == 1) { 
 				/* entire sequence has been completed */
 				retr = false;
@@ -73,8 +77,8 @@ boolean FizzleFade(unsigned xx, unsigned yy, unsigned width, unsigned height, un
 
 		}
 		
-		VL_DirectPlotFlush();
-		
+		//VL_DirectPlotFlush();
+
 		frame++;
 		while (get_TimeCount() < frame);
 	} while (retr == -1);

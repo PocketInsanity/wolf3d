@@ -531,6 +531,11 @@ void VL_DirectPlotFlush()
 {
 }
 
+void VL_DirectUpdateRect(int x, int y, int w, int h)
+{
+	/* TODO: fixme for FizzleFade */
+}
+
 static int XKeysymToScancode(KeySym keysym)
 {
 	switch (keysym) {

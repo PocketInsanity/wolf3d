@@ -26,6 +26,7 @@ void VL_DeModeXize(byte *buf, int width, int height);
 
 void VL_DirectPlot(int x1, int y1, int x2, int y2);
 void VL_DirectPlotFlush();
+void VL_DirectUpdateRect(int x, int y, int w, int h);
 
 #define	MaxPlayers	4
 #define	MaxJoys		2
