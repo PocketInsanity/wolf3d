@@ -27,14 +27,15 @@ TODO:
     - Command line (temporary workaround for no menus).
     - Text only menus (similar to what snes9x has).
 * Different depths/visuals for software clients.
+* Get it to compile/work with g++ if it is not too much trouble.
 
 BUGS:
 * Software Drawing seems like its imprecise, stationary sprites move back and 
   forth, and walls 'swim' when you move around, or sprites pop into different 
   sizes when are far enough and get closer/farther away
   - Possibly caused by 8.8 imprecision?
-* Automap may not be "just right" in OpenGL.  Some walls are clipped on the
-  left side for example.
+* Automap may not be "just right" in OpenGL.  Some wall tiles extend past
+  the left side for example.
 * If you die/win, and have a key held down, screen passes by too fast
 
 IDEAS:
