@@ -975,9 +975,7 @@ void StartMusic(void)
 //	if ((chunk == -1) || (MusicMode != smm_AdLib))
 //DEBUG control panel		return;
 
-	MM_BombOnError (false);
 	CA_CacheAudioChunk(STARTMUSIC + chunk);
-	MM_BombOnError (true);
 	MM_SetLock((memptr)&(audiosegs[STARTMUSIC + chunk]),true);
 	SD_StartMusic((MusicGroup *)audiosegs[STARTMUSIC + chunk]);
 }

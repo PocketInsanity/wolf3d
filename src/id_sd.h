@@ -128,7 +128,7 @@ typedef	struct
 #define	sev_Null		0	// Does nothing
 #define	sev_NoteOff		1	// Turns a note off
 #define	sev_NoteOn		2	// Turns a note on
-#define	sev_NotePitch	3	// Sets the pitch of a currently playing note
+#define	sev_NotePitch		3	// Sets the pitch of a currently playing note
 #define	sev_NewInst		4	// Installs a new instrument
 #define	sev_NewPerc		5	// Installs a new percussive instrument
 #define	sev_PercOn		6	// Turns a percussive note on
@@ -139,20 +139,9 @@ typedef	struct
 #define	sf_Melodic		0
 #define	sf_Percussive	1
 
-#if 1
-typedef	struct
-		{
-			word	length,
-					values[1];
-		} MusicGroup;
-#else
-typedef	struct
-		{
-			word	flags,
-					count,
-					offsets[1];
-		} MusicGroup;
-#endif
+typedef	struct {
+	word length, values[1];
+} PACKED MusicGroup;
 
 typedef	struct
 		{

@@ -835,12 +835,12 @@ void DrawPlayScreen (void)
 
 	VW_FadeOut ();
 
-	CA_CacheGrChunk (STATUSBARPIC);
+	CA_CacheGrChunk(STATUSBARPIC);
 
-	DrawPlayBorder ();
-	VWB_DrawPic (0,200-STATUSLINES,STATUSBARPIC);
+	DrawPlayBorder();
+	VWB_DrawPic(0,200-STATUSLINES,STATUSBARPIC);
 
-	UNCACHEGRCHUNK (STATUSBARPIC);
+	CA_UnCacheGrChunk(STATUSBARPIC);
 
 	DrawFace ();
 	DrawHealth ();

@@ -537,7 +537,7 @@ void BuildTables (void)
 	  sintable[i+ANGLES]=
 	  sintable[ANGLES/2-i] = value;
 	sintable[ANGLES-i]=
-	  sintable[ANGLES/2+i] = value | 0x80000000l;
+	  sintable[ANGLES/2+i] = -value;
 	angle += anglestep;
   }
 

@@ -9,3 +9,5 @@ in an effort to not allocate everything to memory and forget about it
 * remove virtualreality
 * clean up header files, especially wl_def.h, where some externs arent in
 the right place
+* every structure that is read/written must be PACKED, with datatypes
+specifically set! (ie, no int, but short or long int)

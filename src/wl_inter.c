@@ -1677,7 +1677,7 @@ void CopyProtection(void)
 			}
 
 			for (i=0;i<NUMSOUNDS;i++,start++)
-				MM_FreePtr ((memptr *)&audiosegs[start]);
+				CA_UnCacheAudioChunk(start);
 			return;
 		}
 	}

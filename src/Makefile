@@ -10,10 +10,8 @@ OBJS = objs.o misc.o id_ca.o id_in.o id_sd.o id_vl.o id_vh.o id_us.o \
 	wl_debug.o
 
 #LFLAGS = -lm -lvga -pg
-LFLAGS = -lm -lvga 
+LFLAGS = -lm -lvga ElectricFence-2.2.2/libefence.a -lpthread
 
-#LFLAGS = /home/relnev/midas/lib/linux/gcdebug/libmidas.a -lpthread -lm -lvga 
-# /home/relnev/ElectricFence-2.0.5/libefence.a -lm -lvga 
 NASM = nasm
 
 .SUFFIXES: .asm

@@ -6,7 +6,7 @@
 #define NUMMAPS		60
 #define MAPPLANES	2
 
-#define UNCACHEGRCHUNK(chunk)	{MM_FreePtr(&grsegs[chunk]);grneeded[chunk]&=~ca_levelbit;}
+#define UNCACHEGRCHUNK CA_UnCacheGrChunk
 
 //===========================================================================
 
@@ -60,11 +60,13 @@ void CA_Startup (void);
 void CA_Shutdown (void);
 
 void CA_SetGrPurge (void);
-void CA_CacheAudioChunk (int chunk);
+void CA_CacheAudioChunk(int chunk);
+void CA_UnCacheAudioChunk(int chunk);
 void CA_LoadAllSounds (void);
 
 void CA_CacheMap (int mapnum);
-void CA_CacheGrChunk (int chunk);
+void CA_CacheGrChunk(int chunk);
+void CA_UnCacheGrChunk(int chunk);
 
 void CA_UpLevel (void);
 void CA_DownLevel (void);

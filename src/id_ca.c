@@ -58,8 +58,6 @@ char extension[5],
      aheadname[10]="audiohed.",
      afilename[10]="audiot.";
 
-void CA_CannotOpen(char *string);
-
 long *grstarts;	/* array of offsets in vgagraph, -1 for sparse */
 long *audiostarts; /* array of offsets in audio / audiot */
 
@@ -123,6 +121,17 @@ void CAL_GetGrChunkLength (int chunk)
 	lseek(grhandle,GRFILEPOS(chunk),SEEK_SET);
 	read(grhandle,&chunkexplen,sizeof(chunkexplen));
 	chunkcomplen = GRFILEPOS(chunk+1)-GRFILEPOS(chunk)-4;
+}
+
+void CA_CannotOpen(char *string)
+{
+	/* TODO Ow, string must be a small one else boom */
+	char str[30];
+
+	strcpy(str, "Can't open ");
+	strcat(str, string);
+	strcat(str, "!\n");
+	Quit(str);
 }
 
 /*
@@ -286,6 +295,7 @@ boolean CA_LoadFile (char *filename, memptr *ptr)
 ======================
 */
 /* From Ryan C. Gordon -- ryan_gordon@hotmail.com */
+#if 1
 void CAL_HuffExpand(byte *source, byte *dest, long length, huffnode *htable)
 {
 	huffnode *headptr;          
@@ -314,7 +324,49 @@ void CAL_HuffExpand(byte *source, byte *dest, long length, huffnode *htable)
 			nodeon = (htable + (path - 256));
 	} while (dest != endoff);   
 } 
+#else
 
+void CAL_HuffExpand(byte *source, byte *dest, long length, huffnode *hufftable)
+{
+        int x;
+        huffnode *headptr, *nodeon;
+        byte *ptr, *ptrd, *ptrm;
+        byte a, mask;
+        unsigned short int b;
+
+        ptrd = dest;
+
+        headptr = hufftable + 254; /* head node is allways node 254 */
+
+        nodeon = headptr;
+        ptr = source;
+        a = *ptr;
+        ptr++;
+        mask = 1;
+
+        for (x = 0; x < length; x++) {
+        again:
+                if (a & mask)
+                        b = nodeon->bit1;
+                else
+                        b = nodeon->bit0;
+                mask <<= 1;
+                if (mask == 0) {
+                        a = *ptr;
+                        ptr++;
+                        mask = 1;
+                }
+                if (b & 0xFF00) {
+                        nodeon = hufftable + (b - 256);
+                        goto again;
+                } else {
+                        nodeon = headptr;
+                        *ptrd = (b & 0x00FF);
+                        ptrd++;
+                }
+        }
+}
+#endif
 /*
 ======================
 =
@@ -696,14 +748,14 @@ void CA_Shutdown (void)
 ======================
 */
 
-void CA_CacheAudioChunk (int chunk)
+void CA_CacheAudioChunk(int chunk)
 {
 	long	pos,compressed;
 
 	if (audiosegs[chunk])
 	{
 		MM_SetPurge ((memptr)&audiosegs[chunk],0);
-		return;							// allready in memory
+		return;	
 	}
 
 //
@@ -715,9 +767,20 @@ void CA_CacheAudioChunk (int chunk)
 
 	lseek(audiohandle,pos,SEEK_SET);
 
-	MM_GetPtr ((memptr)&audiosegs[chunk],compressed);
+	MM_GetPtr((memptr)&audiosegs[chunk],compressed);
 
 	CA_FarRead(audiohandle,audiosegs[chunk],compressed);
+}
+
+void CA_UnCacheAudioChunk(int chunk)
+{
+	if (audiosegs[chunk] == 0) {
+		fprintf(stderr, "Trying to free null audio chunk %d!\n", chunk);
+		return;
+	}
+	
+	MM_FreePtr((memptr *)&audiosegs[chunk]);
+	audiosegs[chunk] = 0;
 }
 
 //===========================================================================
@@ -786,10 +849,9 @@ cachein:
 ======================
 */
 
-void CAL_ExpandGrChunk (int chunk, byte *source)
+void CAL_ExpandGrChunk(int chunk, byte *source)
 {
-	long	expanded;
-
+	long expanded;
 
 	if (chunk >= STARTTILE8 && chunk < STARTEXTERNS)
 	{
@@ -801,7 +863,7 @@ void CAL_ExpandGrChunk (int chunk, byte *source)
 #define MASKBLOCK	128
 
 		if (chunk<STARTTILE8M)			// tile 8s are all in one chunk!
-			expanded = BLOCK*NUMTILE8;
+			expanded = BLOCK*NUMTILE8 / 4; /* hmm */
 		else if (chunk<STARTTILE16)
 			expanded = MASKBLOCK*NUMTILE8M;
 		else if (chunk<STARTTILE16M)	// all other tiles are one/chunk
@@ -818,7 +880,7 @@ void CAL_ExpandGrChunk (int chunk, byte *source)
 	//
 	// everything else has an explicit size longword
 	//
-		expanded = *(long *)source;
+		expanded = *((long *)source);
 		source += 4;			// skip over length
 	}
 
@@ -826,8 +888,8 @@ void CAL_ExpandGrChunk (int chunk, byte *source)
 // allocate final space, decompress it, and free bigbuffer
 // Sprites need to have shifts made and various other junk
 //
-	MM_GetPtr (&grsegs[chunk],expanded);
-	CAL_HuffExpand (source,grsegs[chunk],expanded,grhuffman);
+	MM_GetPtr(&grsegs[chunk], expanded);
+	CAL_HuffExpand(source, grsegs[chunk], expanded, grhuffman);
 }
 
 
@@ -844,18 +906,18 @@ void CAL_ExpandGrChunk (int chunk, byte *source)
 void CA_CacheGrChunk(int chunk)
 {
 	long	pos,compressed;
-	memptr	bigbufferseg;
 	byte	*source;
 	int		next;
 
+	/* this is due to Quit wanting to cache the error screen before this has been set up! */
 	if ( (grhandle == 0) || (grhandle == -1) ) /* make sure this works ok */
 		return;
 		
 	grneeded[chunk] |= ca_levelbit;	/* make sure it doesn't get removed */
 	if (grsegs[chunk])
 	{
-		MM_SetPurge (&grsegs[chunk],0);
-		return;							// allready in memory
+		MM_SetPurge (&grsegs[chunk], 0);
+		return;
 	}
 
 //
@@ -874,17 +936,27 @@ void CA_CacheGrChunk(int chunk)
 
 	lseek(grhandle,pos,SEEK_SET);
 
-	MM_GetPtr(&bigbufferseg,compressed);
-	MM_SetLock (&bigbufferseg,true);
-	CA_FarRead(grhandle,bigbufferseg,compressed);
-	source = bigbufferseg;
+	MM_GetPtr((memptr)&source, compressed);
+	CA_FarRead(grhandle, source, compressed);
 
-	CAL_ExpandGrChunk (chunk,source);
+	CAL_ExpandGrChunk(chunk, source);
 
-	MM_FreePtr(&bigbufferseg);
+	MM_FreePtr((memptr)&source);
 }
 
-
+void CA_UnCacheGrChunk(int chunk)
+{
+	if (grsegs[chunk] == 0) {
+		fprintf(stderr, "Trying to free null pointer %d!\n", chunk);
+		return;
+	}
+	
+	MM_FreePtr(&grsegs[chunk]);
+	grneeded[chunk] &= ~ca_levelbit;
+	
+	/* Or should MM_FreePtr set it to zero? */
+	grsegs[chunk] = 0;
+}
 
 //==========================================================================
 
@@ -898,7 +970,7 @@ void CA_CacheGrChunk(int chunk)
 ======================
 */
 
-void CA_CacheScreen (int chunk)
+void CA_CacheScreen(int chunk)
 {
 	long	pos,compressed,expanded;
 	memptr	bigbufferseg;
@@ -1256,16 +1328,6 @@ void CA_CacheMarks (void)
 		}
 }
 #endif
-
-void CA_CannotOpen(char *string)
-{
- char str[30];
-
- strcpy(str,"Can't open ");
- strcat(str,string);
- strcat(str,"!\n");
- Quit (str);
-}
 
 /*
 =============================================================================
