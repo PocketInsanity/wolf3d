@@ -15,20 +15,18 @@
 //
 boolean			MousePresent;
 boolean			JoysPresent[MaxJoys];
-boolean			JoyPadPresent;
-
 
 // 	Global variables
 		boolean		Keyboard[NumCodes];
 		boolean		Paused;
 		char		LastASCII;
 		ScanCode	LastScan;
+/*
+KeyboardDef	KbdDefs = {0x1d,0x38,0x47,0x48,0x49,0x4b,0x4d,0x4f,0x50,0x51};
+*/
+KeyboardDef KbdDefs = {sc_Control, sc_Alt, sc_Home, sc_UpArrow, sc_PgUp, sc_LeftArrow, sc_RightArrow, sc_End, sc_DownArrow, sc_PgDn};
 
-		KeyboardDef	KbdDefs = {0x1d,0x38,0x47,0x48,0x49,0x4b,0x4d,0x4f,0x50,0x51};
-		JoystickDef	JoyDefs[MaxJoys];
 		ControlType	Controls[MaxPlayers];
-
-		longword	MouseDownCount;
 
 /*
 =============================================================================
@@ -432,34 +430,6 @@ void IN_ReadControl(int player,ControlInfo *info)
 	info->button3 = buttons & (1 << 3);
 	info->dir = DirTable[((my + 1) * 3) + (mx + 1)];
 
-}
-
-///////////////////////////////////////////////////////////////////////////
-//
-//	IN_SetControlType() - Sets the control type to be used by the specified
-//		player
-//
-///////////////////////////////////////////////////////////////////////////
-void IN_SetControlType(int player, ControlType type)
-{
- 	// DEBUG - check that requested type is present?
-	Controls[player] = type;
-}
-
-///////////////////////////////////////////////////////////////////////////
-//
-//	IN_WaitForASCII() - Waits for an ASCII char, then clears LastASCII and
-//		returns the ASCII value
-//
-///////////////////////////////////////////////////////////////////////////
-char IN_WaitForASCII(void)
-{
-	char		result;
-
-	while (!(result = LastASCII))
-		;
-	LastASCII = '\0';
-	return(result);
 }
 
 ///////////////////////////////////////////////////////////////////////////

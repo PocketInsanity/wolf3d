@@ -22,3 +22,4 @@
 * Have some sort of way of playing both digital and adlib sounds on all
   platforms...
 * Test with other (compatible) available mods
+* Unified input handling

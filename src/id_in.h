@@ -19,10 +19,19 @@ typedef	byte		ScanCode;
 #define	sc_CapsLock		0x3a
 #define	sc_LShift		0x2a
 #define	sc_RShift		0x36
-#define	sc_UpArrow		0x48
+
+/* TODO: have all these defines map into system specific values */
+/*
+#define	sc_UpArrow	0x48
 #define	sc_DownArrow	0x50
 #define	sc_LeftArrow	0x4b
 #define	sc_RightArrow	0x4d
+*/
+#define sc_UpArrow	103
+#define sc_DownArrow	108
+#define sc_LeftArrow	105
+#define sc_RightArrow	106
+
 #define	sc_Insert		0x52
 #define	sc_Delete		0x53
 #define	sc_Home			0x47
@@ -81,13 +90,6 @@ typedef	byte		ScanCode;
 #define	sc_Z			0x2c
 
 #define	key_None		0
-#define	key_Return		0x0d
-#define	key_Enter		key_Return
-#define	key_Escape		0x1b
-#define	key_Space		0x20
-#define	key_BackSpace	0x08
-#define	key_Tab			0x09
-#define	key_Delete		0x7f
 
 typedef	enum		{
 						ctrl_Keyboard,
@@ -120,14 +122,6 @@ typedef	struct		{
 									left,				right,
 									downleft,	down,	downright;
 					} KeyboardDef;
-typedef	struct		{
-						word		joyMinX,joyMinY,
-									threshMinX,threshMinY,
-									threshMaxX,threshMaxY,
-									joyMaxX,joyMaxY,
-									joyMultXL,joyMultYL,
-									joyMultXH,joyMultYH;
-					} JoystickDef;
 // Global variables
 extern	boolean		Keyboard[],
 					MousePresent,
@@ -136,7 +130,6 @@ extern	boolean		Paused;
 extern	char		LastASCII;
 extern	ScanCode	LastScan;
 extern	KeyboardDef	KbdDefs;
-extern	JoystickDef	JoyDefs[];
 extern	ControlType	Controls[MaxPlayers];
 
 // Function prototypes
@@ -144,19 +137,14 @@ extern	ControlType	Controls[MaxPlayers];
 #define	IN_ClearKey(code)	{Keyboard[code] = false; \
 							if (code == LastScan) LastScan = sc_None;}
 
-// DEBUG - put names in prototypes
 extern	void		IN_Startup(void),IN_Shutdown(void),
-					IN_Default(boolean gotit,ControlType in),
-					IN_SetKeyHook(void (*)()),
 					IN_ClearKeysDown(void),
 					IN_ReadControl(int,ControlInfo *),
-					IN_SetControlType(int,ControlType),
 					IN_GetJoyAbs(word joy,word *xp,word *yp),
 					IN_SetupJoy(word joy,word minx,word maxx,
 								word miny,word maxy),
 					IN_Ack(void);
 extern	boolean		IN_UserInput(longword delay);
-extern	char		IN_WaitForASCII(void);
 extern	byte		*IN_GetScanName(ScanCode);
 
 

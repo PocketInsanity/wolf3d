@@ -54,7 +54,7 @@ unsigned	leftmargin[TEXTROWS],rightmargin[TEXTROWS];
 char		*text;
 unsigned	rowon;
 
-int			picx,picy,picnum,picdelay;
+int		picx,picy,picnum,picdelay;
 boolean		layoutdone;
 
 //===========================================================================
