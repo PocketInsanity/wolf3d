@@ -768,7 +768,7 @@ extern	unsigned	farmapylookup[MAPSIZE];
 
 extern	byte		tilemap[MAPSIZE][MAPSIZE];	// wall values only
 extern	byte		spotvis[MAPSIZE][MAPSIZE];
-extern	objtype		*actorat[MAPSIZE][MAPSIZE];
+extern	int		actorat[MAPSIZE][MAPSIZE];
 
 extern	boolean		singlestep,godmode,noclip;
 

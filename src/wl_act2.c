@@ -180,8 +180,7 @@ void A_Smoke(objtype *ob)
 boolean ProjectileTryMove(objtype *ob)
 {
 	int xl,yl,xh,yh,x,y;
-	objtype *check;
-
+ 
 	xl = (ob->x-PROJSIZE) >>TILESHIFT;
 	yl = (ob->y-PROJSIZE) >>TILESHIFT;
 
@@ -191,8 +190,7 @@ boolean ProjectileTryMove(objtype *ob)
 /* check for solid walls */
 	for (y=yl;y<=yh;y++) {
 		for (x=xl;x<=xh;x++) {
-			check = actorat[x][y];
-			if (check && check < objlist)
+			if (actorat[x][y] && !(actorat[x][y] & 0x8000))
 				return false;
 		}
 	}
@@ -437,7 +435,7 @@ void SpawnPatrol (enemy_t which, int tilex, int tiley, int dir)
 	new->flags |= FL_SHOOTABLE;
 	new->active = true;
 
-	actorat[new->tilex][new->tiley] = NULL;		// don't use original spot
+	actorat[new->tilex][new->tiley] = 0;	// don't use original spot
 
 	switch (dir)
 	{
@@ -455,7 +453,7 @@ void SpawnPatrol (enemy_t which, int tilex, int tiley, int dir)
 		break;
 	}
 
-	actorat[new->tilex][new->tiley] = new;
+	actorat[new->tilex][new->tiley] = new->id | 0x8000;
 }
 
 
@@ -1220,22 +1218,22 @@ moveok:
 	yl = (ob->y-MINDIST) >> TILESHIFT;
 	yh = (ob->y+MINDIST) >> TILESHIFT;
 
-	for (y=yl ; y<=yh ; y++)
-		for (x=xl ; x<=xh ; x++)
+	for (y = yl; y <= yh; y++)
+		for (x = xl; x <= xh; x++)
 		{
-			tile = (unsigned)actorat[x][y];
+			tile = actorat[x][y];
 			if (!tile)
 				continue;
-			if (tile<256)
+			if (tile < 256)
 				return;
-			if (((objtype *)tile)->flags&FL_SHOOTABLE)
+			if (objlist[tile & ~0x8000].flags & FL_SHOOTABLE)
 				return;
 		}
 
 	ob->flags |= FL_AMBUSH | FL_SHOOTABLE;
 	ob->flags &= ~FL_ATTACKMODE;
 	ob->dir = nodir;
-	NewState (ob,s_spectrewait1);
+	NewState(ob, s_spectrewait1);
 }
 
 
@@ -2395,10 +2393,9 @@ void T_BJDone(objtype *ob)
 ===============
 */
 
-boolean	CheckPosition (objtype *ob)
+boolean	CheckPosition(objtype *ob)
 {
-	int	x,y,xl,yl,xh,yh;
-	objtype *check;
+	int x, y, xl, yl, xh, yh;
 
 	xl = (ob->x-PLAYERSIZE) >>TILESHIFT;
 	yl = (ob->y-PLAYERSIZE) >>TILESHIFT;
@@ -2412,8 +2409,7 @@ boolean	CheckPosition (objtype *ob)
 	for (y=yl;y<=yh;y++)
 		for (x=xl;x<=xh;x++)
 		{
-			check = actorat[x][y];
-			if (check && check<objlist)
+			if (actorat[x][y] && !(actorat[x][y] & 0x8000))
 				return false;
 		}
 

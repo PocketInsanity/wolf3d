@@ -493,10 +493,10 @@ void SetupGameLevel()
 			tile = *map++;
 			if (tile < AREATILE) { /* solid wall */
 				tilemap[x][y] = tile;
-				(unsigned)actorat[x][y] = tile;
+				actorat[x][y] = tile;
 			} else { /* area floor */
 				tilemap[x][y] = 0;
-				actorat[x][y] = NULL;
+				actorat[x][y] = 0;
 			}
 		}
 
@@ -553,8 +553,8 @@ void SetupGameLevel()
 			if (tile == AMBUSHTILE)
 			{
 				tilemap[x][y] = 0;
-				if ((unsigned)actorat[x][y] == AMBUSHTILE)
-					actorat[x][y] = NULL;
+				if (actorat[x][y] == AMBUSHTILE)
+					actorat[x][y] = 0;
 
 				if (*map >= AREATILE)
 					tile = *map;

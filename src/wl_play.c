@@ -23,7 +23,7 @@ boolean		singlestep,godmode,noclip;
 
 byte		tilemap[MAPSIZE][MAPSIZE];	// wall values only
 byte		spotvis[MAPSIZE][MAPSIZE];
-objtype		*actorat[MAPSIZE][MAPSIZE];
+int		actorat[MAPSIZE][MAPSIZE];
 
 int tics;
 
@@ -778,13 +778,18 @@ void InitActorList()
 
 void GetNewActor()
 {
+	int id;
+	
 	if (!objfreelist)
 		Quit("GetNewActor: No free spots in objlist!");
-
+	
 	new = objfreelist;
+	id = new->id;
 	objfreelist = new->prev;
+	
 	memset(new, 0, sizeof(*new));
-
+	new->id = id;
+	
 	if (lastobj)
 		lastobj->next = new;
 	new->prev = lastobj;	// new->next is already NULL from memset
@@ -817,7 +822,7 @@ static void RemoveObj(objtype *gone)
 // fix the next object's back link
 //
 	if (gone == lastobj)
-		lastobj = (objtype *)gone->prev;
+		lastobj = gone->prev;
 	else
 		gone->next->prev = gone->prev;
 
@@ -1113,7 +1118,7 @@ void DoActor(objtype *ob)
 		if ((ob->flags&FL_NONMARK) && actorat[ob->tilex][ob->tiley])
 			return;
 
-		actorat[ob->tilex][ob->tiley] = ob;
+		actorat[ob->tilex][ob->tiley] = ob->id | 0x8000;
 		return;
 	}
 
@@ -1172,7 +1177,7 @@ think:
 	if ((ob->flags&FL_NONMARK) && actorat[ob->tilex][ob->tiley])
 		return;
 
-	actorat[ob->tilex][ob->tiley] = ob;
+	actorat[ob->tilex][ob->tiley] = ob->id | 0x8000;
 }
 
 //==========================================================================

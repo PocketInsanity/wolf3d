@@ -58,7 +58,7 @@ void SpawnNewObj(unsigned tilex, unsigned tiley, int state) /* stateenum */
 	new->y = ((long)tiley<<TILESHIFT)+TILEGLOBAL/2;
 	new->dir = nodir;
 
-	actorat[tilex][tiley] = new;
+	actorat[tilex][tiley] = new->id | 0x8000;
 	new->areanumber =
 		*(mapsegs[0] + farmapylookup[new->tiley]+new->tilex) - AREATILE;
 }
@@ -113,27 +113,27 @@ void NewState(objtype *ob, int state) /* stateenum */
 */
 
 #define CHECKDIAG(x,y)								\
-{                                                   \
-	temp=(unsigned)actorat[x][y];                   \
+{                                                \
+	temp = actorat[x][y];                   \
 	if (temp)                                       \
 	{                                               \
-		if (temp<256)                               \
+		if (temp < 256)                               \
 			return false;                           \
-		if (((objtype *)temp)->flags&FL_SHOOTABLE)  \
+		if (objlist[temp & ~0x8000].flags & FL_SHOOTABLE)  \
 			return false;                           \
 	}                                               \
 }
 
 #define CHECKSIDE(x,y)								\
 {                                                   \
-	temp=(unsigned)actorat[x][y];                   \
+	temp = actorat[x][y];                   \
 	if (temp)                                       \
 	{                                               \
-		if (temp<128)                               \
+		if (temp < 128)                               \
 			return false;                           \
-		if (temp<256)                               \
+		if (temp < 256)                               \
 			doornum = temp&63;                      \
-		else if (((objtype *)temp)->flags&FL_SHOOTABLE)\
+		else if (objlist[temp & ~0x8000].flags & FL_SHOOTABLE) \
 			return false;                           \
 	}                                               \
 }
@@ -863,7 +863,7 @@ void KillActor (objtype *ob)
 
 	gamestate.killcount++;
 	ob->flags &= ~FL_SHOOTABLE;
-	actorat[ob->tilex][ob->tiley] = NULL;
+	actorat[ob->tilex][ob->tiley] = 0;
 	ob->flags |= FL_NONMARK;
 }
 

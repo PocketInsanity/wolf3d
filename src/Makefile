@@ -1,10 +1,10 @@
 CC = gcc
 
-#CFLAGS = -Wall -O6 -fomit-frame-pointer -ffast-math -funroll-loops -mpentiumpro -mcpu=pentiumpro -march=pentiumpro
-#CFLAGS = -g -Wall
+#CFLAGS = -g -O2 -Wall -pedantic 
+#CFLAGS = -Wall -pedantic -O6 -fomit-frame-pointer -ffast-math -funroll-loops -mpentiumpro -mcpu=pentiumpro -march=pentiumpro
 CFLAGS = -g -Wall -pedantic
-#CFLAGS = -Os -Wall
-#CFLAGS = -Os -Wall -fomit-frame-pointer -ffast-math -mpentiumpro -mcpu=pentiumpro -march=pentiumpro
+#CFLAGS = -Os -Wall -peantic
+#CFLAGS = -Os -Wall -peantic -fomit-frame-pointer -ffast-math -mpentiumpro -mcpu=pentiumpro -march=pentiumpro
 
 OBJS = objs.o misc.o id_ca.o id_vh.o id_us.o \
 	wl_act1.o wl_act2.o wl_act3.o wl_agent.o wl_game.o \

@@ -25,10 +25,10 @@
 //
 long		thrustspeed;
 
-unsigned	plux,pluy;			// player coordinates scaled to unsigned
+unsigned	plux, pluy;	// player coordinates scaled to unsigned
 
-int			anglefrac;
-int			gotgatgun;	// JR
+int		anglefrac;
+int		gotgatgun;
 
 objtype		*LastAttacker;
 
@@ -52,9 +52,9 @@ struct atkinf
 { {6,0,1},{6,1,2},{6,4,3},{6,-1,4} },
 };
 
-void DrawWeapon (void);
-void GiveWeapon (int weapon);
-void GiveAmmo (int ammo);
+void DrawWeapon();
+void GiveWeapon(int weapon);
+void GiveAmmo(int ammo);
 
 /*
 =============================================================================
@@ -81,11 +81,11 @@ void CheckWeaponChange()
 	if (!gamestate.ammo)		// must use knife with no ammo
 		return;
 
-	for (i=wp_knife ; i<=gamestate.bestweapon ; i++)
+	for (i = wp_knife; i <= gamestate.bestweapon; i++)
 		if (buttonstate[bt_readyknife+i-wp_knife])
 		{
 			gamestate.weapon = gamestate.chosenweapon = i;
-			DrawWeapon ();
+			DrawWeapon();
 			return;
 		}
 }
@@ -726,7 +726,7 @@ void GetBonus (statobj_t *check)
 
 boolean TryMove(objtype *ob)
 {
-	int			xl,yl,xh,yh,x,y;
+	int		xl,yl,xh,yh,x,y;
 	objtype		*check;
 	long		deltax,deltay;
 
@@ -742,8 +742,7 @@ boolean TryMove(objtype *ob)
 	for (y=yl;y<=yh;y++)
 		for (x=xl;x<=xh;x++)
 		{
-			check = actorat[x][y];
-			if (check && check<objlist)
+			if (actorat[x][y] && !(actorat[x][y] & 0x8000))
 				return false;
 		}
 
@@ -762,18 +761,20 @@ boolean TryMove(objtype *ob)
 	for (y=yl;y<=yh;y++)
 		for (x=xl;x<=xh;x++)
 		{
-			check = actorat[x][y];
-			if (check > objlist
-			&& (check->flags & FL_SHOOTABLE) )
-			{
-				deltax = ob->x - check->x;
-				if (deltax < -MINACTORDIST || deltax > MINACTORDIST)
-					continue;
-				deltay = ob->y - check->y;
-				if (deltay < -MINACTORDIST || deltay > MINACTORDIST)
-					continue;
+			if (actorat[x][y] & 0x8000) {
+				check = &objlist[actorat[x][y] & ~0x8000]; 
 
-				return false;
+				if (check->flags & FL_SHOOTABLE)
+				{
+					deltax = ob->x - check->x;
+					if (deltax < -MINACTORDIST || deltax > MINACTORDIST)
+						continue;
+					deltay = ob->y - check->y;
+					if (deltay < -MINACTORDIST || deltay > MINACTORDIST)
+						continue;
+
+					return false;
+				}
 			}
 		}
 
@@ -798,7 +799,7 @@ void ClipMove(objtype *ob, long xmove, long ymove)
 
 	ob->x = basex+xmove;
 	ob->y = basey+ymove;
-	if (TryMove (ob))
+	if (TryMove(ob))
 		return;
 
 	if (noclip && ob->x > 2*TILEGLOBAL && ob->y > 2*TILEGLOBAL &&
@@ -811,12 +812,12 @@ void ClipMove(objtype *ob, long xmove, long ymove)
 
 	ob->x = basex+xmove;
 	ob->y = basey;
-	if (TryMove (ob))
+	if (TryMove(ob))
 		return;
 
 	ob->x = basex;
 	ob->y = basey+ymove;
-	if (TryMove (ob))
+	if (TryMove(ob))
 		return;
 
 	ob->x = basex;
