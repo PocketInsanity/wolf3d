@@ -2,7 +2,7 @@ CC = gcc
 #CC = gcc-3.0
 #CC=/opt/intel/compiler60/ia32/bin/icc
 
-CFLAGS = -g -Wall -pedantic
+CFLAGS = -g -Wall
 #CFLAGS = -g -O2 -Wall -pedantic 
 #CFLAGS = -Wall -O6 -fomit-frame-pointer -ffast-math -funroll-loops -mpentiumpro -mcpu=pentiumpro -march=pentiumpro
 #CFLAGS = -g -Wall -pedantic -std=gnu99
