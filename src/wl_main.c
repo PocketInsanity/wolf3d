@@ -69,10 +69,9 @@ char **_argv;
 /*
 ========================
 =
-= FixedByFrac
+= FixedByFrac (FixedMul)
 =
-= multiply a 16/16 bit, 2's complement fixed point number by a 16 bit
-= fraction
+= multiply two 16/16 bit, 2's complement fixed point numbers
 =
 ========================
 */
@@ -280,19 +279,19 @@ void NewGame(int difficulty, int episode)
 	gamestate.ammo = STARTAMMO;
 	gamestate.lives = 3;
 	gamestate.nextextra = EXTRAPOINTS;
-	gamestate.episode=episode;
+	gamestate.episode = episode;
 
 	startgame = true;
 }
 
 void DiskFlopAnim(int x, int y)
 {
-	static char which=0;
+	static char which = 0;
 	
 	if (!x && !y)
 		return;
 	
-	VWB_DrawPic(x,y,C_DISKLOADING1PIC+which);
+	VWB_DrawPic(x, y, C_DISKLOADING1PIC+which);
 	VW_UpdateScreen();
 	
 	which ^= 1;
@@ -427,14 +426,14 @@ boolean LoadTheGame(int file,int x,int y)
 	CA_FarRead (file,(void *)tilemap,sizeof(tilemap));
 	checksum = DoChecksum((byte *)tilemap,sizeof(tilemap),checksum);
 	DiskFlopAnim(x,y);
-	CA_FarRead (file,(void *)actorat,sizeof(actorat));
+	CA_FarRead(file,(void *)actorat,sizeof(actorat));
 	checksum = DoChecksum((byte *)actorat,sizeof(actorat),checksum);
 
-	CA_FarRead (file,(void *)areaconnect,sizeof(areaconnect));
-	CA_FarRead (file,(void *)areabyplayer,sizeof(areabyplayer));
+	CA_FarRead(file,(void *)areaconnect,sizeof(areaconnect));
+	CA_FarRead(file,(void *)areabyplayer,sizeof(areabyplayer));
 
 
-	InitActorList ();
+	InitActorList();
 	DiskFlopAnim(x,y);
 	CA_FarRead (file,(void *)player,sizeof(*player));
 
@@ -540,7 +539,7 @@ void ShutdownId()
 ==================
 */
 
-const float radtoint = (float)FINEANGLES/2.0f/PI;
+static const float radtoint = (float)FINEANGLES/2.0f/PI;
 
 void BuildTables()
 {
@@ -565,9 +564,6 @@ void BuildTables()
 // costable overlays sintable with a quarter phase shift
 // ANGLES is assumed to be divisable by four
 //
-// The low word of the value is the fraction, the high bit is the sign bit,
-// bits 16-30 should be 0
-//
 
   angle = 0;
   anglestep = PI/2/ANGLEQUAD;
@@ -583,9 +579,6 @@ void BuildTables()
   }
 
 }
-
-//===========================================================================
-
 
 /*
 ====================
@@ -636,10 +629,6 @@ void CalcProjection(long focal)
 		pixelangle[halfview+i] = -intang;
 	}
 }
-
-
-
-//===========================================================================
 
 /*
 ===================
@@ -964,7 +953,7 @@ void DoJukebox()
 	MenuFadeOut();
 
 #if !defined(SPEAR) || !defined(UPLOAD)
-	start = (rand() % 3) * 6;
+	start = (US_RndT() % 3) * 6;
 #else
 	start = 0;
 #endif
@@ -1287,8 +1276,6 @@ int WolfMain(int argc, char *argv[])
 
 	printf("Now Loading %s\n", GAMENAME);
 		
-	srand(time(NULL));
-	
 	CheckForEpisodes();
 
 	InitGame();

@@ -65,6 +65,7 @@ SD_StartMusic((MusicGroup *)audiosegs[STARTMUSIC + chunk]);
 =>
 SD_StartMusic(chunk);
 ------------------------------------------------------------------------------
+* remove farmapylookup?
 * would be nice if Quit() used vsnprintf, etc
 * actor walking through door is drawn in front of door: near end of E1M1 for
 example

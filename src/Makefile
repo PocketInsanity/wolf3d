@@ -13,6 +13,7 @@ OBJS = objs.o misc.o id_ca.o id_vh.o id_us.o \
 ROBJS = wl_draw.o
 SOBJS = $(OBJS) $(ROBJS) vi_svga.o
 XOBJS = $(OBJS) $(ROBJS) vi_xlib.o
+DOBJS = $(OBJS) $(ROBJS) vi_sdl.o
 
 LFLAGS = -lm
 
@@ -22,17 +23,21 @@ OBJS += sd_null.o
 #LFLAGS += -lpthread
 
 
+CFLAGS += `sdl-config --cflags`
+
 SLFLAGS = $(LFLAGS) -lvga
 XLFLAGS = $(LFLAGS) -L/usr/X11R6/lib -lX11 -lXext -lXxf86vm -lXxf86dga
+DLFLAGS = $(LFLAGS) `sdl-config --libs` -L/usr/X11R6/lib -lX11 -lXext
 
 NASM = nasm
 
 .SUFFIXES: .asm
 
-all:	swolf3d xwolf3d
+all:	swolf3d xwolf3d sdlwolf3d
 
 $(SOBJS): version.h id_heads.h wl_def.h
 $(XOBJS): version.h id_heads.h wl_def.h
+$(DOBJS): version.h id_heads.h wl_def.h
 
 .asm.o:
 	$(NASM) -f elf -o $@ $<
@@ -42,6 +47,9 @@ swolf3d: $(SOBJS)
 
 xwolf3d: $(XOBJS)
 	gcc -o xwolf3d $(XOBJS) $(XLFLAGS)
+
+sdlwolf3d: $(DOBJS)
+	gcc -o sdlwolf3d $(DOBJS) $(DLFLAGS)
 
 clean:
 	rm -rf swolf3d xwolf3d *.o
