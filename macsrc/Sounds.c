@@ -89,7 +89,7 @@ void FreeSong()
 {
 }
 
-void BeginSongLooped(Song)
+void BeginSongLooped(Word Song)
 {
 }
 

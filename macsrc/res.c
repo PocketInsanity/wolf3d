@@ -158,7 +158,7 @@ void *LoadAResource2(Word RezNum, LongWord Type)
 				memcpy(c->buf, c->dat, c->size);
 			} else {
 				/* DEBUG: we want a fresh copy... */
-				printf("DEBUG: Item %ld/%d already loaded!\n", Type, RezNum);
+				fprintf(stderr, "DEBUG: Item %ld/%d already loaded!\n", Type, RezNum);
 			/*	
 				free(c->buf);
 				c->buf = malloc(c->size);
@@ -176,6 +176,8 @@ void *LoadAResource2(Word RezNum, LongWord Type)
 	
 	fprintf(stderr, "ERROR (LoadAResource2): %ld/%d was not found!\n", Type, RezNum);
 	exit(EXIT_FAILURE);
+	
+	return NULL;
 }
 
 void *FindResource(Word RezNum, LongWord Type)
@@ -189,7 +191,7 @@ void *FindResource(Word RezNum, LongWord Type)
 				memcpy(c->buf, c->dat, c->size);
 			} else {
 				/* DEBUG: we want a fresh copy... */
-				printf("DEBUG: Item %ld/%d already loaded!\n", Type, RezNum);
+				fprintf(stderr, "DEBUG: Item %ld/%d already loaded!\n", Type, RezNum);
 			/*	
 				free(c->buf);
 				c->buf = malloc(c->size);
@@ -221,6 +223,7 @@ void ReleaseAResource2(Word RezNum, LongWord Type)
 		}
 		c = c->next;
 	}
+
 	fprintf(stderr, "ERROR (ReleaseAResource2): %ld/%d was not found!\n", Type, RezNum);
 	exit(EXIT_FAILURE);
 }
