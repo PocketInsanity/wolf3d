@@ -9,32 +9,33 @@
 #define O_BINARY 0
 #endif
 
-/* TimeCount from David Haslam -- dch@sirius.demon.co.uk */
-
 static struct timeval t0;
-static long tc0;
+static unsigned long tc0;
 
 void set_TimeCount(unsigned long t)
 {
 	tc0 = t;
+	
 	gettimeofday(&t0, NULL);
 }
 
-unsigned long get_TimeCount()
+unsigned long get_TimeCount(void)
 {
 	struct timeval t1;
 	long secs, usecs;
-	long tc;
+	unsigned long tc;
 	
 	gettimeofday(&t1, NULL);
+
 	secs = t1.tv_sec - t0.tv_sec;
 	usecs = t1.tv_usec - t0.tv_usec;
+
 	if (usecs < 0) {
 		usecs += 1000000;
 		secs--;
 	}
 
-	tc = tc0 + secs * 70 + usecs * 70 / 1000000;
+	tc = tc0 + secs * 70 + (usecs * 70) / 1000000;
 		
 	return tc;
 }
@@ -65,6 +66,8 @@ char *strlwr(char *s)
 	
 char *itoa(int value, char *string, int radix)
 {
+	(void) radix;
+	
 	/* wolf3d only uses radix 10 */
 	sprintf(string, "%d", value);
 	return string;
@@ -72,12 +75,18 @@ char *itoa(int value, char *string, int radix)
 
 char *ltoa(long value, char *string, int radix)
 {
+	(void) radix;
+	
+	/* wolf3d only uses radix 10 */
 	sprintf(string, "%ld", value);
 	return string;
 }
 
 char *ultoa(unsigned long value, char *string, int radix)
 {
+	(void) radix;
+	
+	/* wolf3d only uses radix 10 */
 	sprintf(string, "%lu", value);
 	return string;
 }

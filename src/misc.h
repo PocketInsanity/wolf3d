@@ -8,7 +8,7 @@ void SavePCX256ToFile(const unsigned char *buf, int width, int height, const uns
 void SavePCXRGBToFile(const unsigned char *buf, int width, int height, const char *name);
 
 void set_TimeCount(unsigned long t);
-unsigned long get_TimeCount();
+unsigned long get_TimeCount(void);
 
 long filelength(int handle);
 
