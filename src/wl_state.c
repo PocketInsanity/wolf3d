@@ -99,10 +99,10 @@ void NewState(objtype *ob, int state) /* stateenum */
 =
 = If move is either clear or blocked only by a door, returns TRUE and sets
 =
-= ob->tilex			= new destination
+= ob->tilex		= new destination
 = ob->tiley
-= ob->areanumber    = the floor tile number (0-(NUMAREAS-1)) of destination
-= ob->distance  	= TILEGLOBAl, or -doornumber if a door is blocking the way
+= ob->areanumber	= the floor tile number (0-(NUMAREAS-1)) of destination
+= ob->distance		= TILEGLOBAL, or -doornumber if a door is blocking the way
 =
 = If a door is in the way, an OpenDoor call is made to start it opening.
 = The actor code should wait until
@@ -113,7 +113,7 @@ void NewState(objtype *ob, int state) /* stateenum */
 */
 
 #define CHECKDIAG(x,y)								\
-{                                                \
+{                                               \
 	temp = actorat[x][y];                   \
 	if (temp)                                       \
 	{                                               \
@@ -125,7 +125,7 @@ void NewState(objtype *ob, int state) /* stateenum */
 }
 
 #define CHECKSIDE(x,y)								\
-{                                                   \
+{                                               \
 	temp = actorat[x][y];                   \
 	if (temp)                                       \
 	{                                               \

@@ -47,26 +47,14 @@ typedef	int8_t ScanCode;
 #define	sc_LShift		0x2a
 #define	sc_RShift		0x36
 
-/* TODO */
-/*
-#define	sc_UpArrow	0x48
-#define	sc_DownArrow	0x50
-#define	sc_LeftArrow	0x4b
-#define	sc_RightArrow	0x4d
+#define	sc_UpArrow		0x48
+#define	sc_DownArrow		0x50
+#define	sc_LeftArrow		0x4b
+#define	sc_RightArrow		0x4d
 #define	sc_Home			0x47
 #define	sc_End			0x4f
 #define	sc_PgUp			0x49
 #define	sc_PgDn			0x51
-*/
-/* SVGAlib specific */
-#define sc_UpArrow	103
-#define sc_DownArrow	108
-#define sc_LeftArrow	105
-#define sc_RightArrow	106
-#define	sc_Home		102
-#define	sc_End		107
-#define	sc_PgUp		104
-#define	sc_PgDn		109
 
 #define	sc_Insert		0x52
 #define	sc_Delete		0x53
@@ -163,7 +151,6 @@ typedef	struct {
 		left, right, downleft, down, downright;
 } KeyboardDef;
 
-// Global variables
 extern boolean Keyboard[], MousePresent, JoysPresent[];
 
 extern	boolean		Paused;
@@ -174,6 +161,8 @@ extern	ControlType	Controls[MaxPlayers];
 
 #define	IN_KeyDown(code)	(Keyboard[(code)])
 
+extern void INL_Update();
+
 extern void IN_Startup(), IN_Shutdown(), IN_ClearKeysDown(),
 		IN_ReadControl(int,ControlInfo *),
 		IN_GetJoyAbs(word joy,word *xp,word *yp),
@@ -182,7 +171,6 @@ extern void IN_Startup(), IN_Shutdown(), IN_ClearKeysDown(),
 		
 extern boolean IN_UserInput(longword delay);
 extern char *IN_GetScanName(ScanCode);
-
 
 byte IN_MouseButtons();
 byte IN_JoyButtons();

@@ -1,38 +1,57 @@
+Priority Levels: I > R > M (I, R required to be complete before release)
+Program: P=PC Wolf3D, M=Mac Wolf3D, B=Both
+P R - create a better "read direction" for menu movement
+P M - convert while (Keyboard[sc_Blah]) IN_CheckAck() to IN_WaitKeyDown(sc..
+P I - finish changing the game movement to the new style
+P R - update input menus/config
+P M - rewrite menu code
+P R - update sound menus/config
+P I - rewrite sound code: get rid of packed structs, clean up thread stuff
+P R - openal sound
+P I - fix issues (speed, hacks) with variable screen size
+P M - BSP trees (or something similar), then OpenGL support
+M R - port menu code (after fixed up) 
+M R - add sound
+M M - complete/fix opengl mode
+M M - add music (would need to RE the sound lib)
+B I - complete savegame, config formats
+M I - add SDL
+B R - decide if to keep SVGA/X11 targets
+B M - configure scripts?
+B M - port to dreamcast?
+B M - add compression to savegames/config
+B I - play through (w/ sound and music) to make sure things work
+B M - use stdint.h where appropiate
+B M - finish serializing reads/writes, endian issues
+P I - fix raycast bug where at certain points you can see through corners
+B I - merge other TODO lists into this list
+B M - use something like config file or getenv to point at data directories
+P I - finish handling/mapping for all keys in sys. specific code
+B I - add mouse support
+B M - add joystick/gamepad support
+
+Complete:
 ------------------------------------------------------------------------------
 Control Menu:
 * TODO
 
 Sound Menu:
-* Sound Effects:
-- PCM
-- OPL2
+* Digital Sound Effects:
+- On [PCM]
+- Off
+* Sound Effects
+- On [AdLib/OPL2]
 - PC Speaker?
-- None
+- Off
 * Music:
-- OPL2
-- None
-* Sampling Rate:
-- 44100
-- 22050
+- On [AdLib/OPL2]
+- Off
 ------------------------------------------------------------------------------
-* use int16_t, etc (stdint)
-* finish serializing reads/writes, endian issues
-* fix fix fix different size stuff
-works alright at some res, but breaks on others currently
-add support for resolution changing at any time?
-probably will only support 320x200, 640x400, 960x600
 * add ylookup?
 * remove farmapylookup?
 * would be nice if Quit() used vsnprintf, etc
 * actor walking through door is drawn in front of door: near end of E1M1 for
 example (is this reproducible?)
-* getenv so that you can point an env. var to the proper dir
-* rewrite hw (sound, input) code, remove stuff like SD_SetSoundMode
-* fix the input code, everything is spread out... ideally everything should
-work the same, let the input handler do it all instead
-i think its safe for now to go with the scancodes as being the "universal"
-key type, and for everything not scancode-based, have a function to
-translate
 * use static and const where appropriate
 * menu code is a mess, always does things differently than the rest of the
 code, it really needs to be cleaned up
@@ -101,3 +120,6 @@ Version 0x00000001 Data: (Official)
 <undetermined but will be compressed>
 
 ------------------------------------------------------------------------------
+fix:
+void ControlMovement(objtype *ob) (wl_agent.c)
+void UpdateInput() / void PollControls() (wl_play.c)

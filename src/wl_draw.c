@@ -338,7 +338,7 @@ static void DrawScaleds()
 
 }
 
-//==========================================================================
+/* ======================================================================== */
 
 /*
 ==============
@@ -603,7 +603,7 @@ static void ClearScreen()
 */
 
 #ifndef DRAWCEIL
-  /* #define DRAWCEIL */
+ /* #define DRAWCEIL */
 #endif
  
 void ThreeDRefresh()
@@ -662,51 +662,51 @@ static void ScaledDrawTrans(byte *gfx, int count, byte *vid, unsigned int frac, 
 
 static void ScaleLine(unsigned int height, byte *source, int x)
 {
-	unsigned long TheFrac;
-	unsigned long y;
+	unsigned int y, frac, delta;
 	
 	if (height) {
-		TheFrac = (64 << 16) / height;
+		frac = (64 << 16) / height;
+		delta = (64 << 16) - frac*height;
 		
 		if (height < viewheight) {
 			y = yoffset + (viewheight - height) / 2;
 			
 			ScaledDraw(source, height, gfxbuf + (y * vwidth) + x + xoffset, 
-			0, TheFrac);
+			delta, frac);
 			
 			return;	
 		} 
 		
 		y = (height - viewheight) / 2;
-		y *= TheFrac;
-		
+		y *= frac;
+
 		ScaledDraw(source, viewheight, gfxbuf + (yoffset * vwidth) + x + xoffset, 
-		y, TheFrac);
+		y+delta, frac);
 	}
 }
 
 static void ScaleLineTrans(unsigned int height, byte *source, int x)
 {
-	unsigned long TheFrac;
-	unsigned long y;
+	unsigned int y, frac, delta;
 	
 	if (height) {
-		TheFrac = (64 << 16) / height;
+		frac = (64 << 16) / height;
+		delta = (64 << 16) - frac*height;
 		
 		if (height < viewheight) {
 			y = yoffset + (viewheight - height) / 2;
 			
 			ScaledDrawTrans(source, height, gfxbuf + (y * vwidth) + x + xoffset, 
-			0, TheFrac);
+			delta, frac);
 			
 			return;	
 		} 
 		
 		y = (height - viewheight) / 2;
-		y *= TheFrac;
+		y *= frac;
 		
 		ScaledDrawTrans(&source[y >> 24], viewheight, gfxbuf + (yoffset * vwidth) + x + xoffset, 
-		y, TheFrac);
+		y+delta, frac);
 	}
 }
 
@@ -1047,9 +1047,9 @@ static void AsmRefresh()
 	int xstep, ystep;
 	
 	midangle = viewangle*(FINEANGLES/ANGLES);
-	xpartialdown = viewx&(TILEGLOBAL-1);
+	xpartialdown = (viewx&(TILEGLOBAL-1));
 	xpartialup = TILEGLOBAL-xpartialdown;
-	ypartialdown = viewy&(TILEGLOBAL-1);
+	ypartialdown = (viewy&(TILEGLOBAL-1));
 	ypartialup = TILEGLOBAL-ypartialdown;
 
 	focaltx = viewx>>TILESHIFT;
@@ -1101,11 +1101,11 @@ for (postx = 0; postx < viewwidth; postx++) {
 		goto entry90;
 	}
 	
-	
-	yintercept = viewy + xpartialbyystep();
+	/* add tilestep to fix raycasting problems? */
+	yintercept = viewy + xpartialbyystep(); // + xtilestep;
 	xtile = focaltx + xtilestep;
 
-	xintercept = viewx + ypartialbyxstep();
+	xintercept = viewx + ypartialbyxstep(); // + ytilestep;
 	ytile = focalty + ytilestep;
 
 /* CORE LOOP */
@@ -1113,13 +1113,14 @@ for (postx = 0; postx < viewwidth; postx++) {
 #define TILE(n) ((n)>>16)
 
 	/* check intersections with vertical walls */
- vertcheck:
+vertcheck:
 	if (!samey(yintercept, ytile))
 		goto horizentry;
 		
 vertentry:
 	tilehit = tilemap[xtile][TILE(yintercept)];
-
+	/* printf("vert: %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d\n", postx, tilehit, xtile, ytile, xintercept, yintercept, xpartialup, xpartialdown, ypartialup, ypartialdown, xpartial, ypartial, doorhit, angle, midangle, focaltx, focalty, xstep, ystep); */
+	
 	if (tilehit) {
 		if (tilehit & 0x80) {
 			if (tilehit & 0x40) {
@@ -1167,7 +1168,8 @@ horizcheck:
 
 horizentry:
 	tilehit = tilemap[TILE(xintercept)][ytile];
-
+	/* printf("horz: %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d\n", postx, tilehit, xtile, ytile, xintercept, yintercept, xpartialup, xpartialdown, ypartialup, ypartialdown, xpartial, ypartial, doorhit, angle, midangle, focaltx, focalty, xstep, ystep); */
+	
 	if (tilehit) {
 		if (tilehit & 0x80) {
 			if (tilehit & 0x40) {

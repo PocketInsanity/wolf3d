@@ -1,27 +1,5 @@
 #include "wl_def.h"
 
-#ifdef DOSISM /* TODO: bad name.. since djgpp code would use interrupt (maybe uclock?) most likely */
-
-#define TICKCOUNT 70
-
-long TimeCount;
-double AdjClock = CLOCKS_PER_SEC / TICKCOUNT;
-double LastClock;
-
-void set_TimeCount(unsigned long count)
-{
-	/* TODO: would using queryperformancecounter be better? */
-	TimeCount = count;
-	LastClock = clock();
-}
-
-unsigned long get_TimeCount()
-{
-	return (unsigned long)(TimeCount + ((clock() - LastClock) / AdjClock));
-}
-
-#else /* DOSISM */
-
 /* TimeCount from David Haslam -- dch@sirius.demon.co.uk */
 
 static struct timeval t0;
@@ -94,8 +72,6 @@ char *ultoa(unsigned long value, char *string, int radix)
 	sprintf(string, "%lu", value);
 	return string;
 }
-
-#endif /* DOSISM */
 
 /* from Dan Olson */
 static void put_dos2ansi(byte attrib)

@@ -106,7 +106,7 @@ void CheckWeaponChange()
 =======================
 */
 
-void ControlMovement (objtype *ob)
+void ControlMovement(objtype *ob)
 {
 	int		angle;
 	int		angleunits;
@@ -1221,7 +1221,7 @@ void T_Attack(objtype *ob)
 	if ( buttonstate[bt_attack] && !buttonheld[bt_attack])
 		buttonstate[bt_attack] = false;
 
-	ControlMovement (ob);
+	ControlMovement(ob);
 	if (gamestate.victoryflag)		// watching the BJ actor
 		return;
 

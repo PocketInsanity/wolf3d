@@ -12,8 +12,8 @@
 =============================================================================
 */
 
-#define FOCALLENGTH     (0x5700l)               // in global coordinates
-#define VIEWGLOBAL      0x10000                 // globals visable flush to wall
+#define FOCALLENGTH     0x5700		// in global coordinates
+#define VIEWGLOBAL      0x10000		// globals visable flush to wall
 
 char str[80], str2[20];
 
@@ -26,7 +26,7 @@ int vwidth, vheight; /* size of screen */
 int viewsize;
 
 int centerx;
-int shootdelta;                     // pixels away from centerx a target can be
+int shootdelta;			/* pixels away from centerx a target can be */
 fixed scale;
 long heightnumerator;
 
@@ -36,7 +36,7 @@ int mouseadjustment;
 long frameon;
 long lasttimecount;
 fixed viewsin, viewcos;
-fixed viewx, viewy;                    // the focal point
+fixed viewx, viewy;		/* the focal point */
 int pixelangle[MAXVIEWWIDTH];
 long finetangent[FINEANGLES/4];
 int horizwall[MAXWALLTILES], vertwall[MAXWALLTILES];
@@ -740,9 +740,9 @@ int MS_CheckParm(char *check)
 	for (i = 1; i < _argc; i++) {
 		parm = _argv[i];
 
-		while (!isalpha(*parm))       // skip - / \ etc.. in front of parm
+		while (!isalpha(*parm))		// skip - / \ etc.. in front of parm
 			if (!*parm++)
-				break;          // hit end of string without an alphanum
+				break;		// hit end of string without an alphanum
 
 		if (!stricmp(check, parm))
 			return i;
@@ -762,7 +762,6 @@ int MS_CheckParm(char *check)
 
 static int wolfdigimap[] =
 {
-	// These first sounds are in the upload version
 #ifndef SPEAR
 	HALTSND,                0,
 	DOGBARKSND,             1,
@@ -786,7 +785,6 @@ static int wolfdigimap[] =
 	SLURPIESND,             22,
 	YEAHSND,		32,
 #ifndef UPLOAD
-	// These are in all other episodes
 	DOGDEATHSND,            16,
 	AHHHGSND,               17,
 	DIESND,                 18,
@@ -815,10 +813,8 @@ static int wolfdigimap[] =
 	MEINSND,		44,		// EPISODE 6 BOSS DIE
 	ROSESND,		45,		// EPISODE 5 BOSS DIE
 #endif
-#else
-//
-// SPEAR OF DESTINY DIGISOUNDS
-//
+
+#else /* SPEAR OF DESTINY DIGISOUNDS */
 	HALTSND,                0,
 	CLOSEDOORSND,           2,
 	OPENDOORSND,            3,
@@ -866,7 +862,6 @@ static int wolfdigimap[] =
 	LASTSOUND
 };
 
-
 void InitDigiMap()
 {
 	int *map;
@@ -875,7 +870,7 @@ void InitDigiMap()
 		DigiMap[map[0]] = map[1];
 }
 
-//===========================================================================
+/* ======================================================================== */
 
 /*
 ==================
@@ -895,14 +890,15 @@ void BuildTables()
 
 /* calculate fine tangents */
 
-	for (i = 0; i < FINEANGLES/8; i++) {
+	finetangent[0] = 0;
+	for (i = 1; i < FINEANGLES/8; i++) {
 		tang = tan((double)i/radtoint);
 		finetangent[i] = tang*TILEGLOBAL;
-		finetangent[FINEANGLES/4-1-i] = 1/tang*TILEGLOBAL;
+		finetangent[FINEANGLES/4-1-i] = TILEGLOBAL/tang;
 	}
 	
 	/* fight off asymptotic behaviour at 90 degrees */
-	finetangent[FINEANGLES/4-1] = finetangent[FINEANGLES/4-2];
+	finetangent[FINEANGLES/4-1] = finetangent[FINEANGLES/4-2]+1;
 	
 //
 // costable overlays sintable with a quarter phase shift
@@ -1085,7 +1081,7 @@ CP_itemtype MusicMenu[]=
 };
 #endif
 
-static int songs[]=
+static const int songs[] =
 {
 #ifndef SPEAR
 	GETTHEM_MUS,
@@ -1418,7 +1414,7 @@ void DemoLoop()
 		VW_FadeOut();
 
 		if (IN_KeyDown(sc_Tab) && MS_CheckParm("debugmode"))
-			RecordDemo ();
+			RecordDemo();
 		else
 			US_ControlPanel(0);
 
@@ -1432,7 +1428,7 @@ void DemoLoop()
 }
 
 
-//===========================================================================
+/* ======================================================================== */
 
 
 /*

@@ -47,7 +47,7 @@ memptr		demobuffer;
 //
 // curent user input
 //
-int			controlx,controly;		// range from -100 to 100 per tic
+int		controlx,controly;	/* range from -100 to 100 per tic */
 boolean		buttonstate[NUMBUTTONS];
 
 static void RemoveObj(objtype *gone);
@@ -61,7 +61,7 @@ static void RemoveObj(objtype *gone);
 */
 
 /* LIST OF SONGS FOR EACH VERSION */
-static int songs[]=
+static const int songs[]=
 {
 #ifndef SPEAR
 /* Episode One */
@@ -263,7 +263,6 @@ void PollJoystickButtons()
 	}
 }
 
-
 /*
 ===================
 =
@@ -315,8 +314,6 @@ void PollMouseMove()
 	controly += mouseymove*20/(13-mouseadjustment);
 }
 
-
-
 /*
 ===================
 =
@@ -355,6 +352,30 @@ void PollJoystickMove()
 	}
 }
 
+void UpdateInput()
+{
+//
+// get button states
+//
+	PollKeyboardButtons();
+
+	if (mouseenabled)
+		PollMouseButtons();
+
+	if (joystickenabled)
+		PollJoystickButtons();
+
+//
+// get movements
+//
+	PollKeyboardMove();
+
+	if (mouseenabled)
+		PollMouseMove();
+
+	if (joystickenabled)
+		PollJoystickMove();
+}
 
 /*
 ===================
@@ -404,33 +425,11 @@ void PollControls()
 		return;
 	}
 
-
-//
-// get button states
-//
-
 	/* Update keys */
 	IN_CheckAck(); 
 	
-	PollKeyboardButtons();
-
-	if (mouseenabled)
-		PollMouseButtons();
-
-	if (joystickenabled)
-		PollJoystickButtons();
-
-//
-// get movements
-//
-	PollKeyboardMove();
-
-	if (mouseenabled)
-		PollMouseMove();
-
-	if (joystickenabled)
-		PollJoystickMove();
-
+	UpdateInput();
+	
 //
 // bound movement to a maximum
 //
@@ -740,9 +739,7 @@ void InitActorList()
 	objfreelist = &objlist[0];
 	lastobj = NULL;
 
-//
-// give the player the first free spots
-//
+/* give the player the first free spots */
 	GetNewActor();
 	player = new;
 
@@ -799,7 +796,7 @@ void GetNewActor()
 static void RemoveObj(objtype *gone)
 {
 	if (gone == player)
-		Quit ("RemoveObj: Tried to remove the player!");
+		Quit("RemoveObj: Tried to remove the player!");
 
 	gone->state = s_none;
 
@@ -879,7 +876,7 @@ void StartMusic()
 byte	redshifts[NUMREDSHIFTS][768];
 byte	whiteshifts[NUMREDSHIFTS][768];
 
-int		damagecount,bonuscount;
+int	damagecount,bonuscount;
 boolean	palshifted;
 
 /*
@@ -895,7 +892,7 @@ void InitRedShifts()
 	byte *workptr;
 	const byte *baseptr;
 
-	int		i,j,delta;
+	int	i,j,delta;
 
 
 //

@@ -557,7 +557,7 @@ void CacheLayoutGraphics()
 			}
 			if (ch == 'T')		// timed draw graphic command, so mark graphics
 			{
-				ParseTimedCommand ();
+				ParseTimedCommand();
 				CA_CacheGrChunk(picnum);
 			}
 		}
@@ -579,8 +579,8 @@ void CacheLayoutGraphics()
 
 void ShowArticle(char *article)
 {
-	unsigned	oldfontnumber;
-	boolean 	newpage,firstpage;
+	unsigned oldfontnumber;
+	boolean newpage, firstpage;
 
 
 	text = article;
@@ -588,7 +588,7 @@ void ShowArticle(char *article)
 	fontnumber = 0;
 	CA_CacheGrChunk(STARTFONT);
 	VW_Bar (0,0,320,200,BACKCOLOR);
-	CacheLayoutGraphics ();
+	CacheLayoutGraphics();
 
 	newpage = true;
 	firstpage = true;
@@ -598,18 +598,17 @@ void ShowArticle(char *article)
 		if (newpage)
 		{
 			newpage = false;
-			PageLayout (true);
-			VW_UpdateScreen ();
+			PageLayout(true);
+			VW_UpdateScreen();
 			if (firstpage)
 			{
 				VL_FadeIn(0,255,gamepal,10);
-				// VW_FadeIn ()
 				firstpage = false;
 			}
 		}
 
 		LastScan = 0;
-		while (!LastScan) IN_CheckAck(); /* TODO: update events */
+		while (!LastScan) IN_CheckAck(); /* update events */
 
 		switch (LastScan)
 		{
@@ -627,7 +626,7 @@ void ShowArticle(char *article)
 		case sc_Enter:
 		case sc_DownArrow:
 		case sc_PgDn:
-		case sc_RightArrow:		// the text allready points at next page
+		case sc_RightArrow:		// the text already points at next page
 			if (pagenum<numpages)
 			{
 				newpage = true;
@@ -645,10 +644,10 @@ void ShowArticle(char *article)
 }
 
 
-//===========================================================================
+/* ======================================================================== */
 
-int endextern = T_ENDART1;
-int helpextern = T_HELPART;
+#define endextern	T_ENDART1
+#define helpextern	T_HELPART
 
 /*
 =================
@@ -691,7 +690,7 @@ void EndText()
 	CA_UpLevel();
 
 	artnum = endextern+gamestate.episode;
-	CA_CacheGrChunk (artnum);
+	CA_CacheGrChunk(artnum);
 	text = (char *)grsegs[artnum];
 
 	ShowArticle(text);
