@@ -2,6 +2,9 @@
 
 #include "id_heads.h"
 
+#include <sys/ipc.h>
+#include <sys/shm.h>
+
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 #include <X11/Xutil.h>
@@ -24,9 +27,12 @@ XImage *img;
 Colormap cmap;
 Atom wmDeleteWindow;
 
+XShmSegmentInfo shminfo;
+
 XColor clr[256];
 
 int indexmode;
+int shmmode;
 unsigned char mypal[768];
 
 Colormap GetVisual()
@@ -252,7 +258,10 @@ void VW_UpdateScreen()
 		}
 	}
 	
-	XPutImage(dpy, win, gc, img, 0, 0, 0, 0, 320, 200);
+	if (shmmode)
+		XShmPutImage(dpy, win, gc, img, 0, 0, 0, 0, 320, 200, False);
+	else
+		XPutImage(dpy, win, gc, img, 0, 0, 0, 0, 320, 200);
 }
 
 /*
@@ -283,21 +292,52 @@ int BPP(int d)
 	
 void VL_Startup()
 {
-	if (gfxbuf == NULL) 
-		gfxbuf = malloc(320 * 200 * 1);
+	shmmode = 0;
 	
-	if (indexmode) 
-		disbuf = gfxbuf;
-	else 
-		disbuf = malloc(320 * 200 * BPP(vi->depth));
+	if (XShmQueryExtension(dpy) == True) {
+		img = XShmCreateImage(dpy, vi->visual, vi->depth, ZPixmap, 
+				      NULL, &shminfo, 320, 200);
+		printf("Shm: bpl = %d, h = %d, bp = %d\n", img->bytes_per_line, img->height, img->bitmap_pad);
+		if ( img->bytes_per_line != (320 * BPP(vi->depth)) ) {
+			printf("Currently cannot handle irregular shm sizes...\n");
+		} else {
+			shminfo.shmid = shmget(IPC_PRIVATE, img->bytes_per_line * img->height, IPC_CREAT | 0777);
+			shminfo.shmaddr = img->data = shmat(shminfo.shmid, 0, 0);	
+			shminfo.readOnly = False;
+			disbuf = img->data;
+			
+			if (indexmode)
+				gfxbuf = disbuf;
+			else
+				gfxbuf = malloc(320 * 200 * 1);
+				
+			if (XShmAttach(dpy, &shminfo) == True) {
+				printf("Using XShm Extension...\n");
+				shmmode = 1;
+			} else {
+				printf("Error with XShm...\n");
+			}
+		}
+	}
+			
+				
+	if (img == NULL) {
+		printf("Falling back on XImage...\n");
 		
-	img = XCreateImage(dpy, vi->visual, vi->depth, ZPixmap, 0, (char *)disbuf, 320, 200,
+		if (gfxbuf == NULL) 
+			gfxbuf = malloc(320 * 200 * 1);
+		if (indexmode) 
+			disbuf = gfxbuf;
+		else 
+			disbuf = malloc(320 * 200 * BPP(vi->depth));
+		
+		img = XCreateImage(dpy, vi->visual, vi->depth, ZPixmap, 0, (char *)disbuf, 320, 200,
 			   8, 320 * BPP(vi->depth));
 	
-	if (img == NULL) {
-		Quit("XCreateImage returned NULL");
-	}
-					   
+		if (img == NULL) {
+			Quit("XCreateImage returned NULL");
+		}
+	}				   
 	XMapWindow(dpy, win);
 	
 	XFlush(dpy);
@@ -313,12 +353,22 @@ void VL_Startup()
 
 void VL_Shutdown (void)
 {
-	if (gfxbuf != NULL) {
+	if ( !shmmode && (gfxbuf != NULL) ) {
 		free(gfxbuf);
 		gfxbuf = NULL;
 	}
 	
-	if ( (indexmode == 0) && (disbuf != NULL) ) {
+	if ( shmmode && !indexmode && (gfxbuf != NULL) ) {
+		free(gfxbuf);
+		gfxbuf = NULL;
+	}
+	
+	if (shmmode) {
+		XShmDetach(dpy, &shminfo);
+		XDestroyImage(img);
+		shmdt(shminfo.shmaddr);
+		shmctl(shminfo.shmid, IPC_RMID, 0);
+	} else if ( (indexmode == 0) && (disbuf != NULL) ) {
 		free(disbuf);
 		disbuf = NULL;
 	}
@@ -380,54 +430,6 @@ void VL_FillPalette(int red, int green, int blue)
 		}
 	}
 }	
-
-//===========================================================================
-
-/*
-=================
-=
-= VL_SetColor
-=
-=================
-*/
-
-void VL_SetColor(int color, int red, int green, int blue)
-{
-	if (indexmode) {
-		clr[color].red = red << 10;
-		clr[color].green = green << 10;
-		clr[color].blue = blue << 10;
-	
-		XStoreColors(dpy, cmap, clr, 256);
-	} else {
-		mypal[color*3+0] = red;
-		mypal[color*3+1] = green;
-		mypal[color*3+2] = blue;
-	}
-}
-
-//===========================================================================
-
-/*
-=================
-=
-= VL_GetColor
-=
-=================
-*/
-
-void VL_GetColor(int color, int *red, int *green, int *blue)
-{
-	if (indexmode) {
-		*red = clr[color].red >> 10;
-		*green = clr[color].green >> 10;
-		*blue = clr[color].blue >> 10;
-	} else {
-		*red = mypal[color*3+0];
-		*green = mypal[color*3+1];
-		*blue = mypal[color*3+2];
-	}
-}
 
 //===========================================================================
 

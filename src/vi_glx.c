@@ -250,34 +250,6 @@ void VL_FillPalette(int red, int green, int blue)
 /*
 =================
 =
-= VL_SetColor
-=
-=================
-*/
-
-void VL_SetColor(int color, int red, int green, int blue)
-{
-}
-
-//===========================================================================
-
-/*
-=================
-=
-= VL_GetColor
-=
-=================
-*/
-
-void VL_GetColor(int color, int *red, int *green, int *blue)
-{
-}
-
-//===========================================================================
-
-/*
-=================
-=
 = VL_SetPalette
 =
 =================

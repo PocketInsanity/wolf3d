@@ -15,7 +15,7 @@ GOBJS = $(OBJS) vi_ogl.o vi_glx.o
 LFLAGS = -lm 
 #LFLAGS = -lm -lvga ElectricFence-2.2.2/libefence.a -lpthread
 SLFLAGS = $(LFLAGS) -lvga
-XLFLAGS = $(LFLAGS) -L/usr/X11R6/lib -lX11
+XLFLAGS = $(LFLAGS) -L/usr/X11R6/lib -lX11 -lXext
 GLFLAGS = $(LFLAGS) -L/usr/X11R6/lib -lX11 -lXext -lGL
 
 NASM = nasm

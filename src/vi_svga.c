@@ -106,36 +106,6 @@ void VL_FillPalette(int red, int green, int blue)
 /*
 =================
 =
-= VL_SetColor
-=
-=================
-*/
-
-void VL_SetColor(int color, int red, int green, int blue)
-{
-	vga_setpalette(color, red, green, blue);
-}
-
-//===========================================================================
-
-/*
-=================
-=
-= VL_GetColor
-=
-=================
-*/
-
-void VL_GetColor(int color, int *red, int *green, int *blue)
-{
-	vga_getpalette(color, red, green, blue);
-}
-
-//===========================================================================
-
-/*
-=================
-=
 = VL_SetPalette
 =
 =================

@@ -83,9 +83,9 @@ we can stop the large conversion before each UpdateScreen
 also, the higher bitrates are a hack since a palette lookup has to be done
 for every byte when transferring to the pixmap, palette fades require a
 screen update
-* mitshm
+* dga 1 and 2
 * make sure none of the code tries to handle gfx/sound data directly
-* GL_shared_texture_palette
+* GL_shared_texture_palette for opengl
 
 Specific:
 * memory/sound intro screen goes

@@ -168,14 +168,14 @@ boolean TransformTile (int tx, int ty, int *dispx, int *dispheight)
 		return false;
 	}
 
-	*dispx = centerx + ny*scale/nx;	// DEBUG: use assembly divide
+	*dispx = centerx + ny*scale/nx;	
 
 	*dispheight = heightnumerator/(nx>>8);
 
 //
 // see if it should be grabbed
 //
-	if (nx<TILEGLOBAL && ny>-TILEGLOBAL/2 && ny<TILEGLOBAL/2)
+	if ( (nx<TILEGLOBAL) && (ny>-TILEGLOBAL/2) && (ny<TILEGLOBAL/2) )
 		return true;
 	else
 		return false;
