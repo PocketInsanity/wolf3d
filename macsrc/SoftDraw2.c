@@ -30,6 +30,36 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 LongWord pow10[] = {1,10,100,1000,10000,100000,1000000};
 Word NumberIndex = 36;		/* First number in the shape list... */
 
+extern int VidSize;
+
+Word ScaleX(Word x) 
+{
+	switch(VidSize) {
+		case 1:
+			return x*8/5;
+		case 2:
+		case 3:
+			return x*2;
+	}
+	return x;
+}
+
+Word ScaleY(Word y)
+{
+	switch(VidSize) {
+		case 1:
+			y = (y*8/5)+64;
+			if (y == 217)
+				y++;
+			return y;
+		case 2:
+			return y*2;
+		case 3:
+			return y*2+80;
+	}
+	return y;
+}
+
 void SetNumber(LongWord number,Word x,Word y,Word digits)
 {
     LongWord val;

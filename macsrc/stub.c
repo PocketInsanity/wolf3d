@@ -81,90 +81,6 @@ void PrintTimeCounter(TimeCounter *t, char *header)
 	printf("Min: %lu, max:%lu\n", t->mintime, t->maxtime);
 }
 
-unsigned short int sMSB(unsigned short int x)
-{
-	int x1 = (x & 0x00FF) << 8;
-	int x2 = (x & 0xFF00) >> 8;
-	
-	return x1 | x2;
-}
-
-unsigned long lMSB(unsigned long x)
-{
-	int x1 = (x & 0x000000FF) << 24;
-	int x2 = (x & 0x0000FF00) << 8;
-	int x3 = (x & 0x00FF0000) >> 8;
-	int x4 = (x & 0xFF000000) >> 24;
-	
-	return x1 | x2 | x3 | x4;
-}
-
-void FixMapList(maplist_t *m)
-{
-	int i;
-	
-	m->MaxMap = sMSB(m->MaxMap);
-	m->MapRezNum = sMSB(m->MapRezNum);
-	
-	for (i = 0; i < m->MaxMap; i++) {
-		m->InfoArray[i].NextLevel = sMSB(m->InfoArray[i].NextLevel);
-		m->InfoArray[i].SecretLevel = sMSB(m->InfoArray[i].SecretLevel);
-		m->InfoArray[i].ParTime = sMSB(m->InfoArray[i].ParTime);
-		m->InfoArray[i].ScenarioNum = sMSB(m->InfoArray[i].ScenarioNum);
-		m->InfoArray[i].FloorNum = sMSB(m->InfoArray[i].FloorNum);
-	}
-}
-
-void InitData()
-{	
-
-/*
-InitSoundMusicSystem(8,8,5, 11025);
-SoundListPtr = (Word *) LoadAResource(MySoundList);	
-RegisterSounds(SoundListPtr,FALSE);
-ReleaseAResource(MySoundList);
-*/
-
-	GetTableMemory();
-	
-	MapListPtr = (maplist_t *) LoadAResource(rMapList);
-	FixMapList(MapListPtr);
-	
-	SongListPtr = (unsigned short *)LoadAResource(rSongList);
-	WallListPtr = (unsigned short *)LoadAResource(MyWallList);
-
-}
-
-extern int VidSize;
-
-Word ScaleX(Word x) 
-{
-	switch(VidSize) {
-		case 1:
-			return x*8/5;
-		case 2:
-		case 3:
-			return x*2;
-	}
-	return x;
-}
-
-Word ScaleY(Word y)
-{
-	switch(VidSize) {
-		case 1:
-			y = (y*8/5)+64;
-			if (y == 217)
-				y++;
-			return y;
-		case 2:
-			return y*2;
-		case 3:
-			return y*2+80;
-	}
-	return y;
-}
-
 Boolean SetupScalers()
 {
 	return TRUE;
@@ -290,8 +206,4 @@ Word WaitTicksEvent(Word Time)
 		}
 	}	
 	return RetVal;
-}
-
-void FinishLoadGame(void)
-{
 }
