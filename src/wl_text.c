@@ -347,12 +347,11 @@ void HandleCtrls (void)
 =====================
 */
 
-void HandleWord (void)
+void HandleWord()
 {
 	char words[WORDLIMIT];
-	int i, wordindex;
-	word wwidth,wheight,newpos;
-
+	int wordindex;
+	word wwidth, wheight, newpos;
 
 	//
 	// copy the next word into words[]
@@ -591,10 +590,9 @@ void CacheLayoutGraphics (void)
 =====================
 */
 
-void ShowArticle (char *article)
+void ShowArticle(char *article)
 {
 	unsigned	oldfontnumber;
-	unsigned	temp;
 	boolean 	newpage,firstpage;
 
 
@@ -651,10 +649,8 @@ void ShowArticle (char *article)
 			break;
 		}
 
-		#ifndef SPEAR
 		if (Keyboard[sc_Tab] && Keyboard[sc_P] && MS_CheckParm("goobers"))
 			PicturePause();
-		#endif
 
 	} while (LastScan != sc_Escape);
 
@@ -679,10 +675,8 @@ int helpextern = T_HELPART;
 */
 void HelpScreens (void)
 {
-	int			artnum;
+	int artnum;
 	char *text;
-	memptr		layout;
-
 
 	CA_UpLevel ();
 	MM_SortMem ();
@@ -694,13 +688,13 @@ void HelpScreens (void)
 
 	ShowArticle (text);
 
-	MM_FreePtr (&grsegs[artnum]);
-
+	CA_UnCacheGrChunk(artnum);
+	
 	VW_FadeOut();
 
-	FreeMusic ();
-	CA_DownLevel ();
-	MM_SortMem ();
+	FreeMusic();
+	CA_DownLevel();
+	MM_SortMem();
 }
 
 //
@@ -708,10 +702,8 @@ void HelpScreens (void)
 //
 void EndText (void)
 {
-	int			artnum;
+	int artnum;
 	char *text;
-	memptr		layout;
-
 
 	ClearMemory ();
 
@@ -725,15 +717,15 @@ void EndText (void)
 
 	ShowArticle (text);
 
-	MM_FreePtr (&grsegs[artnum]);
-
+	CA_UnCacheGrChunk(artnum);
+	
 	VW_FadeOut();
 	SETFONTCOLOR(0,15);
 	IN_ClearKeysDown();
 
-	FreeMusic ();
-	CA_DownLevel ();
-	MM_SortMem ();
+	FreeMusic();
+	CA_DownLevel();
+	MM_SortMem();
 }
 
 #endif

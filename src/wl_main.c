@@ -1187,11 +1187,15 @@ void Quit(char *error)
 
 void DemoLoop (void)
 {
+	static int LastDemo;
+	
 	int i;
 //
 // main game cycle
 //
 
+	LastDemo = 0;
+	
 	#if !defined(GOODTIMES) && defined(SPEAR) && !defined(SPEARDEMO)
 		CopyProtection();
 	#endif

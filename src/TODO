@@ -69,6 +69,8 @@ idea is that different <outputs> can share some drivers, unlike video
 * check filehandling (ex, file missing, bad file type, and such)
 PlayDemoFromFile specifically
 * make sure all infinite loops are found (looping around Keyboard)
+* deathcam went by too fast, and right before the fizzlefade was being done
+on the border
 
 Specific:
 * memory/sound intro screen goes

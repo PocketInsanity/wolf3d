@@ -130,7 +130,7 @@ int  Confirm(char *string);
 void Message(char *string);
 void CheckPause(void);
 void ShootSnd(void);
-void CheckSecretMissions(void);
+void FreeMusic(void);
 void BossKey(void);
 
 void DrawGun(CP_iteminfo *item_i,CP_itemtype *items,int x,int *y,int which,int basey,void (*routine)(int w));

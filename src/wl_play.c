@@ -590,8 +590,6 @@ void CheckKeys (void)
 
 	scan = LastScan;
 
-
-	#ifdef SPEAR
 	//
 	// SECRET CHEAT CODE: TAB-G-F10
 	//
@@ -617,8 +615,6 @@ void CheckKeys (void)
 		IN_ClearKeysDown();
 		return;
 	}
-	#endif
-
 
 	//
 	// SECRET CHEAT CODE: 'MLI'
@@ -660,17 +656,10 @@ void CheckKeys (void)
 	//
 	// OPEN UP DEBUG KEYS
 	//
-#ifndef SPEAR
-	if (Keyboard[sc_BackSpace] &&
-		Keyboard[sc_LShift] &&
-		Keyboard[sc_Alt] &&
-		MS_CheckParm("goobers"))
-#else
 	if (Keyboard[sc_BackSpace] &&
 		Keyboard[sc_LShift] &&
 		Keyboard[sc_Alt] &&
 		MS_CheckParm("debugmode"))
-#endif
 	{
 	 ClearMemory ();
 	 CA_CacheGrChunk (STARTFONT+1);
