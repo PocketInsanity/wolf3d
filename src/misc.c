@@ -17,3 +17,16 @@ long filelength(int handle)
 	
 	return buf.st_size;
 }
+
+char *ltoa(long value, char *string, int radix)
+{
+	sprintf(string, "%d", value);
+	return string;
+}
+
+char *ultoa(unsigned long value, char *string, int radix)
+{
+	sprintf(string, "%u", value);
+	return string;
+}
+	

@@ -1,37 +1,6 @@
-//
-//	ID Engine
-//	ID_US_1.c - User Manager - General routines
-//	v1.1d1
-//	By Jason Blochowiak
-//	Hacked up for Catacomb 3D
-//
+/* id_us.c */
 
-//
-//	This module handles dealing with user input & feedback
-//
-//	Depends on: Input Mgr, View Mgr, some variables from the Sound, Caching,
-//		and Refresh Mgrs, Memory Mgr for background save/restore
-//
-//	Globals:
-//		ingame - Flag set by game indicating if a game is in progress
-//      abortgame - Flag set if the current game should be aborted (if a load
-//			game fails)
-//		loadedgame - Flag set if a game was loaded
-//		abortprogram - Normally nil, this points to a terminal error message
-//			if the program needs to abort
-//		restartgame - Normally set to gd_Continue, this is set to one of the
-//			difficulty levels if a new game should be started
-//		PrintX, PrintY - Where the User Mgr will print (global coords)
-//		WindowX,WindowY,WindowW,WindowH - The dimensions of the current
-//			window
-//
-
-#include "ID_HEADS.H"
-
-#pragma	hdrstop
-
-#pragma	warn	-pia
-
+#include "id_heads.h"
 
 //	Global variables
 		char		*abortprogram;
@@ -50,8 +19,8 @@ static	boolean		US_Started;
 					CursorBad;
 		int			CursorX,CursorY;
 
-		void		(*USL_MeasureString)(char far *,word *,word *) = VW_MeasurePropString,
-					(*USL_DrawString)(char far *) = VWB_DrawPropString;
+		void		(*USL_MeasureString)(char *,word *,word *) = VW_MeasurePropString,
+					(*USL_DrawString)(char *) = VWB_DrawPropString;
 
 		SaveGame	Games[MaxSaveGames];
 		HighScore	Scores[MaxScores] =
@@ -71,109 +40,15 @@ static	boolean		US_Started;
 
 ///////////////////////////////////////////////////////////////////////////
 //
-//	USL_HardError() - Handles the Abort/Retry/Fail sort of errors passed
-//			from DOS.
-//
-///////////////////////////////////////////////////////////////////////////
-#pragma	warn	-par
-#pragma	warn	-rch
-int
-USL_HardError(word errval,int ax,int bp,int si)
-{
-#define IGNORE  0
-#define RETRY   1
-#define	ABORT   2
-extern	void	ShutdownId(void);
-
-static	char		buf[32];
-static	WindowRec	wr;
-		int			di;
-		char		c,*s,*t;
-
-
-	di = _DI;
-
-	if (ax < 0)
-		s = "Device Error";
-	else
-	{
-		if ((di & 0x00ff) == 0)
-			s = "Drive ~ is Write Protected";
-		else
-			s = "Error on Drive ~";
-		for (t = buf;*s;s++,t++)	// Can't use sprintf()
-			if ((*t = *s) == '~')
-				*t = (ax & 0x00ff) + 'A';
-		*t = '\0';
-		s = buf;
-	}
-
-	c = peekb(0x40,0x49);	// Get the current screen mode
-	if ((c < 4) || (c == 7))
-		goto oh_kill_me;
-
-	// DEBUG - handle screen cleanup
-
-	US_SaveWindow(&wr);
-	US_CenterWindow(30,3);
-	US_CPrint(s);
-	US_CPrint("(R)etry or (A)bort?");
-	VW_UpdateScreen();
-	IN_ClearKeysDown();
-
-asm	sti	// Let the keyboard interrupts come through
-
-	while (true)
-	{
-		switch (IN_WaitForASCII())
-		{
-		case key_Escape:
-		case 'a':
-		case 'A':
-			goto oh_kill_me;
-			break;
-		case key_Return:
-		case key_Space:
-		case 'r':
-		case 'R':
-			US_ClearWindow();
-			VW_UpdateScreen();
-			US_RestoreWindow(&wr);
-			return(RETRY);
-			break;
-		}
-	}
-
-oh_kill_me:
-	abortprogram = s;
-	ShutdownId();
-	fprintf(stderr,"Terminal Error: %s\n",s);
-	if (tedlevel)
-		fprintf(stderr,"You launched from TED. I suggest that you reboot...\n");
-
-	return(ABORT);
-#undef	IGNORE
-#undef	RETRY
-#undef	ABORT
-}
-#pragma	warn	+par
-#pragma	warn	+rch
-
-
-///////////////////////////////////////////////////////////////////////////
-//
 //	US_Startup() - Starts the User Mgr
 //
 ///////////////////////////////////////////////////////////////////////////
-void
-US_Startup(void)
+void US_Startup(void)
 {
 	int	i,n;
 
 	if (US_Started)
 		return;
-
-	harderr(USL_HardError);	// Install the fatal error handler
 
 	US_InitRndT(true);		// Initialize the random number generator
 
@@ -204,8 +79,7 @@ US_Startup(void)
 //	US_Shutdown() - Shuts down the User Mgr
 //
 ///////////////////////////////////////////////////////////////////////////
-void
-US_Shutdown(void)
+void US_Shutdown(void)
 {
 	if (!US_Started)
 		return;
@@ -259,7 +133,7 @@ US_CheckParm(char *parm,char **strings)
 //
 ///////////////////////////////////////////////////////////////////////////
 void
-US_SetPrintRoutines(void (*measure)(char far *,word *,word *),void (*print)(char far *))
+US_SetPrintRoutines(void (*measure)(char *,word *,word *),void (*print)(char *))
 {
 	USL_MeasureString = measure;
 	USL_DrawString = print;
@@ -271,10 +145,9 @@ US_SetPrintRoutines(void (*measure)(char far *,word *,word *),void (*print)(char
 //		supported.
 //
 ///////////////////////////////////////////////////////////////////////////
-void
-US_Print(char far *s)
+void US_Print(char *s)
 {
-	char	c,far *se;
+	char	c, *se;
 	word	w,h;
 
 	while (*s)
@@ -308,10 +181,9 @@ US_Print(char far *s)
 //	US_PrintUnsigned() - Prints an unsigned long
 //
 ///////////////////////////////////////////////////////////////////////////
-void
-US_PrintUnsigned(longword n)
+void US_PrintUnsigned(longword n)
 {
-	char	buffer[32];
+	char buffer[32];
 
 	US_Print(ultoa(n,buffer,10));
 }
@@ -321,8 +193,7 @@ US_PrintUnsigned(longword n)
 //	US_PrintSigned() - Prints a signed long
 //
 ///////////////////////////////////////////////////////////////////////////
-void
-US_PrintSigned(long n)
+void US_PrintSigned(long n)
 {
 	char	buffer[32];
 
@@ -334,8 +205,7 @@ US_PrintSigned(long n)
 //	USL_PrintInCenter() - Prints a string in the center of the given rect
 //
 ///////////////////////////////////////////////////////////////////////////
-void
-USL_PrintInCenter(char far *s,Rect r)
+void USL_PrintInCenter(char *s, Rect r)
 {
 	word	w,h,
 			rw,rh;
@@ -355,7 +225,7 @@ USL_PrintInCenter(char far *s,Rect r)
 //
 ///////////////////////////////////////////////////////////////////////////
 void
-US_PrintCentered(char far *s)
+US_PrintCentered(char *s)
 {
 	Rect	r;
 
@@ -374,7 +244,7 @@ US_PrintCentered(char far *s)
 //
 ///////////////////////////////////////////////////////////////////////////
 void
-US_CPrintLine(char far *s)
+US_CPrintLine(char *s)
 {
 	word	w,h;
 
@@ -395,9 +265,9 @@ US_CPrintLine(char far *s)
 //
 ///////////////////////////////////////////////////////////////////////////
 void
-US_CPrint(char far *s)
+US_CPrint(char *s)
 {
-	char	c,far *se;
+	char	c, *se;
 
 	while (*s)
 	{
@@ -591,15 +461,10 @@ US_LineInput(int x,int y,char *buf,char *def,boolean escok,
 		if (cursorvis)
 			USL_XORICursor(x,y,s,cursor);
 
-	asm	pushf
-	asm	cli
-
 		sc = LastScan;
 		LastScan = sc_None;
 		c = LastASCII;
 		LastASCII = key_None;
-
-	asm	popf
 
 		switch (sc)
 		{

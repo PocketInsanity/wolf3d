@@ -1,8 +1,6 @@
-// WL_AGENT.C
+/* wl_agent.c */
 
-#include "WL_DEF.H"
-#pragma hdrstop
-
+#include "wl_def.h"
 
 /*
 =============================================================================
