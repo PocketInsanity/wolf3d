@@ -578,7 +578,7 @@ void IN_Startup(void)
 //	IN_Shutdown() - Shuts down the Input Mgr
 //
 ///////////////////////////////////////////////////////////////////////////
-void IN_Shutdown(void)
+void IN_Shutdown()
 {
 	word i;
 
@@ -598,7 +598,7 @@ void IN_Shutdown(void)
 //	IN_ClearKeysDown() - Clears the keyboard array
 //
 ///////////////////////////////////////////////////////////////////////////
-void IN_ClearKeysDown(void)
+void IN_ClearKeysDown()
 {
 	LastScan = sc_None;
 	LastASCII = key_None;
@@ -701,7 +701,7 @@ IN_CheckAck();
 
 boolean	btnstate[8];
 
-void IN_StartAck(void)
+void IN_StartAck()
 {
 	unsigned	i,buttons;
 
@@ -720,7 +720,7 @@ void IN_StartAck(void)
 			btnstate[i] = true;
 }
 
-boolean IN_CheckAck (void)
+boolean IN_CheckAck()
 {
 	unsigned	i,buttons;
 	
@@ -729,7 +729,7 @@ while (keyboard_update()) ; /* get all events */
 	if (LastScan)
 		return true;
 
-	buttons = IN_JoyButtons () << 4;
+	buttons = IN_JoyButtons() << 4;
 	if (MousePresent)
 		buttons |= IN_MouseButtons ();
 

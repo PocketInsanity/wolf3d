@@ -1,10 +1,3 @@
-//////////////////////////////////////
-//
-// Graphics .H file for .WL1
-// IGRAB-ed on Sun May 03 01:19:32 1992
-//
-//////////////////////////////////////
-
 typedef enum {
 		// Lump Start
 		H_BJPIC=3,
@@ -187,16 +180,8 @@ typedef enum {
 //
 #define NUMCHUNKS    156
 #define NUMFONT      2
-#define NUMFONTM     0
 #define NUMPICS      144
-#define NUMPICM      0
-#define NUMSPRITES   0
 #define NUMTILE8     35
-#define NUMTILE8M    0
-#define NUMTILE16    0
-#define NUMTILE16M   0
-#define NUMTILE32    0
-#define NUMTILE32M   0
 #define NUMEXTERNS   8
 //
 // File offsets for data items
@@ -204,18 +189,6 @@ typedef enum {
 #define STRUCTPIC    0
 
 #define STARTFONT    1
-#define STARTFONTM   3
 #define STARTPICS    3
-#define STARTPICM    147
-#define STARTSPRITES 147
 #define STARTTILE8   147
-#define STARTTILE8M  148
-#define STARTTILE16  148
-#define STARTTILE16M 148
-#define STARTTILE32  148
-#define STARTTILE32M 148
 #define STARTEXTERNS 148
-
-//
-// Thank you for using IGRAB!
-//

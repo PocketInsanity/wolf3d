@@ -39,31 +39,28 @@ typedef	struct {
 } PACKED MusicGroup;
 
 // Global variables
-extern	boolean		AdLibPresent,
-					SoundSourcePresent,
-					SoundBlasterPresent,
-					SoundPositioned;
+extern boolean AdLibPresent, SoundSourcePresent, SoundBlasterPresent;
+
 extern	SDMode		SoundMode;
 extern	SDSMode		DigiMode;
 extern	SMMode		MusicMode;
-extern	boolean		DigiPlaying;
 extern	int		DigiMap[];
 
 // Function prototypes
-extern	void	SD_Startup(void), SD_Shutdown(void);
+extern	void	SD_Startup(), SD_Shutdown();
 
 extern	void	SD_PlaySound(soundnames sound);
-extern	void	SD_StopSound(void),
-				SD_WaitSoundDone(void),
+extern	void	SD_StopSound(),
+				SD_WaitSoundDone(),
 				SD_StartMusic(MusicGroup *music),
-				SD_MusicOn(void),
-				SD_MusicOff(void),
-				SD_FadeOutMusic(void);
+				SD_MusicOn(),
+				SD_MusicOff(),
+				SD_FadeOutMusic();
 
-extern	boolean	SD_MusicPlaying(void),
+extern	boolean	SD_MusicPlaying(),
 				SD_SetSoundMode(SDMode mode),
 				SD_SetMusicMode(SMMode mode);
-extern	word	SD_SoundPlaying(void);
+extern	word	SD_SoundPlaying();
 
 extern void SD_SetDigiDevice(SDSMode);
 extern void SD_Poll();

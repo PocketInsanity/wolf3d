@@ -2631,7 +2631,7 @@ void DrawOutline(int x,int y,int w,int h,int color1,int color2)
 // Setup Control Panel stuff - graphics, etc.
 //
 ////////////////////////////////////////////////////////////////////
-void SetupControlPanel(void)
+void SetupControlPanel()
 {
 #ifdef DOSISM /* DOS VERSION */
 #ifdef HAVE_FFBLK
@@ -2770,7 +2770,7 @@ void SetupControlPanel(void)
 // Clean up all the Control Panel stuff
 //
 ////////////////////////////////////////////////////////////////////
-void CleanupControlPanel(void)
+void CleanupControlPanel()
 {
 #ifndef SPEAR
 	UnCacheLump(CONTROLS_LUMP_START,CONTROLS_LUMP_END);

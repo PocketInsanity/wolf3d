@@ -10,9 +10,9 @@
 ==================
 */
 
-void CountObjects (void)
+void CountObjects()
 {
-	int	i,total,count,active,inactive,doors;
+	int i, total, count, active, inactive, doors;
 	objtype	*obj;
 
 	CenterWindow (16,7);
@@ -48,10 +48,8 @@ void CountObjects (void)
 	US_PrintUnsigned (active);
 
 	VW_UpdateScreen();
-	IN_Ack ();
+	IN_Ack();
 }
-
-//===========================================================================
 
 /*
 ================
@@ -82,10 +80,6 @@ void PicturePause (void)
 	Quit(NULL);
 }
 
-
-//===========================================================================
-
-
 /*
 ================
 =
@@ -96,173 +90,7 @@ void PicturePause (void)
 
 void ShapeTest()
 {
-#if 0 /* TODO: this code want to access the raycasting renderer directly */
-extern	word	NumDigi;
-extern	word	*DigiList;
-static	char	buf[10];
-
-	boolean			done;
-	ScanCode		scan;
-	int				i,j,k,x;
-	longword		l;
-	memptr			addr;
-	PageListStruct *page;
-
-	CenterWindow(20,16);
-	VW_UpdateScreen();
-	for (i = 0,done = false;!done;)
-	{
-		US_ClearWindow();
-
-		page = &PMPages[i];
-		US_Print(" Page #");
-		US_PrintUnsigned(i);
-		if (i < PMSpriteStart)
-			US_Print(" (Wall)");
-		else if (i < PMSoundStart)
-			US_Print(" (Sprite)");
-		else if (i == ChunksInFile - 1)
-			US_Print(" (Sound Info)");
-		else
-			US_Print(" (Sound)");
-
-		US_Print("\n XMS: ");
-		US_Print("No");
-
-		US_Print("\n Main: ");
-		US_Print("No");
-
-		US_Print("\n Last hit: ");
-		US_PrintUnsigned(page->lastHit);
-
-		US_Print("\n Address: ");
-		addr = PM_GetPageAddress(i);
-		sprintf(buf,"%p", addr); /* TODO: might wanna check */
-		US_Print(buf);
-
-		if (addr)
-		{
-			if (i < PMSpriteStart)
-			{
-			//
-			// draw the wall
-			//
-				postx = 128;
-				for (x=0;x<64;x++,postx++)
-				{
-					wallheight[postx] = 256;
-					ScalePost((byte *)addr, x);
-				}
-			}
-			else if (i < PMSoundStart)
-			{
-			//
-			// draw the sprite
-			//
-				SimpleScaleShape (160, i-PMSpriteStart, 64);
-			}
-			else if (i == ChunksInFile - 1)
-			{
-				US_Print("\n\n Number of sounds: ");
-				US_PrintUnsigned(NumDigi);
-				for (l = j = k = 0;j < NumDigi;j++)
-				{
-					l += DigiList[(j * 2) + 1];
-					k += (DigiList[(j * 2) + 1] + (PMPageSize - 1)) / PMPageSize;
-				}
-				US_Print("\n Total bytes: ");
-				US_PrintUnsigned(l);
-				US_Print("\n Total pages: ");
-				US_PrintUnsigned(k);
-			}
-			else
-			{
-				byte *dp = addr;
-				for (j = 0;j < NumDigi;j++)
-				{
-					k = (DigiList[(j * 2) + 1] + (PMPageSize - 1)) / PMPageSize;
-					if
-					(
-						(i >= PMSoundStart + DigiList[j * 2])
-					&&	(i < PMSoundStart + DigiList[j * 2] + k)
-					)
-						break;
-				}
-				if (j < NumDigi)
-				{
-					US_Print("\n Sound #");
-					US_PrintUnsigned(j);
-					US_Print("\n Segment #");
-					US_PrintUnsigned(i - PMSoundStart - DigiList[j * 2]);
-				}
-				for (j = 0;j < page->length;j += 32)
-				{
-					byte v = dp[j];
-					int v2 = (unsigned)v;
-					v2 -= 128;
-					v2 /= 4;
-					if (v2 < 0)
-						VW_Vlin(WindowY + WindowH - 32 + v2,
-								WindowY + WindowH - 32,
-								WindowX + 8 + (j / 32),BLACK);
-					else
-						VW_Vlin(WindowY + WindowH - 32,
-								WindowY + WindowH - 32 + v2,
-								WindowX + 8 + (j / 32),BLACK);
-				}
-			}
-		}
-
-		VW_UpdateScreen();
-
-		while (!(scan = LastScan)) {
-			SD_Poll();
-			IN_CheckAck();
-		}
-
-		IN_ClearKey(scan);
-		switch (scan)
-		{
-		case sc_LeftArrow:
-			if (i)
-				i--;
-			break;
-		case sc_RightArrow:
-			if (++i >= ChunksInFile)
-				i--;
-			break;
-		case sc_W:	// Walls
-			i = 0;
-			break;
-		case sc_S:	// Sprites
-			i = PMSpriteStart;
-			break;
-		case sc_D:	// Digitized
-			i = PMSoundStart;
-			break;
-		case sc_I:	// Digitized info
-			i = ChunksInFile - 1;
-			break;
-		case sc_L:	// Load all pages
-			for (j = 0;j < ChunksInFile;j++)
-				PM_GetPage(j);
-			break;
-		case sc_P:
-/* TODO: this would play the current digital sound */
-			break;
-		case sc_Escape:
-			done = true;
-			break;
-		case sc_Enter:
-			PM_GetPage(i);
-			break;
-		}
-	}
-#endif
 }
-
-//===========================================================================
-
 
 /*
 ================

@@ -823,7 +823,7 @@ static void CAL_ExpandGrChunk(int chunk, byte *source)
 		width = 8;
 		height = 8;
 		tilecount = NUMTILE8;
-	} else if (chunk >= STARTPICS && chunk < STARTSPRITES) {
+	} else if (chunk >= STARTPICS && chunk < STARTTILE8) {
 		width = pictable[chunk - STARTPICS].width;
 		height = pictable[chunk - STARTPICS].height;
 		expanded = *((long *)source);

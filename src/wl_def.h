@@ -700,8 +700,6 @@ extern	int viewheight;
 extern	int			centerx;
 extern	int			shootdelta;
 
-extern	int			dirangle[9];
-
 extern	boolean         startgame,loadedgame;
 extern	int		mouseadjustment;
 extern unsigned xoffset, yoffset;

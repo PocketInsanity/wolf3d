@@ -1111,12 +1111,13 @@ startplayloop:
 		{
 			SD_StopSound();
 			SD_PlaySound(GETSPEARSND);
+			
 			if (DigiMode != sds_Off)
 			{
 				long lasttimecount = get_TimeCount();
 
-				while(get_TimeCount() < lasttimecount+150)
-				//while(DigiPlaying!=false)
+				while(get_TimeCount() < (lasttimecount+150))
+				//while(SD_SoundPlaying()!=false)
 					SD_Poll();
 			}
 			else

@@ -35,10 +35,9 @@
 */
 
 char str[80], str2[20];
-int dirangle[9] = {0,ANGLES/8,2*ANGLES/8,3*ANGLES/8,4*ANGLES/8, 5*ANGLES/8,6*ANGLES/8,7*ANGLES/8,ANGLES};
 
 //
-// proejection variables
+// projection variables
 //
 fixed           focallength;
 int             viewwidth;
@@ -51,7 +50,7 @@ long            heightnumerator;
 boolean         startgame,loadedgame;
 int             mouseadjustment;
 
-/* These are refuges from wl_draw.c */
+/* These are refugees from wl_draw.c */
 long frameon;
 long lasttimecount;
 fixed viewsin, viewcos;
@@ -75,7 +74,7 @@ char **_argv;
 = FixedByFrac
 =
 = multiply a 16/16 bit, 2's complement fixed point number by a 16 bit
-= fraction, passed as a signed magnitude 32 bit number
+= fraction
 =
 ========================
 */
@@ -698,29 +697,28 @@ void SignonScreen()
 ==========================
 */
 
-void FinishSignon (void)
+void FinishSignon()
 {
-
 #ifndef SPEAR
-	VW_Bar (0,189,300,11, introscn[0]);
+	VW_Bar(0, 189, 300, 11, introscn[0]);
 	WindowX = 0;
 	WindowW = 320;
 	PrintY = 190;
 
 	SETFONTCOLOR(14,4);
 
-	US_CPrint ("Press a key");
+	US_CPrint("Press a key");
 	VW_UpdateScreen();
 	
 	if (!NoWait)
 		IN_Ack ();
 
-	VW_Bar (0,189,300,11, introscn[0]);
+	VW_Bar(0, 189, 300, 11, introscn[0]);
 
 	PrintY = 190;
 	SETFONTCOLOR(10,4);
 
-	US_CPrint ("Working...");
+	US_CPrint("Working...");
 	VW_UpdateScreen();
 	
 	SETFONTCOLOR(0,15);
@@ -770,240 +768,228 @@ int MS_CheckParm(char *check)
 =====================
 */
 
-static  int     wolfdigimap[] =
-		{
-			// These first sounds are in the upload version
+static int wolfdigimap[] =
+{
+	// These first sounds are in the upload version
 #ifndef SPEAR
-			HALTSND,                0,
-			DOGBARKSND,             1,
-			CLOSEDOORSND,           2,
-			OPENDOORSND,            3,
-			ATKMACHINEGUNSND,       4,
-			ATKPISTOLSND,           5,
-			ATKGATLINGSND,          6,
-			SCHUTZADSND,            7,
-			GUTENTAGSND,            8,
-			MUTTISND,               9,
-			BOSSFIRESND,            10,
-			SSFIRESND,              11,
-			DEATHSCREAM1SND,        12,
-			DEATHSCREAM2SND,        13,
-			DEATHSCREAM3SND,        13,
-			TAKEDAMAGESND,          14,
-			PUSHWALLSND,            15,
-
-			LEBENSND,               20,
-			NAZIFIRESND,            21,
-			SLURPIESND,             22,
-
-			YEAHSND,		32,
-
+	HALTSND,                0,
+	DOGBARKSND,             1,
+	CLOSEDOORSND,           2,
+	OPENDOORSND,            3,
+	ATKMACHINEGUNSND,       4,
+	ATKPISTOLSND,           5,
+	ATKGATLINGSND,          6,
+	SCHUTZADSND,            7,
+	GUTENTAGSND,            8,
+	MUTTISND,               9,
+	BOSSFIRESND,            10,
+	SSFIRESND,              11,
+	DEATHSCREAM1SND,        12,
+	DEATHSCREAM2SND,        13,
+	DEATHSCREAM3SND,        13,
+	TAKEDAMAGESND,          14,
+	PUSHWALLSND,            15,
+	LEBENSND,               20,
+	NAZIFIRESND,            21,
+	SLURPIESND,             22,
+	YEAHSND,		32,
 #ifndef UPLOAD
-			// These are in all other episodes
-			DOGDEATHSND,            16,
-			AHHHGSND,               17,
-			DIESND,                 18,
-			EVASND,                 19,
+	// These are in all other episodes
+	DOGDEATHSND,            16,
+	AHHHGSND,               17,
+	DIESND,                 18,
+	EVASND,                 19,
+	TOT_HUNDSND,            23,
+	MEINGOTTSND,            24,
+	SCHABBSHASND,           25,
+	HITLERHASND,            26,
+	SPIONSND,               27,
+	NEINSOVASSND,           28,
+	DOGATTACKSND,           29,
+	LEVELDONESND,           30,
+	MECHSTEPSND,		31,
 
-			TOT_HUNDSND,            23,
-			MEINGOTTSND,            24,
-			SCHABBSHASND,           25,
-			HITLERHASND,            26,
-			SPIONSND,               27,
-			NEINSOVASSND,           28,
-			DOGATTACKSND,           29,
-			LEVELDONESND,           30,
-			MECHSTEPSND,		31,
-
-			SCHEISTSND,		33,
-			DEATHSCREAM4SND,	34,		// AIIEEE
-			DEATHSCREAM5SND,	35,		// DEE-DEE
-			DONNERSND,		36,		// EPISODE 4 BOSS DIE
-			EINESND,		37,		// EPISODE 4 BOSS SIGHTING
-			ERLAUBENSND,		38,		// EPISODE 6 BOSS SIGHTING
-			DEATHSCREAM6SND,	39,		// FART
-			DEATHSCREAM7SND,	40,		// GASP
-			DEATHSCREAM8SND,	41,		// GUH-BOY!
-			DEATHSCREAM9SND,	42,		// AH GEEZ!
-			KEINSND,		43,		// EPISODE 5 BOSS SIGHTING
-			MEINSND,		44,		// EPISODE 6 BOSS DIE
-			ROSESND,		45,		// EPISODE 5 BOSS DIE
-
+	SCHEISTSND,		33,
+	DEATHSCREAM4SND,	34,		// AIIEEE
+	DEATHSCREAM5SND,	35,		// DEE-DEE
+	DONNERSND,		36,		// EPISODE 4 BOSS DIE
+	EINESND,		37,		// EPISODE 4 BOSS SIGHTING
+	ERLAUBENSND,		38,		// EPISODE 6 BOSS SIGHTING
+	DEATHSCREAM6SND,	39,		// FART
+	DEATHSCREAM7SND,	40,		// GASP
+	DEATHSCREAM8SND,	41,		// GUH-BOY!
+	DEATHSCREAM9SND,	42,		// AH GEEZ!
+	KEINSND,		43,		// EPISODE 5 BOSS SIGHTING
+	MEINSND,		44,		// EPISODE 6 BOSS DIE
+	ROSESND,		45,		// EPISODE 5 BOSS DIE
 #endif
 #else
 //
 // SPEAR OF DESTINY DIGISOUNDS
 //
-			HALTSND,                0,
-			CLOSEDOORSND,           2,
-			OPENDOORSND,            3,
-			ATKMACHINEGUNSND,       4,
-			ATKPISTOLSND,           5,
-			ATKGATLINGSND,          6,
-			SCHUTZADSND,            7,
-			BOSSFIRESND,            8,
-			SSFIRESND,              9,
-			DEATHSCREAM1SND,        10,
-			DEATHSCREAM2SND,        11,
-			TAKEDAMAGESND,          12,
-			PUSHWALLSND,            13,
-			AHHHGSND,               15,
-			LEBENSND,               16,
-			NAZIFIRESND,            17,
-			SLURPIESND,             18,
-			LEVELDONESND,           22,
-			DEATHSCREAM4SND,	23,		// AIIEEE
-			DEATHSCREAM3SND,        23,		// DOUBLY-MAPPED!!!
-			DEATHSCREAM5SND,	24,		// DEE-DEE
-			DEATHSCREAM6SND,	25,		// FART
-			DEATHSCREAM7SND,	26,		// GASP
-			DEATHSCREAM8SND,	27,		// GUH-BOY!
-			DEATHSCREAM9SND,	28,		// AH GEEZ!
-			GETGATLINGSND,		38,		// Got Gat replacement
-
+	HALTSND,                0,
+	CLOSEDOORSND,           2,
+	OPENDOORSND,            3,
+	ATKMACHINEGUNSND,       4,
+	ATKPISTOLSND,           5,
+	ATKGATLINGSND,          6,
+	SCHUTZADSND,            7,
+	BOSSFIRESND,            8,
+	SSFIRESND,              9,
+	DEATHSCREAM1SND,        10,
+	DEATHSCREAM2SND,        11,
+	TAKEDAMAGESND,          12,
+	PUSHWALLSND,            13,
+	AHHHGSND,               15,
+	LEBENSND,               16,
+	NAZIFIRESND,            17,
+	SLURPIESND,             18,
+	LEVELDONESND,           22,
+	DEATHSCREAM4SND,	23,		// AIIEEE
+	DEATHSCREAM3SND,        23,		// DOUBLY-MAPPED!!!
+	DEATHSCREAM5SND,	24,		// DEE-DEE
+	DEATHSCREAM6SND,	25,		// FART
+	DEATHSCREAM7SND,	26,		// GASP
+	DEATHSCREAM8SND,	27,		// GUH-BOY!
+	DEATHSCREAM9SND,	28,		// AH GEEZ!
+	GETGATLINGSND,		38,		// Got Gat replacement
 #ifndef SPEARDEMO
-			DOGBARKSND,             1,
-			DOGDEATHSND,            14,
-			SPIONSND,               19,
-			NEINSOVASSND,           20,
-			DOGATTACKSND,           21,
-			TRANSSIGHTSND,		29,		// Trans Sight
-			TRANSDEATHSND,		30,		// Trans Death
-			WILHELMSIGHTSND,	31,		// Wilhelm Sight
-			WILHELMDEATHSND,	32,		// Wilhelm Death
-			UBERDEATHSND,		33,		// Uber Death
-			KNIGHTSIGHTSND,		34,		// Death Knight Sight
-			KNIGHTDEATHSND,		35,		// Death Knight Death
-			ANGELSIGHTSND,		36,		// Angel Sight
-			ANGELDEATHSND,		37,		// Angel Death
-			GETSPEARSND,		39,		// Got Spear replacement
+	DOGBARKSND,             1,
+	DOGDEATHSND,            14,
+	SPIONSND,               19,
+	NEINSOVASSND,           20,
+	DOGATTACKSND,           21,
+	TRANSSIGHTSND,		29,		// Trans Sight
+	TRANSDEATHSND,		30,		// Trans Death
+	WILHELMSIGHTSND,	31,		// Wilhelm Sight
+	WILHELMDEATHSND,	32,		// Wilhelm Death
+	UBERDEATHSND,		33,		// Uber Death
+	KNIGHTSIGHTSND,		34,		// Death Knight Sight
+	KNIGHTDEATHSND,		35,		// Death Knight Death
+	ANGELSIGHTSND,		36,		// Angel Sight
+	ANGELDEATHSND,		37,		// Angel Death
+	GETSPEARSND,		39,		// Got Spear replacement
 #endif
 #endif
-			LASTSOUND
-		};
+	LASTSOUND
+};
 
 
-void InitDigiMap (void)
+void InitDigiMap()
 {
-	int                     *map;
+	int *map;
 
-	for (map = wolfdigimap;*map != LASTSOUND;map += 2)
+	for (map = wolfdigimap; *map != LASTSOUND; map += 2)
 		DigiMap[map[0]] = map[1];
-
-
 }
 
 #ifndef SPEAR
-CP_iteminfo	MusicItems={CTL_X,CTL_Y,6,0,32};
+CP_iteminfo MusicItems={CTL_X,CTL_Y,6,0,32};
 CP_itemtype MusicMenu[]=
-	{
-		{1,"Get Them!",0},
-		{1,"Searching",0},
-		{1,"P.O.W.",0},
-		{1,"Suspense",0},
-		{1,"War March",0},
-		{1,"Around The Corner!",0},
+{
+	{1,"Get Them!",0},
+	{1,"Searching",0},
+	{1,"P.O.W.",0},
+	{1,"Suspense",0},
+	{1,"War March",0},
+	{1,"Around The Corner!",0},
 
-		{1,"Nazi Anthem",0},
-		{1,"Lurking...",0},
-		{1,"Going After Hitler",0},
-		{1,"Pounding Headache",0},
-		{1,"Into the Dungeons",0},
-		{1,"Ultimate Conquest",0},
+	{1,"Nazi Anthem",0},
+	{1,"Lurking...",0},
+	{1,"Going After Hitler",0},
+	{1,"Pounding Headache",0},
+	{1,"Into the Dungeons",0},
+	{1,"Ultimate Conquest",0},
 
-		{1,"Kill the S.O.B.",0},
-		{1,"The Nazi Rap",0},
-		{1,"Twelfth Hour",0},
-		{1,"Zero Hour",0},
-		{1,"Ultimate Conquest",0},
-		{1,"Wolfpack",0}
-	};
+	{1,"Kill the S.O.B.",0},
+	{1,"The Nazi Rap",0},
+	{1,"Twelfth Hour",0},
+	{1,"Zero Hour",0},
+	{1,"Ultimate Conquest",0},
+	{1,"Wolfpack",0}
+};
 #else
 CP_iteminfo MusicItems={CTL_X,CTL_Y-20,9,0,32};
 CP_itemtype MusicMenu[]=
-   {
-		{1,"Funky Colonel Bill",0},
-		{1,"Death To The Nazis",0},
-		{1,"Tiptoeing Around",0},
-		{1,"Is This THE END?",0},
-		{1,"Evil Incarnate",0},
-		{1,"Jazzin' Them Nazis",0},
-		{1,"Puttin' It To The Enemy",0},
-		{1,"The SS Gonna Get You",0},
-		{1,"Towering Above",0}
-	};
+{
+	{1,"Funky Colonel Bill",0},
+	{1,"Death To The Nazis",0},
+	{1,"Tiptoeing Around",0},
+	{1,"Is This THE END?",0},
+	{1,"Evil Incarnate",0},
+	{1,"Jazzin' Them Nazis",0},
+	{1,"Puttin' It To The Enemy",0},
+	{1,"The SS Gonna Get You",0},
+	{1,"Towering Above",0}
+};
 #endif
 
+static int songs[]=
+{
+#ifndef SPEAR
+	GETTHEM_MUS,
+	SEARCHN_MUS,
+	POW_MUS,
+	SUSPENSE_MUS,
+	WARMARCH_MUS,
+	CORNER_MUS,
+
+	NAZI_OMI_MUS,
+	PREGNANT_MUS,
+	GOINGAFT_MUS,
+	HEADACHE_MUS,
+	DUNGEON_MUS,
+	ULTIMATE_MUS,
+
+	INTROCW3_MUS,
+	NAZI_RAP_MUS,
+	TWELFTH_MUS,
+	ZEROHOUR_MUS,
+	ULTIMATE_MUS,
+	PACMAN_MUS
+#else
+	XFUNKIE_MUS,             // 0
+	XDEATH_MUS,              // 2
+	XTIPTOE_MUS,             // 4
+	XTHEEND_MUS,             // 7
+	XEVIL_MUS,               // 17
+	XJAZNAZI_MUS,            // 18
+	XPUTIT_MUS,              // 21
+	XGETYOU_MUS,             // 22
+	XTOWER2_MUS              // 23
+#endif
+};
+		
 #ifndef SPEARDEMO
-void DoJukebox(void)
+void DoJukebox()
 {
 	int which,lastsong=-1;
-	unsigned start,songs[]=
-		{
-#ifndef SPEAR
-			GETTHEM_MUS,
-			SEARCHN_MUS,
-			POW_MUS,
-			SUSPENSE_MUS,
-			WARMARCH_MUS,
-			CORNER_MUS,
-
-			NAZI_OMI_MUS,
-			PREGNANT_MUS,
-			GOINGAFT_MUS,
-			HEADACHE_MUS,
-			DUNGEON_MUS,
-			ULTIMATE_MUS,
-
-			INTROCW3_MUS,
-			NAZI_RAP_MUS,
-			TWELFTH_MUS,
-			ZEROHOUR_MUS,
-			ULTIMATE_MUS,
-			PACMAN_MUS
-#else
-			XFUNKIE_MUS,             // 0
-			XDEATH_MUS,              // 2
-			XTIPTOE_MUS,             // 4
-			XTHEEND_MUS,             // 7
-			XEVIL_MUS,               // 17
-			XJAZNAZI_MUS,            // 18
-			XPUTIT_MUS,              // 21
-			XGETYOU_MUS,             // 22
-			XTOWER2_MUS              // 23
-#endif
-		};
+	unsigned start;
 
 	IN_ClearKeysDown();
-	if (!AdLibPresent && !SoundBlasterPresent)
-		return;
-
-
+//	if (!AdLibPresent && !SoundBlasterPresent)
+//		return;
+	
 	MenuFadeOut();
 
-#ifndef SPEAR
-#ifndef UPLOAD
-	start = (rand()%3)*6;
-#else
-	start = 0;
-#endif
+#if !defined(SPEAR) || !defined(UPLOAD)
+	start = (rand() % 3) * 6;
 #else
 	start = 0;
 #endif
 
-
-	CA_CacheGrChunk (STARTFONT+1);
+	CA_CacheGrChunk(STARTFONT+1);
 #ifdef SPEAR
-	CacheLump (BACKDROP_LUMP_START,BACKDROP_LUMP_END);
+	CacheLump(BACKDROP_LUMP_START, BACKDROP_LUMP_END);
 #else
-	CacheLump (CONTROLS_LUMP_START,CONTROLS_LUMP_END);
+	CacheLump(CONTROLS_LUMP_START, CONTROLS_LUMP_END);
 #endif
-	CA_LoadAllSounds ();
+	CA_LoadAllSounds();
 
 	fontnumber=1;
-	ClearMScreen ();
+	ClearMScreen();
 	VWB_DrawPic(112,184,C_MOUSELBACKPIC);
-	DrawStripes (10);
+	DrawStripes(10);
 	SETFONTCOLOR (TEXTCOLOR,BKGDCOLOR);
 
 #ifndef SPEAR
@@ -1015,10 +1001,10 @@ void DoJukebox(void)
 	DrawMenu (&MusicItems,&MusicMenu[start]);
 
 	SETFONTCOLOR (READHCOLOR,BKGDCOLOR);
-	PrintY=15;
+	PrintY = 15;
 	WindowX = 0;
 	WindowY = 320;
-	US_CPrint ("Robert's Jukebox");
+	US_CPrint("Robert's Jukebox");
 
 	SETFONTCOLOR (TEXTCOLOR,BKGDCOLOR);
 	VW_UpdateScreen();
@@ -1043,9 +1029,9 @@ void DoJukebox(void)
 	MenuFadeOut();
 	IN_ClearKeysDown();
 #ifdef SPEAR
-	UnCacheLump (BACKDROP_LUMP_START,BACKDROP_LUMP_END);
+	UnCacheLump(BACKDROP_LUMP_START, BACKDROP_LUMP_END);
 #else
-	UnCacheLump (CONTROLS_LUMP_START,CONTROLS_LUMP_END);
+	UnCacheLump(CONTROLS_LUMP_START, CONTROLS_LUMP_END);
 #endif
 }
 #endif
@@ -1061,7 +1047,7 @@ void DoJukebox(void)
 ==========================
 */
 
-void InitGame(void)
+void InitGame()
 {
 	int i;
 
@@ -1078,24 +1064,14 @@ void InitGame(void)
 //
 // build some tables
 //
-	InitDigiMap ();
+	InitDigiMap();
 
 	for (i = 0;i < MAPSIZE; i++)
 	{
 		farmapylookup[i] = i*64;
 	}
 
-	ReadConfig ();
-
-
-//
-// HOLDING DOWN 'M' KEY?
-//
-#ifndef SPEARDEMO
-	if (IN_KeyDown(sc_M))
-		DoJukebox();
-	else
-#endif
+	ReadConfig();
 
 //
 // load in and lock down some basic chunks
@@ -1104,7 +1080,7 @@ void InitGame(void)
 	CA_CacheGrChunk(STARTFONT);
 
 	LoadLatchMem();
-	BuildTables();          // trig tables
+	BuildTables();
 	SetupWalls();
 
 	NewViewSize(viewsize);
@@ -1113,7 +1089,17 @@ void InitGame(void)
 //
 // initialize variables
 //
-	InitRedShifts ();
+	InitRedShifts();
+
+	IN_CheckAck();
+//
+// HOLDING DOWN 'M' KEY?
+//
+#ifndef SPEARDEMO
+	if (IN_KeyDown(sc_M))
+		DoJukebox();
+#endif
+
 	FinishSignon();
 }
 
@@ -1150,7 +1136,7 @@ boolean SetViewSize(unsigned width, unsigned height)
 }
 
 
-void ShowViewSize (int width)
+void ShowViewSize(int width)
 {
 	int oldwidth,oldheight;
 
@@ -1168,11 +1154,11 @@ void ShowViewSize (int width)
 
 void NewViewSize(int width)
 {
-	CA_UpLevel ();
-	MM_SortMem ();
+	CA_UpLevel();
+	MM_SortMem();
 	viewsize = width;
-	SetViewSize (width*16,width*16*HEIGHTRATIO);
-	CA_DownLevel ();
+	SetViewSize(width*16,width*16*HEIGHTRATIO);
+	CA_DownLevel();
 }
 
 
@@ -1205,7 +1191,7 @@ void DemoLoop()
 	StartCPMusic(INTROSONG);
 
 	if (!NoWait)
-		PG13 ();
+		PG13();
 
 	i = MS_CheckParm("playdemo");
 	if (i && ((i+1) < _argc)) {
@@ -1275,7 +1261,7 @@ void DemoLoop()
 			#ifndef SPEARDEMO
 			PlayDemo (LastDemo++%4);
 			#else
-			PlayDemo (0);
+			PlayDemo(0);
 			#endif
 
 			if (playstate == ex_abort)
@@ -1315,6 +1301,8 @@ int WolfMain(int argc, char *argv[])
 {
 	_argc = argc;
 	_argv = argv;
+	
+	srand(time(NULL));
 	
 	CheckForEpisodes();
 

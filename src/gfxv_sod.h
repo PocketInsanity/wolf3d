@@ -1,10 +1,3 @@
-//////////////////////////////////////
-//
-// Graphics .H file for .SOD
-// IGRAB-ed on Thu Oct 08 20:38:29 1992
-//
-//////////////////////////////////////
-
 typedef enum {
 		// Lump Start
 		C_BACKDROPPIC=3,
@@ -246,16 +239,8 @@ typedef enum {
 //
 #define NUMCHUNKS    169
 #define NUMFONT      2
-#define NUMFONTM     0
 #define NUMPICS      147
-#define NUMPICM      0
-#define NUMSPRITES   0
 #define NUMTILE8     35
-#define NUMTILE8M    0
-#define NUMTILE16    0
-#define NUMTILE16M   0
-#define NUMTILE32    0
-#define NUMTILE32M   0
 #define NUMEXTERNS   18
 //
 // File offsets for data items
@@ -263,18 +248,6 @@ typedef enum {
 #define STRUCTPIC    0
 
 #define STARTFONT    1
-#define STARTFONTM   3
 #define STARTPICS    3
-#define STARTPICM    150
-#define STARTSPRITES 150
 #define STARTTILE8   150
-#define STARTTILE8M  151
-#define STARTTILE16  151
-#define STARTTILE16M 151
-#define STARTTILE32  151
-#define STARTTILE32M 151
 #define STARTEXTERNS 151
-
-//
-// Thank you for using IGRAB!
-//

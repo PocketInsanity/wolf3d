@@ -368,6 +368,8 @@ static void ClearScreen()
 =====================
 */
 
+static int dirangle[9] = {0,ANGLES/8,2*ANGLES/8,3*ANGLES/8,4*ANGLES/8, 5*ANGLES/8,6*ANGLES/8,7*ANGLES/8,ANGLES};
+
 static int CalcRotate(objtype *ob)
 {
 	int	angle,viewangle;

@@ -75,7 +75,7 @@ void VWB_DrawPic(int x, int y, int chunknum)
 	width = pictable[picnum].width;
 	height = pictable[picnum].height;
 
-	VL_MemToScreen (grsegs[chunknum],width,height,x,y);
+	VL_MemToScreen(grsegs[chunknum],width,height,x,y);
 }
 
 /*
@@ -103,10 +103,9 @@ void LoadLatchMem()
 {
 	int i;
 
-	CA_CacheGrChunk (STARTTILE8);
+	CA_CacheGrChunk(STARTTILE8);
 
 	for (i = LATCHPICS_LUMP_START; i <= LATCHPICS_LUMP_END; i++) {
-		/* TODO: this just caches them for eternity */
 		CA_CacheGrChunk(i);
 	}
 

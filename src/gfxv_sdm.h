@@ -1,10 +1,3 @@
-//////////////////////////////////////
-//
-// Graphics .H file for .SDM
-// IGRAB-ed on Mon Sep 21 14:20:19 1992
-//
-//////////////////////////////////////
-
 typedef enum {
 		// Lump Start
 		C_BACKDROPPIC=3,
@@ -190,16 +183,8 @@ typedef enum {
 //
 #define NUMCHUNKS    133
 #define NUMFONT      2
-#define NUMFONTM     0
 #define NUMPICS      125
-#define NUMPICM      0
-#define NUMSPRITES   0
 #define NUMTILE8     35
-#define NUMTILE8M    0
-#define NUMTILE16    0
-#define NUMTILE16M   0
-#define NUMTILE32    0
-#define NUMTILE32M   0
 #define NUMEXTERNS   4
 //
 // File offsets for data items
@@ -207,18 +192,6 @@ typedef enum {
 #define STRUCTPIC    0
 
 #define STARTFONT    1
-#define STARTFONTM   3
 #define STARTPICS    3
-#define STARTPICM    128
-#define STARTSPRITES 128
 #define STARTTILE8   128
-#define STARTTILE8M  129
-#define STARTTILE16  129
-#define STARTTILE16M 129
-#define STARTTILE32  129
-#define STARTTILE32M 129
 #define STARTEXTERNS 129
-
-//
-// Thank you for using IGRAB!
-//
