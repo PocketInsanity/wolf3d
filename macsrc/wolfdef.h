@@ -750,10 +750,6 @@ extern void IO_ClearViewBuffer(void);
 extern void IO_ScaleWallColumn(Word x,Word scale,Word tile,Word column);
 extern void IO_DisplayViewBuffer(void);
 
-/* In SetupScalers.c */
-
-extern Boolean SetupScalers(void);
-extern void ReleaseScalers(void);
 extern void IO_ScaleMaskedColumn(Word x,Word scale, unsigned short *sprite,Word column);
 extern void DrawSmall(Word x,Word y,Word tile);
 extern void MakeSmallFont(void);

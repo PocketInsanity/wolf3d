@@ -58,6 +58,7 @@ TODO:
 * Finish GTK+ code
 * vi_glx.c will probably be the most updated of the frontends. Be sure to
   update the others later.
+* Finish moving things out of stub.c
 
 BUGS:
 * Software Drawing seems like its imprecise, stationary sprites move back and 

@@ -81,15 +81,6 @@ void PrintTimeCounter(TimeCounter *t, char *header)
 	printf("Min: %lu, max:%lu\n", t->mintime, t->maxtime);
 }
 
-Boolean SetupScalers()
-{
-	return TRUE;
-}
-
-void ReleaseScalers()
-{
-}
-
 LongWord PsyTime;
 
 void ShowGetPsyched(void)

@@ -316,7 +316,6 @@ void PrepPlayLoop()
 	StartSong(SongListPtr[gamestate.mapon+2]);	/* start music */
 	if (!SetupGameLevel()) {	/* Load the game map */
 		ReleaseMap();			/* Release map memory */
-		ReleaseScalers();		/* Release the compiled scalers */
 		PlaySong(0);
 		while (!SetupGameLevel()) {	/* Try loading it again */
 Again:
@@ -329,7 +328,6 @@ Again:
 		}
 	}
 	if (!StartupRendering(GameViewSize)) {
-		ReleaseScalers();
 		goto Again;
 	}
 	topspritescale = 0;	/* No overlay sprite */

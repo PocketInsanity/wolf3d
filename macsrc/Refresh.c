@@ -316,10 +316,7 @@ Boolean StartupRendering(Word NewSize)
 	memset(textures[130],DOORPIC+1,MAPSIZE); /* lock 1*/
 	memset(textures[131],DOORPIC+2,MAPSIZE); /* lock 2*/
 	memset(textures[132],DOORPIC+3,MAPSIZE); /* elevator*/
-	ReleaseScalers();		/* Release any compiled scalers */
-	if (!SetupScalers()) {				/* Redo any scalers */
-		return FALSE;
-	}
+
 	MathSize = NewSize;
 		
 	return TRUE;
