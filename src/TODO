@@ -45,9 +45,6 @@ CA_FarRead hit EOF?
 * if possible fix/or at least add ViewMap?
 * remove the #else at the end of each header since nothing is being doubly
 included now (if ever)
-* fix those tiles that do not wish to be extracted (latches or whathaveyou)
-* i don't like this latch nonsense. i think it was for originally storing
-data in vga memory. so figure it out, fix it, and remove
 * especially with the video functions, there are functions/defines which
 just call a different function (most are left from the update block code)
 rename/remove them
@@ -86,6 +83,7 @@ screen update
 * dga 1 and 2
 * make sure none of the code tries to handle gfx/sound data directly
 * GL_shared_texture_palette for opengl
+* if window looses focus, should it clear the keys ?
 
 Specific:
 * memory/sound intro screen goes

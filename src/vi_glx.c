@@ -20,7 +20,6 @@ Display *dpy;
 int screen;
 Window root, win;
 XVisualInfo *vi;
-XImage *img;
 Colormap cmap;
 Atom wmDeleteWindow;
 GLXContext ctx;
@@ -171,10 +170,7 @@ void VL_Startup()
 {
 	if (gfxbuf == NULL) 
 		gfxbuf = malloc(320 * 200 * 1);
-	
-	img = XCreateImage(dpy, vi->visual, 8, ZPixmap, 0, (char *)gfxbuf, 320, 200,
-			   8, 320);
-			   
+				   
 	XMapWindow(dpy, win);
 	
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);

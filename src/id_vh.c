@@ -10,11 +10,6 @@ int px,py;
 byte fontcolor,backcolor;
 int fontnumber;
 
-/* TODO: more latch nonsense
-unsigned freelatch; 
-unsigned latchpics[NUMLATCHPICS];
-*/
-
 boolean	screenfaded;
 
 byte palette1[256][3], palette2[256][3];
@@ -75,8 +70,7 @@ void VW_MeasurePropString (char *string, word *width, word *height)
 
 void VWB_DrawTile8(int x, int y, int tile)
 {
-/* TODO: 'latches' do not work */
-/*	LatchDrawChar(x,y,tile); */
+	VL_MemToScreen(grsegs[STARTTILE8]+(tile*64), 8, 8, x, y);
 }
 
 void VWB_DrawPic(int x, int y, int chunknum)
@@ -142,64 +136,15 @@ void LatchDrawPic(unsigned x, unsigned y, unsigned picnum)
 
 void LoadLatchMem(void)
 {
-	int	i,j,p,m,width,height,start,end;
-	byte *src;
-	word	destoff;
+	int i;
 
-/*
-   tile 8s
-*/
-#if 0 /* I can't get these to extract, if at all */
-	latchpics[0] = freelatch;
+/* tile 8s */
 	CA_CacheGrChunk (STARTTILE8);
-	src = (byte *)grsegs[STARTTILE8];
-	destoff = freelatch;
 
-	for (i=0;i<NUMTILE8;i++)
-	{
-		VL_MemToLatch (src,8,8,destoff);
-		src += 64;
-		destoff +=16;
-	}
-	UNCACHEGRCHUNK (STARTTILE8);
-#endif
-
-#if 0 
-/*
-   tile 16s
-*/
-	src = (byte *)grsegs[STARTTILE16];
-	latchpics[1] = destoff;
-
-	for (i=0;i<NUMTILE16;i++)
-	{
-		CA_CacheGrChunk (STARTTILE16+i);
-		src = (byte *)grsegs[STARTTILE16+i];
-		VL_MemToLatch (src,16,16,destoff);
-		destoff+=64;
-		if (src)
-			UNCACHEGRCHUNK (STARTTILE16+i);
-	}
-#endif
-
-/*
-   pics
-*/
-	start = LATCHPICS_LUMP_START;
-	end = LATCHPICS_LUMP_END;
-
-	for (i=start;i<=end;i++)
-	{
+/* pics */
+	for (i = LATCHPICS_LUMP_START; i <= LATCHPICS_LUMP_END; i++) {
 		/* TODO: this just caches them for eternity */
 		CA_CacheGrChunk (i);
-	#if 0	
-		latchpics[2+i-start] = destoff;
-		width = pictable[i-STARTPICS].width;
-		height = pictable[i-STARTPICS].height;
-		VL_MemToLatch (grsegs[i],width,height,destoff);
-		destoff += width/4 *height;
-		UNCACHEGRCHUNK(i);
-	#endif
 	}
 
 }

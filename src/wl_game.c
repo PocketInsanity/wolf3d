@@ -5,15 +5,6 @@
 /*
 =============================================================================
 
-						 LOCAL CONSTANTS
-
-=============================================================================
-*/
-
-
-/*
-=============================================================================
-
 						 GLOBAL VARIABLES
 
 =============================================================================
@@ -32,12 +23,6 @@ boolean		spearflag;
 // ELEVATOR BACK MAPS - REMEMBER (-1)!!
 //
 int ElevatorBackTo[]={1,1,7,3,5,3};
-
-void ScanInfoPlane (void);
-void SetupGameLevel (void);
-void DrawPlayScreen (void);
-void LoadLatchMem (void);
-void GameLoop (void);
 
 /*
 =============================================================================
@@ -104,8 +89,7 @@ byte lefttable[ATABLEMAX][ATABLEMAX * 2] = {
 { 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8}
 };
 
-void
-SetSoundLoc(fixed gx,fixed gy)
+void SetSoundLoc(fixed gx,fixed gy)
 {
 	fixed	xt,yt;
 	int		x,y;

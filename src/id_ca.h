@@ -31,14 +31,11 @@ extern	void			*grsegs[NUMCHUNKS];
 extern	byte		grneeded[NUMCHUNKS];
 extern	byte		ca_levelbit,ca_levelnum;
 
-extern	char		*titleptr[8];
-
 extern	char		extension[5],
 			gheadname[10],
 			gfilename[10],
 			gdictname[10],
 			mheadname[10],
-			mfilename[10],
 			aheadname[10],
 			afilename[10];
 

@@ -520,6 +520,8 @@ void OverheadRefresh (void)
 				tile = (unsigned)actorat[x][y];
 				break;
 			}
+#define LatchDrawChar(x,y,p) VL_LatchToScreen(latchpics[0]+(p)*16,2,8,x,y)
+#define LatchDrawTile(x,y,p) VL_LatchToScreen(latchpics[1]+(p)*64,4,16,x,y)
 
 			if (tile<MAXWALLTILES)
 				LatchDrawTile(sx,sy,tile);

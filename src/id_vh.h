@@ -59,15 +59,6 @@ void VL_FadeIn(int start, int end, byte *palette, int steps);
 void LatchDrawPic(unsigned x, unsigned y, unsigned picnum);
 void LoadLatchMem(void);
 
-#if 0 /* TODO: find some way to remove this ... */
-#define LatchDrawChar(x,y,p) VL_LatchToScreen(latchpics[0]+(p)*16,2,8,x,y)
-#define LatchDrawTile(x,y,p) VL_LatchToScreen(latchpics[1]+(p)*64,4,16,x,y)
-
-#define NUMLATCHPICS	100
-extern	unsigned	latchpics[NUMLATCHPICS];
-extern	unsigned freelatch;
-#endif
-
 #else
 #error "fix me: TODO"
 #endif

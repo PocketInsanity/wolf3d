@@ -2738,7 +2738,7 @@ int HandleMenu(CP_iteminfo *item_i,CP_itemtype *items,void (*routine)(int w))
 	y=basey+which*13;
 
 	VWB_DrawPic(x,y,C_CURSOR1PIC);
-	SetTextColor(items+which,1);
+	SetMenuTextColor(items+which,1);
 	if (redrawitem)
 	{
 		PrintX=item_i->x+item_i->indent;
@@ -2973,7 +2973,7 @@ int HandleMenu(CP_iteminfo *item_i,CP_itemtype *items,void (*routine)(int w))
 void EraseGun(CP_iteminfo *item_i,CP_itemtype *items,int x,int y,int which)
 {
 	VWB_Bar(x-1,y,25,16,BKGDCOLOR);
-	SetTextColor(items+which,0);
+	SetMenuTextColor(items+which,0);
 
 	PrintX=item_i->x+item_i->indent;
 	PrintY=item_i->y+which*13;
@@ -3003,7 +3003,7 @@ void DrawGun(CP_iteminfo *item_i,CP_itemtype *items,int x,int *y,int which,int b
 	VWB_Bar(x-1,*y,25,16,BKGDCOLOR);
 	*y=basey+which*13;
 	VWB_DrawPic(x,*y,C_CURSOR1PIC);
-	SetTextColor(items+which,1);
+	SetMenuTextColor(items+which,1);
 
 	PrintX=item_i->x+item_i->indent;
 	PrintY=item_i->y+which*13;
@@ -3051,7 +3051,7 @@ void DrawMenu(CP_iteminfo *item_i,CP_itemtype *items)
 
 	for (i=0;i<item_i->amount;i++)
 	{
-		SetTextColor(items+i,which==i);
+		SetMenuTextColor(items+i,which==i);
 
 		PrintY=item_i->y+i*13;
 		if ((items+i)->active)
@@ -3073,7 +3073,7 @@ void DrawMenu(CP_iteminfo *item_i,CP_itemtype *items)
 // SET TEXT COLOR (HIGHLIGHT OR NO)
 //
 ////////////////////////////////////////////////////////////////////
-void SetTextColor(CP_itemtype *items,int hlight)
+void SetMenuTextColor(CP_itemtype *items,int hlight)
 {
 	if (hlight)
 		{SETFONTCOLOR(color_hlite[items->active],BKGDCOLOR);}

@@ -54,7 +54,6 @@ char extension[5],
      gfilename[10]="vgagraph.",
      gdictname[10]="vgadict.",
      mheadname[10]="maphead.",
-     mfilename[10]="maptemp.",
      aheadname[10]="audiohed.",
      afilename[10]="audiot.";
 
@@ -111,7 +110,7 @@ void CA_CannotOpen(char *string)
 =
 = CA_FarRead
 =
-= Read from a file to a far pointer
+= Read from a file to a pointer
 =
 ==========================
 */
@@ -140,7 +139,7 @@ boolean CA_FarRead(int handle, byte *dest, long length)
 =
 = CA_FarWrite
 =
-= Write from a file to a far pointer
+= Write from a file to a pointer
 =
 ==========================
 */
@@ -266,8 +265,9 @@ boolean CA_LoadFile (char *filename, memptr *ptr)
 =
 ======================
 */
-/* From Ryan C. Gordon -- ryan_gordon@hotmail.com */
+
 #if 1
+/* From Ryan C. Gordon -- ryan_gordon@hotmail.com */
 void CAL_HuffExpand(byte *source, byte *dest, long length, huffnode *htable)
 {
 	huffnode *headptr;          
@@ -308,7 +308,7 @@ void CAL_HuffExpand(byte *source, byte *dest, long length, huffnode *hufftable)
 
         ptrd = dest;
 
-        headptr = hufftable + 254; /* head node is allways node 254 */
+        headptr = hufftable + 254; /* head node is always node 254 */
 
         nodeon = headptr;
         ptr = source;
@@ -339,6 +339,7 @@ void CAL_HuffExpand(byte *source, byte *dest, long length, huffnode *hufftable)
         }
 }
 #endif
+
 /*
 ======================
 =
@@ -352,7 +353,6 @@ void CAL_HuffExpand(byte *source, byte *dest, long length, huffnode *hufftable)
 #define NEARTAG	0xa7
 #define FARTAG	0xa8
 
-/* TODO: verify correctness of byteinc */
 void CAL_CarmackExpand(word *source, word *dest, word length)
 {
 	word ch, chhigh, count, offset;
@@ -373,13 +373,11 @@ void CAL_CarmackExpand(word *source, word *dest, word length)
 			/* have to insert a word containing the tag byte */
 				ch |= **byteinc;
 				(*byteinc)++;
-				/* ch |= *((unsigned char *)inptr)++; */
 				*outptr++ = ch;
 				length--;
 			} else {
 				offset = **byteinc;
 				(*byteinc)++;
-				/* offset = *((unsigned char *)inptr)++; */
 				copyptr = outptr - offset;
 				length -= count;
 				while (count--)
@@ -391,7 +389,6 @@ void CAL_CarmackExpand(word *source, word *dest, word length)
 			/* have to insert a word containing the tag byte */
 				ch |= **byteinc;
 				(*byteinc)++;
-				/* ch |= *((unsigned char *)inptr)++; */
 				*outptr++ = ch;
 				length --;
 			} else {
@@ -502,7 +499,7 @@ void CA_RLEWexpand(word *source, word *dest, long length, word rlewtag)
 
 long CAL_GetGrChunkLength(int chunk)
 {
-	long chunkexplen; /* temp var */
+	long chunkexplen;
 	
 	lseek(grhandle,GRFILEPOS(chunk),SEEK_SET);
 	read(grhandle,&chunkexplen,sizeof(chunkexplen));
@@ -572,7 +569,7 @@ void CAL_SetupGrFile (void)
 	chunkcomplen = CAL_GetGrChunkLength(STRUCTPIC);
 	MM_GetPtr(&compseg,chunkcomplen);
 	CA_FarRead(grhandle,compseg,chunkcomplen);
-	CAL_HuffExpand (compseg, (byte *)pictable,NUMPICS*sizeof(pictabletype),grhuffman);
+	CAL_HuffExpand(compseg, (byte *)pictable,NUMPICS*sizeof(pictabletype),grhuffman);
 	MM_FreePtr(&compseg);
 }
 
@@ -846,6 +843,7 @@ cachein:
 
 void CAL_ExpandGrChunk(int chunk, byte *source)
 {
+	int tilecount = 0;
 	long expanded;
 	
 	int width = 0, height = 0;
@@ -855,13 +853,15 @@ void CAL_ExpandGrChunk(int chunk, byte *source)
 	//
 	// expanded sizes of tile8/16/32 are implicit
 	//
-
 #define BLOCK		64
 #define MASKBLOCK	128
 
-		if (chunk<STARTTILE8M)			// tile 8s are all in one chunk!
-			expanded = BLOCK*NUMTILE8 / 4; /* hmm */
-		else if (chunk<STARTTILE16)
+		if (chunk<STARTTILE8M) { /* tile 8s are all in one chunk! */
+			expanded = BLOCK*NUMTILE8;
+			width = 8;
+			height = 8;
+			tilecount = NUMTILE8;
+		} else if (chunk<STARTTILE16) /* TODO: This is removable */
 			expanded = MASKBLOCK*NUMTILE8M;
 		else if (chunk<STARTTILE16M)	// all other tiles are one/chunk
 			expanded = BLOCK*4;
@@ -871,6 +871,7 @@ void CAL_ExpandGrChunk(int chunk, byte *source)
 			expanded = BLOCK*16;
 		else
 			expanded = MASKBLOCK*16;
+		
 	} else if (chunk >= STARTPICS && chunk < STARTSPRITES) {
 		width = pictable[chunk - STARTPICS].width;
 		height = pictable[chunk - STARTPICS].height;
@@ -889,8 +890,14 @@ void CAL_ExpandGrChunk(int chunk, byte *source)
 //
 	MM_GetPtr(&grsegs[chunk], expanded);
 	CAL_HuffExpand(source, grsegs[chunk], expanded, grhuffman);
-	if (width && height)
-		VL_DeModeXize(grsegs[chunk], width, height);
+	if (width && height) {
+		if (tilecount) {
+			int i;
+			for (i = 0; i < tilecount; i++) 
+				VL_DeModeXize(grsegs[chunk]+(width*height)*i, width, height);
+		} else			
+			VL_DeModeXize(grsegs[chunk], width, height);
+	}
 }
 
 
@@ -922,8 +929,7 @@ void CA_CacheGrChunk(int chunk)
 	}
 
 //
-// load the chunk into a buffer, either the miscbuffer if it fits, or allocate
-// a larger buffer
+// load the chunk into a buffer
 //
 	pos = GRFILEPOS(chunk);
 	if (pos < 0) /* $FFFFFFFF start is a sparse tile */
@@ -941,7 +947,7 @@ void CA_CacheGrChunk(int chunk)
 	CA_FarRead(grhandle, source, compressed);
 
 	CAL_ExpandGrChunk(chunk, source);
-
+	
 	MM_FreePtr((memptr)&source);
 }
 
