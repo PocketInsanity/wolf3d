@@ -15,7 +15,7 @@ TODO:
 - Check if top sprite drawing is correct
 - Status bars
 - Draw(XM)Shape
-- Automap
+- Correct viewing frustum
 * Save/Load Games
 * Documentation
 * Sound!
@@ -39,7 +39,7 @@ IDEAS:
 - XXX: Save Game to Previously used File
 - XXX: Options
 * How about adding red/white shifts (from PC wolf3d)? So screen changes
-color when you are hit or pick up items.
+  color when you are hit or pick up items.
 * when saving/loading games, run them through htons/etc.
 
 MISC:

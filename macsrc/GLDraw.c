@@ -72,28 +72,119 @@ GLuint smltex[65];
 
 void MakeSmallFont()
 {
-	Byte *buf;
+	Byte *buf, *buf2, *pal, *ArtStart;
+	Byte *ptr;
+	int i, w, h, j;
 	
 	buf = (Byte *)malloc(16 * 16);
 	
+	pal = LoadAResource(rGamePal);
+	
+	for (i = 0; i < 64; i++) {
+		ArtStart = ArtData[i];
+		
+		if (ArtStart == NULL) {
+			if (smltex[i]) {
+				glDeleteTextures(1, &smltex[i]);
+				smltex[i] = 0;
+			}
+			continue;
+		} else {
+			if (smltex[i])
+				continue;
+
+			glGenTextures(1, &smltex[i]);
+						
+			h = 0;
+			ptr = buf;
+			do {
+				w = 16;
+				j = h*8;
+				do {
+					*ptr = ArtStart[j];
+					ptr++;
+					j += (WALLHEIGHT*8);
+				} while (--w);
+			} while ((++h) < 16);
+			
+			buf2 = Pal256toRGB(buf, 16 * 16, pal);
+			
+			glBindTexture(GL_TEXTURE_2D, smltex[i]);
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 16, 16, 0, GL_RGB, GL_UNSIGNED_BYTE, buf2);
+			
+			free(buf2);
+		}
+	}
+	
 	free(buf);
+	
+	buf = LoadAResource(MyBJFace);
+	buf2 = Pal256toRGB(buf, 16 * 16, pal);
+	
+	glGenTextures(1, &smltex[i]);
+	glBindTexture(GL_TEXTURE_2D, smltex[i]);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 16, 16, 0, GL_RGB, GL_UNSIGNED_BYTE, buf2);
+	
+	free(buf2);
+	ReleaseAResource(MyBJFace);
+	
+	ReleaseAResource(rGamePal);	
 }
 
 void KillSmallFont()
 {
 	int i;
-
 	glDeleteTextures(65, smltex);	
+	
+	for (i = 0; i < 65; i++)
+		smltex[i] = 0;
 }
 
-void DrawSmall(Word x,Word y,Word tile)
+void DrawSmall(Word x, Word y, Word tile)
 {
+	GLfloat w, h;
+	GLfloat xx, yy;
+	GLfloat x1, y1, x2, y2;
+	
+	w = (int)(VidWidth >> 4);
+	h = (int)(VidHeight >> 4);
+	xx = x;
+	yy = y;
+	x1 = ((xx * 2.0f) - w) + 1.0;
+	x2 = x1 - 2.0;
+	y1 = -((yy * 2.0f) - h) + 1.0;
+	y2 = y1 - 2.0;
+		
+	x1 /= w;
+	x2 /= w;
+	y1 /= h;
+	y2 /= h;
+		
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
 	glLoadIdentity();
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	glLoadIdentity();
+	
+	glBindTexture(GL_TEXTURE_2D, smltex[tile]);
+	
+	glBegin(GL_QUADS);
+	glTexCoord2f(0.0, 1.0); glVertex2f(x2, y2); 
+	glTexCoord2f(0.0, 0.0); glVertex2f(x2, y1);
+	glTexCoord2f(1.0, 0.0); glVertex2f(x1, y1);
+	glTexCoord2f(1.0, 1.0); glVertex2f(x1, y2);
+	glEnd();
 	
 	glPopMatrix();
 	glMatrixMode(GL_PROJECTION);
