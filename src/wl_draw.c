@@ -1,28 +1,23 @@
 #include "wl_def.h" 
 
-/* C AsmRefresh() originally from David Haslam -- dch@sirius.demon.co.uk */
+/* C AsmRefresh() and related code
+   originally from David Haslam -- dch@sirius.demon.co.uk */
 
-// the door is the last picture before the sprites
+/* the door is the last picture before the sprites */
 #define DOORWALL	(PMSpriteStart-8)
 
 #define ACTORSIZE	0x4000
 
 static unsigned wallheight[MAXVIEWWIDTH];
 
-//
-// refresh variables
-//
-fixed viewx,viewy;			// the focal point
-int viewangle;
+/* refresh variables */
+fixed viewx,viewy;		/* the focal point */
 
-//
-// ray casting variables
-//
+/* ray casting variables */
 static int focaltx, focalty;
 
-static int midangle;
 static unsigned xpartial, ypartial;
-static unsigned xpartialup, xpartialdown, ypartialup, ypartialdown;
+static int viewangle;
 
 static unsigned tilehit;
 
@@ -257,7 +252,7 @@ static void DrawScaleds()
 //
 // place static objects
 //
-	for (statptr = &statobjlist[0] ; statptr !=laststatobj ; statptr++)
+	for (statptr = &statobjlist[0]; statptr != laststatobj; statptr++)
 	{
 		if ((visptr->shapenum = statptr->shapenum) == -1)
 			continue;						// object has been deleted
@@ -268,7 +263,7 @@ static void DrawScaleds()
 		if (TransformTile(statptr->tilex, statptr->tiley
 			,&visptr->viewx,&visptr->viewheight) && statptr->flags & FL_BONUS)
 		{
-			GetBonus (statptr);
+			GetBonus(statptr);
 			continue;
 		}
 
@@ -406,7 +401,7 @@ static void WallRefresh()
  set up variables for this view
 */
 	viewangle = player->angle;
-	midangle = viewangle*(FINEANGLES/ANGLES);
+	
 	viewsin = sintable[viewangle];
 	viewcos = costable[viewangle];
 	viewx = player->x - FixedByFrac(focallength,viewcos);
@@ -414,11 +409,6 @@ static void WallRefresh()
 
 	focaltx = viewx>>TILESHIFT;
 	focalty = viewy>>TILESHIFT;
-
-	xpartialdown = viewx&(TILEGLOBAL-1);
-	xpartialup = TILEGLOBAL-xpartialdown;
-	ypartialdown = viewy&(TILEGLOBAL-1);
-	ypartialup = TILEGLOBAL-ypartialdown;
 
 	AsmRefresh();
 }
@@ -1068,14 +1058,21 @@ static int samey(int intercept, int tile)
 	else
 	    return 1;
     }
-}
+ }
 
 static void AsmRefresh()
 {
 	fixed doorxhit, dooryhit;
 	long xtemp, ytemp;
-
+	unsigned xpartialup, xpartialdown, ypartialup, ypartialdown;
 	int angle;    /* ray angle through postx */
+	int midangle;
+	
+	midangle = viewangle*(FINEANGLES/ANGLES);
+	xpartialdown = viewx&(TILEGLOBAL-1);
+	xpartialup = TILEGLOBAL-xpartialdown;
+	ypartialdown = viewy&(TILEGLOBAL-1);
+	ypartialup = TILEGLOBAL-ypartialdown;
 
 for (postx = 0; postx < viewwidth; postx++) {
 	angle = midangle + pixelangle[postx];

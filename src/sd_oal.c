@@ -11,6 +11,7 @@ static boolean SD_Started;
 
 static boolean sqActive;
 
+#error "please ignore me for now, thanks"
 
 void SD_Poll()
 {
@@ -157,7 +158,7 @@ boolean SD_MusicPlaying()
 	return false;
 }
 
-void PlaySoundLocGlobal(word s, int id, fixed gx,fixed gy)
+void PlaySoundLocGlobal(word s, int id, fixed gx, fixed gy)
 {
 	SD_PlaySound(s);
 }

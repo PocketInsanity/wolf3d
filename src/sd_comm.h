@@ -3,7 +3,7 @@
 
 #define PACKED __attribute__((packed))
 
-#define	TickBase	70	// 70Hz per tick
+#define	TickBase	70	/* 70Hz per tick */
 
 typedef	enum	{
 					sdm_Off,
@@ -13,7 +13,7 @@ typedef	enum	{
 					smm_Off,smm_AdLib
 				}	SMMode;
 typedef	enum	{
-					sds_Off,sds_PC,sds_SoundSource,sds_SoundBlaster
+					sds_Off,sds_PC,sds_SoundBlaster
 				}	SDSMode;
 typedef	struct {
 	longword length;
@@ -40,19 +40,18 @@ typedef	struct {
 	word length, values[1];
 } PACKED MusicGroup;
 
-// Global variables
-extern boolean AdLibPresent, SoundSourcePresent, SoundBlasterPresent;
+extern boolean AdLibPresent, SoundBlasterPresent;
 
 extern	SDMode		SoundMode;
 extern	SDSMode		DigiMode;
 extern	SMMode		MusicMode;
 extern	int		DigiMap[];
 
-// Function prototypes
-extern	void	SD_Startup(), SD_Shutdown();
+extern void SD_Startup();
+extern void SD_Shutdown();
 
-extern	boolean SD_PlaySound(soundnames sound);
-extern	void	SD_StopSound(),
+extern boolean SD_PlaySound(soundnames sound);
+extern void SD_StopSound(),
 				SD_WaitSoundDone(),
 				SD_StartMusic(MusicGroup *music),
 				SD_MusicOn(),
@@ -67,7 +66,7 @@ extern	word	SD_SoundPlaying();
 extern void SD_SetDigiDevice(SDSMode);
 extern void SD_Poll();
 
-void PlaySoundLocGlobal(word s, fixed gx, fixed gy);
+void PlaySoundLocGlobal(word s, int id, fixed gx, fixed gy);
 void UpdateSoundLoc(fixed x, fixed y, int angle);
 
 #endif

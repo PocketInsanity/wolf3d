@@ -201,7 +201,7 @@ void DisplayTextSplash(byte *text, int l)
 
 uint16_t SwapInt16L(uint16_t i)
 {
-#if __BYTE_ORDER == __BIG_ENDIAN
+#if BYTE_ORDER == BIG_ENDIAN
 	return ((uint16_t)i >> 8) | ((uint16_t)i << 8);
 #else
 	return i;
@@ -210,7 +210,7 @@ uint16_t SwapInt16L(uint16_t i)
 
 uint32_t SwapInt32L(uint32_t i)
 {
-#if __BYTE_ORDER == __BIG_ENDIAN
+#if BYTE_ORDER == BIG_ENDIAN
 	return	((uint32_t)(i & 0xFF000000) >> 24) | 
 		((uint32_t)(i & 0x00FF0000) >>  8) |
 		((uint32_t)(i & 0x0000FF00) <<  8) | 

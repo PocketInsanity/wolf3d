@@ -677,7 +677,6 @@ typedef	enum {
 extern	char str[80], str2[20];
 
 extern	fixed		focallength;
-extern	unsigned	viewangles;
 
 extern int viewwidth, viewheight;
 extern int viewwidthwin, viewheightwin;
@@ -743,8 +742,8 @@ void DrawPlayBorder();
 void DrawPlayBorderSides();
 void DrawStatusBar();
 
-#define	PlaySoundLocTile(s,tx,ty)	PlaySoundLocGlobal(s,(((long)(tx) << TILESHIFT) + (1L << (TILESHIFT - 1))),(((long)ty << TILESHIFT) + (1L << (TILESHIFT - 1))))
-#define	PlaySoundLocActor(s,ob)		PlaySoundLocGlobal(s,(ob)->x,(ob)->y)
+#define	PlaySoundLocTile(s,tx,ty)	PlaySoundLocGlobal(s,(int)((tx<<6)|(ty)),(((long)(tx) << TILESHIFT) + (1L << (TILESHIFT - 1))),(((long)ty << TILESHIFT) + (1L << (TILESHIFT - 1))))
+#define	PlaySoundLocActor(s,ob)		PlaySoundLocGlobal(s,(int)ob,(ob)->x,(ob)->y)
 
 /*
 =============================================================================
@@ -860,7 +859,6 @@ extern	long	heightnumerator;
 // refresh variables
 //
 extern	fixed	viewx,viewy;			// the focal point
-extern	int		viewangle;
 extern	fixed	viewsin,viewcos;
 
 extern	int		horizwall[],vertwall[];

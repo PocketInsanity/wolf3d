@@ -301,8 +301,6 @@ static void CAL_SetupGrFile()
 {
 	char fname[13];
 	int handle;
-	memptr compseg;
-	long chunkcomplen;
 	byte *grtemp;
 	int i;
 
@@ -350,24 +348,15 @@ static void CAL_SetupGrFile()
 		CA_CannotOpen(fname);
 
 /* load the pic headers into pictable */
-	chunkcomplen = grstarts[STRUCTPIC+1] - grstarts[STRUCTPIC];
-	ReadSeek(grhandle, grstarts[STRUCTPIC], SEEK_SET);
-
-	MM_GetPtr(&compseg, chunkcomplen);
-
-	ReadBytes(grhandle, compseg, chunkcomplen);
+	CA_CacheGrChunk(STRUCTPIC);
 	
-	/* pictable is word width, height */
-	MM_GetPtr((memptr)&grtemp, NUMPICS*4);
-	CAL_HuffExpand((byte *)compseg+4, (byte *)grtemp, NUMPICS*4, grhuffman);
-	MM_FreePtr(&compseg);
-	
+	grtemp = grsegs[STRUCTPIC];
 	for (i = 0; i < NUMPICS; i++) {
 		pictable[i].width = grtemp[i*4+0] | (grtemp[i*4+1] << 8);
 		pictable[i].height = grtemp[i*4+2] | (grtemp[i*4+3] << 8);
 	}
 	
-	MM_FreePtr((memptr)&grtemp);	
+	CA_UnCacheGrChunk(STRUCTPIC);
 }
 
 /* ======================================================================== */

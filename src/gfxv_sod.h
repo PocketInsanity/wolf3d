@@ -218,12 +218,6 @@ typedef enum {
 #define TITLESCREEN_LUMP_START		79
 #define TITLESCREEN_LUMP_END		80
 
-#define ENDGAME1_LUMP_START		81
-#define ENDGAME1_LUMP_END		81
-
-#define ENDGAME2_LUMP_START		82
-#define ENDGAME2_LUMP_END		82
-
 #define EASTEREGG_LUMP_START		93
 #define EASTEREGG_LUMP_END		94
 
@@ -242,6 +236,7 @@ typedef enum {
 #define NUMPICS      147
 #define NUMTILE8     35
 #define NUMEXTERNS   18
+
 //
 // File offsets for data items
 //

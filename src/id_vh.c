@@ -17,28 +17,6 @@ int xfrac, yfrac;
 /*
 ===================
 =
-= LoadLatchMem
-=
-===================
-*/
-
-void LoadLatchMem()
-{
-	int i;
-
-	CA_CacheGrChunk(STARTTILE8);
-
-	for (i = LATCHPICS_LUMP_START; i <= LATCHPICS_LUMP_END; i++) {
-		CA_CacheGrChunk(i);
-	}
-
-}
-
-/* ======================================================================== */
-
-/*
-===================
-=
 = FizzleFade
 =
 = returns true if aborted
@@ -61,7 +39,7 @@ boolean FizzleFade(unsigned xx, unsigned yy, unsigned width, unsigned height, un
 	frame = 0;
 	set_TimeCount(0);
 	
-	if (vwidth != 320)
+	if (vwidth != 320) /* TODO */
 		return false;
 	
 	retr = -1;
@@ -221,7 +199,7 @@ void VL_DeModeXize(byte *buf, int width, int height)
 		return;
 	}
 	
-	MM_GetPtr((memptr)&mem, width *height);
+	MM_GetPtr((memptr)&mem, width * height);
 	
 	ptr = buf;
 

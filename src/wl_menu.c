@@ -931,7 +931,7 @@ void DrawNewGameDiff(int w)
 // HANDLE SOUND MENU
 //
 ////////////////////////////////////////////////////////////////////
-void CP_Sound(void)
+void CP_Sound()
 {
 	int which;
 
@@ -995,12 +995,6 @@ void CP_Sound(void)
 				}
 				break;
 			case 6:
-				if (DigiMode!=sds_SoundSource)
-				{
-					SD_SetDigiDevice(sds_SoundSource);
-					DrawSoundMenu();
-					ShootSnd();
-				}
 				break;
 			case 7:
 				if (DigiMode!=sds_SoundBlaster)
@@ -1069,13 +1063,12 @@ void DrawSoundMenu(void)
 		SndMenu[2].active=SndMenu[10].active=SndMenu[11].active=0;
 	}
 
-	if (!SoundSourcePresent)
-		SndMenu[6].active=0;
+	SndMenu[6].active = 0;
 
 	if (!SoundBlasterPresent)
 		SndMenu[7].active=0;
 
-	if (!SoundSourcePresent && !SoundBlasterPresent)
+	if (!SoundBlasterPresent)
 		SndMenu[5].active=0;
 
 	DrawMenu(&SndItems,&SndMenu[0]);
@@ -1103,7 +1096,7 @@ void DrawSoundMenu(void)
 				// DIGITIZED SOUND
 				//
 				case 5: if (DigiMode==sds_Off) on=1; break;
-				case 6: if (DigiMode==sds_SoundSource) on=1; break;
+				case 6: break;
 				case 7: if (DigiMode==sds_SoundBlaster) on=1; break;
 
 				//

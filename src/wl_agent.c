@@ -435,7 +435,7 @@ void GiveExtraMan()
 
 void DrawScore()
 {
-	LatchNumber (6,16,6,gamestate.score);
+	LatchNumber(6, 16, 6, gamestate.score);
 }
 
 /*
@@ -472,7 +472,6 @@ void DrawWeapon()
 	StatusDrawPic(32,8,KNIFEPIC+gamestate.weapon);
 }
 
-
 /*
 ==================
 =
@@ -494,8 +493,6 @@ void DrawKeys()
 		StatusDrawPic(30,20,NOKEYPIC);
 }
 
-
-
 /*
 ==================
 =
@@ -515,7 +512,6 @@ void GiveWeapon(int weapon)
 	DrawWeapon();
 }
 
-
 //===========================================================================
 
 /*
@@ -530,7 +526,6 @@ void DrawAmmo()
 {
 	LatchNumber(27,16,2,gamestate.ammo);
 }
-
 
 /*
 ===============
@@ -572,8 +567,6 @@ void GiveKey(int key)
 	DrawKeys();
 }
 
-
-
 /*
 =============================================================================
 
@@ -581,7 +574,6 @@ void GiveKey(int key)
 
 =============================================================================
 */
-
 
 /*
 ===================
@@ -713,7 +705,6 @@ void GetBonus (statobj_t *check)
 	check->shapenum = -1;			// remove from list
 }
 
-
 /*
 ===================
 =
@@ -781,7 +772,6 @@ boolean TryMove(objtype *ob)
 	return true;
 }
 
-
 /*
 ===================
 =
@@ -841,7 +831,6 @@ void VictoryTile()
 #endif
 	gamestate.victoryflag = true;
 }
-
 
 /*
 ===================

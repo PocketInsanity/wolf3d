@@ -3,13 +3,14 @@ CC = gcc
 #CFLAGS = -g -O2 -Wall -pedantic 
 #CFLAGS = -Wall -pedantic -O6 -fomit-frame-pointer -ffast-math -funroll-loops -mpentiumpro -mcpu=pentiumpro -march=pentiumpro
 CFLAGS = -g -Wall -pedantic
+#CFLAGS = -Wall -pedantic -std=c99
 #CFLAGS = -Os -Wall -peantic
 #CFLAGS = -Os -Wall -peantic -fomit-frame-pointer -ffast-math -mpentiumpro -mcpu=pentiumpro -march=pentiumpro
 
 OBJS = objs.o misc.o id_ca.o id_vh.o id_us.o \
 	wl_act1.o wl_act2.o wl_act3.o wl_agent.o wl_game.o \
 	wl_inter.o wl_menu.o wl_play.o wl_state.o wl_text.o wl_main.o \
-	wl_debug.o gfxsave.o
+	wl_debug.o
 ROBJS = wl_draw.o
 SOBJS = $(OBJS) $(ROBJS) vi_svga.o
 XOBJS = $(OBJS) $(ROBJS) vi_xlib.o
@@ -21,7 +22,9 @@ OBJS += sd_null.o
 #OBJS += sd_oss.o fmopl.o
 #CFLAGS += -D_REENTRANT
 #LFLAGS += -lpthread
-
+#OBJS += sd_oal.o
+#CFLAGS += -D_REENTRANT
+#LFLAGS += -lpthread #-lopenal
 
 CFLAGS += `sdl-config --cflags`
 

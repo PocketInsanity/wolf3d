@@ -1288,13 +1288,13 @@ void InitGame()
 
 	ReadConfig();
 
-//
-// load in and lock down some basic chunks
-//
+/* load in and lock down some basic chunks */
 
 	CA_CacheGrChunk(STARTFONT);
-
-	LoadLatchMem();
+	CA_CacheGrChunk(STARTTILE8);
+	for (i = LATCHPICS_LUMP_START; i <= LATCHPICS_LUMP_END; i++)
+		CA_CacheGrChunk(i);
+			
 	BuildTables();
 	SetupWalls();
 

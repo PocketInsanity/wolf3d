@@ -7,7 +7,7 @@
 
 #include "fmopl.h"
 
-boolean SoundSourcePresent, AdLibPresent, SoundBlasterPresent;
+boolean AdLibPresent, SoundBlasterPresent;
 	
 SDMode SoundMode, MusicMode;
 SDSMode DigiMode;
@@ -522,7 +522,7 @@ static void SetSoundLoc(fixed gx, fixed gy)
 ==========================
 */
 
-void PlaySoundLocGlobal(word s, fixed gx, fixed gy)
+void PlaySoundLocGlobal(word s, int id, fixed gx, fixed gy)
 {
 	SetSoundLoc(gx, gy);
 	

@@ -36,8 +36,6 @@ boolean FizzleFade(unsigned xoffset, unsigned yoffset, unsigned width,unsigned h
 void VL_FadeOut(int start, int end, int red, int green, int blue, int steps);
 void VL_FadeIn(int start, int end, const byte *palette, int steps);
 
-void LoadLatchMem();
-
 void VL_CacheScreen(int chunk);
 
 void VW_Bar(int x, int y, int width, int height, int color);
