@@ -300,6 +300,9 @@ void SpawnStand(Word x,Word y,class_t which)
 	Word *TilePtr;
 	Word tile;
 	
+	if (NoEnemies)		/* DEBUG MODE */
+		return;
+		
 	if (numactors >= MAXACTORS) {
 		fprintf("SpawnStand DEBUG (%d, %d)\n", numactors, MAXACTORS);
 	}
@@ -346,6 +349,9 @@ void SpawnStand(Word x,Word y,class_t which)
 void SpawnAmbush(Word x,Word y,class_t which)
 {
 	actor_t *ActorPtr;
+	
+	if (NoEnemies)		/* DEBUG MODE */
+		return;
 	
 	if (numactors >= MAXACTORS) {
 		fprintf("SpawnAmbush DEBUG (%d, %d)\n", numactors, MAXACTORS);

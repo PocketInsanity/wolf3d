@@ -225,42 +225,6 @@ void IO_DrawStatusBar(void)
 
 /**********************************
 
-	Erase the floor and ceiling
-	
-**********************************/
-
-void IO_ClearViewBuffer(void)
-{
-	unsigned char *Screenad;
-	Word Count,WCount;
-	LongWord *LScreenad;
-	LongWord Fill;
-
-	Screenad = VideoPointer;
-	Count = VIEWHEIGHT/2;
-	Fill = 0x2f2f2f2f;
-	do {
-		WCount = SCREENWIDTH/4;
-		LScreenad = (LongWord *) Screenad;
-		do {
-			*LScreenad++ = Fill;	/* 004 */
-		} while (--WCount);
-		Screenad+=VideoWidth;
-	} while (--Count);
-	Count = VIEWHEIGHT/2;
-	Fill = 0x2A2A2A2A;
-	do {
-		WCount = SCREENWIDTH/4;
-		LScreenad = (LongWord *) Screenad;
-		do {
-			*LScreenad++ = Fill;
-		} while (--WCount);
-		Screenad+=VideoWidth;
-	} while (--Count);
-}
-
-/**********************************
-
 	Copy the 3-D screen to display memory
 	
 **********************************/

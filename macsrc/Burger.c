@@ -42,12 +42,6 @@ void InitYTable(void)
 
 /**********************************
 
-	Palette Manager
-
-**********************************/
-
-/**********************************
-
 	Load and set a palette resource
 
 **********************************/
@@ -60,20 +54,6 @@ void SetAPalette(Word PalNum)
 
 /**********************************
 
-	Load and set a palette from a pointer
-
-**********************************/
-
-Byte CurrentPal[768];
-
-void SetAPalettePtr(unsigned char *PalPtr)
-{
-	memcpy(&CurrentPal, PalPtr, 768);
-	SetPalette(PalPtr);
-}
-
-/**********************************
-
 	Fade the screen to black
 
 **********************************/
@@ -82,7 +62,7 @@ void FadeToBlack(void)
 {
 	unsigned char MyPal[768];
 
-	memset(MyPal,0,sizeof(MyPal));	/* Fill with black */
+	memset(MyPal, 0, sizeof(MyPal));        /* Fill with black */
 	MyPal[0] = MyPal[1] = MyPal[2] = 255;
 	FadeToPtr(MyPal);
 }
@@ -90,54 +70,15 @@ void FadeToBlack(void)
 /**********************************
 
 	Fade the screen to a palette
-
+	
 **********************************/
 
 void FadeTo(Word RezNum)
 {
 	FadeToPtr(LoadAResource(RezNum));
-	ReleaseAResource(RezNum);
+        ReleaseAResource(RezNum);
 }
-
-/**********************************
-
-	Fade the palette
-
-**********************************/
-
-void FadeToPtr(unsigned char *PalPtr)
-{
-	int DestPalette[768];				/* Dest offsets */
-	Byte WorkPalette[768];		/* Palette to draw */
-	Byte SrcPal[768];
-	Word Count;
-	Word i;
-	
-	if (!memcmp(PalPtr,&CurrentPal,768)) {	/* Same palette? */
-		return;
-	}
-	memcpy(SrcPal,CurrentPal,768);
-	i = 0;
-	do {		/* Convert the source palette to ints */
-		DestPalette[i] = PalPtr[i];			
-	} while (++i<768);
-
-	i = 0;
-	do {
-		DestPalette[i] -= SrcPal[i];	/* Convert to delta's */
-	} while (++i<768);
-
-	Count = 1;
-	do {
-		i = 0;
-		do {
-			WorkPalette[i] = ((DestPalette[i] * (int)(Count)) / 16) + SrcPal[i];
-		} while (++i<768);
-		SetAPalettePtr(WorkPalette);
-		WaitTicks(1);
-	} while (++Count<17);
-}
-
+                        
 /**********************************
 
 	Resource manager subsystem

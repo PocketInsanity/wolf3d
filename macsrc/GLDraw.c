@@ -28,6 +28,16 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 extern Byte Pal[768];
 
+void FadeToPtr(unsigned char *PalPtr)
+{
+	SetPalette(PalPtr);
+}
+
+void SetAPalettePtr(unsigned char *PalPtr)
+{
+	SetPalette(PalPtr);
+}
+
 void ClearTheScreen(Word c)
 {
 	glClearColor((double)Pal[c*3+0]/256.0, (double)Pal[c*3+1]/256.0, (double)Pal[c*3+2]/256.0, 0.0);
@@ -70,28 +80,46 @@ Byte *Pal256toRGB(Byte *dat, int len, Byte *pal)
 	return buf;
 }
 
-Byte *Pal256toRGBA(Byte *dat, int len, Byte *pal)
+Byte *FlipWall(Byte *dat, int w, int h)
 {
 	Byte *buf;
-	int i;
+	int i, j;
 	
-	buf = (Byte *)malloc(len * 4);
+	buf = (Byte *)malloc(w * h);
 	
-	for (i = 0; i < len; i++) {
-		buf[i*4+0] = pal[dat[i]*3+0];
-		buf[i*4+1] = pal[dat[i]*3+1];
-		buf[i*4+2] = pal[dat[i]*3+2];
-	}
-	
+	for (j = 0; j < h; j++) 
+		for (i = 0; i < w; i++) 
+			buf[(h-j-1)*w+(w-i-1)] = dat[i*w+j];
 	return buf;
 }
 
-void DrawSprites(void)
+void IO_ClearViewBuffer()
 {
-}
+	glBindTexture(GL_TEXTURE_2D, 0);
+	
+	/* glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); */
+	glClear(GL_DEPTH_BUFFER_BIT);
+	
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	
+	glDisable(GL_DEPTH_TEST);
+	
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	
+	glColor3b(Pal[0x2F*3+0], Pal[0x2F*3+1], Pal[0x2F*3+2]);
+	glRectf(-1, 0, 1, 1);
+	
+	glColor3b(Pal[0x2A*3+0], Pal[0x2A*3+1], Pal[0x2A*3+2]);	
+	glRectf(1, -1, -1, 0);
+		
+	glColor3f(1.0, 1.0, 1.0);
 
-void DrawTopSprite(void)
-{
+	glEnable(GL_DEPTH_TEST);
+	
+	glPopMatrix();	
 }
 
 GLuint waltex[64];
@@ -112,20 +140,25 @@ void InitRenderView()
 	
 	pal = LoadAResource(rGamePal);
 	for (i = 0; i < 64; i++) {
-		Byte *buf;
+		Byte *buf, *buf2;
 		
 		glBindTexture(GL_TEXTURE_2D, waltex[i]);
 		if (ArtData[i] == NULL) {
 			glDeleteTextures(1, &waltex[i]);
-			glEnable(GL_TEXTURE_2D);
 			waltex[i] = 0;
 			continue;
 		}
 		
-		buf = Pal256toRGB(ArtData[i], 128 * 128, pal);
+		buf2 = FlipWall(ArtData[i], 128, 128);
+		buf = Pal256toRGB(buf2, 128 * 128, pal);
+		free(buf2);
 		
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);		
+		/*
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		*/
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
@@ -133,16 +166,18 @@ void InitRenderView()
 				
 		free(buf);
 	}
+
 	ReleaseAResource(rGamePal);
 	
 	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL);
+	
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	//glFrustum(-0.286751, 0.286751, -0.288675, 0.288675, 0.200000, 182.000000);
-	glFrustum(-0.20, 0.20, -0.288675, 0.288675, 0.200000, 182.000000);
-	//glFrustum(-0.1, 0.1, -0.1, 0.1, .50000, 182.000000);
+	
+	glFrustum(-0.20, 0.20, -0.288675, 0.288675, 0.2, 182.0);
 	
 	glFrontFace(GL_CCW);
 	glCullFace(GL_BACK);
@@ -151,13 +186,73 @@ void InitRenderView()
 
 void StartRenderView()
 {	
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
 	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
+	/* glLoadIdentity(); */
+	
 	glRotatef(270.0-((double)gamestate.viewangle / (double)ANGLES * 360.0), 0.0, 1.0, 0.0);
-	//glTranslatef(-(double)actors[0].x / 256.0, 0, (double)actors[0].y / 256.0);
 	glTranslatef((double)actors[0].x / 256.0, 0, (double)actors[0].y / 256.0);
+}
+
+void DrawSprite(thing_t *t)
+{
+	glPushMatrix();
+	
+	glTranslatef(-(double)t->x / 256.0, 0, -(double)t->y / 256.0);
+	glRotatef(90.0+((double)gamestate.viewangle / (double)ANGLES * 360.0), 0.0, 1.0, 0.0);
+	
+	glBegin(GL_QUADS);
+	glTexCoord2f(1.0, 1.0); glVertex2f( 0.5, -1); 
+	glTexCoord2f(0.0, 1.0); glVertex2f( 0.5,  1);
+	glTexCoord2f(0.0, 0.0); glVertex2f(-0.5,  1);
+	glTexCoord2f(1.0, 0.0); glVertex2f(-0.5, -1);
+	glEnd();
+	
+	glPopMatrix();
+}
+
+void DrawSprites(void)
+{
+	Word i;
+	static_t *stat;
+	actor_t *actor;
+	missile_t *MissilePtr;
+	
+	//glRotatef(360.0 - (270.0-((double)gamestate.viewangle / (double)ANGLES * 360.0)), 0.0, 1.0, 0.0);
+	//glRotatef((((double)gamestate.viewangle / (double)ANGLES * 360.0)), 0.0, 1.0, 0.0);
+	
+	if (numstatics) {
+		i = numstatics;
+		stat = statics;
+		do {
+			if (areavis[stat->areanumber]) 
+				DrawSprite((thing_t *)stat);
+			++stat;
+		} while (--i);
+	}
+	
+	if (numactors > 1) {
+		i = 1;
+		actor = &actors[1];
+		do {
+			if (areavis[actor->areanumber])
+				DrawSprite((thing_t *)actor);
+			++actor;
+		} while (++i<numactors);
+	}
+	
+	if (nummissiles) {
+		i = nummissiles;
+		MissilePtr = missiles;
+		do {
+			if (areavis[MissilePtr->areanumber])
+				DrawSprite((thing_t *)MissilePtr);
+			++MissilePtr;
+		} while (--i);
+	}
+}
+
+void DrawTopSprite(void)
+{
 }
 
 int WallSeen = 0;
@@ -259,11 +354,10 @@ void P_DrawSegx(saveseg_t *seg);
 void P_DrawSeg(saveseg_t *seg)
 {
 	Word	segplane;
-	Word	door;
-	door_t	*door_p;
+	Word    door;
+	door_t  *door_p;
 	unsigned short	span, tspan;
 	unsigned short	angle1, angle2;
-	int		texslide;
 	
 	WallSeen = 0;
 	
@@ -273,7 +367,7 @@ void P_DrawSeg(saveseg_t *seg)
 
 	segplane = (LongWord)seg->plane << 7;
 	rw_mintex = (LongWord)seg->min << 7;
-	rw_maxtex = (LongWord)seg->max << 7;
+	rw_maxtex = (LongWord)seg->max << 7;	
 	
 /* adjust pushwall segs */
 
@@ -284,19 +378,14 @@ void P_DrawSeg(saveseg_t *seg)
 			segplane += PushWallRec.pwallxchange;
 		}
 	}
-	
-/* get texture*/
 
 	if (seg->texture >= 129) {	/* segment is a door */
 		door = seg->texture - 129;	/* Which door is this? */
 		door_p = &doors[door];
-		rw_texture = &textures[129 + (door_p->info>>1)][0];
-		texslide = door_p->position;
-		rw_mintex += texslide;
-	} else {
-		texslide = 0;
-		rw_texture = &textures[seg->texture][0];
-	}
+		rw_mintex += door_p->position;
+	} 
+	
+/* get texture*/
 	
 	switch (seg->dir&3) {	/* mask off the flags*/
 	case di_north:
@@ -365,70 +454,116 @@ void P_DrawSeg(saveseg_t *seg)
 
 void P_DrawSegx(saveseg_t *seg)
 {
-	GLfloat min, max;
+	GLfloat min, max, plane, pos, texslide;
+	GLfloat smin, smax;
+	Word door = -1;
+	door_t *door_p;
 	Byte *tex;
 	int i, t;
+
+	plane = -((float)seg->plane)/2.0;
+
+	if (seg == pwallseg) {		/* Is this the active pushwall? */
+		if (seg->dir&1)	{	/* east/west */
+			plane += -(float)PushWallRec.pwallychange / 256.0;
+		} else {		/* north/south */
+			plane += -(float)PushWallRec.pwallxchange / 256.0;
+		}
+	}
 	
-	tex = &textures[seg->texture][0];
+	min = 0.0f;
+	max = 1.0f;
 	
-	if (waltex[i]) 
-		glBindTexture(GL_TEXTURE_2D, waltex[i]);
-	else
-		fprintf(stderr, "ERROR: 0 texture in P_DrawSegx!\n");
+	if (seg->texture >= 129) {
+		door = seg->texture - 129;
+		door_p = &doors[door];
+		texslide = (float)door_p->position / 256.0f;
+		tex = &textures[129 + (door_p->info>>1)][0];
+	} else {
+		texslide = 0.0f;
+		tex = &textures[seg->texture][0];
+	}
+		
+	for (i = seg->min; i < seg->max;) {
 	
-	max = (seg->max - seg->min) / 2.0f;
-	/*
-	i = seg->min;
-	min = (float)i - seg->min;
-	*/
-	if (seg->min & 1)
-		min = -0.5f;
-	else
+	t = tex[i >> 1];
+		
+	pos = ((double)i) / 2.0f;
+	
+	if (i == seg->min) {
+		if (i & 1) {
+			min = 0.5;
+			i++;
+		} else {
+			i+=2;
+			min = 0.0;
+		}
+		max = 1.0f;
+	} /* else if (i == (seg->max-1)) {
 		min = 0.0f;
-	
-	for (i = seg->min >> 1; i < (seg->max >> 1); i++) {
-	
-	t = tex[i];
-	
+		max = 0.5f;		
+		i += 2;	
+	} */ else {
+		min = 0.0f;
+		max = 1.0f;
+		i += 2;
+	}
+		        		
+	smin = -((float)pos + texslide); 
+	smax = -((float)pos + (max - min));
+		
 	if (waltex[t]) 
 		glBindTexture(GL_TEXTURE_2D, waltex[t]);
 	else
 		fprintf(stderr, "ERROR: 0 texture in P_DrawSegx!\n");	
 	
-	if (seg->min & 1)
-		min = 0.5f;
-	else
-		min = 0.0f;
-	max = 1.0f;
-	
 	glBegin(GL_QUADS);
 	switch(seg->dir&3) {
 	case di_north:
-		glTexCoord2f(min, 0.0); glVertex3f(-(seg->plane)/2.0, -1, -min); 
-		glTexCoord2f(min, 1.0); glVertex3f(-(seg->plane)/2.0,  1, -min);
-		glTexCoord2f(max, 1.0); glVertex3f(-(seg->plane)/2.0,  1, -max);
-		glTexCoord2f(max, 0.0); glVertex3f(-(seg->plane)/2.0, -1, -max);
+		if (door != -1) {
+			min += texslide;
+			glTexCoord2f(max, 0.0); glVertex3f(plane, -1, smin); 
+			glTexCoord2f(min, 0.0); glVertex3f(plane, -1, smax);
+			glTexCoord2f(min, 1.0); glVertex3f(plane,  1, smax);
+			glTexCoord2f(max, 1.0); glVertex3f(plane,  1, smin);
+		} else {
+			glTexCoord2f(min, 0.0); glVertex3f(plane, -1, smin); 
+			glTexCoord2f(max, 0.0); glVertex3f(plane, -1, smax);
+			glTexCoord2f(max, 1.0); glVertex3f(plane,  1, smax);
+			glTexCoord2f(min, 1.0); glVertex3f(plane,  1, smin);
+		}
 		break;
 	case di_south:
-		glTexCoord2f(min, 0.0); glVertex3f(-(seg->plane)/2.0, -1, -(seg->max)/2.0); 
-		glTexCoord2f(min, 1.0); glVertex3f(-(seg->plane)/2.0,  1, -(seg->max)/2.0);
-		glTexCoord2f(max, 1.0); glVertex3f(-(seg->plane)/2.0,  1, -(seg->min)/2.0);
-		glTexCoord2f(max, 0.0); glVertex3f(-(seg->plane)/2.0, -1, -(seg->min)/2.0);
+		min += texslide;
+		if (min == 0.5 && texslide == 0.0) { min -= 0.5; max -= 0.5; }
+		glTexCoord2f(max, 0.0); glVertex3f(plane, -1, smin); 
+		glTexCoord2f(min, 0.0); glVertex3f(plane, -1, smax);
+		glTexCoord2f(min, 1.0); glVertex3f(plane,  1, smax);
+		glTexCoord2f(max, 1.0); glVertex3f(plane,  1, smin);
 		break;
 	case di_east:
-		glTexCoord2f(min, 0.0); glVertex3f(-(seg->max)/2.0, -1, -(seg->plane)/2.0); 
-		glTexCoord2f(min, 1.0); glVertex3f(-(seg->max)/2.0,  1, -(seg->plane)/2.0);
-	 	glTexCoord2f(max, 1.0); glVertex3f(-(seg->min)/2.0,  1, -(seg->plane)/2.0);
-		glTexCoord2f(max, 0.0); glVertex3f(-(seg->min)/2.0, -1, -(seg->plane)/2.0);
+		min += texslide;
+		if (min == 0.5 && texslide == 0.0) { min -= 0.5; max -= 0.5; }
+		glTexCoord2f(max, 0.0); glVertex3f(smin, -1, plane);
+		glTexCoord2f(min, 0.0); glVertex3f(smax, -1, plane);
+	 	glTexCoord2f(min, 1.0); glVertex3f(smax,  1, plane);
+		glTexCoord2f(max, 1.0); glVertex3f(smin,  1, plane);		
 		break;
 	case di_west:
-		glTexCoord2f(min, 0.0); glVertex3f(-(seg->min)/2.0, -1, -(seg->plane)/2.0); 
-		glTexCoord2f(min, 1.0); glVertex3f(-(seg->min)/2.0,  1, -(seg->plane)/2.0);
-		glTexCoord2f(max, 1.0); glVertex3f(-(seg->max)/2.0,  1, -(seg->plane)/2.0);
-		glTexCoord2f(max, 0.0); glVertex3f(-(seg->max)/2.0, -1, -(seg->plane)/2.0);
-		break;	
+		if (door != -1) {
+			min += texslide;
+			glTexCoord2f(max, 0.0); glVertex3f(smin, -1, plane); 
+			glTexCoord2f(min, 0.0); glVertex3f(smax, -1, plane);
+	 		glTexCoord2f(min, 1.0); glVertex3f(smax,  1, plane);
+			glTexCoord2f(max, 1.0); glVertex3f(smin,  1, plane);
+		} else {
+			glTexCoord2f(min, 0.0); glVertex3f(smin, -1, plane);
+			glTexCoord2f(max, 0.0); glVertex3f(smax, -1, plane);
+		 	glTexCoord2f(max, 1.0); glVertex3f(smax,  1, plane);
+			glTexCoord2f(min, 1.0); glVertex3f(smin,  1, plane);
+		}
+		break;
 	}
-	glEnd();	
-	
+	glEnd();
 	}
 }

@@ -453,10 +453,10 @@ void RenderView(void)
 	viewcos = costable[gamestate.viewangle];	/* Get the basic cosine */
 	memset(areavis, 0, sizeof(areavis));	/* No areas are visible */
 	
+	IO_ClearViewBuffer();		/* Erase to ceiling / floor colors*/
 	StartRenderView(); /* Marker to let GL code know */
 	
-	ClearClipSegs();			/* Clip first seg only to sides of screen */	
-	IO_ClearViewBuffer();		/* Erase to ceiling / floor colors*/
+	ClearClipSegs();			/* Clip first seg only to sides of screen */
 	
 	bspcoord[BSPTOP] = 0;		/* The map is 64*64 */
 	bspcoord[BSPBOTTOM] = 64*FRACUNIT;

@@ -826,6 +826,7 @@ extern Word nummissiles;					/* Number of active missiles */
 extern missile_t missiles[MAXMISSILES];		/* Data for the missile items */
 extern Word numactors;						/* Number of active actors */
 extern actor_t actors[MAXACTORS];			/* Data for the actors */
+extern Word NoEnemies;		/* No Enemies Debug Mode */
 extern Byte **GameShapes;		/* Pointer to the game shape array */
 extern Word difficulty;					/* 0 = easy, 1= normal, 2=hard*/
 extern gametype_t gamestate;			/* Status of the game (Save game) */

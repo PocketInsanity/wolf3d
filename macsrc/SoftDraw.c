@@ -19,6 +19,95 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "wolfdef.h"
 
+/**********************************
+
+	Load and set a palette from a pointer
+
+**********************************/
+
+Byte CurrentPal[768];
+
+void SetAPalettePtr(unsigned char *PalPtr)
+{
+	memcpy(&CurrentPal, PalPtr, 768);
+	SetPalette(PalPtr);
+}
+
+/**********************************
+
+	Fade the palette
+
+**********************************/
+
+void FadeToPtr(unsigned char *PalPtr)
+{
+	int DestPalette[768];				/* Dest offsets */
+	Byte WorkPalette[768];		/* Palette to draw */
+	Byte SrcPal[768];
+	Word Count;
+	Word i;
+	
+	if (!memcmp(PalPtr,&CurrentPal,768)) {	/* Same palette? */
+		return;
+	}
+	memcpy(SrcPal,CurrentPal,768);
+	i = 0;
+	do {		/* Convert the source palette to ints */
+		DestPalette[i] = PalPtr[i];			
+	} while (++i<768);
+
+	i = 0;
+	do {
+		DestPalette[i] -= SrcPal[i];	/* Convert to delta's */
+	} while (++i<768);
+
+	Count = 1;
+	do {
+		i = 0;
+		do {
+			WorkPalette[i] = ((DestPalette[i] * (int)(Count)) / 16) + SrcPal[i];
+		} while (++i<768);
+		SetAPalettePtr(WorkPalette);
+		WaitTicks(1);
+	} while (++Count<17);
+}
+
+/**********************************
+
+	Erase the floor and ceiling
+	
+**********************************/
+
+void IO_ClearViewBuffer(void)
+{
+	unsigned char *Screenad;
+	Word Count,WCount;
+	LongWord *LScreenad;
+	LongWord Fill;
+
+	Screenad = VideoPointer;
+	Count = VIEWHEIGHT/2;
+	Fill = 0x2f2f2f2f;
+	do {
+		WCount = SCREENWIDTH/4;
+		LScreenad = (LongWord *) Screenad;
+		do {
+			*LScreenad++ = Fill;	/* 004 */
+		} while (--WCount);
+		Screenad+=VideoWidth;
+	} while (--Count);
+	Count = VIEWHEIGHT/2;
+	Fill = 0x2A2A2A2A;
+	do {
+		WCount = SCREENWIDTH/4;
+		LScreenad = (LongWord *) Screenad;
+		do {
+			*LScreenad++ = Fill;
+		} while (--WCount);
+		Screenad+=VideoWidth;
+	} while (--Count);
+}
+
 void ScaledDraw(Byte *gfx, Word scale, Byte *vid, LongWord TheFrac, Word TheInt, Word Width, LongWord Delta)
 {	
 	LongWord OldDelta;

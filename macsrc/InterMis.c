@@ -300,9 +300,11 @@ void LevelCompleted (void)
 	if (gamestate.treasurecount == gamestate.treasuretotal) {
 		k++;			/* Perfect treasure */
 	}
-	RollRatio(RATIOX,RATIOY2,(gamestate.killcount*100)/gamestate.killtotal);
-	if (gamestate.killcount == gamestate.killtotal) {
-		k++;			/* Perfect kills */
+	if (!NoEnemies) {
+		RollRatio(RATIOX,RATIOY2,(gamestate.killcount*100)/gamestate.killtotal);
+		if (gamestate.killcount == gamestate.killtotal) {
+			k++;			/* Perfect kills */
+		}
 	}
 	RollRatio(RATIOX,RATIOY3,(gamestate.secretcount*100)/gamestate.secrettotal);
 	if (gamestate.secretcount == gamestate.secrettotal) {

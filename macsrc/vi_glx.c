@@ -172,7 +172,9 @@ int main(int argc, char *argv[])
 
 	ClearTheScreen(BLACK);
 	BlastScreen();
-	
+
+	NoEnemies = 1;
+		
 	return WolfMain(argc, argv);
 }
 
@@ -255,6 +257,7 @@ Word NewGameWindow(Word NewVidSize)
 	sizehints.flags = PMinSize | PMaxSize | PBaseSize;
 	XSetWMNormalHints(dpy, win, &sizehints);
 	XResizeWindow(dpy, win, w, h);
+	XSync(dpy, False);
 	glViewport(0, 0, w, h);
 	
 	gfxbuf = (Byte *)malloc(w * h);

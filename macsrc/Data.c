@@ -37,6 +37,7 @@ Word nummissiles;					/* Number of active missiles */
 missile_t missiles[MAXMISSILES];	/* Data for the missile items */
 Word numactors;						/* Number of active actors */
 actor_t actors[MAXACTORS];			/* Data for the actors */
+Word NoEnemies = 0;				/* No Enemies Debug Mode */
 unsigned char **GameShapes;			/* Pointer to the game shape array */
 Word difficulty;					/* 0 = easy, 1= normal, 2=hard*/
 gametype_t gamestate;				/* Status of the game (Save game) */
