@@ -2443,25 +2443,21 @@ void A_StartDeathCam(objtype *ob)
 	}
 
 	gamestate.victoryflag = true;
-	VW_Bar(0, 0, 320, 200-STATUSLINES, 127);
 	
-	/* TODO: fizzlefaze was here */
-	/* FizzleFade(0, 0, 320, 200-STATUSLINES, 70, false); */
+	FizzleFade(false, 70, 127);
 
 	CA_UpLevel();
 	CacheLump(LEVELEND_LUMP_START, LEVELEND_LUMP_END);
 
-	Write(0,7,STR_SEEAGAIN);
+	Write(0, 7, STR_SEEAGAIN);
 
-	CA_DownLevel ();
+	CA_DownLevel();
 
-	VW_UpdateScreen ();
+	VW_UpdateScreen();
 
 	IN_UserInput(300);
 
-//
-// line angle up exactly
-//
+/* line angle up exactly */
 	NewState (player,s_deathcam);
 
 	player->x = gamestate.killx;
@@ -2470,26 +2466,25 @@ void A_StartDeathCam(objtype *ob)
 	dx = ob->x - player->x;
 	dy = player->y - ob->y;
 
-	fangle = atan2(dy,dx);			// returns -pi to pi
+	fangle = atan2(dy, dx);			/* returns -pi to pi */
 	if (fangle<0)
 		fangle = PI*2+fangle;
 
 	player->angle = fangle/(PI*2)*ANGLES;
 
-//
-// try to position as close as possible without being in a wall
-//
+/* try to position as close as possible without being in a wall */
 	dist = 0x14000l;
 	do
 	{
-		xmove = FixedByFrac(dist,costable[player->angle]);
-		ymove = -FixedByFrac(dist,sintable[player->angle]);
+		xmove = FixedByFrac(dist, costable[player->angle]);
+		ymove = -FixedByFrac(dist, sintable[player->angle]);
 
 		player->x = ob->x - xmove;
 		player->y = ob->y - ymove;
 		dist += 0x1000;
 
-	} while (!CheckPosition (player));
+	} while (!CheckPosition(player));
+	
 	plux = player->x >> UNSIGNEDSHIFT;			// scale to fit in unsigned
 	pluy = player->y >> UNSIGNEDSHIFT;
 	player->tilex = player->x >> TILESHIFT;		// scale to tile values

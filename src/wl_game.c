@@ -982,10 +982,7 @@ void Died()
 //
 	FinishPaletteShifts();
 
-	VL_Bar(xoffset, yoffset, viewwidth, viewheight, 4);
-	
-	/* TODO: fizzlefade was here */
-	/* FizzleFade(xoffset, yoffset, viewwidth, viewheight, 70, false); */
+	FizzleFade(false, 70, 4);
 	
 	IN_ClearKeysDown();
 	

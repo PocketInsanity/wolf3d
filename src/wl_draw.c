@@ -23,6 +23,10 @@ static long xintercept, yintercept;
 
 static unsigned postx;
 
+static fixed focallength;
+static fixed scale;
+static long heightnumerator;
+
 static void AsmRefresh();
 
 #define NOASM
@@ -40,6 +44,49 @@ void ScaleShape(int xcenter, int shapenum, unsigned height);
 void SimpleScaleShape(int xcenter, int shapenum, unsigned height);
  
 /* ======================================================================== */
+
+/*
+====================
+=
+= CalcProjection
+=
+====================
+*/
+
+static const double radtoint = (double)FINEANGLES/2.0/PI;
+
+void CalcProjection(long focal)
+{
+	int     i;
+	long    intang;
+	double angle, tang, facedist;
+	int     halfview;
+
+	focallength = focal;
+	facedist = focal+MINDIST;
+	halfview = viewwidth/2;               /* half view in pixels */
+
+/*
+ calculate scale value for vertical height calculations
+ and sprite x calculations
+*/
+	scale = halfview*facedist/(VIEWGLOBAL/2);
+
+/*
+ divide heightnumerator by a posts distance to get the posts height for
+ the heightbuffer.  The pixel height is height>>2
+*/
+	heightnumerator = (TILEGLOBAL*scale)>>6;
+
+/* calculate the angle offset from view angle of each pixel's ray */
+	for (i = 0; i < halfview; i++) {
+		tang = ((double)i)*VIEWGLOBAL/viewwidth/facedist;
+		angle = atan(tang);
+		intang = angle*radtoint;
+		pixelangle[halfview-1-i] = intang;
+		pixelangle[halfview+i] = -intang;
+	}
+}
 
 /*
 ========================
@@ -625,19 +672,7 @@ void ThreeDRefresh()
 	DrawScaleds();		/* draw scaled stuff */
 	DrawPlayerWeapon();	/* draw player's hands */
 
-/* show screen and time last cycle */
-/* TODO: fizzlefaze was here */
-/*
-	if (fizzlein)
-	{
-		FizzleFade(xoffset, yoffset, viewwidth, viewheight, 20, false);
-		fizzlein = false;
-
-		lasttimecount = 0;
-		set_TimeCount(0);
-	}
-*/
-	
+/* show screen and time last cycle */	
 	VW_UpdateScreen();
 	frameon++;
 }
@@ -1211,4 +1246,10 @@ passhoriz:
 	xintercept += xstep;
 	goto horizcheck;
 }
+}
+
+/* ======================================================================== */
+
+void FizzleFade(boolean abortable, int frames, int color)
+{
 }

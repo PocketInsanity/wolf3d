@@ -29,7 +29,7 @@ B M - use something like config file or getenv to point at data directories
 P I - finish handling/mapping for all keys in sys. specific code
 B I - add mouse support
 B M - add joystick/gamepad support
-P I - add an appropiate replacement where fizzlefade was
+P I - fill in the new fizzlefade function
 P I - add sound "emulation" to the necessary targets so WaitSoundDone works
 
 Complete:

@@ -12,12 +12,9 @@
 =============================================================================
 */
 
-#define FOCALLENGTH     0x5700		// in global coordinates
-#define VIEWGLOBAL      0x10000		// globals visable flush to wall
+#define FOCALLENGTH     0x5800		/* in global coordinates */
 
 char str[80], str2[20];
-
-fixed focallength;
 
 int viewwidth, viewheight;
 int viewwidthwin, viewheightwin; /* for borders */
@@ -27,8 +24,6 @@ int viewsize;
 
 int centerx;
 int shootdelta;			/* pixels away from centerx a target can be */
-fixed scale;
-long heightnumerator;
 
 boolean startgame,loadedgame;
 int mouseadjustment;
@@ -918,50 +913,6 @@ void BuildTables()
 		sintable[ANGLES/2+i] = -value;
 		
 		angle += anglestep;
-	}
-}
-
-/*
-====================
-=
-= CalcProjection
-=
-====================
-*/
-
-void CalcProjection(long focal)
-{
-	int     i;
-	long    intang;
-	double angle, tang, facedist;
-	int     halfview;
-
-	focallength = focal;
-	facedist = focal+MINDIST;
-	halfview = viewwidth/2;               // half view in pixels
-
-//
-// calculate scale value for vertical height calculations
-// and sprite x calculations
-//
-	scale = halfview*facedist/(VIEWGLOBAL/2);
-
-//
-// divide heightnumerator by a posts distance to get the posts height for
-// the heightbuffer.  The pixel height is height>>2
-//
-	heightnumerator = (TILEGLOBAL*scale)>>6;
-
-//
-// calculate the angle offset from view angle of each pixel's ray
-//
-
-	for (i = 0; i < halfview; i++) {
-		tang = ((double)i)*VIEWGLOBAL/viewwidth/facedist;
-		angle = atan(tang);
-		intang = angle*radtoint;
-		pixelangle[halfview-1-i] = intang;
-		pixelangle[halfview+i] = -intang;
 	}
 }
 

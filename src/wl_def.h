@@ -38,32 +38,33 @@ extern int vwidth, vheight; /* size of screen */
 
 //----------------
 
-#define EXTRAPOINTS		40000
+#define EXTRAPOINTS	40000
 
-#define RUNSPEED   		6000
+#define RUNSPEED   	6000
 
-#define PLAYERSIZE		MINDIST		// player radius
-#define MINACTORDIST		0x10000l	// minimum dist from player center
-						// to any actor center
+#define PLAYERSIZE	MINDIST		/* player radius */
+#define MINACTORDIST	0x10000		/* minimum dist from player center */
+					/* to any actor center */
 						
-#define GLOBAL1		(1l<<16)
-#define TILEGLOBAL  GLOBAL1
-#define TILESHIFT		16l
+#define GLOBAL1		0x10000
+#define TILEGLOBAL  	GLOBAL1
+#define VIEWGLOBAL	GLOBAL1
+#define TILESHIFT	16
 #define UNSIGNEDSHIFT	8
 
-#define ANGLES		360					// must be divisable by 4
+#define ANGLES		360		/* must be divisible by 4 */
 #define ANGLEQUAD	(ANGLES/4)
 #define FINEANGLES	3600
 
-#define MINDIST		(0x5800l)
+#define MINDIST		0x5800
 
-#define MAXVIEWWIDTH		1280
+#define MAXVIEWWIDTH	1280
 
-#define MAPSIZE		64					// maps are 64*64 max
+#define MAPSIZE		64		/* maps are 64*64 */
 
-#define STATUSLINES		40
+#define STATUSLINES	40
 
-#define STARTAMMO		8
+#define STARTAMMO	8
 
 // object flag values
 
@@ -676,8 +677,6 @@ typedef	enum {
 
 extern	char str[80], str2[20];
 
-extern	fixed		focallength;
-
 extern int viewwidth, viewheight;
 extern int viewwidthwin, viewheightwin;
 extern int xoffset, yoffset;
@@ -846,27 +845,21 @@ void PicturePause (void);
 =============================================================================
 */
 
-extern	long 	lasttimecount;
-extern	long 	frameon;
+extern long lasttimecount;
+extern long frameon;
 
-//
-// derived constants
-//
-extern	fixed 	scale;
-extern	long	heightnumerator;
+/* refresh variables */
+extern fixed viewx, viewy;			/* the focal point */
+extern fixed viewsin, viewcos;
 
-//
-// refresh variables
-//
-extern	fixed	viewx,viewy;			// the focal point
-extern	fixed	viewsin,viewcos;
+extern int horizwall[], vertwall[];
 
-extern	int		horizwall[],vertwall[];
+fixed FixedByFrac(fixed a, fixed b);
+void BuildTables();
+void CalcTics();
+void ThreeDRefresh();
 
-fixed	FixedByFrac (fixed a, fixed b);
-void	BuildTables (void);
-void	CalcTics (void);
-void	ThreeDRefresh (void);
+void FizzleFade(boolean abortable, int frames, int color);
 
 /*
 =============================================================================
