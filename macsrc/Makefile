@@ -1,5 +1,5 @@
 CC = gcc
-#CC = g++
+#CC = gcc-3.0
 
 #CFLAGS = -Wall -O6 -fomit-frame-pointer -ffast-math -funroll-loops -mpentiumpro -mcpu=pentiumpro -march=pentiumpro 
 #CFLAGS = -g -Wall -O6 -fomit-frame-pointer -ffast-math -funroll-loops -mpentiumpro -mcpu=pentiumpro -march=pentiumpro 
@@ -47,22 +47,22 @@ $(DOBJS):  Sounds.h  Sprites.h  States.h  Wolf.h  burger.h  wolfdef.h
 	$(NASM) -f elf -o $@ $<
 
 vi_gtk.o: vi_gtk.c
-	gcc -c vi_gtk.c $(CFLAGS) `gtk-config --cflags`
+	$(CC) -c vi_gtk.c $(CFLAGS) `gtk-config --cflags`
 
 swolf3d: $(SOBJS)
-	gcc -o swolf3d $(SOBJS) $(SLFLAGS) 
+	$(CC) -o swolf3d $(SOBJS) $(SLFLAGS) 
 
 xwolf3d: $(XOBJS)
-	gcc -o xwolf3d $(XOBJS) $(XLFLAGS)
+	$(CC) -o xwolf3d $(XOBJS) $(XLFLAGS)
 
 gwolf3d: $(GOBJS)
-	gcc -o gwolf3d $(GOBJS) $(GLFLAGS)
+	$(CC) -o gwolf3d $(GOBJS) $(GLFLAGS)
 
 glwolf3d: $(GLOBJS)
-	gcc -o glwolf3d $(GLOBJS) $(GLLFLAGS)
+	$(CC) -o glwolf3d $(GLOBJS) $(GLLFLAGS)
 
 sdlwolf3d: $(DOBJS)
-	gcc -o sdlwolf3d $(DOBJS) $(DLFLAGS)
+	$(CC) -o sdlwolf3d $(DOBJS) $(DLFLAGS)
 
 clean:
 	rm -rf swolf3d xwolf3d gwolf3d glwolf3d sdlwolf3d *.o

@@ -1,4 +1,7 @@
 TODO:
+* See TODO in src/TODO
+* FX_GLIDE_SWAPINTERVAL=0 is needed for me to prevent jerkyness
+
 * Pause key
   - With windowed systems, put paused in the title bar?
   + Being in a text menu could be the "pause"
