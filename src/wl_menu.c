@@ -23,7 +23,7 @@ void CP_ReadThis(void);
 #endif
 #endif
 
-char far endStrings[9][80]=
+char endStrings[9][80]=
 {
 #ifndef SPEAR
 	{"Dost thou wish to\nleave with such hasty\nabandon?"},
@@ -57,8 +57,7 @@ CP_iteminfo
 	NewEitems={NE_X,NE_Y,11,0,88},
 	NewItems={NM_X,NM_Y,4,2,24};
 
-#pragma warn -sus
-CP_itemtype far
+CP_itemtype 
 MainMenu[]=
 {
 #ifdef JAPAN
@@ -99,7 +98,7 @@ MainMenu[]=
 #endif
 },
 
-far SndMenu[]=
+SndMenu[]=
 {
 #ifdef JAPAN
 	{1,"",0},
@@ -130,7 +129,7 @@ far SndMenu[]=
 #endif
 },
 
-far CtlMenu[]=
+CtlMenu[]=
 {
 #ifdef JAPAN
 	{0,"",0},
@@ -149,10 +148,8 @@ far CtlMenu[]=
 #endif
 },
 
-#pragma warn +sus
-
 #ifndef SPEAR
-far NewEmenu[]=
+NewEmenu[]=
 {
 #ifdef JAPAN
 #ifdef JAPDEMO
@@ -225,7 +222,7 @@ far NewEmenu[]=
 #endif
 
 
-far NewMenu[]=
+NewMenu[]=
 {
 #ifdef JAPAN
 	{1,"",0},
@@ -240,7 +237,7 @@ far NewMenu[]=
 #endif
 },
 
-far LSMenu[]=
+LSMenu[]=
 {
 	{1,"",0},
 	{1,"",0},
@@ -254,7 +251,7 @@ far LSMenu[]=
 	{1,"",0}
 },
 
-far CusMenu[]=
+CusMenu[]=
 {
 	{1,"",0},
 	{0,"",0},
@@ -307,7 +304,7 @@ static byte
 	"?","?","?","?","?","?","?","?","?","?","?","?","?","?","?","?",
 	"?","?","?","?","?","?","?","?","?","?","?","?","?","?","?","?"
 					},	// DEBUG - consolidate these
-					far ExtScanCodes[] =	// Scan codes with >1 char names
+					ExtScanCodes[] =	// Scan codes with >1 char names
 					{
 	1,0xe,0xf,0x1d,0x2a,0x39,0x3a,0x3b,0x3c,0x3d,0x3e,
 	0x3f,0x40,0x41,0x42,0x43,0x44,0x57,0x59,0x46,0x1c,0x36,
@@ -707,10 +704,7 @@ int CP_CheckQuick(unsigned scancode)
 					playstate = ex_abort;
 				lasttimecount = TimeCount;
 
-				if (MousePresent)
-					Mouse(MDelta);	// Clear accumulated mouse movement
 
-				PM_CheckMainMem ();
 
 				#ifndef SPEAR
 				UNCACHEGRCHUNK(C_CURSOR1PIC);
@@ -781,8 +775,6 @@ int CP_CheckQuick(unsigned scancode)
 
 				lasttimecount = TimeCount;
 
-				if (MousePresent)
-					Mouse(MDelta);	// Clear accumulated mouse movement
 				PM_CheckMainMem ();
 
 				#ifndef SPEAR
@@ -1546,7 +1538,7 @@ int CP_SaveGame(int quick)
 
 			strcpy(input,&SaveGameNames[which][0]);
 
-			_dos_write(handle,(void far *)input,32,&nwritten);
+			nwritten = write(handle,(void *)input,32);
 			lseek(handle,32,SEEK_SET);
 			SaveTheGame(handle,0,0);
 			close(handle);
@@ -1605,7 +1597,7 @@ int CP_SaveGame(int quick)
 
 				unlink(name);
 				handle=creat(name,S_IREAD|S_IWRITE);
-				_dos_write(handle,(void far *)input,32,&nwritten);
+				nwritten = write(handle,(void *)input,32);
 				lseek(handle,32,SEEK_SET);
 
 				DrawLSAction(1);
@@ -1768,8 +1760,6 @@ void CP_Control(void)
 		{
 			case MOUSEENABLE:
 				mouseenabled^=1;
-				_CX=_DX=CENTER;
-				Mouse(4);
 				DrawCtlScreen();
 				CusItems.curpos=-1;
 				ShootSnd();
@@ -1777,14 +1767,10 @@ void CP_Control(void)
 
 			case JOYENABLE:
 				joystickenabled^=1;
-				if (joystickenabled)
-					if (!CalibrateJoystick())
-						joystickenabled = 0;
 				DrawCtlScreen();
 				CusItems.curpos=-1;
 				ShootSnd();
 				break;
-
 			case USEPORT2:
 				joystickport^=1;
 				DrawCtlScreen();
@@ -2212,8 +2198,7 @@ void EnterCtrlData(int index,CustomCtrls *cust,void (*DrawRtn)(int),void (*Print
 	switch(type)
 	{
 	 case MOUSE:
-	   Mouse(3);
-	   button=_BX;
+	 	button = 0; /* TODO */
 	   switch(button)
 	   {
 	case 1: result=1; break;
@@ -2868,75 +2853,6 @@ void CP_Quit(void)
 ////////////////////////////////////////////////////////////////////
 void IntroScreen(void)
 {
-#ifdef SPEAR
-
-#define MAINCOLOR	0x4f
-#define EMSCOLOR	0x4f
-#define XMSCOLOR	0x4f
-
-#else
-
-#define MAINCOLOR	0x6c
-#define EMSCOLOR	0x6c
-#define XMSCOLOR	0x6c
-
-#endif
-#define FILLCOLOR	14
-
-	long memory,emshere,xmshere;
-	int i,num,ems[10]={100,200,300,400,500,600,700,800,900,1000},
-		xms[10]={100,200,300,400,500,600,700,800,900,1000},
-		main[10]={32,64,96,128,160,192,224,256,288,320};
-
-
-	//
-	// DRAW MAIN MEMORY
-	//
-	memory=(1023l+mminfo.nearheap+mminfo.farheap)/1024l;
-	for (i=0;i<10;i++)
-		if (memory>=main[i])
-			VWB_Bar(49,163-8*i,6,5,MAINCOLOR-i);
-
-
-	//
-	// DRAW EMS MEMORY
-	//
-	if (EMSPresent)
-	{
-		emshere=4l*EMSPagesAvail;
-		for (i=0;i<10;i++)
-			if (emshere>=ems[i])
-				VWB_Bar(89,163-8*i,6,5,EMSCOLOR-i);
-	}
-
-	//
-	// DRAW XMS MEMORY
-	//
-	if (XMSPresent)
-	{
-		xmshere=4l*XMSPagesAvail;
-		for (i=0;i<10;i++)
-			if (xmshere>=xms[i])
-				VWB_Bar(129,163-8*i,6,5,XMSCOLOR-i);
-	}
-
-	//
-	// FILL BOXES
-	//
-	if (MousePresent)
-		VWB_Bar(164,82,12,2,FILLCOLOR);
-
-	if (JoysPresent[0] || JoysPresent[1])
-		VWB_Bar(164,105,12,2,FILLCOLOR);
-
-	if (AdLibPresent && !SoundBlasterPresent)
-		VWB_Bar(164,128,12,2,FILLCOLOR);
-
-	if (SoundBlasterPresent)
-		VWB_Bar(164,151,12,2,FILLCOLOR);
-
-	if (SoundSourcePresent)
-		VWB_Bar(164,174,12,2,FILLCOLOR);
 }
 
 
@@ -3059,12 +2975,6 @@ void SetupControlPanel(void)
 				strcpy(&SaveGameNames[which][0],temp);
 			}
 		} while(!findnext(&f));
-
-	//
-	// CENTER MOUSE
-	//
-	_CX=_DX=CENTER;
-	Mouse(4);
 }
 
 
@@ -3090,7 +3000,7 @@ void CleanupControlPanel(void)
 // Handle moving gun around a menu
 //
 ////////////////////////////////////////////////////////////////////
-int HandleMenu(CP_iteminfo *item_i,CP_itemtype far *items,void (*routine)(int w))
+int HandleMenu(CP_iteminfo *item_i,CP_itemtype *items,void (*routine)(int w))
 {
 	char key;
 	static int redrawitem=1,lastitem=-1;
@@ -3336,7 +3246,7 @@ int HandleMenu(CP_iteminfo *item_i,CP_itemtype far *items,void (*routine)(int w)
 //
 // ERASE GUN & DE-HIGHLIGHT STRING
 //
-void EraseGun(CP_iteminfo *item_i,CP_itemtype far *items,int x,int y,int which)
+void EraseGun(CP_iteminfo *item_i,CP_itemtype *items,int x,int y,int which)
 {
 	VWB_Bar(x-1,y,25,16,BKGDCOLOR);
 	SetTextColor(items+which,0);
@@ -3364,7 +3274,7 @@ void DrawHalfStep(int x,int y)
 //
 // DRAW GUN AT NEW POSITION
 //
-void DrawGun(CP_iteminfo *item_i,CP_itemtype far *items,int x,int *y,int which,int basey,void (*routine)(int w))
+void DrawGun(CP_iteminfo *item_i,CP_itemtype *items,int x,int *y,int which,int basey,void (*routine)(int w))
 {
 	VWB_Bar(x-1,*y,25,16,BKGDCOLOR);
 	*y=basey+which*13;
@@ -3407,7 +3317,7 @@ void TicDelay(int count)
 // Draw a menu
 //
 ////////////////////////////////////////////////////////////////////
-void DrawMenu(CP_iteminfo *item_i,CP_itemtype far *items)
+void DrawMenu(CP_iteminfo *item_i,CP_itemtype *items)
 {
 	int i,which=item_i->curpos;
 
@@ -3441,7 +3351,7 @@ void DrawMenu(CP_iteminfo *item_i,CP_itemtype far *items)
 // SET TEXT COLOR (HIGHLIGHT OR NO)
 //
 ////////////////////////////////////////////////////////////////////
-void SetTextColor(CP_itemtype far *items,int hlight)
+void SetTextColor(CP_itemtype *items,int hlight)
 {
 	if (hlight)
 		{SETFONTCOLOR(color_hlite[items->active],BKGDCOLOR);}
@@ -3477,96 +3387,14 @@ void ReadAnyControl(ControlInfo *ci)
 {
 	int mouseactive=0;
 
-
 	IN_ReadControl(0,ci);
 
 	if (mouseenabled)
 	{
-		int mousey,mousex;
-
-
-		// READ MOUSE MOTION COUNTERS
-		// RETURN DIRECTION
-		// HOME MOUSE
-		// CHECK MOUSE BUTTONS
-
-		Mouse(3);
-		mousex=_CX;
-		mousey=_DX;
-
-		if (mousey<CENTER-SENSITIVE)
-		{
-			ci->dir=dir_North;
-			_CX=_DX=CENTER;
-			Mouse(4);
-			mouseactive=1;
-		}
-		else
-		if (mousey>CENTER+SENSITIVE)
-		{
-			ci->dir=dir_South;
-			_CX=_DX=CENTER;
-			Mouse(4);
-			mouseactive=1;
-		}
-
-		if (mousex<CENTER-SENSITIVE)
-		{
-			ci->dir=dir_West;
-			_CX=_DX=CENTER;
-			Mouse(4);
-			mouseactive=1;
-		}
-		else
-		if (mousex>CENTER+SENSITIVE)
-		{
-			ci->dir=dir_East;
-			_CX=_DX=CENTER;
-			Mouse(4);
-			mouseactive=1;
-		}
-
-		if (IN_MouseButtons())
-		{
-			ci->button0=IN_MouseButtons()&1;
-			ci->button1=IN_MouseButtons()&2;
-			ci->button2=IN_MouseButtons()&4;
-			ci->button3=false;
-			mouseactive=1;
-		}
 	}
 
 	if (joystickenabled && !mouseactive)
 	{
-		int jx,jy,jb;
-
-
-		INL_GetJoyDelta(joystickport,&jx,&jy);
-		if (jy<-SENSITIVE)
-			ci->dir=dir_North;
-		else
-		if (jy>SENSITIVE)
-			ci->dir=dir_South;
-
-		if (jx<-SENSITIVE)
-			ci->dir=dir_West;
-		else
-		if (jx>SENSITIVE)
-			ci->dir=dir_East;
-
-		jb=IN_JoyButtons();
-		if (jb)
-		{
-			ci->button0=jb&1;
-			ci->button1=jb&2;
-			if (joypadenabled)
-			{
-				ci->button2=jb&4;
-				ci->button3=jb&8;
-			}
-			else
-				ci->button2=ci->button3=false;
-		}
 	}
 }
 
@@ -3576,7 +3404,7 @@ void ReadAnyControl(ControlInfo *ci)
 // DRAW DIALOG AND CONFIRM YES OR NO TO QUESTION
 //
 ////////////////////////////////////////////////////////////////////
-int Confirm(char far *string)
+int Confirm(char *string)
 {
 	int xit=0,i,x,y,tick=0,time,whichsnd[2]={ESCPRESSEDSND,SHOOTSND};
 
@@ -3708,7 +3536,7 @@ int GetYorN(int x,int y,int pic)
 // PRINT A MESSAGE IN A WINDOW
 //
 ////////////////////////////////////////////////////////////////////
-void Message(char far *string)
+void Message(char *string)
 {
 	int h=0,w=0,mw=0,i,x,y,time;
 	fontstruct *font;
@@ -3764,13 +3592,8 @@ void StartCPMusic(int song)
 	MM_BombOnError (false);
 	CA_CacheAudioChunk(STARTMUSIC + chunk);
 	MM_BombOnError (true);
-	if (mmerror)
-		mmerror = false;
-	else
-	{
-		MM_SetLock(&((memptr)audiosegs[STARTMUSIC + chunk]),true);
-		SD_StartMusic((MusicGroup far *)audiosegs[STARTMUSIC + chunk]);
-	}
+	MM_SetLock((memptr *)&(audiosegs[STARTMUSIC + chunk]),true);
+	SD_StartMusic((MusicGroup *)audiosegs[STARTMUSIC + chunk]);
 }
 
 void FreeMusic (void)
@@ -3786,11 +3609,10 @@ void FreeMusic (void)
 //		specified scan code
 //
 ///////////////////////////////////////////////////////////////////////////
-byte *
-IN_GetScanName(ScanCode scan)
+byte *IN_GetScanName(ScanCode scan)
 {
 	byte		**p;
-	ScanCode	far *s;
+	ScanCode *s;
 
 	for (s = ExtScanCodes,p = ExtScanNames;*s;p++,s++)
 		if (*s == scan)
@@ -3878,11 +3700,11 @@ void CheckForEpisodes(void)
 	if (!findfirst("*.WJ1",&f,FA_ARCH))
 	{
 		strcpy(extension,"WJ1");
-#else
+#else /* JAPDEMO */
 	if (!findfirst("*.WJ6",&f,FA_ARCH))
 	{
 		strcpy(extension,"WJ6");
-#endif
+#endif /* JAPDEMO */
 		strcat(configname,extension);
 		strcat(SaveName,extension);
 		strcat(PageFileName,extension);
@@ -3894,7 +3716,7 @@ void CheckForEpisodes(void)
 	}
 	else
 		Quit("NO JAPANESE WOLFENSTEIN 3-D DATA FILES to be found!");
-#else
+#else /* JAPAN */
 
 //
 // ENGLISH
@@ -3925,8 +3747,8 @@ void CheckForEpisodes(void)
 		EpisodeSelect[2] = 1;
 	}
 	else
-#endif
-#endif
+#endif /* SPEAR */
+#endif /* UPLOAD */
 
 
 
@@ -3938,25 +3760,27 @@ void CheckForEpisodes(void)
 	}
 	else
 		Quit("NO SPEAR OF DESTINY DATA FILES TO BE FOUND!");
-#else
+#else /* SPEARDEMO */
 	if (!findfirst("*.SDM",&f,FA_ARCH))
 	{
 		strcpy(extension,"SDM");
 	}
 	else
 		Quit("NO SPEAR OF DESTINY DEMO DATA FILES TO BE FOUND!");
-#endif
+#endif /* SPEARDEMO */
 
-#else
+#else /* SPEAR */
 	if (!findfirst("*.WL1",&f,FA_ARCH))
 	{
 		strcpy(extension,"WL1");
 	}
 	else
 		Quit("NO WOLFENSTEIN 3-D DATA FILES to be found!");
-#endif
+#endif /* SPEAR */
+#endif /* JAPAN */
 
 	strcat(configname,extension);
 	strcat(SaveName,extension);
 	strcat(PageFileName,extension);
+
 }

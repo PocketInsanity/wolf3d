@@ -18,15 +18,21 @@ long filelength(int handle)
 	return buf.st_size;
 }
 
+char *itoa(short int value, char *string, int radix)
+{
+	/* wolf3d only uses radix 10 */
+	sprintf(string, "%d", value);
+	return string;
+}
+
 char *ltoa(long value, char *string, int radix)
 {
-	sprintf(string, "%d", value);
+	sprintf(string, "%ld", value);
 	return string;
 }
 
 char *ultoa(unsigned long value, char *string, int radix)
 {
-	sprintf(string, "%u", value);
+	sprintf(string, "%lu", value);
 	return string;
 }
-	

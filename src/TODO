@@ -2,3 +2,5 @@
 id_ca.c has code for setting the extension to load files
 so does wl_menu.c
 * would it not make sense to remove bufferseg from id_ca.c?
+* menu code is a mess, always does things differently than the rest of the
+code, it really needs to be cleaned up

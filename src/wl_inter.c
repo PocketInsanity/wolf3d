@@ -1,8 +1,6 @@
-// WL_INTER.C
+/* wl_inter.c */
 
-#include "WL_DEF.H"
-#pragma hdrstop
-
+#include "wl_def.h"
 
 //==========================================================================
 
