@@ -30,25 +30,25 @@
 =============================================================================
 */
 
-#define MAXACTORS		150				// max number of nazis, etc / map
-#define MAXSTATS		400				// max number of lamps, bonus, etc
-#define MAXDOORS		64				// max number of sliding doors
-#define MAXWALLTILES	64				// max number of wall tiles
+#define MAXACTORS		150		// max number of nazis, etc / map
+#define MAXSTATS		400		// max number of lamps, bonus, etc
+#define MAXDOORS		64		// max number of sliding doors
+#define MAXWALLTILES		64		// max number of wall tiles
 
 //
 // tile constants
 //
 
 #define	ICONARROWS		90
-#define PUSHABLETILE	98
-#define EXITTILE		99				// at end of castle
-#define AREATILE		107				// first of NUMAREAS floor tiles
+#define PUSHABLETILE		98
+#define EXITTILE		99		// at end of castle
+#define AREATILE		107		// first of NUMAREAS floor tiles
 #define NUMAREAS		37
-#define ELEVATORTILE	21
+#define ELEVATORTILE		21
 #define AMBUSHTILE		106
-#define	ALTELEVATORTILE	107
+#define	ALTELEVATORTILE		107
 
-#define HEIGHTRATIO            0.50
+#define HEIGHTRATIO		0.50
 
 //----------------
 
@@ -56,8 +56,8 @@
 
 #define RUNSPEED   		6000
 
-#define PLAYERSIZE		MINDIST			// player radius
-#define MINACTORDIST	0x10000l		// minimum dist from player center
+#define PLAYERSIZE		MINDIST		// player radius
+#define MINACTORDIST		0x10000l	// minimum dist from player center
 						// to any actor center
 						
 #define GLOBAL1		(1l<<16)
@@ -885,8 +885,6 @@ extern	fixed	viewx,viewy;			// the focal point
 extern	int		viewangle;
 extern	fixed	viewsin,viewcos;
 
-extern	unsigned	postx;
-
 extern	int		horizwall[],vertwall[];
 
 extern	unsigned	pwallpos;
@@ -907,9 +905,6 @@ void	ThreeDRefresh (void);
 
 #define SPDPATROL	512
 #define SPDDOG		1500
-
-extern	dirtype opposite[9];
-extern	dirtype diagonal[9][9];
 
 void	SpawnNewObj (unsigned tilex, unsigned tiley, statetype *state);
 void	NewState (objtype *ob, statetype *state);
@@ -942,8 +937,6 @@ typedef struct
 	word dataofs[64];
 /* table data after dataofs[rightpix-leftpix+1] */
 } PACKED t_compshape;
-
-extern	int			maxscale;
 
 void SetupScaling (int maxscaleheight);
 void ScaleShape (int xcenter, int shapenum, unsigned height);
@@ -1097,7 +1090,7 @@ void SpawnStand (enemy_t which, int tilex, int tiley, int dir);
 void SpawnPatrol (enemy_t which, int tilex, int tiley, int dir);
 void KillActor (objtype *ob);
 
-void	US_ControlPanel(byte);
+void US_ControlPanel(byte);
 
 void SpawnDeadGuard (int tilex, int tiley);
 void SpawnBoss (int tilex, int tiley);
@@ -1123,7 +1116,7 @@ void SpawnHitler (int tilex, int tiley);
 =============================================================================
 */
 
-extern	void	HelpScreens(void);
-extern	void	EndText(void);
+extern void HelpScreens();
+extern void EndText();
 
 #endif

@@ -20,7 +20,9 @@
 #define PI 3.14159265358979323846
 #endif
 
+#ifndef INLINE
 #define INLINE inline
+#endif
 
 void logerror(const char *text, ...)
 {

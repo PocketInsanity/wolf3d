@@ -38,6 +38,8 @@ static unsigned postx;
 static void AsmRefresh();
 void xBuildCompScale(int height, byte *source, int x);
 
+#define NOASM
+
 #ifndef NOASM
 #define FixedByFrac(x, y) \
  ({ unsigned long z; \

@@ -653,7 +653,7 @@ void CalcProjection(long focal)
 ===================
 */
 
-void SetupWalls (void)
+void SetupWalls()
 {
 	int     i;
 

@@ -2,6 +2,7 @@ CC = gcc
 
 #CFLAGS = -Wall -O6 -fomit-frame-pointer -ffast-math -funroll-loops -mpentiumpro -mcpu=pentiumpro -march=pentiumpro
 CFLAGS = -g -Wall
+#CFLAGS = -g -Wall -pedantic
 #CFLAGS = -Os -Wall
 #CFLAGS = -Os -Wall -fomit-frame-pointer -ffast-math -mpentiumpro -mcpu=pentiumpro -march=pentiumpro
 
