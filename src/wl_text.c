@@ -51,7 +51,7 @@ TEXT FORMATTING COMMANDS
 int			pagenum,numpages;
 
 unsigned	leftmargin[TEXTROWS],rightmargin[TEXTROWS];
-char		far *text;
+char		*text;
 unsigned	rowon;
 
 int			picx,picy,picnum,picdelay;
@@ -542,7 +542,7 @@ void BackPage (void)
 */
 void CacheLayoutGraphics (void)
 {
-	char	far *bombpoint, far *textstart;
+	char	*bombpoint, *textstart;
 	char	ch;
 
 	textstart = text;
@@ -598,7 +598,7 @@ void CacheLayoutGraphics (void)
 #ifdef JAPAN
 void ShowArticle (int which)
 #else
-void ShowArticle (char far *article)
+void ShowArticle (char *article)
 #endif
 {
 	#ifdef JAPAN
@@ -747,7 +747,7 @@ char helpfilename[13] = "HELPART.",
 void HelpScreens (void)
 {
 	int			artnum;
-	char far 	*text;
+	char *text;
 	memptr		layout;
 
 
@@ -800,7 +800,7 @@ void HelpScreens (void)
 void EndText (void)
 {
 	int			artnum;
-	char far 	*text;
+	char *text;
 	memptr		layout;
 
 
