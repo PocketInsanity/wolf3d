@@ -1189,18 +1189,6 @@ void InitGame (void)
 	BuildTables ();          // trig tables
 	SetupWalls ();
 
-#if 0
-{
-int temp,i;
-temp = viewsize;
-	profilehandle = open("SCALERS.TXT", O_CREAT | O_WRONLY | O_TEXT);
-for (i=1;i<20;i++)
-	NewViewSize(i);
-viewsize = temp;
-close(profilehandle);
-}
-#endif
-
 	NewViewSize (viewsize);
 
 

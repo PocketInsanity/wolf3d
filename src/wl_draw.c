@@ -1,7 +1,6 @@
 /* wl_draw.c */
 
 #include "wl_def.h"
-#include <dos.h>
 
 /*
 =============================================================================
@@ -1242,14 +1241,6 @@ void CalcTics (void)
 	} while (!tics);			// make sure at least one tic passes
 
 	lasttimecount = newtime;
-
-#ifdef FILEPROFILE
-		strcpy (scratch,"\tTics:");
-		itoa (tics,str,10);
-		strcat (scratch,str);
-		strcat (scratch,"\n");
-		write (profilehandle,scratch,strlen(scratch));
-#endif
 
 	if (tics>MAXTICS)
 	{

@@ -72,6 +72,8 @@
 
 //===========================================================================
 
+extern byte *gfxbuf;
+
 extern	unsigned	bufferofs;			// all drawing is reletive to this
 extern	unsigned	displayofs;	// last setscreen coordinates
 

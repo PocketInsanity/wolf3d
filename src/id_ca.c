@@ -41,7 +41,7 @@ void			*grsegs[NUMCHUNKS];
 byte			grneeded[NUMCHUNKS];
 byte		ca_levelbit,ca_levelnum;
 
-int			profilehandle,debughandle;
+memptr bufferseg;
 
 /*
 =============================================================================
@@ -51,7 +51,7 @@ int			profilehandle,debughandle;
 =============================================================================
 */
 
-char extension[5],	// Need a string, not constant to change cache files
+char extension[5],
      gheadname[10]="vgahead.",
      gfilename[10]="vgagraph.",
      gdictname[10]="vgadict.",
@@ -62,8 +62,8 @@ char extension[5],	// Need a string, not constant to change cache files
 
 void CA_CannotOpen(char *string);
 
-long		 *grstarts;	// array of offsets in vgagraph, -1 for sparse
-long		 *audiostarts;	// array of offsets in audio / audiot
+long *grstarts;	/* array of offsets in vgagraph, -1 for sparse */
+long *audiostarts; /* array of offsets in audio / audiot */
 
 huffnode	grhuffman[255];
 
@@ -81,8 +81,9 @@ void CAL_CarmackExpand (word *source, word *dest, word length);
 
 
 #define FILEPOSSIZE	3
-
-//#define	GRFILEPOS(c) (*(long *)(((byte *)grstarts)+(c)*3)&0xffffff)
+/*
+#define	GRFILEPOS(c) (*(long *)(((byte *)grstarts)+(c)*3)&0xffffff)
+*/
 long GRFILEPOS(int c)
 {
 	long value;
@@ -283,21 +284,19 @@ boolean CA_LoadFile (char *filename, memptr *ptr)
 = CAL_HuffExpand
 =
 = Length is the length of the EXPANDED data
-= If screenhack, the data is decompressed in four planes directly
-= to the screen
 =
 ======================
 */
 /* From Ryan C. Gordon -- ryan_gordon@hotmail.com */
 void CAL_HuffExpand(byte *source, byte *dest, long length, huffnode *htable)
 {
-	huffnode *headptr;          // remains constant head of huffman tree.
-	huffnode *nodeon;           // for trailing down node trees...
-	byte      mask = 0x0001;    // for bitwise testing.
-	word      path;             // stores branch of huffman node.
-	byte     *endoff = dest + length;    // ptr to where uncompressed ends.
+	huffnode *headptr;          
+	huffnode *nodeon;           
+	byte      mask = 0x0001;    
+	word      path;             
+	byte     *endoff = dest + length;    
 
-	nodeon = headptr = htable + 254;  // head node is always node 254.
+	nodeon = headptr = htable + 254;  
 
 	do {
 		if (*source & mask)
@@ -305,17 +304,17 @@ void CAL_HuffExpand(byte *source, byte *dest, long length, huffnode *htable)
 	        else
 			path = nodeon->bit0;
        		mask <<= 1;
-	        if (mask == 0x0000) {   // fully cycled bit positions? Get next char.
+	        if (mask == 0x0000) {   
 			mask = 0x0001;
 			source++;
 	        } 
-		if (path < 256) {  // if (path < 256) it's a byte, else move node.
+		if (path < 256) {  
 			*dest = (byte) path;
 			dest++;
 			nodeon = headptr;
 		} else
 			nodeon = (htable + (path - 256));
-	} while (dest != endoff);   // written all data to *dest?
+	} while (dest != endoff);   
 } 
 
 /*
@@ -331,12 +330,14 @@ void CAL_HuffExpand(byte *source, byte *dest, long length, huffnode *htable)
 #define NEARTAG	0xa7
 #define FARTAG	0xa8
 
+/* TODO: very correctness of byteinc */
 void CAL_CarmackExpand(word *source, word *dest, word length)
 {
 	word ch, chhigh, count, offset;
 	word *copyptr, *inptr, *outptr;
-
-	length/=2;
+	byte **byteinc = (byte **)&inptr;
+	
+	length /= 2;
 
 	inptr = source;
 	outptr = dest;
@@ -347,12 +348,16 @@ void CAL_CarmackExpand(word *source, word *dest, word length)
 		if (chhigh == NEARTAG) {
 			count = ch&0xff;
 			if (!count) {	
-				// have to insert a word containing the tag byte
-				ch |= *((unsigned char *)inptr)++;
+			/* have to insert a word containing the tag byte */
+				ch |= **byteinc;
+				(*byteinc)++;
+				/* ch |= *((unsigned char *)inptr)++; */
 				*outptr++ = ch;
 				length--;
 			} else {
-				offset = *((unsigned char *)inptr)++;
+				offset = **byteinc;
+				(*byteinc)++;
+				/* offset = *((unsigned char *)inptr)++; */
 				copyptr = outptr - offset;
 				length -= count;
 				while (count--)
@@ -361,8 +366,10 @@ void CAL_CarmackExpand(word *source, word *dest, word length)
 		} else if (chhigh == FARTAG) {
 			count = ch&0xff;
 			if (!count) {
-				// have to insert a word containing the tag byte
-				ch |= *((unsigned char *)inptr)++;
+			/* have to insert a word containing the tag byte */
+				ch |= **byteinc;
+				(*byteinc)++;
+				/* ch |= *((unsigned char *)inptr)++; */
 				*outptr++ = ch;
 				length --;
 			} else {
@@ -387,52 +394,38 @@ void CAL_CarmackExpand(word *source, word *dest, word length)
 ======================
 */
 
+/* TODO: actually this isn't used so it can be removed from here */
 long CA_RLEWCompress(word *source, long length, word *dest, word rlewtag)
 {
-  long complength;
-  word value,count,i;
-  word *start, *end;
+	word value, count, i;
+	word *start, *end;
 
-  start = dest;
+	start = dest;
 
-  end = source + (length+1)/2;
+	end = source + (length + 1)/2;
 
-//
-// compress it
-//
-  do
-  {
-	count = 1;
-	value = *source++;
-	while (*source == value && source<end)
-	{
-	  count++;
-	  source++;
-	}
-	if (count>3 || value == rlewtag)
-	{
-    //
-    // send a tag / count / value string
-    //
-      *dest++ = rlewtag;
-      *dest++ = count;
-      *dest++ = value;
-    }
-    else
-    {
-    //
-    // send word without compressing
-    //
-      for (i=1;i<=count;i++)
-	*dest++ = value;
-	}
+	/* compress it */
+	do {
+		count = 1;
+		value = *source++;
+		while ( (*source == value) && (source < end) ) { 
+			count++;
+			source++;
+		}
+		if ( (count > 3) || (value == rlewtag) ) {
+		 	/* send a tag / count / value string */
+			*dest++ = rlewtag;
+			*dest++ = count;
+			*dest++ = value;
+		} else {
+			/* send word without compressing */
+			for (i = 1; i <= count; i++)
+				*dest++ = value;
+		}
+	} while (source < end);
 
-  } while (source<end);
-
-  complength = 2*(dest-start);
-  return complength;
+	return 2*(dest-start);
 }
-
 
 /*
 ======================
@@ -445,34 +438,25 @@ long CA_RLEWCompress(word *source, long length, word *dest, word rlewtag)
 
 void CA_RLEWexpand(word *source, word *dest, long length, word rlewtag)
 {
-	word value, count,i;
+	word value, count, i;
 	word *end = dest + length / 2;
-//
-// expand it
-//
-  do
-  {
-	value = *source++;
-	if (value != rlewtag)
-	//
-	// uncompressed
-	//
-	  *dest++=value;
-	else
-	{
-	//
-	// compressed string
-	//
-	  count = *source++;
-	  value = *source++;
-	  for (i=1;i<=count;i++)
-	*dest++ = value;
-	}
-  } while (dest<end);
-
+	
+	/* expand it */
+	do {
+		value = *source++;
+		
+		if (value != rlewtag)
+			/* uncompressed */
+			*dest++=value;
+		else {
+			/* compressed string */
+			count = *source++;
+			value = *source++;
+			for (i = 1; i <= count; i++)
+				*dest++ = value;
+		}
+	} while (dest < end);
 }
-
-
 
 /*
 =============================================================================
@@ -481,7 +465,6 @@ void CA_RLEWexpand(word *source, word *dest, long length, word rlewtag)
 
 =============================================================================
 */
-
 
 /*
 ======================
@@ -674,21 +657,15 @@ void CAL_SetupAudioFile (void)
 ======================
 */
 
-void CA_Startup (void)
+void CA_Startup(void)
 {
-#ifdef PROFILE
-	unlink ("PROFILE.TXT");
-	profilehandle = open("PROFILE.TXT", O_CREAT | O_WRONLY | O_TEXT);
-#endif
-
-	CAL_SetupMapFile ();
-	CAL_SetupGrFile ();
-	CAL_SetupAudioFile ();
+	CAL_SetupMapFile();
+	CAL_SetupGrFile();
+	CAL_SetupAudioFile();
 
 	mapon = -1;
 	ca_levelbit = 1;
 	ca_levelnum = 0;
-
 }
 
 //==========================================================================
@@ -706,10 +683,6 @@ void CA_Startup (void)
 
 void CA_Shutdown (void)
 {
-#ifdef PROFILE
-	close (profilehandle);
-#endif
-
 	close (maphandle);
 	close (grhandle);
 	close (audiohandle);
@@ -744,13 +717,9 @@ void CA_CacheAudioChunk (int chunk)
 
 	lseek(audiohandle,pos,SEEK_SET);
 
-
 	MM_GetPtr ((memptr)&audiosegs[chunk],compressed);
-	if (mmerror)
-		return;
 
 	CA_FarRead(audiohandle,audiosegs[chunk],compressed);
-
 }
 
 //===========================================================================
@@ -860,8 +829,6 @@ void CAL_ExpandGrChunk (int chunk, byte *source)
 // Sprites need to have shifts made and various other junk
 //
 	MM_GetPtr (&grsegs[chunk],expanded);
-	if (mmerror)
-		return;
 	CAL_HuffExpand (source,grsegs[chunk],expanded,grhuffman);
 }
 
@@ -895,8 +862,8 @@ void CA_CacheGrChunk (int chunk)
 // a larger buffer
 //
 	pos = GRFILEPOS(chunk);
-	if (pos<0) /* $FFFFFFFF start is a sparse tile */
-	  return;
+	if (pos < 0) /* $FFFFFFFF start is a sparse tile */
+		return;
 
 	next = chunk +1;
 	while (GRFILEPOS(next) == -1)		// skip past any sparse tiles
@@ -969,8 +936,8 @@ void CA_CacheScreen (int chunk)
 // allocate final space, decompress it, and free bigbuffer
 // Sprites need to have shifts made and various other junk
 //
-	/* TODO: show screen! */
-	CAL_HuffExpand (source, MK_FP(SCREENSEG,bufferofs),expanded,grhuffman);
+	/* TODO: this cheats and expands to the 320x200 screen buffer */
+	CAL_HuffExpand(source, gfxbuf, expanded, grhuffman);
 	VW_MarkUpdateBlock (0,0,319,199);
 	MM_FreePtr(&bigbufferseg);
 }
@@ -1022,12 +989,12 @@ void CA_CacheMap(int mapnum)
 		}
 
 		CA_FarRead(maphandle,(byte *)source,compressed);
-		//
+		/*
 		// unhuffman, then unRLEW
 		// The huffman'd chunk has a two byte expanded length first
 		// The resulting RLEW chunk also does, even though it's not really
 		// needed
-		//
+		*/
 		expanded = *source;
 		source++;
 		MM_GetPtr (&buffer2seg,expanded);
@@ -1133,7 +1100,6 @@ void CA_ClearAllMarks (void)
 
 //===========================================================================
 
-
 /*
 ======================
 =
@@ -1141,7 +1107,6 @@ void CA_ClearAllMarks (void)
 =
 ======================
 */
-
 
 void CA_SetGrPurge (void)
 {
@@ -1156,8 +1121,6 @@ void CA_SetGrPurge (void)
 		if (grsegs[i])
 			MM_SetPurge ((memptr)&grsegs[i],3);
 }
-
-
 
 /*
 ======================
@@ -1290,8 +1253,6 @@ void CA_CacheMarks (void)
 			{
 			// big chunk, allocate temporary buffer
 				MM_GetPtr(&bigbufferseg,compressed);
-				if (mmerror)
-					return;
 				MM_SetLock (&bigbufferseg,true);
 				lseek(grhandle,pos,SEEK_SET);
 				CA_FarRead(grhandle,bigbufferseg,compressed);
@@ -1299,8 +1260,6 @@ void CA_CacheMarks (void)
 			}
 
 			CAL_ExpandGrChunk (i,source);
-			if (mmerror)
-				return;
 
 			if (compressed>BUFFERSIZE)
 				MM_FreePtr(&bigbufferseg);
@@ -1318,50 +1277,6 @@ void CA_CannotOpen(char *string)
  Quit (str);
 }
 
-/* TODO: totally remove */
-
-/*
-=============================================================================
-
-							LOCAL INFO
-
-=============================================================================
-*/
-
-#define LOCKBIT		0x80	// if set in attributes, block cannot be moved
-#define PURGEBITS	3		// 0-3 level, 0= unpurgable, 3= purge first
-#define PURGEMASK	0xfffc
-#define BASEATTRIBUTES	0	// unlocked, non purgable
-
-#define MAXUMBS		10
-
-typedef struct mmblockstruct
-{
-	unsigned	start,length;
-	unsigned	attributes;
-	memptr		*useptr;	// pointer to the segment start
-	struct mmblockstruct *next;
-} mmblocktype;
-
-#define GETNEWBLOCK {if(!mmfree)MML_ClearBlock();mmnew=mmfree;mmfree=mmfree->next;}
-
-#define FREEBLOCK(x) {*x->useptr=NULL;x->next=mmfree;mmfree=x;}
-
-/*
-=============================================================================
-
-						 GLOBAL VARIABLES
-
-=============================================================================
-*/
-
-mminfotype	mminfo;
-memptr		bufferseg;
-boolean		mmerror;
-
-void		(* beforesort) (void);
-void		(* aftersort) (void);
-
 /*
 =============================================================================
 
@@ -1369,23 +1284,6 @@ void		(* aftersort) (void);
 
 =============================================================================
 */
-
-boolean		mmstarted;
-
-void		*farheap;
-void		*nearheap;
-
-mmblocktype	 mmblocks[MAXBLOCKS], *mmhead, *mmfree, *mmrover, *mmnew;
-
-boolean		bombonerror;
-
-//unsigned	totalEMSpages,freeEMSpages,EMSpageframe,EMSpagesmapped,EMShandle;
-
-void		(* XMSaddr) (void);		// far pointer to XMS driver
-
-unsigned	numUMBs,UMBbase[MAXUMBS];
-
-//==========================================================================
 
 /*
 ===================
@@ -1400,7 +1298,7 @@ unsigned	numUMBs,UMBbase[MAXUMBS];
 
 void MM_Startup (void)
 {
-	MM_GetPtr (&bufferseg,BUFFERSIZE);
+	MM_GetPtr (&bufferseg, BUFFERSIZE);
 }
 
 /*
@@ -1559,42 +1457,16 @@ long MM_TotalFree (void)
 
 void MM_BombOnError(boolean bomb)
 {
-	bombonerror = bomb;
 }
 
-//	Main Mem specific variables
-	boolean			MainPresent;
-	memptr			MainMemPages[PMMaxMainMem];
-	PMBlockAttr		MainMemUsed[PMMaxMainMem];
-	int				MainPagesAvail;
-
-//	EMS specific variables
-	boolean			EMSPresent;
-	word			EMSAvail,EMSPagesAvail,EMSHandle,
-					EMSPageFrame,EMSPhysicalPage;
-	EMSListStruct	EMSList[EMSFrameCount];
-
-//	XMS specific variables
-	boolean			XMSPresent;
-	word			XMSAvail,XMSPagesAvail,XMSHandle;
-	longword		XMSDriver;
-	int				XMSProtectPage = -1;
-
-//	File specific variables
-	char			PageFileName[13] = {"VSWAP."};
+	boolean PMStarted;
+	char			PageFileName[13] = {"vswap."};
 	int				PageFile = -1;
 	word			ChunksInFile;
 	word			PMSpriteStart,PMSoundStart;
 
-//	General usage variables
-	boolean			PMStarted,
-					PMPanicMode,
-					PMThrashing;
-	word			XMSPagesUsed,
-					EMSPagesUsed,
-					MainPagesUsed,
-					PMNumBlocks;
-	long			PMFrameCount;
+	word PMNumBlocks;
+	long PMFrameCount;
 	PageListStruct *PMPages, *PMSegPages;
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1641,9 +1513,8 @@ void PML_OpenPageFile(void)
 
 	// Allocate and clear the page list
 	PMNumBlocks = ChunksInFile;
-	MM_GetPtr((memptr)&PMSegPages,sizeof(PageListStruct) * PMNumBlocks);
-	MM_SetLock((memptr)&PMSegPages,true);
-	PMPages = (PageListStruct *)PMSegPages;
+	MM_GetPtr((memptr)&PMPages,sizeof(PageListStruct) * PMNumBlocks);
+	MM_SetLock((memptr)&PMPages,true);
 	memset(PMPages,0,sizeof(PageListStruct) * PMNumBlocks);
 
 	// Read in the chunk offsets
@@ -1674,10 +1545,10 @@ void PML_ClosePageFile(void)
 {
 	if (PageFile != -1)
 		close(PageFile);
-	if (PMSegPages)
-	{
-		MM_SetLock((memptr)&PMSegPages,false);
-		MM_FreePtr((memptr)&PMSegPages);
+		
+	if (PMPages) {
+		MM_SetLock((memptr)&PMPages,false);
+		MM_FreePtr((memptr)&PMPages);
 	}
 }
 
@@ -1690,7 +1561,7 @@ void PML_ClosePageFile(void)
 //
 //	PM_GetPageAddress() - Returns the address of a given page
 //		Maps in EMS if necessary
-//		Returns nil if block isn't cached into Main Memory or EMS
+//		Returns nil if block is not cached into Main Memory or EMS
 //
 //
 memptr PM_GetPageAddress(int pagenum)
