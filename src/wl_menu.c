@@ -539,7 +539,7 @@ int CP_CheckQuick(unsigned scancode)
 				pickquick = gamestate.lives = 0;
 			}
 
-			DrawAllPlayBorder();
+			DrawPlayBorder();
 			WindowH=200;
 			fontnumber=0;
 			MainMenu[savegame].active = 0;
@@ -624,7 +624,7 @@ int CP_CheckQuick(unsigned scancode)
 				if (Confirm(string))
 					CP_LoadGame(1);
 
-				DrawAllPlayBorder();
+				DrawPlayBorder();
 				fontnumber=0;
 			}
 			else
@@ -694,7 +694,7 @@ int CP_CheckQuick(unsigned scancode)
 				Quit(NULL);
 			}
 
-			DrawAllPlayBorder();
+			DrawPlayBorder();
 			WindowH=200;
 			fontnumber=0;
 			return 1;
@@ -2463,8 +2463,8 @@ void CP_ChangeView(void)
 		case dir_North:
 		case dir_East:
 			newview++;
-			if (newview>19)
-				newview=19;
+			if (newview>20)
+				newview=20;
 			ShowViewSize(newview);
 			VW_UpdateScreen();
 			SD_PlaySound(HITWALLSND);

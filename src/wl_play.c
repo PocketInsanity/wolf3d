@@ -602,7 +602,7 @@ void CheckKeys()
 
 		IN_Ack();
 		godmode ^= 1;
-		DrawAllPlayBorderSides();
+		DrawPlayBorderSides();
 		IN_ClearKeysDown();
 		return;
 	}
@@ -638,7 +638,7 @@ void CheckKeys()
 		IN_ClearKeysDown();
 		IN_Ack();
 
-		DrawAllPlayBorder ();
+		DrawPlayBorder ();
 	}
 
 	//
@@ -655,7 +655,7 @@ void CheckKeys()
 	 IN_ClearKeysDown();
 	 IN_Ack();
 
-	 DrawAllPlayBorderSides ();
+	 DrawPlayBorderSides ();
 	 DebugOk=1;
 	}
 
@@ -676,7 +676,7 @@ void CheckKeys()
 		IN_ClearKeysDown();
 		IN_Ack();
 
-		DrawAllPlayBorder();
+		DrawPlayBorder();
 	}
 
 	if (Paused) {
@@ -706,7 +706,7 @@ void CheckKeys()
 		ClearSplitVWB ();
 		US_ControlPanel(scan);
 	
-		DrawAllPlayBorderSides ();
+		DrawPlayBorderSides ();
 		VW_UpdateScreen();
 		
 		if (scan == sc_F9)

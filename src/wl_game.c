@@ -602,42 +602,20 @@ void SetupGameLevel()
 
 void DrawPlayBorderSides()
 {
-	int	xl,yl;
-
+	int xl, yl;
+	
 	xl = 160-viewwidth/2;
 	yl = (200-STATUSLINES-viewheight)/2;
 
-	VW_Bar (0,0,xl-1,200-STATUSLINES,127);
-	VW_Bar (xl+viewwidth+1,0,xl-2,200-STATUSLINES,127);
+	if (xl == 0) {
+		return;
+	} else {
+		VW_Bar(0,0,xl-1,200-STATUSLINES,127);
+		VW_Bar(xl+viewwidth+1,0,xl-2,200-STATUSLINES,127);
 
-	VW_Vlin (yl-1,yl+viewheight,xl-1,0);
-	VW_Vlin (yl-1,yl+viewheight,xl+viewwidth,125);
-}
-
-
-/*
-===================
-=
-= DrawAllPlayBorderSides
-=
-===================
-*/
-
-void DrawAllPlayBorderSides()
-{
-	DrawPlayBorderSides();
-}
-
-/*
-===================
-=
-= DrawPlayBorder
-=
-===================
-*/
-void DrawAllPlayBorder()
-{
-	DrawPlayBorder();
+		VW_Vlin(yl-1,yl+viewheight,xl-1,0);
+		VW_Vlin(yl-1,yl+viewheight,xl+viewwidth,125);
+	}
 }
 
 /*
@@ -652,17 +630,21 @@ void DrawPlayBorder()
 {
 	int xl, yl;
 
-	VW_Bar (0,0,320,200-STATUSLINES,127);
-
+	VW_Bar(0,0,320,200-STATUSLINES+1,127);
+		
 	xl = 160-viewwidth/2;
 	yl = (200-STATUSLINES-viewheight)/2;
-	VW_Bar (xl,yl,viewwidth,viewheight,0);
+	VW_Bar(xl,yl,viewwidth,viewheight+1,0);
 
-	VW_Hlin (xl-1,xl+viewwidth,yl-1,0);
-	VW_Hlin (xl-1,xl+viewwidth,yl+viewheight,125);
-	VW_Vlin (yl-1,yl+viewheight,xl-1,0);
-	VW_Vlin (yl-1,yl+viewheight,xl+viewwidth,125);
-	VW_Plot (xl-1,yl+viewheight,124);
+	if (xl == 0) {
+		VW_Hlin(0,viewwidth-1,viewheight,125);
+	} else {	
+		VW_Hlin(xl-1,xl+viewwidth,yl-1,0);
+		VW_Hlin(xl-1,xl+viewwidth,yl+viewheight,125);
+		VW_Vlin(yl-1,yl+viewheight,xl-1,0);
+		VW_Vlin(yl-1,yl+viewheight,xl+viewwidth,125);
+		VW_Plot(xl-1,yl+viewheight,124);
+	}
 }
 
 /*

@@ -748,9 +748,9 @@ void ClearMemory (void);
 void PlayDemo(int demonumber);
 int PlayDemoFromFile(char *demoname);
 void RecordDemo (void);
-void DrawAllPlayBorder (void);
+void DrawPlayBorder (void);
 void	DrawHighScores(void);
-void DrawAllPlayBorderSides (void);
+void DrawPlayBorderSides (void);
 
 #define	PlaySoundLocTile(s,tx,ty)	PlaySoundLocGlobal(s,(((long)(tx) << TILESHIFT) + (1L << (TILESHIFT - 1))),(((long)ty << TILESHIFT) + (1L << (TILESHIFT - 1))))
 #define	PlaySoundLocActor(s,ob)		PlaySoundLocGlobal(s,(ob)->x,(ob)->y)
