@@ -25,7 +25,7 @@ SLFLAGS = $(LFLAGS) -lvga
 #XLFLAGS = $(LFLAGS) -L/usr/X11R6/lib -lX11 -lXext -lXxf86vm -lXxf86dga
 XLFLAGS = $(LFLAGS) -L/usr/X11R6/lib -lX11
 GLFLAGS = $(LFLAGS) `gtk-config --libs` # -L/usr/X11R6/lib -lX11 -lXi -lXext -lgdk -lgtk 
-GLLFLAGS = $(LFLAGS) -L/usr/X11R6/lib -lX11 -lXext -lGL
+GLLFLAGS = $(LFLAGS) -L/usr/lib -L/usr/X11R6/lib -lX11 -lXext -lGL
 
 NASM = nasm
 

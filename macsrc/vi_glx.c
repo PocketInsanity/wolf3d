@@ -40,8 +40,12 @@ XVisualInfo *vi;
 GLXContext ctx;
 Atom wmDeleteWindow;
 
+#ifdef GL_EXT_shared_texture_palette
 extern int UseSharedTexturePalette;
 extern PFNGLCOLORTABLEEXTPROC pglColorTableEXT;
+#endif
+
+extern int CheckToken(const char *str, const char *item);
 
 int attrib[] = {
 	GLX_RGBA,
@@ -63,6 +67,7 @@ int main(int argc, char *argv[])
 	XColor fg = { 0 };
 	char data[8] = { 0x01 };
 	char *display;
+	const char *ext;
 	int mask, major, minor, verbose = 0;
 	int opt;
 	
@@ -128,7 +133,7 @@ int main(int argc, char *argv[])
 		
 	ctx = glXCreateContext(dpy, vi, NULL, True);
 	if (ctx == NULL) {
-		fprintf(stderr, "glx context create failed\n");
+ 		fprintf(stderr, "GLX context creation failed\n");
 		exit(EXIT_FAILURE);
 	}
 	
@@ -171,6 +176,18 @@ int main(int argc, char *argv[])
 	
 	XMapWindow(dpy, win);
 	XFlush(dpy);
+	
+	ext = (const char *)glGetString(GL_EXTENSIONS);
+#ifdef GL_EXT_shared_texture_palette
+	UseSharedTexturePalette = 0;
+	if (CheckToken(ext, "GL_EXT_shared_texture_palette")) {
+		pglColorTableEXT = glXGetProcAddressARB((unsigned const char *)"glColorTableEXT");
+		if (pglColorTableEXT) {
+			UseSharedTexturePalette = 1;
+			printf("GL_EXT_shared_texture_palette found...\n");
+		}
+	}
+#endif
 	
 	InitData();
 	

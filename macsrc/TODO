@@ -3,6 +3,7 @@ TODO:
   - With windowed systems, put paused in the title bar?
   + Being in a text menu could be the "pause"
     - This would be fine for svgalib
+    - What if the program is ran without a term? The user's fault?
 * SVGAlib Hack:
   - Check to make sure linear addressing is supported
   - If SVGAlib does not support 512x384x256, allow the user to pan around 
@@ -21,7 +22,7 @@ TODO:
   - When all drawing is implemented, remove any unnecessary state/matrix
     changes.
   - Split up GLDraw.c
-  - GL_EXT_shared_texture_palette
+  - Is GL_REPLACE faster than GL_MODULATE for textures?
 * Save/Load Games
   - Menu code does not exist yet -- so just have a compiled in default save
     and load files
@@ -39,13 +40,14 @@ TODO:
   - 11025 will probably be the best rate
 * Interface
   + Menus and dialog boxes
-    + Command line (temporary workaround for no menus).
-      - Resolution
-      - Difficulty
+    - Command line (temporary workaround for no menus).
     - Text only menus (similar to what snes9x has).
+    - Would like to have a "lower level" X Toolkit, to provide menus and
+      dialog boxes, and various widgets, but I rather not be "forced" into
+      losing the ability to call Xlib functions directly.
 * Different depths/visuals for software clients.
   + Different functions to draw with different bpps.
-    - 15 bpp uses same draw routes as 16 but different palette one
+    - 15 bpp uses same draw routes as 16 but different set palette
     + not sure how to do palette fades
       - don't support them generally
       - MacPlay->Id Logo: have some sort of redraw.
@@ -77,6 +79,9 @@ IDEAS:
   - XXX: Load Previously Loaded Game
   - XXX: Save Game to Previously used File
   - F10: Quit
+* Command Line
+  - Resolution
+  - Difficulty
 * How about adding red/white shifts (from PC wolf3d)? So screen changes
   color when you are hit or pick up items.
 

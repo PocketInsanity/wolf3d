@@ -33,8 +33,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define M_PI 3.14159265358979323846
 #endif
 
+#ifdef GL_EXT_shared_texture_palette
 int UseSharedTexturePalette = 0;
 PFNGLCOLORTABLEEXTPROC pglColorTableEXT;
+Byte TexPal[256 * 4];
+#endif
+
 Byte Pal[768];
 
 /*
@@ -92,11 +96,27 @@ void SetAPalettePtr(unsigned char *PalPtr)
 void SetPalette(Byte *pal)
 {
 	memcpy(Pal, pal, 768);
+#ifdef GL_EXT_shared_texture_palette
+	if (UseSharedTexturePalette) {
+		int i;
+		
+		for (i = 0; i < 256; i++) {
+			TexPal[i*4+0] = Pal[i*3+0];
+			TexPal[i*4+1] = Pal[i*3+1];
+			TexPal[i*4+2] = Pal[i*3+2];
+			TexPal[i*4+3] = 255;
+		}
+		TexPal[000*4+3] = 0; /* ??? */
+		TexPal[255*4+3] = 0;
+		
+		pglColorTableEXT(GL_SHARED_TEXTURE_PALETTE_EXT, GL_RGBA, 256, GL_RGBA, GL_UNSIGNED_BYTE, TexPal);
+	}
+#endif		
 }
 
 void ClearTheScreen(Word c)
 {
-	glClearColor((double)Pal[c*3+0]/255.0, (double)Pal[c*3+1]/255.0, (double)Pal[c*3+2]/255.0, 0.0);
+	glClearColor((GLdouble)Pal[c*3+0]/255.0, (GLdouble)Pal[c*3+1]/255.0, (GLdouble)Pal[c*3+2]/255.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 }
 
@@ -125,41 +145,51 @@ void SetNumber(LongWord number, Word x, Word y, Word digits)
 }
 
 /*
-Unused Status Bar stuff
+Status Bar stuff
 */
 
 Word NumberIndex = 36; /* Argh */
 
+static int Floor, Score, Lives, Health, Ammo, Treasure, Keys, Face;
+
 void IO_DrawFloor(Word floor)
 {
+	Floor = floor;
 }
 
 void IO_DrawScore(LongWord score)
 {
+	Score = score;
 }
 
 void IO_DrawLives(Word lives)
 {
+	Lives = lives;
 }
 
 void IO_DrawHealth(Word health)
 {
+	Health = health;
 }
 
 void IO_DrawAmmo(Word ammo)
 {
+	Ammo = ammo;
 }
 
 void IO_DrawTreasure(Word treasure)
 {
+	Treasure = treasure;
 }
 
 void IO_DrawKeys(Word keys)
 {
+	Keys = keys;
 }
 
 void IO_DrawFace(Word face)
 {
+	Face = face;
 }
 
 void IO_DrawStatusBar(void)
@@ -247,7 +277,7 @@ void MakeSmallFont()
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 16, 16, 0, GL_RGB, GL_UNSIGNED_BYTE, buf2);
 	
 	free(buf2);
@@ -358,6 +388,32 @@ Byte *DeSprite(Byte *data, Byte *pal)
 	return buf;
 }
 
+Byte *DeSprite256(Byte *data)
+{
+	Byte *buf;
+	unsigned short *dat = (unsigned short *)data;
+	int i, x, width, offset;
+	
+	buf = (Byte *)malloc(128 * 128);
+	memset(buf, 255, 128 * 128);
+	
+	width = sMSB(dat[0]);
+	
+	offset = 64 - width / 2;
+	for (x = 0; x < width; x++) {
+		SpriteRun *p = (SpriteRun *)&dat[ sMSB(dat[x+1]) / 2 ];
+		
+		while (p->Topy != 0xFFFF) {
+			for (i = sMSB(p->Topy) / 2; i < sMSB(p->Boty) / 2; i++) 
+				*(buf + i * 128 + x + offset) = data[sMSB(p->Shape)+sMSB(p->Topy)/2 + (i-sMSB(p->Topy)/2)];
+
+			p++;
+		}
+	}
+		
+	return buf;
+}
+
 Byte *DeXMShape(Byte *data, Byte *pal)
 {
 	Byte *buf, *mask, *ptr;
@@ -394,6 +450,38 @@ Byte *DeXMShape(Byte *data, Byte *pal)
 	return buf;
 }
 
+Byte *DeXMShape256(Byte *data)
+{
+	Byte *buf, *mask, *ptr;
+	int x, y, w, h;
+	
+	buf = (Byte *)malloc(128 * 128);
+	memset(buf, 255, 128 * 128);
+	
+	x = data[0] << 8 | data[1];
+	y = data[2] << 8 | data[3];
+	w = data[4] << 8 | data[5];
+	h = data[6] << 8 | data[7];
+	
+	data += 8;
+	mask = data + w*h;
+	ptr = buf + 128*y + x;
+	
+	do {
+		int w2 = w;
+		do {
+			if (*mask == 0) 
+				*ptr = *data;
+			data++;
+			mask++;
+			ptr++;
+		} while (--w2);
+		ptr += 128 - w;
+	} while (--h);
+	
+	return buf;
+}
+
 void IO_ClearViewBuffer()
 {
 	LastTexture = 0;
@@ -420,8 +508,6 @@ void IO_ClearViewBuffer()
 	glColor3ub(Pal[0x2A*3+0], Pal[0x2A*3+1], Pal[0x2A*3+2]);
 	glRectf(1, -1, -1, 0);
 		
-	glColor3f(1.0, 1.0, 1.0);
-
 	glEnable(GL_DEPTH_TEST);
 #else	
 	glEnable(GL_DEPTH_TEST);
@@ -434,9 +520,7 @@ void IO_ClearViewBuffer()
 	
 	glColor3ub(Pal[0x2A*3+0], Pal[0x2A*3+1], Pal[0x2A*3+2]);
 	glRectf(1, -1, -1, 0);
-		
-	glColor3f(1.0, 1.0, 1.0);
-	
+			
 	glDepthRange(0.0, 1.0);
 	glDepthFunc(GL_LESS);
 #endif
@@ -444,8 +528,11 @@ void IO_ClearViewBuffer()
 	
 	glMatrixMode(GL_MODELVIEW);
 	
-	glRotatef(270.0-((double)gamestate.viewangle / (double)ANGLES * 360.0), 0.0, 1.0, 0.0);
-	glTranslatef((double)actors[0].x / 256.0, 0, (double)actors[0].y / 256.0);
+	/* Not needed when using GL_REPLACE */
+	/* glColor3f(1.0, 1.0, 1.0); */
+	
+	glRotatef(270.0-((GLfloat)gamestate.viewangle / (GLfloat)ANGLES * 360.0), 0.0, 1.0, 0.0);
+	glTranslatef((GLfloat)actors[0].x / 256.0, 0, (GLfloat)actors[0].y / 256.0);
 }
 
 GLuint waltex[64];
@@ -454,17 +541,20 @@ GLuint weptex[NUMWEAPONS*4];
 
 void InitRenderView()
 {
-	Byte *pal;
+	Byte *buf, *pal;
 	int i;
 	
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
 	LastTexture = 0;
 	glEnable(GL_TEXTURE_2D);	
+
+#ifdef GL_EXT_shared_texture_palette
+	glEnable(GL_SHARED_TEXTURE_PALETTE_EXT);
+#endif
 		
 	pal = LoadAResource(rGamePal);
 	for (i = 0; i < 64; i++) {
-		Byte *buf, *buf2;
 		
 		if (waltex[i]) {
 			if (ArtData[i] == NULL) {
@@ -479,10 +569,7 @@ void InitRenderView()
 		}
 		
 		glBindTexture(GL_TEXTURE_2D, waltex[i]);
-		
-		buf2 = FlipWall(ArtData[i], 128, 128);
-		buf = Pal256toRGB(buf2, 128 * 128, pal);
-		free(buf2);
+		buf = FlipWall(ArtData[i], 128, 128);
 		
 		/*
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -493,14 +580,23 @@ void InitRenderView()
 		
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 128, 128, 0, GL_RGB, GL_UNSIGNED_BYTE, buf);
-				
-		free(buf);
+		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);		
+
+#ifdef GL_EXT_shared_texture_palette
+		if (UseSharedTexturePalette) {
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_COLOR_INDEX8_EXT, 128, 128, 0, GL_COLOR_INDEX, GL_UNSIGNED_BYTE, buf);
+		} else 
+#endif
+		{					
+			Byte *dat = Pal256toRGB(buf, 128 * 128, pal);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 128, 128, 0, GL_RGB, GL_UNSIGNED_BYTE, dat);
+			free(dat);
+		}
+
+		free(buf);				
 	}
 	
 	for (i = 1; i < S_LASTONE; i++) {
-		Byte *buf;
 				
 		if (sprtex[i]) {
 			if (SpriteArray[i] == NULL) {
@@ -516,7 +612,6 @@ void InitRenderView()
 		}
 		glBindTexture(GL_TEXTURE_2D, sprtex[i]);
 		
-		buf = DeSprite(SpriteArray[i], pal);
 		/*
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);		
@@ -526,8 +621,18 @@ void InitRenderView()
 		
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 128, 128, 0, GL_RGBA, GL_UNSIGNED_BYTE, buf);
+		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+
+#ifdef GL_EXT_shared_texture_palette
+		if (UseSharedTexturePalette) {
+			buf = DeSprite256(SpriteArray[i]);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_COLOR_INDEX8_EXT, 128, 128, 0, GL_COLOR_INDEX, GL_UNSIGNED_BYTE, buf);
+		} else
+#endif
+		{		
+			buf = DeSprite(SpriteArray[i], pal);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 128, 128, 0, GL_RGBA, GL_UNSIGNED_BYTE, buf);
+		}
 				
 		free(buf);
 	}
@@ -550,8 +655,9 @@ void InitRenderView()
 			
 		glGenTextures(NUMWEAPONS*4, weptex);
 		for (i = 0; i < NUMWEAPONS*4; i++) {
-			Byte *buf = DeXMShape(GameShapes[12+i], pal);
+			
 			glBindTexture(GL_TEXTURE_2D, weptex[i]);
+			
 			/*
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);		
@@ -561,8 +667,18 @@ void InitRenderView()
 			
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 128, 128, 0, GL_RGBA, GL_UNSIGNED_BYTE, buf);
+			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+
+#ifdef GL_EXT_shared_texture_palette
+			if (UseSharedTexturePalette) {
+				buf = DeXMShape256(GameShapes[12+i]);
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_COLOR_INDEX8_EXT, 128, 128, 0, GL_COLOR_INDEX, GL_UNSIGNED_BYTE, buf);
+			} else
+#endif
+			{	
+				buf = DeXMShape(GameShapes[12+i], pal);		
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 128, 128, 0, GL_RGBA, GL_UNSIGNED_BYTE, buf);
+			}
 				
 			free(buf);
 		}
@@ -585,6 +701,7 @@ void InitRenderView()
 	glLoadIdentity();
 	
 	xgluPerspective(90.0, 400.0/640.0, 0.20, 182.0);
+
 /*	
 	glFrontFace(GL_CCW);
 	glCullFace(GL_BACK);
@@ -628,8 +745,8 @@ void DrawSprite(thing_t *t)
 {
 	glPushMatrix();
 	
-	glTranslatef(-(double)t->x / 256.0, 0, -(double)t->y / 256.0);
-	glRotatef(90.0+((double)gamestate.viewangle / (double)ANGLES * 360.0), 0.0, 1.0, 0.0);
+	glTranslatef(-(GLfloat)t->x / 256.0, 0, -(GLfloat)t->y / 256.0);
+	glRotatef(90.0+((GLfloat)gamestate.viewangle / (GLfloat)ANGLES * 360.0), 0.0, 1.0, 0.0);
 	
 	if (sprtex[t->sprite] == 0) {
 		fprintf(stderr, "ERROR: 0 texture in DrawSprite (%d)\n", t->sprite);
@@ -803,7 +920,7 @@ void SortEvents(void)
 	
 **********************************/
 
-void AddSprite (thing_t *thing, Word actornum)
+void AddSprite(thing_t *thing, Word actornum)
 {
 	fixed_t tx;		/* New X coord */
 	fixed_t tz;		/* New z coord (Size) */
@@ -838,15 +955,15 @@ void AddSprite (thing_t *thing, Word actornum)
 /* calculate edges of the shape */
 
 	patch = SpriteArray[thing->sprite];     /* Pointer to the sprite info */
-	width =((LongWord)sMSB(patch[0])*scale)>>6; /* Get the width of the sprite */
+	width = (sMSB(patch[0]) * scale) >> 6; /* Get the width of the sprite */
 	if (!width)
 		return; 	/* too far away */
 	
-	x1 = px - (width>>1);   /* Get the left edge */
-	if (x1 >= (int) SCREENWIDTH)
+	x1 = px - width;   /* Get the left edge */
+	if (x1 > SCREENWIDTH)
 		return;         /* off the right side */
 	
-	x2 = x1 + width - 1;                    /* Get the right edge */
+	x2 = x1 + (width << 1);                    /* Get the right edge */
 	if (x2 < 0) 
 		return;		/* off the left side */	
 	
@@ -923,10 +1040,9 @@ void DrawSprites(void)
 
 /* draw from smallest scale to largest */
 
-		/* TODO: GL should raw back to front with depth */
 		xe = &firstevent[i-1];
 		do {
-			dseg = &vissprites[xe[0]&(MAXVISSPRITES-1)];	/* Which one? */
+			dseg = &vissprites[xe[0]&(MAXVISSPRITES-1)];
 			DrawSprite(dseg->pos);
 			--xe;
 		} while (--i);
@@ -935,7 +1051,7 @@ void DrawSprites(void)
 
 static int WallSeen = 0;
 
-void WallIsSeen(saveseg_t *seg)
+static void WallIsSeen(saveseg_t *seg)
 {
 	seg->dir |= DIR_SEENFLAG;		/* for automap*/
 	areavis[seg->area] = 1;			/* for sprite drawing*/
@@ -1137,13 +1253,13 @@ void P_DrawSegx(saveseg_t *seg)
 	Byte *tex;
 	int i, t;
 
-	plane = -((float)seg->plane)/2.0;
+	plane = -((GLfloat)seg->plane)/2.0;
 
 	if (seg == pwallseg) {		/* Is this the active pushwall? */
 		if (seg->dir&1)	{	/* east/west */
-			plane += -(float)PushWallRec.pwallychange / 256.0;
+			plane += -(GLfloat)PushWallRec.pwallychange / 256.0;
 		} else {		/* north/south */
-			plane += -(float)PushWallRec.pwallxchange / 256.0;
+			plane += -(GLfloat)PushWallRec.pwallxchange / 256.0;
 		}
 	}
 	
@@ -1153,7 +1269,7 @@ void P_DrawSegx(saveseg_t *seg)
 	if (seg->texture >= 129) {
 		door = seg->texture - 129;
 		door_p = &doors[door];
-		texslide = (float)door_p->position / 256.0f;
+		texslide = (GLfloat)door_p->position / 256.0f;
 		tex = &textures[129 + (door_p->info>>1)][0];
 	} else {
 		texslide = 0.0f;
@@ -1164,7 +1280,7 @@ void P_DrawSegx(saveseg_t *seg)
 	
 	t = tex[i >> 1];
 		
-	pos = ((double)i) / 2.0f;
+	pos = (GLfloat)i / 2.0f;
 	
 	if (i == seg->min) {
 		if (i & 1) {
@@ -1175,18 +1291,14 @@ void P_DrawSegx(saveseg_t *seg)
 			min = 0.0;
 		}
 		max = 1.0f;
-	} /* else if (i == (seg->max-1)) {
-		min = 0.0f;
-		max = 0.5f;		
-		i += 2;	
-	} */ else {
+	} else {
 		min = 0.0f;
 		max = 1.0f;
 		i += 2;
 	}
 		        		
-	smin = -((float)pos + texslide); 
-	smax = -((float)pos + (max - min));
+	smin = -(pos + texslide); 
+	smax = -(pos + (max - min));
 	
 	if (waltex[t] == 0)
 		fprintf(stderr, "ERROR: 0 texture in P_DrawSegx!\n");	
