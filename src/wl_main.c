@@ -137,7 +137,7 @@ int WriteConfig()
 	if (fd != -1) {
 		WriteBytes(fd, (byte *)GAMEHDR, 8);	/* WOLF3D, 0, 0 */
 		WriteBytes(fd, (byte *)CFGTYPE, 4);	/* CFG, 0 */
-	/**/	WriteInt32(fd, 0xFFFFFFFF);		/* Version (integer) */
+		WriteInt32(fd, 0x00000000);		/* Version (integer) */
 		WriteBytes(fd, (byte *)GAMETYPE, 4);	/* XXX, 0 */
 		WriteInt32(fd, time(NULL));		/* Time */
 		WriteInt32(fd, 0x00000000);		/* Padding */
@@ -151,6 +151,40 @@ int WriteConfig()
 		}
 		
 		WriteInt32(fd, viewsize);
+
+		/* sound config, etc. (to be done) */
+		WriteInt32(fd, 0); /* padding */
+		WriteInt32(fd, 0); /* padding */
+		WriteInt32(fd, 0); /* padding */
+		WriteInt32(fd, 0); /* padding */
+		WriteInt32(fd, 0); /* padding */
+		WriteInt32(fd, 0); /* padding */
+		WriteInt32(fd, 0); /* padding */
+		WriteInt32(fd, 0); /* padding */
+			
+		/* direction keys */	
+		for (i = 0; i < 4; i++) {
+			WriteInt32(fd, dirscan[i]);
+		}
+			
+		/* other game keys */
+		for (i = 0; i < 8; i++) { /* NUMBUTTONS = 8 */
+			WriteInt32(fd, buttonscan[i]);
+		}
+			
+		/* mouse enabled */
+		WriteInt8(fd, mouseenabled);
+			
+		/* mouse buttons */
+		for (i = 0; i < 4; i++) {
+			WriteInt32(fd, buttonmouse[i]);
+		}
+			
+		/* mouse adjustment */
+		WriteInt32(fd, mouseadjustment);
+			
+		/* joystick (to be done) */
+		WriteInt32(fd, -1);
 
 		CloseWrite(fd);
 		
@@ -172,13 +206,25 @@ int WriteConfig()
 static void SetDefaults()
 {
 	viewsize = 15;
+	
+	mouseenabled = false;
+
+	joystickenabled = false;
+	joypadenabled = false;
+	joystickport = 0;
+
+	mouseadjustment = 5;
+
+	SD_SetMusicMode(smm_AdLib);
+	SD_SetSoundMode(sdm_AdLib);
+	SD_SetDigiDevice(sds_SoundBlaster);
 }
 
 int ReadConfig()
 {
 	int fd, configokay;
 	char buf[8];
-	int32_t v;
+	int32_t version, v;
 	int i;
 	
 	configokay = 0;
@@ -186,6 +232,8 @@ int ReadConfig()
 	fd = OpenRead(configname);
 	
 	if (fd != -1) {
+		SetDefaults();
+		
 		ReadBytes(fd, (byte *)buf, 8);
 		if (strncmp(buf, GAMEHDR, 8))
 			goto configend;
@@ -194,8 +242,8 @@ int ReadConfig()
 		if (strncmp(buf, CFGTYPE, 4))
 			goto configend;
 		
-		v = ReadInt32(fd);
-	/**/	if (v != 0xFFFFFFFF)
+		version = ReadInt32(fd);
+		if (version != 0xFFFFFFFF && version != 0x00000000)
 			goto configend;
 		
 		ReadBytes(fd, (byte *)buf, 4);
@@ -220,6 +268,44 @@ int ReadConfig()
 		
 		viewsize = ReadInt32(fd);
 		
+		/* load the new data */
+		if (version == 0x00000000) {
+			/* sound config, etc. */
+			ReadInt32(fd); /* padding */
+			ReadInt32(fd); /* padding */
+			ReadInt32(fd); /* padding */
+			ReadInt32(fd); /* padding */
+			ReadInt32(fd); /* padding */
+			ReadInt32(fd); /* padding */
+			ReadInt32(fd); /* padding */
+			ReadInt32(fd); /* padding */
+			
+			/* direction keys */	
+			for (i = 0; i < 4; i++) {
+				dirscan[i] = ReadInt32(fd);
+			}
+			
+			/* other game keys */
+			for (i = 0; i < 8; i++) { /* NUMBUTTONS = 8 */
+				buttonscan[i] = ReadInt32(fd);
+			}
+			
+			/* mouse enabled */
+			mouseenabled = ReadInt8(fd);
+			
+			/* mouse buttons */
+			for (i = 0; i < 4; i++) {
+				buttonmouse[i] = ReadInt32(fd);
+			}
+			
+			/* mouse adjustment */
+			mouseadjustment = ReadInt32(fd);
+			
+			/* unimplemented joystick */
+			v = ReadInt32(fd);
+			if (v != 0xFFFFFFFF) {
+			}
+		}
 #ifdef UPLOAD		
 		MainMenu[readthis].active = 1;
 		MainItems.curpos = 0;
@@ -238,18 +324,6 @@ configend:
 		SetDefaults();
 	}
 	
-	mouseenabled = false;
-
-	joystickenabled = false;
-	joypadenabled = false;
-	joystickport = 0;
-
-	mouseadjustment = 5;
-
-	SD_SetMusicMode(smm_AdLib);
-	SD_SetSoundMode(sdm_AdLib);
-	SD_SetDigiDevice(sds_SoundBlaster);
-	
 	return 0;
 }
 
@@ -264,7 +338,7 @@ int SaveTheGame(char *fn, char *tag, int dx, int dy)
 	if (fd != -1) {
 		WriteBytes(fd, (byte *)GAMEHDR, 8);
 		WriteBytes(fd, (byte *)SAVTYPE, 4);
-		WriteInt32(fd, 0xFFFFFFFF); /* write version */
+		WriteInt32(fd, 0x00000000); /* write version */
 		WriteBytes(fd, (byte *)GAMETYPE, 4);
 	
 		WriteInt32(fd, time(NULL));
@@ -498,7 +572,7 @@ int LoadTheGame(char *fn, int dx, int dy)
 		goto loadfail;
 	
 	v = ReadInt32(fd);
-	if (v != 0xFFFFFFFF)
+	if (v != 0xFFFFFFFF && v != 0x00000000) /* -1 and 0 are the same */
 		goto loadfail;
 	
 	ReadBytes(fd, (byte *)buf, 4);
