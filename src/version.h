@@ -12,7 +12,7 @@
 #if WMODE == 0
 /* #define SPEAR */
 /* #define SPEARDEMO */
-#define GOODTIMES
+/* #define GOODTIMES */
 #define UPLOAD
 
 #elif WMODE == 1

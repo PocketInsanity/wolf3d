@@ -62,6 +62,7 @@ metaname like sc_Left etc or something
 update once per frame or such.. hm
 and where is that greenpixel coming from (when using end game with largest
 window size)
+* merge id_vl.c and id_in.c to get id_svga.c
 
 Specific:
 * memory/sound intro screen goes

@@ -11,7 +11,6 @@
 	SDMode		SoundMode;
 	SMMode		MusicMode;
 	SDSMode		DigiMode;
-	word		HackCount;
 	word		*SoundTable;	
 	word		ssPort = 2;
 	int			DigiMap[LASTSOUND];

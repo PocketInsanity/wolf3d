@@ -151,7 +151,7 @@ void	ParseTimedCommand (void)
 =====================
 */
 
-void	TimedPicCommand (void)
+void TimedPicCommand (void)
 {
 	ParseTimedCommand ();
 
@@ -625,8 +625,7 @@ void ShowArticle (char *article)
 		}
 
 		LastScan = 0;
-		while (!LastScan)
-		;
+		while (!LastScan) IN_CheckAck(); /* TODO: update events */
 
 		switch (LastScan)
 		{
@@ -666,9 +665,9 @@ void ShowArticle (char *article)
 
 //===========================================================================
 
-int 	endextern = T_ENDART1;
+int endextern = T_ENDART1;
 #ifndef SPEAR
-int		helpextern = T_HELPART;
+int helpextern = T_HELPART;
 #endif
 
 /*

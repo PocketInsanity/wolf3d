@@ -189,7 +189,7 @@ int EpisodeSelect[6]={1};
 
 
 int SaveGamesAvail[10],StartGame,SoundStatus=1,pickquick;
-char SaveGameNames[10][32],SaveName[13]="SAVEGAM?.";
+char SaveGameNames[10][32],SaveName[13]="savegam?.";
 
 
 ////////////////////////////////////////////////////////////////////
