@@ -2,7 +2,16 @@ This is not yet finished, but:
 
 Wolfenstein 3D is an id Software game.  This is a port of the Macintosh
 version that was released by MacPlay in 1994.  You can find information about
-the source release at: http://www.maccentral.com/news/0001/24.wolf3d.shtml
+the source release at: http://www.maccentral.com/news/0001/24.wolf3d.shtml 
+WolfReadMe.txt, from that Mac Wolf3d source release, is also included with
+this port.
+
+Goals of this Project (Just what am I trying to do?):  Like the PC verison,
+this game (I consider the PC and Mac versions as different games) was only 
+available on a certain platform, The Macintosh.  I had ported the PC version
+to Linux before, so when I found the source to the Macintosh version, I
+thought "Why not?"  So here it is.  My goal is to implement everything the
+Macintosh version had, and then somehow improve on that.
 
 To use this, you need the resource fork from the First Encounter (the two
 level shareware version) or the Second Encounter (the for-sell version). 
@@ -63,6 +72,9 @@ Any suggestions?
 glwolf3d: The OpenGL Version (written using Xlib w/ GLX).  I like it.  Not
 all graphics are currently shown.
 
+Note: The available targets (binaries) may change over time as I decide
+which APIs work the best, etc.
+
 To build these binaries, type 'make' in the directory with the source... If
 you don't want to build a certain binary, edit the Makefile.  On the line
 "all: swolf3d xwolf3d gwolf3d glwolf3d" in the Makefile, you can remove the
@@ -74,10 +86,12 @@ and off you go!
 
 Thanks to id Software for allowing me to release this source under the GNU
 GPL (see LICENSE) and Bill Heineman (Programmer and Project Lead of the
-Macintosh version) for answering my inquiries. WolfReadMe.txt is included
-from the original Mac Wolf3d source release.
+Macintosh version) for answering my inquiries. 
+
 
 Steven Fuller <relnev@users.sourceforge.net>
+
+
 ----------------------------
 TODO (Stuff to Write About):
 Contents:
@@ -85,6 +99,7 @@ Contents:
 * How to Compile
 * How to Use
 * About (More Specific, document how this source is different than original)
+* Thanks
 * License
 * Contact
 

@@ -11,19 +11,21 @@ TODO:
     640x400 or 480 is supported?)
 * Finish moving all 2D code to SoftDraw.c
 * Finish OpenGL
-  - Check if top sprite drawing is correct
-  + Status bars, Introscreens, etc. [Draw(XM)Shape]
-    - Not sure exactly yet how I will implement this.
+  - Check if topsprite drawing is correct
+  + Status bars, Introscreens [DrawShape]
+    - Not sure exactly yet how I will implement this yet.
   - Correct viewing frustum
   + Allow window resizing
-    - Not sure what to about the currently loaded GameShapes (keep or load
-      most appropiate for the new video mode).
+    - Only bother with 640x480 versions of GameShapes.  Minimum for GLQuake
+      was 640x480, and you could get lower resolutions with software.
   - Could use the LastTexture to have less glBegin/Ends (would need to know
     where to stop though (try IO_DisplayViewBuffer).
 * Save/Load Games
 * Documentation
 * Sound!
-  - Waiting for information about music.
+  - Need to write sound playing code (probably access /dev/dsp directly
+    since this source does not have any code for determining sound position).
+  - Music is planned.
 * Interface
   + Menus and dialog boxes
     - Command line (temporary workaround for no menus).

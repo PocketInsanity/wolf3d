@@ -19,6 +19,17 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "wolfdef.h"
 
+/**********************************
+
+	Draw the gun in the foreground
+	
+**********************************/
+
+void IO_AttackShape(Word shape)
+{
+	DrawXMShape(ScaleX(128),ScaleY(96),GameShapes[shape+12]);
+}
+
 void DisplayScreen(Word res)
 {
 	LongWord *PackPtr;

@@ -191,17 +191,6 @@ void IO_DrawKeys(Word keys)
 
 /**********************************
 
-	Draw the gun in the foreground
-	
-**********************************/
-
-void IO_AttackShape(Word shape)
-{
-	DrawXMShape(ScaleX(128),ScaleY(96),GameShapes[shape+12]);
-}
-
-/**********************************
-
 	Draw the BJ's face
 	
 **********************************/

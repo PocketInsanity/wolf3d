@@ -68,10 +68,6 @@ void DrawShape(Word x, Word y, void *ShapePtr)
 {
 }
 
-void DrawXMShape(Word x, Word y, void *ShapePtr)
-{
-}
-
 GLuint LastTexture;
 
 GLuint smltex[65];
@@ -249,6 +245,42 @@ Byte *DeSprite(Byte *data, Byte *pal)
 	return buf;
 }
 
+Byte *DeXMShape(Byte *data, Byte *pal)
+{
+	Byte *buf, *mask, *ptr;
+	int x, y, w, h;
+	
+	buf = (Byte *)malloc(128 * 128 * 4);
+	memset(buf, 0, 128 * 128 * 4);
+	
+	x = data[0] << 8 | data[1];
+	y = data[2] << 8 | data[3];
+	w = data[4] << 8 | data[5];
+	h = data[6] << 8 | data[7];
+	
+	data += 8;
+	mask = data + w*h;
+	ptr = buf + 512*y + x*4;
+	
+	do {
+		int w2 = w;
+		do {
+			if (*mask == 0) {
+				ptr[0] = pal[data[0]*3+0];
+				ptr[1] = pal[data[0]*3+1];
+				ptr[2] = pal[data[0]*3+2];
+				ptr[3] = 255;
+			}
+			ptr += 4;
+			data++;
+			mask++;
+		} while (--w2);
+		ptr += 4*(128 - w);
+	} while (--h);
+	
+	return buf;
+}
+
 void IO_ClearViewBuffer()
 {
 	LastTexture = 0;
@@ -257,11 +289,11 @@ void IO_ClearViewBuffer()
 	/* glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); */
 	glClear(GL_DEPTH_BUFFER_BIT);
 	
+	/* IO_AttackShape disables depth */
+	
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	
-	glDisable(GL_DEPTH_TEST);
-	
+		
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
 	glLoadIdentity();
@@ -281,6 +313,7 @@ void IO_ClearViewBuffer()
 
 GLuint waltex[64];
 GLuint sprtex[S_LASTONE];
+GLuint weptex[NUMWEAPONS*4];
 
 void InitRenderView()
 {
@@ -360,6 +393,27 @@ void InitRenderView()
 		free(buf);
 	}
 	
+	if (weptex[0] == 0) {
+		glGenTextures(NUMWEAPONS*4, weptex);
+		for (i = 0; i < NUMWEAPONS*4; i++) {
+			Byte *buf = DeXMShape(GameShapes[12+i], pal);
+			glBindTexture(GL_TEXTURE_2D, weptex[i]);
+			/*
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);		
+			*/
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 128, 128, 0, GL_RGBA, GL_UNSIGNED_BYTE, buf);
+				
+			free(buf);
+		}	
+	}
+	
 	ReleaseAResource(rGamePal);
 
 	glEnable(GL_DEPTH_TEST);
@@ -380,6 +434,38 @@ void InitRenderView()
 	glCullFace(GL_BACK);
 	glEnable(GL_CULL_FACE);
 */
+}
+
+void IO_AttackShape(Word shape)
+{
+	LastTexture = weptex[shape];
+	if (weptex[shape] == 0) {
+		fprintf(stderr, "Weapon shape %d is zero texture!\n", shape);
+	}
+	
+	glDisable(GL_DEPTH_TEST);
+	
+	glBindTexture(GL_TEXTURE_2D, weptex[shape]);
+	
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+	
+	glBegin(GL_QUADS);
+	glTexCoord2f(1.0, 0.0); glVertex2f( 0.2, -0.36);
+	glTexCoord2f(1.0, 1.0); glVertex2f( 0.2, -1.00);
+	glTexCoord2f(0.0, 1.0); glVertex2f(-0.2, -1.00);
+	glTexCoord2f(0.0, 0.0); glVertex2f(-0.2, -0.36);
+	glEnd();
+	
+	glPopMatrix();
+	
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
 }
 
 void StartRenderView()

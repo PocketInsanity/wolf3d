@@ -175,7 +175,7 @@ int main(int argc, char *argv[])
 	
 	InitData();
 	
-	GameViewSize = 2;	
+	GameViewSize = 3;	
 	NewGameWindow(GameViewSize); 
 
 	ClearTheScreen(BLACK);
