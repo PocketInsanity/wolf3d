@@ -10,7 +10,12 @@ some sort of garbage collection
 the right place
 * every structure that is read/written must be PACKED, with datatypes
 specifically set! (ie, no int, but short or long int)
-* is that memory intro screen needed anymore? probably not
+* or at least have PACKED versions of read/write structures, and transfer
+to/from just for reading, so only not-packed structures are used during
+actual gameplay/etc. 
+* is that memory intro screen needed anymore? probably not, although it
+would be nice to show what version is loaded, but doom just printed text
+* then, what about PG13? OH NO!!!!
 * fix the input code, everything is spread out... ideally everything should
 work the same, let the input handler do it all instead
 * when viewsize is around 20, sprites end up being drawn over the border.
@@ -26,11 +31,10 @@ version than a spanish version
 * fix status bar gfx junk, and those tiles that do not wish to be extracted
 * Use either US_CheckParm or MS_CheckParm.
 * perhaps rename UPLOAD
-TOO MANY #IFDEF.
-and upload builds with lots of wl6 code anyway (sound references were just
-ifdefed
+* TOO MANY #IFDEFs
+* and upload builds with lots of wl6 code anyway (sound references were just
+ifndefed out)
 * verify if the sounds and graphics are correctly numbered, once again...
-* remove -fwritable-strings
 * find out why shareware version produces these messages:
 CA_FarRead only read 471 out of 1671
 Trying to free null audio chunk 207!

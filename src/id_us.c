@@ -111,11 +111,12 @@ int US_CheckParm(char *parm,char **strings)
 //		supported.
 //
 ///////////////////////////////////////////////////////////////////////////
-void US_Print(char *s)
+void US_Print(char *str)
 {
-	char	c, *se;
-	word	w,h;
-
+	char c, *se, *s, *sz = strdup(str);
+	word w, h;
+	s = sz;
+	
 	while (*s)
 	{
 		se = s;
@@ -140,6 +141,8 @@ void US_Print(char *s)
 		else
 			PrintX += w;
 	}
+	
+	free(sz);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -228,10 +231,13 @@ void US_CPrintLine(char *s)
 //		supported.
 //
 ///////////////////////////////////////////////////////////////////////////
-void US_CPrint(char *s)
+void US_CPrint(char *str)
 {
-	char	c, *se;
-
+	/* Functions like to pass a string constant */
+	
+	char c, *se, *s, *sz = strdup(str);
+	s = sz;
+	
 	while (*s)
 	{
 		se = s;
@@ -248,6 +254,8 @@ void US_CPrint(char *s)
 			s++;
 		}
 	}
+	
+	free(sz);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -305,7 +313,7 @@ US_DrawWindow(word x,word y,word w,word h)
 //	USL_XORICursor() - XORs the I-bar text cursor. Used by US_LineInput()
 //
 ///////////////////////////////////////////////////////////////////////////
-static void USL_XORICursor(int x,int y,char *s,word cursor)
+static void USL_XORICursor(int x, int y, char *s, word cursor)
 {
 	static	boolean	status;		// VGA doesn't XOR...
 	char	buf[MaxString];
