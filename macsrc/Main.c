@@ -137,7 +137,7 @@ Boolean TitleScreen()
 	NewGameWindow(1);	/* Set to 512 mode */
 	FadeToBlack();		/* Fade out the video */
 
-	DisplayScreen(rTitlePic);
+	DisplayScreen(rTitlePic, rTitlePal);
 	BlastScreen();
 
 	StartSong(SongListPtr[0]);

@@ -40,12 +40,16 @@ XVisualInfo *vi;
 GLXContext ctx;
 Atom wmDeleteWindow;
 
+int VidWidth, VidHeight, ViewHeight;
+
 #ifdef GL_EXT_shared_texture_palette
 extern int UseSharedTexturePalette;
 extern PFNGLCOLORTABLEEXTPROC pglColorTableEXT;
 #endif
 
 extern int CheckToken(const char *str, const char *item);
+
+int HandleEvents();
 
 int attrib[] = {
 	GLX_RGBA,
@@ -189,6 +193,8 @@ int main(int argc, char *argv[])
 	}
 #endif
 	
+	glShadeModel(GL_FLAT);
+	
 	InitData();
 	
 	SlowDown = 1;
@@ -222,7 +228,6 @@ void BlastScreen2(Rect *BlastRect)
 	BlastScreen();
 }
 
-int VidWidth, VidHeight, ViewHeight;
 #define w VidWidth
 #define h VidHeight
 #define v ViewHeight
@@ -243,7 +248,7 @@ void BlastScreen()
 	}
 }
 
-Word VidXs[] = {320,512,640,640};       /* Screen sizes to play with */
+Word VidXs[] = {320,512,640,640};
 Word VidYs[] = {200,384,400,480};
 Word VidVs[] = {160,320,320,400};
 Word VidPics[] = {rFaceShapes,rFace512,rFace640,rFace640};
@@ -270,14 +275,17 @@ Word NewGameWindow(Word NewVidSize)
 	sizehints.flags = PMinSize;
 	XSetWMNormalHints(dpy, win, &sizehints);
 	XResizeWindow(dpy, win, w, h);
-	XSync(dpy, False);
 	
-	InitYTable();
 	SetAPalette(rBlackPal);
 	ClearTheScreen(BLACK);
 	BlastScreen();
 	
 	VidSize = NewVidSize;
+	
+	XSync(dpy, False);
+	glXWaitGL();
+	glXWaitX();
+	HandleEvents();
 	
 	return VidSize;
 }
@@ -412,6 +420,15 @@ void keyboard_handler(KeySym keycode, int press)
 	
 	UpdateKeys(keycode, press);
 	
+	if (press == 0) {
+		switch(keycode) {
+		case XK_Escape:
+			Quit(NULL); /* fast way out */
+		default:
+			break;
+		}
+	}
+	
 	if (RSJ) {		
 		if (press == 0) {
 			for (i = 0; i < CheatCount; i++) {
@@ -505,9 +522,7 @@ void keyboard_handler(KeySym keycode, int press)
 			case XK_period:
 			case XK_slash:
 				joystick1 = JOYPAD_START;
-				break;
-			case XK_Escape:
-				Quit(NULL); /* fast way out */
+				break;		
 			}
 		}
 		
@@ -558,23 +573,22 @@ void keyboard_handler(KeySym keycode, int press)
 			joystick1 |= (JOYPAD_X|JOYPAD_Y);
 		if (keys[SC_RIGHTSHIFT])
 			joystick1 |= (JOYPAD_X|JOYPAD_Y);
-	}
+		
+		if ((joystick1 & (JOYPAD_LFT|JOYPAD_RGT)) == (JOYPAD_LFT|JOYPAD_RGT))
+			joystick1 &= ~(JOYPAD_LFT|JOYPAD_RGT);
+		if ((joystick1 & (JOYPAD_UP|JOYPAD_DN)) == (JOYPAD_UP|JOYPAD_DN))
+			joystick1 &= ~(JOYPAD_UP|JOYPAD_DN);
 	
-	if ((joystick1 & (JOYPAD_LFT|JOYPAD_RGT)) == (JOYPAD_LFT|JOYPAD_RGT))
-		joystick1 &= ~(JOYPAD_LFT|JOYPAD_RGT);
-	if ((joystick1 & (JOYPAD_UP|JOYPAD_DN)) == (JOYPAD_UP|JOYPAD_DN))
-		joystick1 &= ~(JOYPAD_UP|JOYPAD_DN);
-	
-	if (joystick1 & JOYPAD_TR) {
-		if (joystick1 & JOYPAD_LFT) {
-			joystick1 = (joystick1 & ~(JOYPAD_TR|JOYPAD_LFT)) | JOYPAD_TL;
-		} else if (joystick1 & JOYPAD_RGT) {
-			joystick1 = joystick1 & ~JOYPAD_RGT;
-		} else {
-			joystick1 &= ~JOYPAD_TR;
+		if (joystick1 & JOYPAD_TR) {
+			if (joystick1 & JOYPAD_LFT) {
+				joystick1 = (joystick1 & ~(JOYPAD_TR|JOYPAD_LFT)) | JOYPAD_TL;
+			} else if (joystick1 & JOYPAD_RGT) {
+				joystick1 = joystick1 & ~JOYPAD_RGT;
+			} else {
+				joystick1 &= ~JOYPAD_TR;
+			}
 		}
 	}
-	
 }
 
 int HandleEvents()
@@ -595,10 +609,12 @@ int HandleEvents()
 					ret = 0;
 					break;
 				case Expose:
-					BlastScreen();
+					RedrawScreen();
 					break;
 				case ConfigureNotify:
 					glViewport(0, 0, event.xconfigure.width, event.xconfigure.height);
+					glPixelZoom(1.0f, -1.0f);
+					glRasterPos2f(-1.0f, 1.0f);
 					break;
 				case ClientMessage:
 					if (event.xclient.data.l[0] == wmDeleteWindow)

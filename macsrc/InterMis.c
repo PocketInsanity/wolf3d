@@ -243,8 +243,9 @@ void LevelCompleted(void)
 	NumberIndex = 47;		/* Hack to draw score using an alternate number set */
 	NewGameWindow(1);		/* Force 512 mode screen */
 	
-	DisplayScreen(rIntermission);
-
+	DisplayScreen(rIntermission, rInterPal);
+	BlastScreen();
+	
 	PackPtr = LoadAResource(rInterPics);
 	PackLength = lMSB(PackPtr[0]);
 	BJPtr = (Byte *)AllocSomeMem(PackLength);

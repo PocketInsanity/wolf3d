@@ -22,24 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <stdlib.h>
 #include <string.h>
 
-unsigned char *VideoPointer;
-Word VideoWidth;
-LongWord YTable[480]; 
-
 #define BRGR 0x42524752
-
-void InitYTable(void)
-{
-	Word i;
-	LongWord Offset;
-
-	i = 0;
-	Offset = 0;
-	do {
-		YTable[i] = Offset;
-		Offset+=VideoWidth;
-	} while (++i<480);
-}
 
 /**********************************
 

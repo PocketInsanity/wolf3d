@@ -45,6 +45,47 @@ Byte Pal[768];
 Utility Functions
 */
 
+GLuint LastTexture;
+
+static void StartTexture()
+{
+	LastTexture = -1;
+}
+
+static void ChangeTexture(GLuint x)
+{ 
+	if (x == 0)
+		fprintf(stderr, "%s/%d: Binding zero texture!\n", __FILE__, __LINE__);
+	
+	if (LastTexture != x) {
+		if (LastTexture != -1) 
+			glEnd();
+		glBindTexture(GL_TEXTURE_2D, x);
+		glBegin(GL_QUADS);
+		LastTexture = x;
+		return;
+	}
+}
+
+static void StopTexture()
+{
+	if (LastTexture != -1) 
+		glEnd();
+	LastTexture = -1;
+}
+
+static void ChangeTextureSimple(GLuint x)
+{ 
+	if (x == 0)
+		fprintf(stderr, "%s/%d: Binding zero texture!\n", __FILE__, __LINE__);
+	
+	if (LastTexture != x) {
+		glBindTexture(GL_TEXTURE_2D, x);
+		LastTexture = x;
+		return;
+	}
+}		
+
 void xgluPerspective(GLdouble fovx, GLdouble aspect, GLdouble zNear, GLdouble zFar)
 {
 	GLdouble xmin, xmax, ymin, ymax;
@@ -78,10 +119,6 @@ int CheckToken(const char *str, const char *item)
 /*
 Temp Stuff
 */
-
-void DisplayScreen(Word res)
-{
-}
 
 void FadeToPtr(unsigned char *PalPtr)
 {
@@ -136,8 +173,62 @@ Byte *Pal256toRGB(Byte *dat, int len, Byte *pal)
 	return buf;
 }
 
+typedef struct
+{
+	GLuint t;
+	GLfloat w;
+	GLfloat h;
+} Texture;
+
+void RedrawScreen()
+{
+	BlastScreen();
+}
+
 void DrawShape(Word x, Word y, void *ShapePtr)
 {
+}
+
+void DrawPsyched(Word Index)
+{
+}
+
+void DisplayScreen(Word res, Word pres)
+{
+	LongWord *PackPtr;
+	LongWord PackLength;
+	unsigned short *ShapePtr;
+	int width, height;
+	Byte *buf, *pal;
+	
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	
+	PackPtr = LoadAResource(res);
+	PackLength = lMSB(PackPtr[0]);
+	ShapePtr = (unsigned short *)AllocSomeMem(PackLength);
+	DLZSS((Byte *)ShapePtr, (Byte *)&PackPtr[1], PackLength);
+	
+	pal = LoadAResource(pres);
+	
+	glPixelZoom(1.0f, -1.0f);
+	glRasterPos2f(-1.0f, 1.0f);
+	
+	width = sMSB(ShapePtr[0]);
+	height = sMSB(ShapePtr[1]);
+	
+	buf = Pal256toRGB((Byte *)&ShapePtr[2], width * height, pal);
+        glDrawPixels(width, height, GL_RGB, GL_UNSIGNED_BYTE, buf);        
+
+        free(buf);
+        FreeSomeMem(ShapePtr);
+        
+        ReleaseAResource(pres);
+        ReleaseAResource(res);
+        
+        glFinish();
 }
 
 void SetNumber(LongWord number, Word x, Word y, Word digits)
@@ -205,7 +296,6 @@ void IO_DisplayViewBuffer(void)
 	}
 }
 
-GLuint LastTexture;
 
 /*
 Automap Drawing
@@ -222,9 +312,7 @@ void MakeSmallFont()
 	buf = (Byte *)malloc(16 * 16);
 	
 	pal = LoadAResource(rGamePal);
-	
-	LastTexture = 0;
-	
+		
 	for (i = 0; i < 64; i++) {
 		ArtStart = ArtData[i];
 		
@@ -325,7 +413,6 @@ void DrawSmall(Word x, Word y, Word tile)
 	glPushMatrix();
 	glLoadIdentity();
 	
-	LastTexture = smltex[tile];
 	glBindTexture(GL_TEXTURE_2D, smltex[tile]);
 	
 	glBegin(GL_QUADS);
@@ -484,11 +571,14 @@ Byte *DeXMShape256(Byte *data)
 
 void IO_ClearViewBuffer()
 {
-	LastTexture = 0;
+	StartTexture();
+	
 	glBindTexture(GL_TEXTURE_2D, 0);
+/* **MESA BUG** */
+glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
 	glViewport(0, VidHeight - ViewHeight, VidWidth, ViewHeight);
-	
+
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 		
@@ -496,41 +586,28 @@ void IO_ClearViewBuffer()
 	glPushMatrix();
 	glLoadIdentity();
 
-#if 0	
-	/* glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); */
-	glClear(GL_DEPTH_BUFFER_BIT);
-	
-	glDisable(GL_DEPTH_TEST);
-	
-	glColor3ub(Pal[0x2F*3+0], Pal[0x2F*3+1], Pal[0x2F*3+2]);
-	glRectf(-1, 0, 1, 1);
-	
-	glColor3ub(Pal[0x2A*3+0], Pal[0x2A*3+1], Pal[0x2A*3+2]);
-	glRectf(1, -1, -1, 0);
-		
-	glEnable(GL_DEPTH_TEST);
-#else	
 	glEnable(GL_DEPTH_TEST);
 	
 	glDepthRange(1.0, 1.0);
 	glDepthFunc(GL_ALWAYS);
 	
 	glColor3ub(Pal[0x2F*3+0], Pal[0x2F*3+1], Pal[0x2F*3+2]);
-	glRectf(-1, 0, 1, 1);
+	glRectf(-1.0, 0.0, 1.0, 1.0);
 	
 	glColor3ub(Pal[0x2A*3+0], Pal[0x2A*3+1], Pal[0x2A*3+2]);
-	glRectf(1, -1, -1, 0);
+	glRectf(1.0, -1.0, -1.0, 0.0);
 			
 	glDepthRange(0.0, 1.0);
 	glDepthFunc(GL_LESS);
-#endif
+
 	glPopMatrix();	
 	
 	glMatrixMode(GL_MODELVIEW);
 	
 	/* Not needed when using GL_REPLACE */
-	/* glColor3f(1.0, 1.0, 1.0); */
-	
+	/* glColor3f(1.0, 1.0, 1.0);  */
+glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);	
+
 	glRotatef(270.0-((GLfloat)gamestate.viewangle / (GLfloat)ANGLES * 360.0), 0.0, 1.0, 0.0);
 	glTranslatef((GLfloat)actors[0].x / 256.0, 0, (GLfloat)actors[0].y / 256.0);
 }
@@ -544,9 +621,9 @@ void InitRenderView()
 	Byte *buf, *pal;
 	int i;
 	
+	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
-	LastTexture = 0;
 	glEnable(GL_TEXTURE_2D);	
 
 #ifdef GL_EXT_shared_texture_palette
@@ -695,8 +772,6 @@ void InitRenderView()
 	glEnable(GL_ALPHA_TEST);
 	glAlphaFunc(GL_GREATER, 0.5);
 	
-	glClearColor(0.0, 0.0, 0.0, 0.0);
-	
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	
@@ -711,7 +786,6 @@ void InitRenderView()
 
 void IO_AttackShape(Word shape)
 {
-	LastTexture = weptex[shape];
 	if (weptex[shape] == 0) {
 		fprintf(stderr, "Weapon shape %d is zero texture!\n", shape);
 	}
@@ -748,14 +822,7 @@ void DrawSprite(thing_t *t)
 	glTranslatef(-(GLfloat)t->x / 256.0, 0, -(GLfloat)t->y / 256.0);
 	glRotatef(90.0+((GLfloat)gamestate.viewangle / (GLfloat)ANGLES * 360.0), 0.0, 1.0, 0.0);
 	
-	if (sprtex[t->sprite] == 0) {
-		fprintf(stderr, "ERROR: 0 texture in DrawSprite (%d)\n", t->sprite);
-	}
-
-	if (LastTexture != sprtex[t->sprite]) {
-		LastTexture = sprtex[t->sprite];
-		glBindTexture(GL_TEXTURE_2D, sprtex[t->sprite]);
-	}
+	ChangeTextureSimple(sprtex[t->sprite]);
 	
 	glBegin(GL_QUADS);
 	glTexCoord2f(1.0, 0.0); glVertex2f( 0.5,  1); 
@@ -763,7 +830,7 @@ void DrawSprite(thing_t *t)
 	glTexCoord2f(0.0, 1.0); glVertex2f(-0.5, -1);
 	glTexCoord2f(0.0, 0.0); glVertex2f(-0.5,  1);
 	glEnd();
-	
+
 	glPopMatrix();
 }
 
@@ -994,6 +1061,8 @@ void DrawSprites(void)
 	missile_t *MissilePtr;	/* Pointer to active missile record */
 	Word *xe;				/* Pointer to sort value */
 
+	StopTexture();			/* Draw Walls */
+	
 	numvisspr = 0;			/* Init the sprite count */
 	
 /* add all sprites in visareas*/
@@ -1039,14 +1108,13 @@ void DrawSprites(void)
 		SortEvents();
 
 /* draw from smallest scale to largest */
-
 		xe = &firstevent[i-1];
 		do {
 			dseg = &vissprites[xe[0]&(MAXVISSPRITES-1)];
 			DrawSprite(dseg->pos);
 			--xe;
 		} while (--i);
-	}
+	}	
 }
 
 static int WallSeen = 0;
@@ -1300,15 +1368,8 @@ void P_DrawSegx(saveseg_t *seg)
 	smin = -(pos + texslide); 
 	smax = -(pos + (max - min));
 	
-	if (waltex[t] == 0)
-		fprintf(stderr, "ERROR: 0 texture in P_DrawSegx!\n");	
-		
-	if (LastTexture != waltex[t]) {
-		LastTexture = waltex[t];
-		glBindTexture(GL_TEXTURE_2D, waltex[t]);
-	}
+	ChangeTexture(waltex[t]);
 	
-	glBegin(GL_QUADS);
 	switch(seg->dir&3) {
 	case di_north:
 		if (door != -1) {
@@ -1359,6 +1420,5 @@ void P_DrawSegx(saveseg_t *seg)
 		}
 		break;
 	}
-	glEnd();
 	}
 }

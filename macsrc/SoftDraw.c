@@ -10,7 +10,7 @@ This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
 
-See the GNU General Public License for more details.
+ See the GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
@@ -19,11 +19,30 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "wolfdef.h"
 
-void DisplayScreen(Word res)
+unsigned char *VideoPointer;
+Word VideoWidth;
+LongWord YTable[480];
+
+void InitYTable(void)
+{
+	Word i;
+	LongWord Offset;
+
+	i = 0;
+	Offset = 0;
+	do {
+		YTable[i] = Offset;
+		Offset+=VideoWidth;
+	} while (++i<480);
+}
+
+void DisplayScreen(Word res, Word pal)
 {
 	LongWord *PackPtr;
 	LongWord PackLength;	
 	unsigned short *ShapePtr;
+	
+	/* pal is ignored in 8bit */
 	
 	PackPtr = LoadAResource(res);
 	PackLength = lMSB(PackPtr[0]);
@@ -33,6 +52,15 @@ void DisplayScreen(Word res)
 		  (VidHeight- sMSB(ShapePtr[1]))/2, (Byte *)ShapePtr);
 	FreeSomeMem(ShapePtr);
 	ReleaseAResource(res);
+}
+
+void RedrawScreen()
+{
+	BlastScreen();
+}
+
+void DrawPsyched(Word Index)
+{
 }
 
 /**********************************

@@ -107,11 +107,6 @@ void ShowGetPsyched(void)
 	SetAPalette(rGamePal);	
 }
 
-void DrawPsyched(Word Index)
-{
-	/* TODO: blah */
-}
-
 void EndGetPsyched(void)
 {
 	while (PsyTime > ReadTick()) ;

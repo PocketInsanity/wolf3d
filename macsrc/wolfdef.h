@@ -585,7 +585,7 @@ extern Byte *ArtData[64];
 extern Byte textures[MAPSIZE*2+5][MAPSIZE]; /* 0-63 is horizontal, 64-127 is vertical*/
 
 extern void SetPalette(Byte *pal);
-extern void DisplayScreen(Word res);
+extern void DisplayScreen(Word res, Word pal);
 extern void InitRenderView();
 extern void StartRenderView();
 extern void Quit(char *str);
@@ -594,6 +594,7 @@ extern int InitResources(char *name);
 extern void InitData();
 extern int WolfMain(int argc, char *argv[]);
 extern void FreeResources();
+extern void RedrawScreen();
 
 extern void BlastScreen(void);
 extern void BlastScreen2(Rect *BlastRect);

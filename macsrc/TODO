@@ -13,16 +13,16 @@ TODO:
 * Finish moving all 2D code to SoftDraw.c
   - Should move some code so it is not such a large file (SoftDraw2.c)
 * Finish OpenGL
-  + Status bars, Introscreens, Psyched [DrawShape]
-    + Not exactly sure how I will implement this yet.
-      - IO_Draw* (status bar versions) are stubbed, update statusbar when
-        doing screen update
+  + Status bars, Level completed screen, Psyched [DrawShape]
+    - IO_Draw* (status bar versions) are stubbed, update statusbar when
+      doing screen update
   - Finish window resizing
-  - Could use the LastTexture to have less glBegin/Ends.
   - When all drawing is implemented, remove any unnecessary state/matrix
     changes.
   - Split up GLDraw.c
   - Is GL_REPLACE faster than GL_MODULATE for textures?
+  - Save "draw state" so redrawing works right when screen is
+    resized/exposed
 * Save/Load Games
   - Menu code does not exist yet -- so just have a compiled in default save
     and load files

@@ -32,19 +32,23 @@ void Intro(void)
 
 	FadeToBlack();		/* Fade out the video */
 	
-	DisplayScreen(rMacPlayPic);
+	DisplayScreen(rMacPlayPic, rMacPlayPal);
 	BlastScreen();
 
 	StartSong(SongListPtr[0]);	/* Play the song */
 	
 	FadeTo(rMacPlayPal);		/* Fade in the picture */
 	WaitTicksEvent(240);		/* Wait for event */
+	
+	DisplayScreen(rMacPlayPic, rIdLogoPal); /* higher bpp hack */
+	BlastScreen();
+	
 	FadeTo(rIdLogoPal);
 
 	if (toupper(WaitTicksEvent(240))=='B') { /* Wait for event */
 		FadeToBlack();
 		ClearTheScreen(BLACK);
-		DisplayScreen(rYummyPic);
+		DisplayScreen(rYummyPic, rYummyPal);
 		BlastScreen();
 		FadeTo(rYummyPal);
 		
