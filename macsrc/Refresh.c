@@ -451,7 +451,6 @@ void RenderView(void)
 	memset(areavis, 0, sizeof(areavis));	/* No areas are visible */
 	
 	IO_ClearViewBuffer();		/* Erase to ceiling / floor colors*/
-	StartRenderView(); /* Marker to let GL code know */
 	
 	ClearClipSegs();			/* Clip first seg only to sides of screen */
 	

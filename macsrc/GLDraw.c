@@ -33,6 +33,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 int UseSharedTexturePalette = 0;
 
+/*
+Utility Functions
+*/
+
 void xgluPerspective(GLdouble fovx, GLdouble aspect, GLdouble zNear, GLdouble zFar)
 {
 	GLdouble xmin, xmax, ymin, ymax;
@@ -45,6 +49,10 @@ void xgluPerspective(GLdouble fovx, GLdouble aspect, GLdouble zNear, GLdouble zF
 	
 	glFrustum(xmin, xmax, ymin, ymax, zNear, zFar);
 }
+
+/*
+Temp Stuff
+*/
 
 void DisplayScreen(Word res)
 {
@@ -88,7 +96,66 @@ void DrawShape(Word x, Word y, void *ShapePtr)
 {
 }
 
+void SetNumber(LongWord number, Word x, Word y, Word digits)
+{
+}
+
+/*
+Unused Status Bar stuff
+*/
+
+Word NumberIndex = 36; /* Argh */
+
+void IO_DrawFloor(Word floor)
+{
+}
+
+void IO_DrawScore(LongWord score)
+{
+}
+
+void IO_DrawLives(Word lives)
+{
+}
+
+void IO_DrawHealth(Word health)
+{
+}
+
+void IO_DrawAmmo(Word ammo)
+{
+}
+
+void IO_DrawTreasure(Word treasure)
+{
+}
+
+void IO_DrawKeys(Word keys)
+{
+}
+
+void IO_DrawFace(Word face)
+{
+}
+
+void IO_DrawStatusBar(void)
+{
+}
+
+void IO_DisplayViewBuffer(void)
+{
+	BlastScreen();
+		if (firstframe) {
+		FadeTo(rGamePal);
+		firstframe = 0;
+	}
+}
+
 GLuint LastTexture;
+
+/*
+Automap Drawing
+*/
 
 GLuint smltex[65];
 
@@ -180,19 +247,22 @@ void DrawSmall(Word x, Word y, Word tile)
 	GLfloat xx, yy;
 	GLfloat x1, y1, x2, y2;
 	
-	w = (int)(VidWidth >> 4);
-	h = (int)(VidHeight >> 4);
+	w = (int)(640 >> 4);
+	h = (int)(480 >> 4);
+	
 	xx = x;
 	yy = y;
-	x1 = ((xx * 2.0f) - w) + 1.0;
+	x1 = ((xx * 2.0f) - w) + 2.0;
 	x2 = x1 - 2.0;
-	y1 = -((yy * 2.0f) - h) + 1.0;
+	y1 = -((yy * 2.0f) - h);
 	y2 = y1 - 2.0;
 		
 	x1 /= w;
 	x2 /= w;
 	y1 /= h;
 	y2 /= h;
+	
+	glViewport(0, 0, VidWidth, VidHeight);
 		
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
@@ -215,7 +285,6 @@ void DrawSmall(Word x, Word y, Word tile)
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
 }
-
 
 Byte *FlipWall(Byte *dat, int w, int h)
 {
@@ -306,13 +375,15 @@ void IO_ClearViewBuffer()
 	LastTexture = 0;
 	glBindTexture(GL_TEXTURE_2D, 0);
 
+	glViewport(0, VidHeight - ViewHeight, VidWidth, ViewHeight);
+	
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 		
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
 	glLoadIdentity();
-	
+
 #if 0	
 	/* glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); */
 	glClear(GL_DEPTH_BUFFER_BIT);
@@ -346,6 +417,11 @@ void IO_ClearViewBuffer()
 	glDepthFunc(GL_LESS);
 #endif
 	glPopMatrix();	
+	
+	glMatrixMode(GL_MODELVIEW);
+	
+	glRotatef(270.0-((double)gamestate.viewangle / (double)ANGLES * 360.0), 0.0, 1.0, 0.0);
+	glTranslatef((double)actors[0].x / 256.0, 0, (double)actors[0].y / 256.0);
 }
 
 GLuint waltex[64];
@@ -432,7 +508,22 @@ void InitRenderView()
 		free(buf);
 	}
 	
-	if (weptex[0] == 0) {
+	if (weptex[0] == 0) { 
+		/* Load GameShapes */
+		LongWord *LongPtr;
+		Byte *DestPtr;
+		int i;
+		
+		LongPtr = (LongWord *)LoadAResource(rFace640);
+		GameShapes = (Byte **)AllocSomeMem(lMSB(LongPtr[0]));
+		DLZSS((Byte *)GameShapes, (Byte *)&LongPtr[1], lMSB(LongPtr[0]));
+		ReleaseAResource(rFace640);
+		
+		LongPtr = (LongWord *)GameShapes;
+		DestPtr = (Byte *)GameShapes;
+		for (i = 0; i < 47; i++) 
+			GameShapes[i] = DestPtr + lMSB(LongPtr[i]);
+			
 		glGenTextures(NUMWEAPONS*4, weptex);
 		for (i = 0; i < NUMWEAPONS*4; i++) {
 			Byte *buf = DeXMShape(GameShapes[12+i], pal);
@@ -450,7 +541,10 @@ void InitRenderView()
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 128, 128, 0, GL_RGBA, GL_UNSIGNED_BYTE, buf);
 				
 			free(buf);
-		}	
+		}
+		
+		free(GameShapes);
+		GameShapes = NULL;
 	}
 	
 	ReleaseAResource(rGamePal);
@@ -504,17 +598,6 @@ void IO_AttackShape(Word shape)
 	
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
-}
-
-void StartRenderView()
-{	
-	glViewport(0, VidHeight - ViewHeight, VidWidth, ViewHeight); 
-	
-	glMatrixMode(GL_MODELVIEW);
-	/* glLoadIdentity(); */
-	
-	glRotatef(270.0-((double)gamestate.viewangle / (double)ANGLES * 360.0), 0.0, 1.0, 0.0);
-	glTranslatef((double)actors[0].x / 256.0, 0, (double)actors[0].y / 256.0);
 }
 
 void DrawSprite(thing_t *t)

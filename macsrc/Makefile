@@ -10,12 +10,12 @@ OBJS 	 = Data.o Doors.o EnMove.o EnThink.o Intro.o Level.o \
 	   Missiles.o Sounds.o PlMove.o PlStuff.o PlThink.o PushWall.o \
 	   RefBsp.o Refresh.o Refresh2.o Sight.o Main.o \
 	   StateDef.o WolfMain.o WolfIO.o InterMis.o Burger.o stub.o res.o
-SOFTOBJS = RefSprite.o SoftDraw.o
+SOFTOBJS = RefSprite.o SoftDraw.o SoftDraw2.o
 OGLOBJS	 = GLDraw.o
-SOBJS	 = $(SOFTOBJS) $(OBJS) vi_svga.o
-XOBJS	 = $(SOFTOBJS) $(OBJS) vi_xlib.o
-GOBJS	 = $(SOFTOBJS) $(OBJS) vi_gtk.o
-GLOBJS	 = $(OGLOBJS)  $(OBJS) vi_glx.o
+SOBJS	 = $(OBJS) $(SOFTOBJS) vi_svga.o
+XOBJS	 = $(OBJS) $(SOFTOBJS) vi_xlib.o
+GOBJS	 = $(OBJS) $(SOFTOBJS) vi_gtk.o
+GLOBJS	 = $(OBJS) $(OGLOBJS)  vi_glx.o
 
 LFLAGS = -lm 
 #LFLAGS = -lm /home/relnev/ElectricFence-2.1/libefence.a

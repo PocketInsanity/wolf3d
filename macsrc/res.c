@@ -145,7 +145,6 @@ void *LoadAResource2(Word RezNum, LongWord Type)
 	exit(EXIT_FAILURE);
 }
 
-
 void *FindResource(Word RezNum, LongWord Type)
 {
 	ResItem *c = lr;

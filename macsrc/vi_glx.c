@@ -239,9 +239,6 @@ Word VidSize = -1;
 Word NewGameWindow(Word NewVidSize)
 {
 	XSizeHints sizehints;
-	LongWord *LongPtr;
-	Byte *DestPtr;
-	int i;
 		
 	if (NewVidSize == VidSize)
 		return VidSize;
@@ -267,20 +264,6 @@ Word NewGameWindow(Word NewVidSize)
 	ClearTheScreen(BLACK);
 	BlastScreen();
 	
-	LongPtr = (LongWord *)LoadAResource(VidPics[NewVidSize]);
-
-	if (GameShapes)
-		FreeSomeMem(GameShapes);
-		
-	GameShapes = (Byte **)AllocSomeMem(lMSB(LongPtr[0]));
-	DLZSS((Byte *)GameShapes, (Byte *)&LongPtr[1], lMSB(LongPtr[0]));
-	ReleaseAResource(VidPics[NewVidSize]);
-	
-	LongPtr = (LongWord *)GameShapes;
-	DestPtr = (Byte *)GameShapes;
-	for (i = 0; i < ((NewVidSize == 1) ? 57 : 47); i++) 
-		GameShapes[i] = DestPtr + lMSB(LongPtr[i]);
-	
 	VidSize = NewVidSize;
 	
 	return VidSize;
@@ -300,15 +283,12 @@ void FlushKeys()
 struct {
 	char code[13];
 } CheatCodes[] = {
-{ "XUSCNIELPPA" }, /* "XUSCNIELPPA" */
-{ "IDDQD" }, /* "IDDQD" */
-{ "BURGER" }, /* "BURGER" */
-{ "WOWZERS" }, /* "WOWZERS" */
-{ "LEDOUX" }, /* "LEDOUX" */
-{ "SEGER" }, /* "SEGER" */
-{ "MCCALL" }, /* "MCCALL" */
-{ "APPLEIIGS" } /* "APPLEIIGS" */
+{ "XUSCNIELPPA" }, 	{ "IDDQD" },
+{ "BURGER" },		{ "WOWZERS" },
+{ "LEDOUX" },		{ "SEGER" },
+{ "MCCALL" },		{ "APPLEIIGS" }
 };
+
 const int CheatCount = sizeof(CheatCodes) / sizeof(CheatCodes[0]);
 int CheatIndex;
 

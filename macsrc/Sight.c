@@ -179,7 +179,7 @@ void T_Stand(actor_t *ActorPtr)
 		if (ActorPtr->flags&FL_AMBUSH ) {	/* Ambush actor? */
 			if (!CheckLine(ActorPtr)) {	/* Can I see you? */
 				ActorPtr->reacttime=1;	/* be very ready, but*/
-				return;					/* don't attack yet*/
+				return;				/* don't attack yet*/
 			}
 			ActorPtr->flags &= ~FL_AMBUSH;	/* Clear the ambush flag */
 		}
