@@ -141,13 +141,15 @@ int main(int argc, char *argv[])
 	
 	gtk_init(&argc, &argv);
 	
-	visual = gdk_visual_get_best_with_depth(8);
+/*	visual = gdk_visual_get_best_with_depth(8); */
+	visual = gdk_visual_get_best_with_both(8, GDK_VISUAL_PSEUDO_COLOR);
 	if (visual == NULL) {
 		fprintf(stderr, "Unable to get a 8 bpp visual\n");
 		exit(EXIT_FAILURE);
 	}
-	
-	gtk_widget_set_default_visual(visual);
+
+/* I forget what this was for ... */	
+/*	gtk_widget_set_default_visual(visual); */
 		
 	cmapo = gdk_colormap_get_system();
 	
@@ -161,6 +163,7 @@ int main(int argc, char *argv[])
 	
 	win = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	
+	gtk_window_set_policy(GTK_WINDOW(win), FALSE, FALSE, TRUE);
 	
 	gtk_window_set_title(GTK_WINDOW(win), "Wolfenstein 3D");
 	
@@ -332,8 +335,10 @@ Word NewGameWindow(Word NewVidSize)
 
 	image = gdk_image_new(GDK_IMAGE_FASTEST, visual, w, h);
 	gtk_image_set(image_area, image, NULL);
-	gtk_widget_set_usize(GTK_WIDGET(win), w, h);
+	
+/*	gtk_widget_set_usize(GTK_WIDGET(win), w, h); */
 	gtk_widget_set_usize(GTK_WIDGET(image_area), w, h);
+	
 	
 	if (gfxbuf)
 		free(gfxbuf);
