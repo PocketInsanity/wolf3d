@@ -4,6 +4,9 @@
 extern int _argc;
 extern char **_argv;
 
+void set_TimeCount(unsigned long t);
+unsigned long get_TimeCount();
+
 long filelength(int handle);
 
 char *itoa(short int value, char *string, int radix);

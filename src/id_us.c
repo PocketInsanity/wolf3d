@@ -9,8 +9,7 @@ word		WindowX,WindowY,WindowW,WindowH;
 
 //	Internal variables
 
-static	char		*ParmStrings[] = {"TEDLEVEL","NOWAIT"},
-					*ParmStrings2[] = {"COMP","NOCOMP"};
+static	char		*ParmStrings[] = {"TEDLEVEL","NOWAIT"};
 static	boolean		US_Started;
 
 int			CursorX,CursorY;
@@ -18,7 +17,6 @@ int			CursorX,CursorY;
 void		(*USL_MeasureString)(char *,word *,word *) = VW_MeasurePropString,
 			(*USL_DrawString)(char *) = VWB_DrawPropString;
 
-SaveGame	Games[MaxSaveGames];
 HighScore	Scores[MaxScores] = {
 		{"id software-'92",10000,1},
 		{"Adrian Carmack",10000,1},
@@ -111,24 +109,10 @@ int US_CheckParm(char *parm,char **strings)
 				cp = tolower(cp);
 		}
 	}
-	return(-1);
+	return -1;
 }
-
 
 //	Window/Printing routines
-
-///////////////////////////////////////////////////////////////////////////
-//
-//	US_SetPrintRoutines() - Sets the routines used to measure and print
-//		from within the User Mgr. Primarily provided to allow switching
-//		between masked and non-masked fonts
-//
-///////////////////////////////////////////////////////////////////////////
-void US_SetPrintRoutines(void (*measure)(char *,word *,word *),void (*print)(char *))
-{
-	USL_MeasureString = measure;
-	USL_DrawString = print;
-}
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -326,54 +310,6 @@ US_DrawWindow(word x,word y,word w,word h)
 		VWB_DrawTile8(sx,i,3),VWB_DrawTile8(sx + sw,i,4);
 }
 
-///////////////////////////////////////////////////////////////////////////
-//
-//	US_CenterWindow() - Generates a window of a given width & height in the
-//		middle of the screen
-//
-///////////////////////////////////////////////////////////////////////////
-void
-US_CenterWindow(word w,word h)
-{
-	US_DrawWindow(((MaxX / 8) - w) / 2,((MaxY / 8) - h) / 2,w,h);
-}
-
-///////////////////////////////////////////////////////////////////////////
-//
-//	US_SaveWindow() - Saves the current window parms into a record for
-//		later restoration
-//
-///////////////////////////////////////////////////////////////////////////
-void
-US_SaveWindow(WindowRec *win)
-{
-	win->x = WindowX;
-	win->y = WindowY;
-	win->w = WindowW;
-	win->h = WindowH;
-
-	win->px = PrintX;
-	win->py = PrintY;
-}
-
-///////////////////////////////////////////////////////////////////////////
-//
-//	US_RestoreWindow() - Sets the current window parms to those held in the
-//		record
-//
-///////////////////////////////////////////////////////////////////////////
-void
-US_RestoreWindow(WindowRec *win)
-{
-	WindowX = win->x;
-	WindowY = win->y;
-	WindowW = win->w;
-	WindowH = win->h;
-
-	PrintX = win->px;
-	PrintY = win->py;
-}
-
 //	Input routines
 
 ///////////////////////////////////////////////////////////////////////////
@@ -381,8 +317,7 @@ US_RestoreWindow(WindowRec *win)
 //	USL_XORICursor() - XORs the I-bar text cursor. Used by US_LineInput()
 //
 ///////////////////////////////////////////////////////////////////////////
-static void
-USL_XORICursor(int x,int y,char *s,word cursor)
+static void USL_XORICursor(int x,int y,char *s,word cursor)
 {
 	static	boolean	status;		// VGA doesn't XOR...
 	char	buf[MaxString];
@@ -417,8 +352,7 @@ USL_XORICursor(int x,int y,char *s,word cursor)
 //		returned
 //
 ///////////////////////////////////////////////////////////////////////////
-boolean
-US_LineInput(int x,int y,char *buf,char *def,boolean escok,
+boolean US_LineInput(int x,int y,char *buf,char *def,boolean escok,
 				int maxchars,int maxwidth)
 {
 	boolean		redraw,
