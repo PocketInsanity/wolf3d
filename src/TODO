@@ -7,3 +7,5 @@ code, it really needs to be cleaned up
 * id_ca.c cache code: nice idea but messy and maybe can be fixed 
 in an effort to not allocate everything to memory and forget about it
 * remove virtualreality
+* clean up header files, especially wl_def.h, where some externs arent in
+the right place

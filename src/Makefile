@@ -1,6 +1,6 @@
 CC = gcc
 #CFLAGS = -Wall -O6 -fomit-frame-pointer -mpentiumpro -mcpu=pentiumpro -march=pentiumpro -DUSEVGA
-CFLAGS = -g -DUSEVGA
+CFLAGS = -g -DUSEVGA -fwritable-strings
 #CFLAGS = -g -Wall -DUSEVGA -DDEBUG 
 #CFLAGS = -g -DUSEVGA -DDEBUG
 #CFLAGS = -g -pg -DDEBUG

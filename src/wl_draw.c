@@ -17,12 +17,10 @@ fixed	tileglobal	= TILEGLOBAL;
 
 #define mindist	MINDIST
 
-unsigned char tempy[4096]; /* TODO: testing code only... */
-
 //
 // math tables
 //
-int			pixelangle[MAXVIEWWIDTH];
+int 		pixelangle[MAXVIEWWIDTH];
 long		finetangent[FINEANGLES/4];
 fixed 		sintable[ANGLES+ANGLES/4+1],*costable = sintable+(ANGLES/4);
 
@@ -785,18 +783,11 @@ void HitVertWall (void);
 void HitHorizPWall (void);
 void HitVertPWall (void);
 
-int tempylock;
-
 void AsmRefresh (void)
 {
     fixed doorxhit, dooryhit;
 
     int angle;    /* ray angle through pixx */
-int i;
-tempylock = 1;
-for (i = 0; i < 4096; i++) { /* TODO: testing */
-	tempy[i] = tilemap[i % 64][i / 64] ? '1' : '0';
-}
 
     for (pixx = 0; pixx < viewwidth; pixx++) {
 	angle = midangle + pixelangle[pixx];
@@ -870,7 +861,6 @@ for (i = 0; i < 4096; i++) { /* TODO: testing */
 	    printf ("vert: %d  %x %d, %d\n", pixx, tilehit, xtile, TILE(yintercept));
 #endif
 	    if (tilehit != 0) {
-	    	tempy[xtile + TILE(yintercept) * 64] = 'X';
 		if (tilehit & 0x80) {
 		    if (tilehit & 0x40) {
 			/* vertpushwall */
@@ -916,7 +906,6 @@ for (i = 0; i < 4096; i++) { /* TODO: testing */
 	    printf ("horiz: %d  %x %d, %d\n", pixx, tilehit, TILE(xintercept), ytile);
 #endif
 	    if (tilehit != 0) {
-	    	tempy[TILE(xintercept) + ytile * 64] = 'Y';
 		if (tilehit & 0x80) {
 		    /* horizdoor */
 		    if (tilehit & 0x40) {
@@ -954,7 +943,6 @@ for (i = 0; i < 4096; i++) { /* TODO: testing */
 	    goto horizcheck;
     nextpix:
     }
-    tempylock = 0;
 }
 
 

@@ -70,9 +70,9 @@ void VWB_DrawTile8 (int x, int y, int tile)
 	LatchDrawChar(x,y,tile);
 }
 
-void VWB_DrawPic (int x, int y, int chunknum)
+void VWB_DrawPic(int x, int y, int chunknum)
 {
-	int	picnum = chunknum - STARTPICS;
+	int picnum = chunknum - STARTPICS;
 	unsigned width,height;
 
 	x &= ~7;

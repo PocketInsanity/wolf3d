@@ -1,6 +1,7 @@
+#ifndef __WL_DEF_H__
+#define __WL_DEF_H__
+
 #include "id_heads.h"
-#include <math.h>
-#include <values.h>
 
 #include "wl_menu.h"
 
@@ -724,15 +725,14 @@ extern	int		mouseadjustment;
 //
 // math tables
 //
-extern	int pixelangle[MAXVIEWWIDTH];
-extern	long finetangent[FINEANGLES/4];
-extern	fixed sintable[], *costable;
+extern int pixelangle[MAXVIEWWIDTH];
+extern long finetangent[FINEANGLES/4];
+extern fixed sintable[], *costable;
 
 //
 // derived constants
 //
-extern	fixed 	scale, maxslope;
-extern	long	heightnumerator;
+extern	fixed maxslope;
 extern	int		minheightdiv;
 
 extern	char	configname[13];
@@ -895,8 +895,6 @@ void PicturePause (void);
 =============================================================================
 */
 
-extern	unsigned screenloc[3];
-
 extern	long 	lasttimecount;
 extern	long 	frameon;
 extern	boolean	fizzlein;
@@ -906,13 +904,6 @@ extern	unsigned	wallheight[MAXVIEWWIDTH];
 extern	fixed	tileglobal;
 extern	fixed	focallength;
 extern	fixed	mindist;
-
-//
-// math tables
-//
-extern	int			pixelangle[MAXVIEWWIDTH];
-extern	long		finetangent[FINEANGLES/4];
-extern	fixed 		sintable[], *costable;
 
 //
 // derived constants
@@ -992,10 +983,10 @@ boolean	CheckSight (objtype *ob);
 
 typedef struct
 {
-	unsigned	leftpix,rightpix;
-	unsigned	dataofs[64];
+	word leftpix,rightpix;
+	word dataofs[64];
 /* table data after dataofs[rightpix-leftpix+1] */
-}	t_compshape;
+} PACKED t_compshape;
 
 extern	int			maxscale,maxscaleshl2;
 
@@ -1178,3 +1169,7 @@ void SpawnHitler (int tilex, int tiley);
 
 extern	void	HelpScreens(void);
 extern	void	EndText(void);
+
+#elif
+#error "fix me TODO"
+#endif

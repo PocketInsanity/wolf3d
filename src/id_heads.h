@@ -12,6 +12,7 @@
 #include <values.h>
 #include <sys/types.h>
 #include <glob.h>
+#include <math.h>
 
 #include "misc.h"
 

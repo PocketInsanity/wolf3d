@@ -13,12 +13,12 @@
 typedef struct
 {
 	/* 0-255 is a character, > is a pointer to a node */
-	unsigned short int bit0,bit1;
+	word bit0, bit1;
 } PACKED huffnode;
 
 typedef struct
 {
-	unsigned short int RLEWtag;
+	word RLEWtag;
 	long headeroffsets[100];
 } PACKED mapfiletype;
 
@@ -1576,7 +1576,7 @@ memptr PM_GetPage(int pagenum)
 	page = &PMPages[pagenum];
 	if (page->addr == NULL) {
 		page->lastHit = 0;
-		MM_GetPtr(page->addr, PMPageSize);
+		MM_GetPtr((memptr)&page->addr, PMPageSize);
 		PML_ReadFromFile(page->addr, page->offset, page->length);
 	}
 	page->lastHit++;

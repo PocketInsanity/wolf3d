@@ -8,15 +8,15 @@
 
 typedef struct
 {
-	int width, height;
-} pictabletype;
+	word width, height;
+} PACKED pictabletype;
 
 typedef struct
 {
-	int height;
-	int location[256];
+	word height;
+	word location[256];
 	char width[256];
-} fontstruct;
+} PACKED fontstruct;
 
 /* ======================================================================== */
 

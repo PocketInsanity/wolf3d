@@ -499,7 +499,7 @@ void ShutdownId (void)
 ==================
 */
 
-const   float   radtoint = (float)FINEANGLES/2/PI;
+const float radtoint = (float)FINEANGLES/2.0f/PI;
 
 void BuildTables (void)
 {
@@ -1095,7 +1095,7 @@ void InitGame (void)
 	BuildTables ();          // trig tables
 	SetupWalls ();
 
-	NewViewSize (viewsize);
+	NewViewSize(viewsize);
 
 
 //
@@ -1170,7 +1170,7 @@ void ShowViewSize (int width)
 }
 
 
-void NewViewSize (int width)
+void NewViewSize(int width)
 {
 	CA_UpLevel ();
 	MM_SortMem ();
@@ -1258,19 +1258,10 @@ void Quit (char *error)
 void DemoLoop (void)
 {
 	static int LastDemo;
-	int     i,level;
-	long nsize;
-	memptr	nullblock;
-
 //
 // main game cycle
 //
 
-
-//	nsize = (long)40*1024;
-//	MM_GetPtr(&nullblock,nsize);
-
-#ifndef DEMOTEST
 
 	#ifndef UPLOAD
 
@@ -1299,8 +1290,6 @@ void DemoLoop (void)
 		PG13 ();
 #endif
 
-#endif
-
 	while (1)
 	{
 		while (!NoWait)
@@ -1309,8 +1298,6 @@ void DemoLoop (void)
 // title page
 //
 			MM_SortMem ();
-#ifndef DEMOTEST
-
 #ifdef SPEAR
 			CA_CacheGrChunk (TITLEPALETTE);
 
@@ -1351,7 +1338,6 @@ void DemoLoop (void)
 
 			if (IN_UserInput(TickBase*10))
 				break;
-#endif
 //
 // demo
 //

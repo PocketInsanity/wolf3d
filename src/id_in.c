@@ -529,8 +529,8 @@ void IN_Ack (void)
 {
 	IN_StartAck ();
 
-	while (!IN_CheckAck ())
-	;
+	return; /* TODO: fix when keyboard implemented */
+	while (!IN_CheckAck ()) ;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -546,12 +546,13 @@ boolean IN_UserInput(longword delay)
 	longword	lasttime;
 
 	lasttime = get_TimeCount();
+	
 	IN_StartAck ();
-	do
-	{
+	do {
 		if (IN_CheckAck())
 			return true;
 	} while ( (get_TimeCount() - lasttime) < delay );
+	
 	return false;
 }
 

@@ -14,7 +14,7 @@ typedef	struct
 {
 	long planestart[3];
 	word planelength[3];
-	word width,height;
+	word width, height;
 	char name[16];
 } PACKED maptype;
 
