@@ -15,7 +15,6 @@
 /* #define JAPAN */
 /* #define JAPDEMO */
 #define GOODTIMES
-#define DEMOSEXTERN
 #define UPLOAD
 
 #elif WMODE == 1
@@ -24,7 +23,6 @@
 /* #define JAPAN */
 /* #define JAPDEMO */
 #define GOODTIMES
-#define DEMOSEXTERN
 /* #define UPLOAD */
 
 #elif WMODE == 2
@@ -33,7 +31,6 @@
 /* #define JAPAN */
 /* #define JAPDEMO */
 #define GOODTIMES
-#define DEMOSEXTERN
 /* #define UPLOAD */
 
 #elif WMODE == 3
@@ -42,7 +39,6 @@
 /* #define JAPAN */
 /* #define JAPDEMO */
 #define GOODTIMES
-#define DEMOSEXTERN
 /* #define UPLOAD */
 
 /*

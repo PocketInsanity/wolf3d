@@ -878,7 +878,7 @@ void StartDemoRecord (int levelnumber)
 ==================
 */
 
-char demoname[13] = "demo?.";
+char demoname[13] = "demo?.dem";
 
 void FinishDemoRecord (void)
 {
@@ -896,7 +896,7 @@ void FinishDemoRecord (void)
 	US_Print(" Demo number (0-9):");
 	VW_UpdateScreen();
 
-	if (US_LineInput (px,py,str,NULL,true,2,0))
+	if (US_LineInput(px,py,str,NULL,true,2,0))
 	{
 		level = atoi (str);
 		if (level>=0 && level<=9)
@@ -922,7 +922,7 @@ void FinishDemoRecord (void)
 ==================
 */
 
-void RecordDemo (void)
+void RecordDemo(void)
 {
 	int level,esc;
 
@@ -954,6 +954,8 @@ void RecordDemo (void)
 	StartDemoRecord (level);
 
 	DrawPlayScreen ();
+	VW_UpdateScreen();
+	
 	VW_FadeIn ();
 
 	startgame = false;
@@ -986,12 +988,10 @@ void RecordDemo (void)
 ==================
 */
 
-void PlayDemo (int demonumber)
+void PlayDemo(int demonumber)
 {
 	int length;
 
-#ifdef DEMOSEXTERN
-// debug: load chunk
 #ifndef SPEARDEMO
 	int dems[4]={T_DEMO0,T_DEMO1,T_DEMO2,T_DEMO3};
 #else
@@ -1001,12 +1001,6 @@ void PlayDemo (int demonumber)
 	CA_CacheGrChunk(dems[demonumber]);
 	demoptr = grsegs[dems[demonumber]];
 	MM_SetLock (&grsegs[dems[demonumber]],true);
-#else
-	demoname[4] = '0'+demonumber;
-	CA_LoadFile (demoname,&demobuffer);
-	MM_SetLock (&demobuffer,true);
-	demoptr = (char *)demobuffer;
-#endif
 
 	NewGame (1,0);
 	gamestate.mapon = *demoptr++;
@@ -1019,6 +1013,49 @@ void PlayDemo (int demonumber)
 
 	SETFONTCOLOR(0,15);
 	DrawPlayScreen ();
+	VW_UpdateScreen(); /* force redraw */
+	
+	VW_FadeIn();
+
+	startgame = false;
+	demoplayback = true;
+
+	SetupGameLevel ();
+	StartMusic ();
+	fizzlein = true;
+
+	PlayLoop ();
+
+	UNCACHEGRCHUNK(dems[demonumber]);
+
+	demoplayback = false;
+
+	StopMusic ();
+	VW_FadeOut ();
+	ClearMemory ();
+}
+
+void PlayDemoFromFile(char *demoname)
+{
+	int length;
+
+	CA_LoadFile(demoname, &demobuffer);
+	MM_SetLock(&demobuffer,true);
+	demoptr = (char *)demobuffer;
+
+	NewGame(1,0);
+	gamestate.mapon = *demoptr++;
+	gamestate.difficulty = gd_hard;
+	length = *((word *)demoptr)++;
+	demoptr++;
+	lastdemoptr = demoptr-4+length;
+
+	VW_FadeOut ();
+
+	SETFONTCOLOR(0,15);
+	DrawPlayScreen ();
+	VW_UpdateScreen(); /* force redraw */
+	
 	VW_FadeIn ();
 
 	startgame = false;
@@ -1030,17 +1067,15 @@ void PlayDemo (int demonumber)
 
 	PlayLoop ();
 
-#ifdef DEMOSEXTERN
-	UNCACHEGRCHUNK(dems[demonumber]);
-#else
-	MM_FreePtr (&demobuffer);
-#endif
+	MM_FreePtr(&demobuffer);
 
 	demoplayback = false;
 
 	StopMusic ();
 	VW_FadeOut ();
 	ClearMemory ();
+	
+	IN_Ack();
 }
 
 //==========================================================================

@@ -1,3 +1,4 @@
+General:
 * inconsistancy:
 id_ca.c has code for setting the data filenames' extension
 so does wl_menu.c
@@ -55,3 +56,12 @@ remove them
 * implement fizzlefade, and get that last pixel!
 * remove the time verification code (in wl_inter.c)
 * fix wl_debug.c, lots of junk code..
+* change the current parameter handling code to something like getopt
+
+Specific:
+* memory/sound intro screen goes
+  - trademarked images, only came with wolf3d 1.4's (I believe)
+* japan code goes
+  - Unable to find, doubtful if released
+* spanish code goes
+  - Unable to find, doubtful if released
