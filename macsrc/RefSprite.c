@@ -1,4 +1,4 @@
-#include "WolfDef.h"
+#include "wolfdef.h"
 #include <string.h>
 
 Word *src1,*src2,*dest;		/* Used by the sort */

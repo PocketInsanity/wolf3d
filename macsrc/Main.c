@@ -1,4 +1,4 @@
-#include "WolfDef.h"
+#include "wolfdef.h"
 #include <string.h>
 #include <stdlib.h>
 #include <setjmp.h>
@@ -144,7 +144,7 @@ jmp_buf ResetJmp;
 Boolean JumpOK;
 extern Word NumberIndex;
 
-void main(void)
+int main(int argc, char *argv[])
 {
 	InitTools();		/* Init the system environment */
 	WaitTick();			/* Wait for a system tick to go by */
@@ -171,4 +171,6 @@ DoGame:
 			}
 		}
 	}
+	
+	return 0;
 }

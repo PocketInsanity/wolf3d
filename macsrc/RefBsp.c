@@ -1,4 +1,4 @@
-#include "WolfDef.h"
+#include "wolfdef.h"
 
 static Word checkcoord[11][4] = {	/* Indexs to the bspcoord table */
 {3,0,2,1},

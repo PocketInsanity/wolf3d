@@ -1,19 +1,11 @@
 #ifndef __WOLFDEF__
 #define __WOLFDEF__
 
-#define DEMO		/* Define if this is the lame demo for dealers */
-
-/* japversion has mission pics instead */
-/* #define JAPVERSION */
-
-/* If code is compiled on a IIgs, pass the compiler presets... */
-
-#ifdef __ORCAC__
-#pragma optimize 15		/* Normal optimization */
-#pragma memorymodel 0	/* Force small memory model */
-#pragma noroot			/* No root files */
-#pragma lint -1			/* Full error checking */
-segment "Wolf3d";		/* Code segment */
+#ifndef TRUE
+#define TRUE 1
+#endif
+#ifndef FALSE
+#define FALSE 0
 #endif
 
 /* an angle_t occupies an entire 16 bits so wraparound is automatically handled */
@@ -25,7 +17,7 @@ typedef unsigned short angle_t;		/* Must be short to allow wraparound */
 typedef short fixed_t;				/* 8.8 fixed point number */	
 typedef unsigned short ufixed_t;	/* 8.8 unsigned fixed point number */
 
-#include <burger.h>		/* My standard system equates */
+#include "burger.h"		/* My standard system equates */
 #include "States.h"		/* Think state equates */
 #include "Sounds.h"		/* Sound equates */
 #include "Sprites.h"	/* Sprite indexs */
@@ -540,10 +532,9 @@ extern int	rw_centerangle;
 extern Boolean	rw_downside;		/* True for dir_east and dir_south*/
 extern Byte *ArtData[64];
 extern Byte textures[MAPSIZE*2+5][MAPSIZE]; /* 0-63 is horizontal, 64-127 is vertical*/
-										/* 128 - 132 are doors*/
 
-/* In Mac.c, 3DO.c, AppleIIgs.c */
-
+/* TODO - these were in Mac.c etc */										/* 128 - 132 are doors*/
+/*
 extern void InitTools(void);
 extern void BlastScreen(void);
 extern void BlastScreen2(Rect *BlastRect);
@@ -558,6 +549,7 @@ extern void EndGetPsyched(void);
 extern Word ChooseGameDiff(void);
 extern void ShareWareEnd(void);
 extern void FinishLoadGame(void);
+*/
 
 /* In StateDef.c */
 

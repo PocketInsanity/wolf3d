@@ -1,4 +1,4 @@
-#include "WolfDef.h"
+#include "wolfdef.h"
 #include <stdlib.h>
 
 Word MathSize;			/* What size of math data is calculated? */

@@ -6,10 +6,10 @@ CFLAGS = -g
 #CFLAGS = -Os
 #CFLAGS = -g -Wall -I/home/relnev/cvs/oal/include
 
-OBJS =  Data.o Doors.o EnMove.o EnThink.o InterMis.o Intro.o Level.o \
+OBJS =  Data.o Doors.o EnMove.o EnThink.o Intro.o Level.o \
 	Missiles.o Music.o PlMove.o PlStuff.o PlThink.o PushWall.o \
 	RefBsp.o RefSprite.o Refresh.o Refresh2.o Sight.o Main.o \
-	StateDef.o WolfMain.o WolfIO.o Burger.o 
+	StateDef.o WolfMain.o WolfIO.o InterMis.o
 SOBJS = $(OBJS) 
 XOBJS = $(OBJS)
 GOBJS = $(OBJS)
