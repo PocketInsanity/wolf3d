@@ -10,7 +10,11 @@ int px,py;
 byte fontcolor,backcolor;
 int fontnumber;
 
-unsigned freelatch;
+/* TODO: more latch nonsense
+unsigned freelatch; 
+unsigned latchpics[NUMLATCHPICS];
+*/
+
 /* ======================================================================== */
 
 void VW_DrawPropString(char *string)
@@ -65,9 +69,10 @@ void VW_MeasurePropString (char *string, word *width, word *height)
 =============================================================================
 */
 
-void VWB_DrawTile8 (int x, int y, int tile)
+void VWB_DrawTile8(int x, int y, int tile)
 {
-	LatchDrawChar(x,y,tile);
+/* TODO: 'latches' do not work */
+/*	LatchDrawChar(x,y,tile); */
 }
 
 void VWB_DrawPic(int x, int y, int chunknum)
@@ -85,13 +90,12 @@ void VWB_DrawPic(int x, int y, int chunknum)
 
 void VWB_DrawPropString(char *string)
 {
-	VW_DrawPropString (string);
+	VW_DrawPropString(string);
 }
-
 
 void VWB_Bar(int x, int y, int width, int height, int color)
 {
-	VW_Bar (x,y,width,height,color);
+	VW_Bar(x,y,width,height,color);
 }
 
 void VWB_Plot(int x, int y, int color)
@@ -111,16 +115,8 @@ void VWB_Vlin(int y1, int y2, int x, int color)
 
 void VW_UpdateScreen(void)
 {
-	VL_UpdateScreen ();
+	VL_UpdateScreen();
 }
-
-/*
-=============================================================================
-
-						WOLFENSTEIN STUFF
-
-=============================================================================
-*/
 
 /*
 =====================
@@ -130,15 +126,9 @@ void VW_UpdateScreen(void)
 =====================
 */
 
-void LatchDrawPic (unsigned x, unsigned y, unsigned picnum)
+void LatchDrawPic(unsigned x, unsigned y, unsigned picnum)
 {
-	unsigned wide, height, source;
-
-	wide = pictable[picnum-STARTPICS].width;
-	height = pictable[picnum-STARTPICS].height;
-	source = latchpics[2+picnum-LATCHPICS_LUMP_START];
-
-	VL_LatchToScreen (source,wide/4,height,x*8,y);
+	VWB_DrawPic(x*8, y+160, picnum);
 }
 
 /* ======================================================================== */
@@ -160,6 +150,7 @@ void LoadLatchMem(void)
 /*
    tile 8s
 */
+#if 0 /* I can't get these to extract, if at all */
 	latchpics[0] = freelatch;
 	CA_CacheGrChunk (STARTTILE8);
 	src = (byte *)grsegs[STARTTILE8];
@@ -172,8 +163,9 @@ void LoadLatchMem(void)
 		destoff +=16;
 	}
 	UNCACHEGRCHUNK (STARTTILE8);
+#endif
 
-#if 0 /* ran out of latch space! */
+#if 0 
 /*
    tile 16s
 */
@@ -199,13 +191,16 @@ void LoadLatchMem(void)
 
 	for (i=start;i<=end;i++)
 	{
-		latchpics[2+i-start] = destoff;
+		/* TODO: this just caches them for eternity */
 		CA_CacheGrChunk (i);
+	#if 0	
+		latchpics[2+i-start] = destoff;
 		width = pictable[i-STARTPICS].width;
 		height = pictable[i-STARTPICS].height;
 		VL_MemToLatch (grsegs[i],width,height,destoff);
 		destoff += width/4 *height;
 		UNCACHEGRCHUNK(i);
+	#endif
 	}
 
 }

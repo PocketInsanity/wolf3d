@@ -268,17 +268,19 @@ int CalcHeight (void)
 ===================
 */
 
-unsigned	postx;
+unsigned postx;
 
-void ScalePost (byte *wall, int texture)		// VGA version
+void ScalePost(byte *wall, int texture)
 {
-    int height;
-    byte *source;
-    height = (wallheight [postx] & 0xfff8) >> 1;
-    if (height > maxscaleshl2)
-	height = maxscaleshl2;
-    source = wall+texture;
-    xBuildCompScale (height/2, source, postx);
+	int height;
+	byte *source;
+
+	height = (wallheight [postx] & 0xfff8) >> 1;
+	if (height > maxscaleshl2)
+		height = maxscaleshl2;
+	
+	source = wall+texture;
+	xBuildCompScale (height/2, source, postx);
 }
 
 
@@ -318,9 +320,8 @@ void HitHorizDoor (void)
 			break;
 		}
 
- wall = PM_GetPage (doorpage);
- ScalePost (wall, texture);
-
+	wall = PM_GetPage (doorpage);
+	ScalePost (wall, texture);
 }
 
 //==========================================================================
@@ -695,7 +696,7 @@ void	ThreeDRefresh (void)
 //
 // clear out the traced array
 //
-	memset (spotvis, 0, sizeof (spotvis));
+	memset(spotvis, 0, sizeof(spotvis));
 
 //
 // follow the walls from there to the right, drawwing as we go
@@ -724,7 +725,7 @@ void	ThreeDRefresh (void)
 
 	}
 
-  VL_UpdateScreen ();
+	VL_UpdateScreen ();
 
 	frameon++;
 }
@@ -736,8 +737,8 @@ void	ThreeDRefresh (void)
    ystep = 32 bit fixed 32,16
    */
 
-#define xpartialbyystep() FixedByFrac (xpartial, ystep)
-#define ypartialbyxstep() FixedByFrac (ypartial, xstep)
+#define xpartialbyystep() FixedByFrac(xpartial, ystep)
+#define ypartialbyxstep() FixedByFrac(ypartial, xstep)
 
 int samex (int intercept, int tile)
 {
@@ -746,8 +747,7 @@ int samex (int intercept, int tile)
 	    return 0;
 	else
 	    return 1;
-    }
-    else {
+    } else {
 	if ((intercept>>16) <= tile)
 	    return 0;
 	else
@@ -762,8 +762,7 @@ int samey (int intercept, int tile)
 	    return 0;
 	else
 	    return 1;
-    }
-    else {
+    } else {
 	if ((intercept>>16) <= tile)
 	    return 0;
 	else
@@ -980,8 +979,7 @@ void HitVertWall (void)
 
 }
 
-void
-HitHorizWall (void)
+void HitHorizWall (void)
 {
 	int			wallpic;
 	unsigned	texture;

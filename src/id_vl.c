@@ -358,45 +358,6 @@ void VL_Bar(int x, int y, int width, int height, int color)
 /*
 =================
 =
-= VL_MemToLatch
-=
-=================
-*/
-
-void VL_MemToLatch (byte *source, int width, int height, word dest)
-{
-#if 0
-	unsigned	count;
-	byte	plane,mask;
-
-	count = ((width+3)/4)*height;
-	mask = 1;
-	for (plane = 0; plane<4 ; plane++)
-	{
-		VGAMAPMASK(mask);
-		mask <<= 1;
-
-asm	mov	cx,count
-asm mov ax,SCREENSEG
-asm mov es,ax
-asm	mov	di,[dest]
-asm	lds	si,[source]
-asm	rep movsb
-asm mov	ax,ss
-asm	mov	ds,ax
-
-		source+= count;
-	}
-#endif
-}
-
-
-//===========================================================================
-
-
-/*
-=================
-=
 = VL_MemToScreen
 =
 = Draws a block of data to the screen.
@@ -412,53 +373,6 @@ void VL_MemToScreen(byte *source, int width, int height, int x, int y)
 		source += width;
 		ptr += 320;
 	}
-}
-
-/* ======================================================================== */
-
-/*
-=================
-=
-= VL_LatchToScreen
-=
-=================
-*/
-
-void VL_LatchToScreen (unsigned source, int width, int height, int x, int y)
-{
-#if 0
-	VGAWRITEMODE(1);
-	VGAMAPMASK(15);
-
-asm	mov	di,[y]				// dest = bufferofs+ylookup[y]+(x>>2)
-asm	shl	di,1
-asm	mov	di,[WORD PTR ylookup+di]
-asm	add	di,[bufferofs]
-asm	mov	ax,[x]
-asm	shr	ax,2
-asm	add	di,ax
-
-asm	mov	si,[source]
-asm	mov	ax,[width]
-asm	mov	bx,[linewidth]
-asm	sub	bx,ax
-asm	mov	dx,[height]
-asm	mov	cx,SCREENSEG
-asm	mov	ds,cx
-asm	mov	es,cx
-
-drawline:
-asm	mov	cx,ax
-asm	rep movsb
-asm	add	di,bx
-asm	dec	dx
-asm	jnz	drawline
-
-asm	mov	ax,ss
-asm	mov	ds,ax
-
-	VGAWRITEMODE(0);
-#endif
 }
 
 void VL_DeModeXize(byte *buf, int width, int height)

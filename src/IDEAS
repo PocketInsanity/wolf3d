@@ -4,11 +4,13 @@
   handles this transparently
 * Audio support using OpenAL
   - Problem is, that SDL and OpenAL would need pthread, which with SVGAlib is
-    a no-go... oh well.
+    a no-go... oh well. Using DGA (if possible at 320x200) would fulfill the
+    desire for full screen mode
 * Add support for the Mac version, if possible
 * Network support!
 * Fully compile with no warnings/errors using -Wall -ansi -pedantic
-* Port to: Linux/SVGAlib, Linux/X, Linux/OpenGL, DOS/Allegro, Win32/GDI, 
-  Win32/DX, Win32/D3D, Win32/OpenGL, BeOS?, MacOS?
+* Port to: Linux/SVGAlib, Linux/X (Windowed and DGA), Linux/OpenGL, 
+  DOS/Allegro, Win32/GDI, Win32/DX, Win32/D3D, Win32/OpenGL, BeOS?, MacOS?
 * Ease in using demos. Playing demos from files, recording to files, batch
   playing, and so on.
+* Make Wolf3D the game it was originally planned to be...

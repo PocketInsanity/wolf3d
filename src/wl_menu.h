@@ -202,13 +202,9 @@ enum
 	loadgame,
 	savegame,
 	changeview,
-
-#ifndef GOODTIMES
-#ifndef SPEAR
+#if !defined(GOODTIMES) && !defined(SPEAR)
 	readthis,
 #endif
-#endif
-
 	viewscores,
 	backtodemo,
 	quit

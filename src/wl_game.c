@@ -20,7 +20,6 @@
 */
 
 boolean		ingame,fizzlein;
-unsigned	latchpics[NUMLATCHPICS];
 gametype	gamestate;
 
 long		spearx,speary;

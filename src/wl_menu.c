@@ -49,7 +49,11 @@ char endStrings[9][80]=
 };
 
 CP_iteminfo
+#if !defined(GOODTIMES) && !defined(SPEAR)
 	MainItems={MENU_X,MENU_Y,10,STARTITEM,24},
+#else
+	MainItems={MENU_X,MENU_Y, 9,STARTITEM,24},
+#endif
 	SndItems={SM_X,SM_Y1,12,0,52},
 	LSItems={LSM_X,LSM_Y,10,0,24},
 	CtlItems={CTL_X,CTL_Y,6,-1,56},
