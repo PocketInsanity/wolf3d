@@ -94,9 +94,10 @@ void CalcTics()
 	
 	lasttimecount = newtime;
 	
-	if (tics > MAXTICS) {
+	if (demoplayback || demorecord)
+		tics = DEMOTICS;
+	else if (tics > MAXTICS)
 		tics = MAXTICS;
-	}
 }
 
 /* ======================================================================== */
@@ -327,9 +328,9 @@ int SaveTheGame(char *fn, char *tag, int dx, int dy)
 	
 		DiskFlopAnim(dx, dy);
 	
-		for (y = 0; y < 64; y++)
-			for (x = 0; x < 64; x++)
-				WriteInt32(fd, actorat[y][x]);
+		for (x = 0; x < 64; x++)
+			for (y = 0; y < 64; y++)
+				WriteInt32(fd, actorat[x][y]);
 	
 		DiskFlopAnim(dx, dy);
 			
@@ -573,9 +574,9 @@ int LoadTheGame(char *fn, int dx, int dy)
 	
 	DiskFlopAnim(dx, dy);
 	
-	for (y = 0; y < 64; y++)
-		for (x = 0; x < 64; x++)
-			actorat[y][x] = ReadInt32(fd);
+	for (x = 0; x < 64; x++)
+		for (y = 0; y < 64; y++)
+			actorat[x][y] = ReadInt32(fd);
 	
 	DiskFlopAnim(dx, dy);
 			
@@ -618,10 +619,10 @@ int LoadTheGame(char *fn, int dx, int dy)
 	player->temp3		= ReadInt32(fd);
 	
 	/* update the id */
-	for (y = 0; y < 64; y++)
-		for (x = 0; x < 64; x++)
-			if (actorat[y][x] == (id | 0x8000))
-				actorat[y][x] = player->id | 0x8000;
+	for (x = 0; x < 64; x++)
+		for (y = 0; y < 64; y++)
+			if (actorat[x][y] == (id | 0x8000))
+				actorat[x][y] = player->id | 0x8000;
 
 	while (1) {
 		DiskFlopAnim(dx, dy);
@@ -656,10 +657,10 @@ int LoadTheGame(char *fn, int dx, int dy)
 		new->temp2		= ReadInt32(fd);
 		new->temp3		= ReadInt32(fd);
 		
-		for (y = 0; y < 64; y++)
-			for (x = 0; x < 64; x++)
-				if (actorat[y][x] == (id | 0x8000))
-					actorat[y][x] = new->id | 0x8000;
+		for (x = 0; x < 64; x++)
+			for (y = 0; y < 64; y++)
+				if (actorat[x][y] == (id | 0x8000))
+					actorat[x][y] = new->id | 0x8000;
 	}
 	
 	DiskFlopAnim(dx, dy);
@@ -1341,6 +1342,15 @@ void DemoLoop()
 				IN_UserInput(3 * 70);
 		}
 		VW_FadeOut();
+	}
+	
+	if (MS_CheckParm("demotest")) {
+	#ifndef SPEARDEMO
+		for (i = 0; i < 4; i++)
+			PlayDemo(i);
+	#else
+		PlayDemo(0);
+	#endif
 	}
 	
 	while (1)

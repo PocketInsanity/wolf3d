@@ -15,9 +15,7 @@ long		spearx,speary;
 unsigned	spearangle;
 boolean		spearflag;
 
-//
-// ELEVATOR BACK MAPS - REMEMBER (-1)!!
-//
+/* ELEVATOR BACK MAPS - REMEMBER (-1)!! */
 #ifndef SPEAR
 static int ElevatorBackTo[]={ 1, 1, 7, 3, 5, 3};
 #endif
@@ -473,11 +471,12 @@ void SetupGameLevel()
 
 /* load the level */
 	CA_CacheMap(gamestate.mapon+10*gamestate.episode);
-	mapon -= gamestate.episode*10;
-
+	
 	if ((mapheaderseg[mapon]->width != 64) || (mapheaderseg[mapon]->height != 64))
 		Quit("Map not 64*64!");
 
+	mapon -= gamestate.episode*10;
+	
 	memset(tilemap, 0, sizeof(tilemap));
 	memset(actorat, 0, sizeof(actorat));
 
@@ -501,8 +500,8 @@ void SetupGameLevel()
 
 /* spawn doors */
 	map = mapsegs[0];
-	for (y=0;y<mapheight;y++)
-		for (x=0;x<mapwidth;x++)
+	for (y = 0; y < mapheight; y++)
+		for (x = 0; x < mapwidth; x++)
 		{
 			tile = *map++;
 			if (tile >= 90 && tile <= 101)
@@ -694,7 +693,7 @@ void FinishDemoRecord()
 
 	demorecord = false;
 
-	length = demoptr - (byte *)demobuffer;
+	length = (byte *)demoptr - (byte *)demobuffer;
 
 	demoptr = ((byte *)demobuffer)+1;
 
@@ -735,21 +734,22 @@ void RecordDemo()
 	int level,esc;
 
 	CenterWindow(26,3);
-	PrintY+=6;
+	PrintY += 6;
 	CA_CacheGrChunk(STARTFONT);
-	fontnumber=0;
+	fontnumber = 0;
 	US_Print("  Demo which level(1-10):");
 	VW_UpdateScreen();
-	VW_FadeIn ();
-	esc = !US_LineInput (px,py,str,NULL,true,2,0);
+	VW_FadeIn();
+	
+	esc = !US_LineInput(px,py,str,NULL,true,2,0);
 	if (esc)
 		return;
 
-	level = atoi (str);
+	level = atoi(str);
 	level--;
 
 	SETFONTCOLOR(0,15);
-	VW_FadeOut ();
+	VW_FadeOut();
 
 #ifndef SPEAR
 	NewGame (gd_hard,level/10);
@@ -759,27 +759,27 @@ void RecordDemo()
 	gamestate.mapon = level;
 #endif
 
-	StartDemoRecord (level);
+	StartDemoRecord(level);
 
-	DrawPlayScreen ();
+	DrawPlayScreen();
 	VW_UpdateScreen();
 	
-	VW_FadeIn ();
+	VW_FadeIn();
 
 	startgame = false;
 	demorecord = true;
 
-	SetupGameLevel ();
-	StartMusic ();
+	SetupGameLevel();
+	StartMusic();
 	fizzlein = true;
 
-	PlayLoop ();
+	PlayLoop();
 
 	demoplayback = false;
 
-	StopMusic ();
-	VW_FadeOut ();
-	ClearMemory ();
+	StopMusic();
+	VW_FadeOut();
+	ClearMemory();
 
 	FinishDemoRecord ();
 }
@@ -808,11 +808,13 @@ void PlayDemo(int demonumber)
 	demoptr = grsegs[dems[demonumber]];
 
 	NewGame(1, 0);
-	gamestate.mapon = *demoptr++;
+
+	gamestate.mapon = demoptr[0];
 	gamestate.difficulty = gd_hard;
-	length = demoptr[0] | (demoptr[1] << 8);
-	demoptr += 3;
-	lastdemoptr = demoptr-4+length;
+	length = demoptr[1] | (demoptr[2] << 8);
+	demoptr += 4;
+	
+	lastdemoptr = demoptr+length-4;
 
 	VW_FadeOut();
 
@@ -822,6 +824,7 @@ void PlayDemo(int demonumber)
 	
 	VW_FadeIn();
 
+	loadedgame = false;
 	startgame = false;
 	demoplayback = true;
 
@@ -835,9 +838,9 @@ void PlayDemo(int demonumber)
 
 	demoplayback = false;
 
-	StopMusic ();
-	VW_FadeOut ();
-	ClearMemory ();
+	StopMusic();
+	VW_FadeOut();
+	ClearMemory();
 }
 
 int PlayDemoFromFile(char *demoname)

@@ -53,7 +53,7 @@ extern void SD_Shutdown();
 extern boolean SD_PlaySound(soundnames sound);
 extern void SD_StopSound(),
 				SD_WaitSoundDone(),
-				SD_StartMusic(MusicGroup *music),
+				SD_StartMusic(int music),
 				SD_MusicOn(),
 				SD_MusicOff(),
 				SD_FadeOutMusic();

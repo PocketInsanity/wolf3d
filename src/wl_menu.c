@@ -3178,7 +3178,7 @@ void StartCPMusic(int song)
 	lastmusic = song;
 
 	CA_CacheAudioChunk(STARTMUSIC + song);
-	SD_StartMusic((MusicGroup *)audiosegs[STARTMUSIC + song]);
+	SD_StartMusic(STARTMUSIC + song);
 }
 
 void FreeMusic()

@@ -131,7 +131,7 @@ void SD_MusicOff()
 //	SD_StartMusic() - starts playing the music pointed to
 //
 ///////////////////////////////////////////////////////////////////////////
-void SD_StartMusic(MusicGroup *music)
+void SD_StartMusic(int music)
 {
 	SD_MusicOff();
 }

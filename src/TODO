@@ -15,11 +15,6 @@ Sound Menu:
 - 44100
 - 22050
 ------------------------------------------------------------------------------
-*
-SD_StartMusic((MusicGroup *)audiosegs[STARTMUSIC + chunk]);
-=>
-SD_StartMusic(chunk);
-------------------------------------------------------------------------------
 * use int16_t, etc (stdint)
 * finish serializing reads/writes, endian issues
 * fix fix fix different size stuff
@@ -33,6 +28,11 @@ probably will only support 320x200, 640x400, 960x600
 example (is this reproducible?)
 * getenv so that you can point an env. var to the proper dir
 * rewrite hw (sound, input) code, remove stuff like SD_SetSoundMode
+* fix the input code, everything is spread out... ideally everything should
+work the same, let the input handler do it all instead
+i think its safe for now to go with the scancodes as being the "universal"
+key type, and for everything not scancode-based, have a function to
+translate
 * use static and const where appropriate
 * menu code is a mess, always does things differently than the rest of the
 code, it really needs to be cleaned up
@@ -40,12 +40,6 @@ code, it really needs to be cleaned up
 * rewrite id_ca.c: uniform memory handling system
 * clean up header files, especially wl_def.h, where some declarations aren't 
 in the right place
-* fix the input code, everything is spread out... ideally everything should
-work the same, let the input handler do it all instead
-i think its safe for now to go with the scancodes as being the "universal"
-key type, and for everything not scancode-based, have a function to
-translate
-* add a ViewMap? (could be done similar to mac version)
 * change the current parameter handling code to something like getopt
 * remove check for debugmode?
 * fizzlefade is hackish, stipple buf would work ok in opengl, maybe only

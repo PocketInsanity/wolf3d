@@ -373,10 +373,8 @@ void PollJoystickMove()
 
 void PollControls()
 {
-	int	max, min, i;
-	byte	buttonbits;
-
-
+	int max, min, i;
+	byte buttonbits;
 
 	controlx = 0;
 	controly = 0;
@@ -388,14 +386,14 @@ void PollControls()
 	// read commands from demo buffer
 	//
 		buttonbits = *demoptr++;
-		for (i=0;i<NUMBUTTONS;i++)
+		for (i = 0; i < NUMBUTTONS; i++)
 		{
 			buttonstate[i] = buttonbits&1;
 			buttonbits >>= 1;
 		}
 
-		controlx = *demoptr++;
-		controly = *demoptr++;
+		controlx = (signed char)*demoptr++;
+		controly = (signed char)*demoptr++;
 
 		if (demoptr == lastdemoptr)
 			playstate = ex_completed;		// demo is done
