@@ -619,3 +619,7 @@ void P_DrawSeg (saveseg_t *seg)
 void StartRenderView()
 {
 }
+
+void InitRenderView()
+{
+}

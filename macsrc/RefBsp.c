@@ -159,7 +159,7 @@ void RenderBSPNode(Word bspnum)
 
 	coordinate = bsp->plane<<7;		/* stored as half tiles*/
 	
-	if (bsp->dir) {					/* True for vertical tiles */
+	if (bsp->dir&1) {				/* True for vertical tiles */
 		side = viewx > coordinate;	/* vertical decision line*/
 		savednum = BSPLEFT + (side^1);	/* Left or right */
 	} else {

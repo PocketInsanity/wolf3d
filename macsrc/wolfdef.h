@@ -378,10 +378,9 @@ typedef struct {
 
 /* Used by the renderer, must match the header of static_t, actor_t, missile_t */
 
-/* TODO: hrm */
 typedef struct {
-	Word	x,y;		/* Item's x,y */
-	Word sprite;	/* Item's shape */
+	Word x,y;		/* Item's x,y */
+	Word sprite;		/* Item's shape */
 	Word areanumber;	/* Item's visible area */
 } thing_t;
 
