@@ -11,6 +11,7 @@
 /* #define SPEAR */
 /* #define SPEARDEMO */
 /* #define JAPAN */
+/* #define JAPDEMO */
 #define GOODTIMES
 #define DEMOSEXTERN
 #define UPLOAD
@@ -20,6 +21,7 @@
 /* #define SPEAR */
 /* #define SPEARDEMO */
 /* #define JAPAN */
+/* #define JAPDEMO */
 #define GOODTIMES
 #define DEMOSEXTERN
 /* #define UPLOAD */
@@ -28,6 +30,7 @@
 #define SPEAR 
 #define SPEARDEMO 
 /* #define JAPAN */
+/* #define JAPDEMO */
 #define GOODTIMES
 #define DEMOSEXTERN
 /* #define UPLOAD */
@@ -36,6 +39,7 @@
 #define SPEAR
 /* #define SPEARDEMO */
 /* #define JAPAN */
+/* #define JAPDEMO */
 #define GOODTIMES
 #define DEMOSEXTERN
 /* #define UPLOAD */

@@ -16,3 +16,5 @@ work the same, let the input handler do it all instead
 * when viewsize is around 20, sprites end up being drawn over the border.
 maybe there are clipping bugs that will cause it to fill over the top, left, 
 and right
+* if japan versions are not to be found, remove the code 
+* remove DEMOEXTERN, and add ability to play demos from commandline 
