@@ -7,7 +7,7 @@
 /* SDM = 2 */
 /* SOD = 3 */
 #ifndef WMODE
-#define WMODE 1
+#define WMODE 0
 #endif
 
 /* --- End of User-Modifiable Variables --- */

@@ -13,6 +13,7 @@
 #include <X11/Xatom.h>
 #include <X11/extensions/XShm.h>
 
+
 byte *gfxbuf = NULL;
 byte *disbuf = NULL;
 
@@ -34,6 +35,9 @@ int shmmode;
 static byte cpal[768];
 static word spal[768];
 static dword ipal[768];
+
+static int ByteOrder; /* 0 = LSBFirst, 1 = MSBFirst */
+static int NeedSwap;
 
 int MyDepth;
 
@@ -277,10 +281,17 @@ void VL_Startup()
 		XInitImage(img);
 		XDestroyImage(imgtmp);
 	}
+		
+	MyDepth = GetBPP();
 
-	if (img)
-		MyDepth = GetBPP();
-	
+#if BYTE_ORDER == BIG_ENDIAN
+	ByteOrder = 1;
+#else
+	ByteOrder = 0;
+#endif
+
+	NeedSwap = (ByteOrder != img->byte_order);
+
 	XMapRaised(dpy, win);
 }
 
@@ -327,12 +338,13 @@ void VW_UpdateScreen()
 		case 15:
 		case 16:
 			ptrs = (word *)disbuf;
+			
 			for (i = 0; i < 64000; i++) {
 				*ptrs = spal[gfxbuf[i]];
 				ptrs++;
 			}
 			break;
-		case 24:
+		case 24: /* Endian Safe? Untested. */
 			ptrb = disbuf;
 			for (i = 0; i < 64000; i++) {
 				*ptrb = cpal[gfxbuf[i]*3+2] << 2; ptrb++;
@@ -342,10 +354,15 @@ void VW_UpdateScreen()
 			break;
 		case 32:
 			ptri = (dword *)disbuf;
+			
 			for (i = 0; i < 64000; i++) {
 				*ptri = ipal[gfxbuf[i]];
 				ptri++;
 			}
+			break;
+		default:
+			break;
+			/* ... */
 		}
 	}
 
@@ -418,17 +435,24 @@ void VL_SetPalette(const byte *palette)
 	} else {
 		memcpy(cpal, palette, 768);
 		for (i = 0; i < 256; i++) {
+/* TODO: this should really use the visual for creating the pixel */		
 			switch(MyDepth) {
 				case 8:
 					break;
-				case 15:
+				case 15: /* Endian Safe? Untested. */
 					spal[i] = ((palette[i*3+0] >> 1) << 10) | ((palette[i*3+1] >> 1) << 5) | ((palette[i*3+2] >> 1) << 0);
+					if (NeedSwap)
+						spal[i] = SwapInt16(spal[i]);
 					break;
 				case 16:
 					spal[i] = ((palette[i*3+0] >> 1) << 11) | ((palette[i*3+1] >> 0) << 5) | ((palette[i*3+2] >> 1) << 0);
+					if (NeedSwap)
+						spal[i] = SwapInt16(spal[i]);
 					break;
 				case 32:
 					ipal[i] = (palette[i*3+0] << 18) | (palette[i*3+1] << 10) | (palette[i*3+2] << 2);
+					if (NeedSwap)
+						ipal[i] = SwapInt32(ipal[i]);
 					break;
 			}
 		}

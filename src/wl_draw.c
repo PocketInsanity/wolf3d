@@ -1249,3 +1249,100 @@ passhoriz:
 void FizzleFade(boolean abortable, int frames, int color)
 {
 }
+
+#if 0
+static int xarr[1280];
+static int yarr[1280];
+
+static int myrand()
+{
+	return rand();
+}
+
+static void fillarray(int *arr, int len)
+{
+	int i;
+	
+	for (i = 0; i < len; i++)
+		arr[i] = i;
+}
+
+static void randarray(int *arr, int len)
+{
+	int i, j, k;
+	
+	for (i = 0; i < len; i++) {
+		j = myrand() % len;
+		
+		k = arr[i];
+		arr[i] = arr[j];
+		arr[j] = k;
+	}
+}
+			
+void FizzleFade(boolean abortable, int frames, int color)
+{
+	boolean retr;
+	int pixperframe;
+	int x, y, xc, yc;
+	int count, p, frame;
+		
+	count = viewwidth * viewheight;
+	pixperframe = count / frames;
+	
+	srand(time(NULL));
+		
+	fillarray(xarr, viewwidth);
+	randarray(xarr, viewwidth);
+	
+	fillarray(yarr, viewheight - 1);
+	randarray(yarr, viewheight - 1);
+
+	IN_StartAck();
+
+	frame = 0;
+	set_TimeCount(0);
+	
+	xc = 0;
+	yc = 0;
+	x = 0;
+	y = 0;
+	
+	retr = false;
+	do {
+		if (abortable && IN_CheckAck())
+			retr = true;
+		else
+		for (p = 0; p < pixperframe; p++) {
+				
+			gfxbuf[(xarr[x]+xoffset)+(yarr[y]+yoffset)*vwidth] = color;
+			
+			count--;
+			
+			x++;
+			if (x >= viewwidth)
+				x = 0;
+			
+			y++;
+			if (y >= (viewheight-1))
+				y = 0;
+			
+			yc++;	
+			if (yc >= (viewheight-1)) {
+				yc = 0;
+				y++;
+				
+				if (y >= (viewheight-1))
+					y = 0;
+			}
+		}
+		
+		VW_UpdateScreen();
+		
+		frame++;
+		while (get_TimeCount() < frame);
+	} while (!retr && (count > 0));
+	
+	VW_UpdateScreen();
+}
+#endif

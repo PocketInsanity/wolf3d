@@ -189,6 +189,9 @@ void CAL_HuffExpand(byte *source, byte *dest, long length, huffnode *htable)
 = CAL_CarmackExpand
 = Length is the length of the EXPANDED data
 =
+= Note: This function happens to implicity swap words' bytes around.
+=       For maps, this happens to be the desired effect.
+=
 ======================
 */
 
@@ -267,13 +270,14 @@ void CA_RLEWexpand(word *source, word *dest, long length, word rlewtag)
 	/* expand it */
 	do {
 		value = *source++;
-		
+
 		if (value != rlewtag)
 			/* uncompressed */
 			*dest++ = value;
 		else {
 			/* compressed string */
-			count = SwapInt16L(*source); source++;
+			count = *source++;
+			
 			value = *source++;
 			for (i = 0; i < count; i++)
 				*dest++ = value;
@@ -383,8 +387,7 @@ static void CAL_SetupMapFile()
 	if (handle == -1)
 		CA_CannotOpen(fname);
 
-	/* RLEWtag = ReadInt16(handle); */
-	ReadBytes(handle, (byte *)&RLEWtag, 2); /* RLEWtag = word */
+	RLEWtag = ReadInt16(handle);
 
 /* open the data file */
 	strcpy(fname, gmapsname);
@@ -680,7 +683,6 @@ void CA_CacheMap(int mapnum)
 	byte *source;
 	memptr buffer2seg;
 	long expanded;
-	int i;
 	
 	mapon = mapnum;
 
@@ -697,19 +699,22 @@ void CA_CacheMap(int mapnum)
 
 		ReadBytes(maphandle, (byte *)source, compressed);
 		
-		expanded = source[0] | (source[1] << 8);
+		expanded = source[0] | (source[1] << 8);		
 		MM_GetPtr(&buffer2seg, expanded);
-		
+
+/* NOTE: CarmackExpand implicitly fixes endianness, a RLEW'd only map
+         would (likely) need to be swapped in CA_RLEWexpand
+         
+         Wolfenstein 3D/Spear of Destiny maps are always Carmack'd so this
+         case is OK.  CA_RLEWexpand would need to be adjusted for Blake Stone
+         and the like.
+*/         		
 		CAL_CarmackExpand(source+2, (word *)buffer2seg, expanded);
 		MM_FreePtr((void *)&source);
-		
+
 		expanded = 64*64*2;
 		CA_RLEWexpand(((word *)buffer2seg)+1, mapsegs[plane], expanded, RLEWtag);
 		MM_FreePtr(&buffer2seg);
-		
-		/* swap for big-endian */
-		for (i = 0; i < 64*64; i++)
-			mapsegs[plane][i] = SwapInt16L(mapsegs[plane][i]);		
 	}
 }
 
@@ -791,12 +796,14 @@ static void PML_OpenPageFile()
 	memset(PMPages, 0, sizeof(PageListStruct) * ChunksInFile);
 
 	/* Read in the chunk offsets */
-	for (i = 0, page = PMPages; i < ChunksInFile; i++, page++)
+	for (i = 0, page = PMPages; i < ChunksInFile; i++, page++) {
 		page->offset = ReadInt32(PageFile);
+	}
 		
 	/* Read in the chunk lengths */
-	for (i = 0, page = PMPages; i < ChunksInFile; i++, page++)
+	for (i = 0, page = PMPages; i < ChunksInFile; i++, page++) {	
 		page->length = ReadInt16(PageFile);
+	}
 }
 
 static void PML_ClosePageFile()

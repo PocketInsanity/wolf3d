@@ -5,7 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <stdint.h>
+#include <sys/types.h>
+#include <inttypes.h>
 #include <glob.h>
 #include <ctype.h>
 #include <math.h>

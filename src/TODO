@@ -1,4 +1,4 @@
-Priority Levels: I > R > M (I, R required to be complete before release)
+Priority Levels: I > R > M (I, R required to be complete before full release)
 Program: P=PC Wolf3D, M=Mac Wolf3D, B=Both
 P R - create a better "read direction" for menu movement
 P M - convert while (Keyboard[sc_Blah]) IN_CheckAck() to IN_WaitKeyDown(sc..
@@ -21,8 +21,9 @@ B M - port to dreamcast?
 B M - add compression to savegames/config
 B I - play through game (w/ sound and music) to make sure things work
 B M - use stdint.h where appropiate
-B M - finish serializing reads/writes, endian issues
-P I - fix raycast bug where at certain points you can see through corners
+B M - finish serializing reads/writes, endian issues.
+      - PC version should be OK for loading -- savegames not yet tested.
+P M - fix raycast bug where at certain points you can see through corners
 B I - merge other TODO lists into this list
 B M - use something like config file or getenv to point at data directories
 P I - finish handling/mapping for all keys in sys. specific code
@@ -43,10 +44,12 @@ P M - rename visable to visible
 B M - change the commandline handling (use something like getopt?)
 P R - rewrite RLEWexpand to not use words
 B M - openal support
+B I - when window loses focus, it should clear the keys
+B M - [X11] use the data in the visual/image for formatting colors
 
 Complete:
 P I - fix or remove fizzle fade
-    - Removed [nice, but very hacky effect]
+      - Removed [nice, but very hacky effect]
 ------------------------------------------------------------------------------
 * what exactly is the point of all the DigiMode checks in wl_act2.c?
 * add ylookup?
@@ -63,9 +66,7 @@ PlayDemoFromFile specifically
 * deathcam went by too fast, same with the spear of destiny ending animation
   - probably due to waiting for sounds to finish
 * split wl_draw into two files (draw independent, draw dependent)
-* when window loses focus, it should clear the keys
 ------------------------------------------------------------------------------
-fix:
 void ControlMovement(objtype *ob) (wl_agent.c)
 void UpdateInput() / void PollControls() (wl_play.c)
 ------------------------------------------------------------------------------

@@ -14,6 +14,8 @@ int xfrac, yfrac;
 
 /* ======================================================================== */
 
+#define SKIPFADE 0
+
 void VL_FillPalette(int red, int green, int blue)
 {
 	byte pal[768];
@@ -39,6 +41,9 @@ void VL_FillPalette(int red, int green, int blue)
 
 void VL_FadeOut(int start, int end, int red, int green, int blue, int steps)
 {
+#ifdef SKIPFADE
+	VL_FillPalette(red, green, blue);
+#else
 	int i,j,orig,delta;
 	byte *origptr, *newptr;
 
@@ -68,6 +73,7 @@ void VL_FadeOut(int start, int end, int red, int green, int blue, int steps)
 
 /* final color */
 	VL_FillPalette(red, green, blue);
+#endif
 
 	screenfaded = true;
 }
@@ -82,6 +88,9 @@ void VL_FadeOut(int start, int end, int red, int green, int blue, int steps)
 
 void VL_FadeIn(int start, int end, const byte *palette, int steps)
 {
+#ifdef SKIPFADE
+	VL_SetPalette(palette);
+#else
 	int i, j, delta;
 
 	VL_GetPalette(&palette1[0][0]);
@@ -104,6 +113,7 @@ void VL_FadeIn(int start, int end, const byte *palette, int steps)
 
 /* final color */
 	VL_SetPalette(palette);
+#endif
 	screenfaded = false;
 }
 
