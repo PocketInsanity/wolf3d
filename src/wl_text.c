@@ -24,8 +24,9 @@ TEXT FORMATTING COMMANDS
 =============================================================================
 */
 
-#define BACKCOLOR		0x11
+#ifndef SPEAR
 
+#define BACKCOLOR		0x11
 
 #define WORDLIMIT		80
 #define FONTHEIGHT		10
@@ -747,7 +748,6 @@ int		helpextern = T_HELPART;
 =
 =================
 */
-#ifndef SPEAR
 void HelpScreens (void)
 {
 	int			artnum;
@@ -781,7 +781,6 @@ void HelpScreens (void)
 	MM_SortMem ();
 #endif
 }
-#endif
 
 //
 // END ARTICLES
@@ -828,3 +827,5 @@ void EndText (void)
 	MM_SortMem ();
 #endif
 }
+
+#endif

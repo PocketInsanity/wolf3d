@@ -1952,7 +1952,7 @@ moveok:
 	for (y=yl ; y<=yh ; y++)
 		for (x=xl ; x<=xh ; x++)
 		{
-			tile = actorat[x][y];
+			tile = (unsigned)actorat[x][y];
 			if (!tile)
 				continue;
 			if (tile<256)

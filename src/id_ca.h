@@ -139,6 +139,6 @@ void	PM_Startup(void),
 memptr	PM_GetPageAddress(int pagenum),
 				PM_GetPage(int pagenum);		// Use this one to cache page
 
-#elif 
+#else 
 #error "fix me TODO"
 #endif

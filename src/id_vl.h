@@ -35,6 +35,6 @@ void VL_MemToScreen(byte *source, int width, int height, int x, int y);
 
 void VL_DeModeXize(byte *buf, int width, int height);
 
-#elif
+#else
 #error "fix me: TODO"
 #endif

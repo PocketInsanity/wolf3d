@@ -1237,9 +1237,9 @@ startplayloop:
 			SD_PlaySound(GETSPEARSND);
 			if (DigiMode != sds_Off)
 			{
-				long lasttimecount = TimeCount;
+				long lasttimecount = get_TimeCount();
 
-				while(TimeCount < lasttimecount+150)
+				while(get_TimeCount() < lasttimecount+150)
 				//while(DigiPlaying!=false)
 					SD_Poll();
 			}
@@ -1292,7 +1292,7 @@ startplayloop:
 				CheckHighScore (gamestate.score,gamestate.mapon+1);
 
 				#ifndef JAPAN
-				_fstrcpy(MainMenu[viewscores].string,STR_VS);
+				strcpy(MainMenu[viewscores].string,STR_VS);
 				#endif
 				MainMenu[viewscores].routine = CP_ViewScores;
 

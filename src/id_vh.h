@@ -68,6 +68,6 @@ boolean FizzleFade(byte *source, unsigned width,unsigned height, unsigned frames
 extern	unsigned	latchpics[NUMLATCHPICS];
 extern	unsigned freelatch;
 
-#elif
+#else
 #error "fix me: TODO"
 #endif

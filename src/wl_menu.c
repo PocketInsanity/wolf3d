@@ -472,7 +472,7 @@ void US_ControlPanel(byte scancode)
 					if (SoundMode != sdm_Off)
 						for (i=0;i<NUMSOUNDS;i++,start++)
 							if (audiosegs[start])
-								MM_SetPurge (&(memptr)audiosegs[start],3);		// make purgable
+								MM_SetPurge ((memptr)&audiosegs[start],3);		// make purgable
 				}
 				#endif
 
@@ -610,9 +610,7 @@ void CP_ReadThis(void)
 #endif
 #endif
 
-#ifndef SPEAR
-#ifndef GOODTIMES
-#else
+#if defined(SPEAR) || defined(GOODTIMES)
 ////////////////////////////////////////////////////////////////////
 //
 // BOSS KEY
@@ -621,7 +619,6 @@ void CP_ReadThis(void)
 void BossKey(void)
 {
 }
-#endif
 #endif
 
 ////////////////////////////////////////////////////////////////////

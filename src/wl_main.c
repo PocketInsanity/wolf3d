@@ -1264,7 +1264,6 @@ void DemoLoop (void)
 // main game cycle
 //
 
-
 	#ifndef UPLOAD
 
 		#ifndef GOODTIMES

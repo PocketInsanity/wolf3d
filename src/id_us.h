@@ -55,6 +55,6 @@ int		US_CheckParm(char *parm,char **strings),
 
 		void	USL_PrintInCenter(char *s,Rect r);
 
-#elif
+#else
 #error "fix me: TODO"
 #endif
