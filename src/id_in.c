@@ -101,7 +101,7 @@ static void INL_KeyService(void)
 	byte k, c, temp;
 	int i;
 
-	k = inportb(0x60);	// Get the scan code
+	/* k = inportb(0x60);	// Get the scan code */
 
 	if (k == 0xe0)		// Special key prefix
 		special = true;

@@ -59,8 +59,6 @@ void DebugMemory (void)
 
 	US_CPrint ("Memory Usage");
 	US_CPrint ("------------");
-	US_Print ("Total     :");
-	US_PrintUnsigned (mminfo.mainmem/1024);
 	US_Print ("k\nFree      :");
 	US_PrintUnsigned (MM_UnusedMemory()/1024);
 	US_Print ("k\nWith purge:");
@@ -216,21 +214,10 @@ static	char	buf[10];
 			US_Print(" (Sound)");
 
 		US_Print("\n XMS: ");
-		if (page->xmsPage != -1)
-			US_PrintUnsigned(page->xmsPage);
-		else
-			US_Print("No");
+		US_Print("No");
 
 		US_Print("\n Main: ");
-		if (page->mainPage != -1)
-			US_PrintUnsigned(page->mainPage);
-		else if (page->emsPage != -1)
-		{
-			US_Print("EMS ");
-			US_PrintUnsigned(page->emsPage);
-		}
-		else
-			US_Print("No");
+		US_Print("No");
 
 		US_Print("\n Last hit: ");
 		US_PrintUnsigned(page->lastHit);
@@ -247,7 +234,6 @@ static	char	buf[10];
 			//
 			// draw the wall
 			//
-				bufferofs += 32*SCREENWIDTH;
 				postx = 128;
 				postwidth = 1;
 				postsource = ((long)((unsigned)addr))<<16;
@@ -256,16 +242,13 @@ static	char	buf[10];
 					wallheight[postx] = 256;
 					FarScalePost ();
 				}
-				bufferofs -= 32*SCREENWIDTH;
 			}
 			else if (i < PMSoundStart)
 			{
 			//
 			// draw the sprite
 			//
-				bufferofs += 32*SCREENWIDTH;
 				SimpleScaleShape (160, i-PMSpriteStart, 64);
-				bufferofs -= 32*SCREENWIDTH;
 			}
 			else if (i == ChunksInFile - 1)
 			{
@@ -283,7 +266,7 @@ static	char	buf[10];
 			}
 			else
 			{
-				byte *dp = (byte *)MK_FP(addr,0);
+				byte *dp = addr;
 				for (j = 0;j < NumDigi;j++)
 				{
 					k = (DigiList[(j * 2) + 1] + (PMPageSize - 1)) / PMPageSize;

@@ -2,12 +2,11 @@
 
 #include "id_heads.h"
 
-unsigned	bufferofs;
-unsigned	displayofs;
-
 boolean		screenfaded;
 
 byte		palette1[256][3], palette2[256][3];
+
+byte *gfxbuf;
 
 void VL_WaitVBL(int vbls)
 {

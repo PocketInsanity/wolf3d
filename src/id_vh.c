@@ -12,6 +12,7 @@ int px,py;
 byte fontcolor,backcolor;
 int fontnumber;
 
+unsigned freelatch;
 /* ======================================================================== */
 
 void VW_DrawPropString(char *string)

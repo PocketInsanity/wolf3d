@@ -56,6 +56,8 @@
 #define NUMBERCHARS	9
 
 
+#define HEIGHTRATIO            0.50
+
 //----------------
 
 #define EXTRAPOINTS		40000

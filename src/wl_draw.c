@@ -75,7 +75,6 @@ void AsmRefresh (void);
 =
 ========================
 */
-#if 0
 fixed FixedByFrac (fixed a, fixed b)
 {
 	long long ra = a;
@@ -86,7 +85,6 @@ fixed FixedByFrac (fixed a, fixed b)
 	r >>= 16;
 	return (fixed)r;
 }
-#endif
 
 //==========================================================================
 

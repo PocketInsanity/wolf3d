@@ -1,7 +1,6 @@
-// WL_PLAY.C
+/* wl_play.c */
 
-#include "WL_DEF.H"
-#pragma hdrstop
+#include "wl_def.h"
 
 
 /*
@@ -67,7 +66,7 @@ int			viewsize;
 boolean		buttonheld[NUMBUTTONS];
 
 boolean		demorecord,demoplayback;
-char		far *demoptr, far *lastdemoptr;
+char		*demoptr, *lastdemoptr;
 memptr		demobuffer;
 
 //
@@ -374,11 +373,7 @@ void PollKeyboardMove (void)
 
 void PollMouseMove (void)
 {
-	int	mousexmove,mouseymove;
-
-	Mouse(MDelta);
-	mousexmove = _CX;
-	mouseymove = _DX;
+	int	mousexmove = 0, mouseymove = 0;
 
 	controlx += mousexmove*10/(13-mouseadjustment);
 	controly += mouseymove*20/(13-mouseadjustment);
@@ -684,7 +679,6 @@ void CheckKeys (void)
 				STR_CHEATER5);
 
 		UNCACHEGRCHUNK(STARTFONT+1);
-		PM_CheckMainMem ();
 		IN_ClearKeysDown();
 		IN_Ack();
 
@@ -713,7 +707,6 @@ void CheckKeys (void)
 
 	 Message("Debugging keys are\nnow available!");
 	 UNCACHEGRCHUNK(STARTFONT+1);
-	 PM_CheckMainMem ();
 	 IN_ClearKeysDown();
 	 IN_Ack();
 
@@ -739,7 +732,6 @@ void CheckKeys (void)
 			 "that - right, Cheatmeister?!");
 
 	 UNCACHEGRCHUNK(STARTFONT+1);
-	 PM_CheckMainMem ();
 	 IN_ClearKeysDown();
 	 IN_Ack();
 
@@ -758,8 +750,6 @@ void CheckKeys (void)
 		IN_ClearKeysDown ();
 		SD_MusicOn();
 		Paused = false;
-		if (MousePresent)
-			Mouse(MDelta);	// Clear accumulated mouse movement
 		return;
 	}
 
@@ -783,7 +773,6 @@ void CheckKeys (void)
 		if (scan == sc_F9)
 		  StartMusic ();
 
-		PM_CheckMainMem ();
 		SETFONTCOLOR(0,15);
 		IN_ClearKeysDown();
 		return;
@@ -808,9 +797,6 @@ void CheckKeys (void)
 		if (loadedgame)
 			playstate = ex_abort;
 		lasttimecount = TimeCount;
-		if (MousePresent)
-			Mouse(MDelta);	// Clear accumulated mouse movement
-		PM_CheckMainMem ();
 		return;
 	}
 
@@ -823,8 +809,6 @@ void CheckKeys (void)
 		fontnumber=0;
 		SETFONTCOLOR(0,15);
 		DebugKeys();
-		if (MousePresent)
-			Mouse(MDelta);	// Clear accumulated mouse movement
 		lasttimecount = TimeCount;
 		return;
 	}
@@ -1001,8 +985,8 @@ void StopMusic(void)
 	for (i = 0;i < LASTMUSIC;i++)
 		if (audiosegs[STARTMUSIC + i])
 		{
-			MM_SetPurge(&((memptr)audiosegs[STARTMUSIC + i]),3);
-			MM_SetLock(&((memptr)audiosegs[STARTMUSIC + i]),false);
+			MM_SetPurge((memptr)&(audiosegs[STARTMUSIC + i]),3);
+			MM_SetLock((memptr)&(audiosegs[STARTMUSIC + i]),false);
 		}
 }
 
@@ -1030,13 +1014,8 @@ void StartMusic(void)
 	MM_BombOnError (false);
 	CA_CacheAudioChunk(STARTMUSIC + chunk);
 	MM_BombOnError (true);
-	if (mmerror)
-		mmerror = false;
-	else
-	{
-		MM_SetLock(&((memptr)audiosegs[STARTMUSIC + chunk]),true);
-		SD_StartMusic((MusicGroup far *)audiosegs[STARTMUSIC + chunk]);
-	}
+	MM_SetLock((memptr)&(audiosegs[STARTMUSIC + chunk]),true);
+	SD_StartMusic((MusicGroup *)audiosegs[STARTMUSIC + chunk]);
 }
 
 
@@ -1056,13 +1035,13 @@ void StartMusic(void)
 #define WHITETICS		6
 
 
-byte	far redshifts[NUMREDSHIFTS][768];
-byte	far whiteshifts[NUMREDSHIFTS][768];
+byte	redshifts[NUMREDSHIFTS][768];
+byte	whiteshifts[NUMREDSHIFTS][768];
 
 int		damagecount,bonuscount;
 boolean	palshifted;
 
-extern 	byte	far	gamepal;
+extern 	byte	gamepal;
 
 /*
 =====================
@@ -1074,7 +1053,7 @@ extern 	byte	far	gamepal;
 
 void InitRedShifts (void)
 {
-	byte	far *workptr, far *baseptr;
+	byte *workptr, *baseptr;
 	int		i,j,delta;
 
 
@@ -1083,7 +1062,7 @@ void InitRedShifts (void)
 //
 	for (i=1;i<=NUMREDSHIFTS;i++)
 	{
-		workptr = (byte far *)&redshifts[i-1][0];
+		workptr = (byte *)&redshifts[i-1][0];
 		baseptr = &gamepal;
 
 		for (j=0;j<=255;j++)
@@ -1099,7 +1078,7 @@ void InitRedShifts (void)
 
 	for (i=1;i<=NUMWHITESHIFTS;i++)
 	{
-		workptr = (byte far *)&whiteshifts[i-1][0];
+		workptr = (byte *)&whiteshifts[i-1][0];
 		baseptr = &gamepal;
 
 		for (j=0;j<=255;j++)
@@ -1376,9 +1355,6 @@ void PlayLoop (void)
 	memset (buttonstate,0,sizeof(buttonstate));
 	ClearPaletteShifts ();
 
-	if (MousePresent)
-		Mouse(MDelta);	// Clear accumulated mouse movement
-
 	if (demoplayback)
 		IN_StartAck ();
 
@@ -1386,7 +1362,7 @@ void PlayLoop (void)
 	{
 		if (virtualreality)
 		{
-			helmetangle = peek (0x40,0xf0);
+			helmetangle = 0; /* TODO: virtualreality can be removed */
 			player->angle += helmetangle;
 			if (player->angle >= ANGLES)
 				player->angle -= ANGLES;
