@@ -11,9 +11,11 @@ typedef struct
 
 extern pictabletype pictable[NUMPICS];
 
-extern	byte	fontcolor;
-extern	int	fontnumber;
-extern	int	px,py;
+extern byte fontcolor, backcolor;
+extern int fontnumber;
+extern int px, py;
+
+#define SETFONTCOLOR(f, b) { fontcolor = f; backcolor = b; }
 
 void VW_UpdateScreen();
 

@@ -1,11 +1,41 @@
 #include "wl_def.h"
 
-#include <math.h>
 #include <pthread.h>
 #include <sys/ioctl.h>
 #include <sys/soundcard.h>
-
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+                     
 #include "fmopl.h"
+
+#define PACKED __attribute__((packed))
+
+typedef	struct {
+	longword length;
+	word priority;
+} PACKED SoundCommon;
+
+typedef	struct {
+	SoundCommon common;
+	byte data[1];
+} PACKED PCSound;
+
+typedef	struct {
+	byte mChar, cChar, mScale, cScale, mAttack, cAttack, mSus, cSus,
+		mWave, cWave, nConn, voice, mode, unused[3];
+} PACKED Instrument;
+
+typedef	struct {
+	SoundCommon common;
+	Instrument inst;
+	byte block, data[1];
+} PACKED AdLibSound;
+
+typedef	struct {
+	word length, values[1];
+} PACKED MusicGroup;
 
 boolean AdLibPresent, SoundBlasterPresent;
 	
@@ -42,17 +72,17 @@ static volatile int NewMusic;
 static volatile int NewAdlib;
 static volatile int AdlibPlaying;
 
-pthread_t hSoundThread;
+static pthread_t hSoundThread;
 
-int CurDigi;
-int CurAdlib;
+static int CurDigi;
+static int CurAdlib;
 
-boolean SPHack;
+static boolean SPHack;
 
-short int sndbuf[512];
-short int musbuf[256];
+static short int sndbuf[512];
+static short int musbuf[256];
 
-void *SoundThread(void *data)
+static void *SoundThread(void *data)
 {
 	int i, snd;
 	short int samp;
@@ -230,7 +260,7 @@ void *SoundThread(void *data)
 	return NULL;
 }
 
-void Blah()
+static void Blah()
 {
         memptr  list;
         word    *p, pg;
@@ -569,34 +599,14 @@ void SD_MusicOff()
 ///////////////////////////////////////////////////////////////////////////
 void SD_StartMusic(int music)
 {
+	music += STARTMUSIC;
+	
 	CA_CacheAudioChunk(music);
 	
 	SD_MusicOff();
 	SD_MusicOn();
 	Music = (MusicGroup *)audiosegs[music];
 	NewMusic = 1;
-}
-
-///////////////////////////////////////////////////////////////////////////
-//
-//	SD_FadeOutMusic() - starts fading out the music. Call SD_MusicPlaying()
-//		to see if the fadeout is complete
-//
-///////////////////////////////////////////////////////////////////////////
-void SD_FadeOutMusic()
-{
-	SD_MusicOff();
-}
-
-///////////////////////////////////////////////////////////////////////////
-//
-//	SD_MusicPlaying() - returns true if music is currently playing, false if
-//		not
-//
-///////////////////////////////////////////////////////////////////////////
-boolean SD_MusicPlaying()
-{
-	return sqActive;
 }
 
 void SD_SetDigiDevice(SDSMode mode)

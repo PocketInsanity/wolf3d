@@ -1,15 +1,19 @@
 #include "wl_def.h"
 
+#include <unistd.h>
+#include <pthread.h>
+
 #include <AL/al.h>
 #include <AL/alc.h>
 #include <AL/alut.h>
+
+#include "fmopl.h"
 
 /* old stuff */
 boolean AdLibPresent, SoundBlasterPresent;
 SDMode SoundMode, MusicMode;
 SDSMode DigiMode;
 static boolean SD_Started;
-static boolean sqActive;
 
 
 /* AdLib Sound:
@@ -35,7 +39,8 @@ static boolean sqActive;
 /* new stuff */
 
 static int NumPCM;
-struct _PCMSound {
+struct _PCMSound
+{
 	byte *data;
 	int length;
 	int used;
@@ -43,7 +48,8 @@ struct _PCMSound {
 	ALuint handle;
 } static *PCMSound;
 
-struct _SoundData {
+struct _SoundData
+{
 	int priority;
 	
 	/* PCM */
@@ -58,7 +64,10 @@ struct _SoundData {
 	byte *adata;
 } static SoundData[LASTSOUND];
 
-struct _MusicData {
+static ALuint AdBuf[4];
+
+struct _MusicData
+{
 	int length;
 	
 	word *regval;
@@ -78,6 +87,156 @@ struct _SoundChan {
 	ALuint handle;	/* OpenAL source handle */
 } static SoundChan[CHANNELS];
 
+
+/* how to do streaming buffer:
+queue say 4 buffers of a certain size and play
+now, run your updating loop: 
+	unqueue buffers that have finished
+	generate new data and fill these buffers
+	queue the buffers with the new data
+
+since "Applications can have multiple threads that share one more or contexts.
+In other words, AL and ALC are threadsafe.", the streaming code can be
+implemented as a second thread
+
+*/
+
+/* threads:
+	main thread handles pcm channels/sounds
+	sound thread handles adlib channels/sounds
+	
+	sound thread sets priority to -1 if a sound is not playing
+	
+	potential thread contention with both main and sound threads 
+	accessing channel 0's information, but:
+	1. it's not done in any loops
+	2. any data mismatch won't affect the game (at least I think so)
+*/
+
+static pthread_t hSoundThread;
+static pthread_mutex_t SoundMutex;
+
+#define SOUND_START	0	/* play this adlib sound */
+#define SOUND_STARTD	1	/* play this pcm sound */
+#define SOUND_STOP	2	/* stop all sounds */
+#define MUSIC_START	3	/* play this song */
+#define MUSIC_STOP	4	/* stop music */
+#define MUSIC_PAUSE	5	/* pause music */
+#define MUSIC_UNPAUSE	6	/* unpause music */
+#define ST_SHUTDOWN	7	/* shutdown thread */
+
+struct _SoundMessage
+{
+	int type;	/* what is it? (see above) */
+	
+	int item;	/* what to play (if anything) */
+	
+	struct _SoundMessage *next;
+};
+
+struct _SoundMessage *SoundMessage;
+
+static void SendSTMessage(int type, int item)
+{
+	struct _SoundMessage *t;
+	
+	pthread_mutex_lock(&SoundMutex);
+	
+	MM_GetPtr((memptr)&t, sizeof(struct _SoundMessage));
+	
+	t->type = type;
+	t->item = item;
+	
+	t->next = SoundMessage;
+	SoundMessage = t;
+	
+	pthread_mutex_unlock(&SoundMutex);	
+}
+
+static boolean ReceiveSTMessage(int *type, int *item)
+{
+	boolean retr = false;
+	
+	pthread_mutex_lock(&SoundMutex);
+	
+	if (SoundMessage) {
+		struct _SoundMessage *p, *t;
+		
+		p = NULL;
+		t = SoundMessage;
+		while (t->next) {
+			p = t;
+			t = t->next;
+		}
+		
+		if (p) {
+			p->next = NULL;
+		} else {
+			SoundMessage = NULL;
+		}
+				
+		*type = t->type;
+		*item = t->item;
+		
+		MM_FreePtr((memptr)&t);
+		
+		retr = true;
+	} else {
+		retr = false;
+	}
+	
+	pthread_mutex_unlock(&SoundMutex);
+	
+	return retr;
+}
+
+static void *SoundThread(void *data)
+{
+	FM_OPL *OPL;
+	byte *s;
+	int type, item;
+	int i;
+	
+	OPL = OPLCreate(OPL_TYPE_YM3812, 3579545, 44100);
+	OPLWrite(OPL, 0x01, 0x20); /* Set WSE=1 */
+	OPLWrite(OPL, 0x08, 0x00); /* Set CSM=0 & SEL=0 */
+	
+	MM_GetPtr((memptr)&s, 63*2*5);
+	alGenBuffers(4, AdBuf);
+	
+	for (i = 0; i < 4; i++)
+		alBufferData(AdBuf[i], AL_FORMAT_MONO16, s, 63*5, 44100);
+	
+	alSourceQueueBuffers(SoundChan[0].handle, 4, AdBuf);
+	
+	for (;;) {
+		while (ReceiveSTMessage(&type, &item)) {
+			switch (type) {
+				case SOUND_START:
+					break;
+				case SOUND_STOP:
+					break;
+				case MUSIC_START:
+					break;
+				case MUSIC_STOP:
+					break;
+				case MUSIC_PAUSE:
+					break;
+				case MUSIC_UNPAUSE:
+					break;
+				case ST_SHUTDOWN:
+					/* TODO: free the openal stuff allocated in this thread */
+					OPLDestroy(OPL);
+					return NULL;
+			}
+		}
+		
+		/* Do Stuff */
+		usleep(1);
+	}
+		
+	return NULL;
+}
 
 void SD_Startup()
 {
@@ -183,7 +342,7 @@ void SD_Startup()
 	SoundChan[0].id = -1;
 	SoundChan[0].priority = -1;
 	
-	for (i = 1; i < CHANNELS; i++) {
+	for (i = 0; i < CHANNELS; i++) {
 		alGenSources(1, &(SoundChan[i].handle));
 		
 		SoundChan[i].id = -1;
@@ -193,10 +352,19 @@ void SD_Startup()
 		/* alSourcef(SoundChan[i].handle, AL_ROLLOFF_FACTOR, 1.0f); */
 	}
 	
+	alSourcei(SoundChan[0].handle, AL_SOURCE_RELATIVE, AL_TRUE);
+	alSourcef(SoundChan[0].handle, AL_ROLLOFF_FACTOR, 0.0f);
 	alSourcei(SoundChan[1].handle, AL_SOURCE_RELATIVE, AL_TRUE);
 	alSourcef(SoundChan[i].handle, AL_ROLLOFF_FACTOR, 0.0f);
 	
 	MusicData[0].length = 0; /* silence warnings for now */
+		
+	SoundMessage = NULL;
+	
+	pthread_mutex_init(&SoundMutex, NULL);
+	if (pthread_create(&hSoundThread, NULL, SoundThread, NULL) != 0) {
+		perror("pthread_create");		
+	}
 	
 	SD_Started = true;
 }
@@ -205,6 +373,10 @@ void SD_Shutdown()
 {
 	if (!SD_Started)
 		return;
+		
+	SendSTMessage(ST_SHUTDOWN, 0);
+	
+/* TODO: deallocate everything here */
 
 	SD_Started = false;
 }
@@ -224,13 +396,15 @@ boolean SD_PlaySound(soundnames sound)
 				
 				alSourceStop(SoundChan[1].handle);
 				alSourcei(SoundChan[1].handle, AL_BUFFER, s->pcm->handle);
-				alSourcePlay(SoundChan[1].handle);
-				return false;
+				alSourcePlay(SoundChan[1].handle);	
 			}
+			return false;
 		}
 	}
 	
-	/* Adlib */
+	if (s->priority >= SoundChan[0].priority)
+		SendSTMessage(SOUND_START, sound);
+	
 	return false;
 }
 
@@ -282,7 +456,7 @@ void PlaySoundLocGlobal(word sound, int id, fixed gx, fixed gy)
 		}
 	}
 	
-	/* AdLib */
+	/* Just play the AdLib version */
 	SD_PlaySound(sound);
 }
 
@@ -295,22 +469,21 @@ void UpdateSoundLoc(fixed x, fixed y, int angle)
 	val[2] = (ALfloat)y / 32768.0f;
 	alListenerfv(AL_POSITION, val); 
 	
-	val[0] = cos(angle * PI / 180.0f);
+	val[0] = -cos(angle * PI / 180.0f);
 	val[1] = 0.0f;
 	val[2] = -sin(angle * PI / 180.0f);
 	val[3] = 0.0f;
 	val[4] = 1.0f;
 	val[5] = 0.0f;
-	alListenerfv(AL_ORIENTATION, val);
-	
+	alListenerfv(AL_ORIENTATION, val);	
 }
 
 void SD_StopSound()
 {
 	int i;
 	
-	/* Stop AdLib */
-	
+	SendSTMessage(SOUND_STOP, 0);
+		
 	for (i = 1; i < CHANNELS; i++) {
 		SoundChan[i].id = -1;
 		SoundChan[i].sound = -1;
@@ -323,14 +496,11 @@ void SD_StopSound()
 
 word SD_SoundPlaying()
 {
-/* returns 0 or currently playing sound */
-/* this is only checked for GETGATLINGSND so to be pedantic */
-/* return currently playing adlib else return the first found */
-/* playing channel */
 	ALint val;
 	int i;
 
-	/* Check AdLib sound status */
+	if (SoundChan[0].priority != -1)
+		return SoundChan[0].sound;
 	
 	for (i = 1; i < CHANNELS; i++) {
 		alGetSourceiv(SoundChan[i].handle, AL_SOURCE_STATE, &val);
@@ -343,9 +513,23 @@ word SD_SoundPlaying()
 
 void SD_WaitSoundDone()
 {
-/* TODO: should also "work" when sound is disabled... */
 	while (SD_SoundPlaying())
 		;
+}
+
+void SD_MusicOn()
+{
+	SendSTMessage(MUSIC_UNPAUSE, 0);
+}
+
+void SD_MusicOff()
+{
+	SendSTMessage(MUSIC_PAUSE, 0);
+}
+
+void SD_StartMusic(int music)
+{
+	SendSTMessage(MUSIC_START, music);
 }
 
 void SD_SetDigiDevice(SDSMode mode)
@@ -358,30 +542,6 @@ boolean SD_SetSoundMode(SDMode mode)
 }
 
 boolean SD_SetMusicMode(SMMode mode)
-{
-	return false;
-}
-
-void SD_MusicOn()
-{
-	sqActive = true;
-}
-
-void SD_MusicOff()
-{
-	sqActive = false;
-}
-
-void SD_StartMusic(int music)
-{
-	SD_MusicOff();
-}
-
-void SD_FadeOutMusic()
-{
-}
-
-boolean SD_MusicPlaying()
 {
 	return false;
 }

@@ -3149,7 +3149,7 @@ void StartCPMusic(int song)
 	
 	lastmusic = song;
 
-	SD_StartMusic(STARTMUSIC + song);
+	SD_StartMusic(song);
 }
 
 void FreeMusic()

@@ -5,22 +5,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <sys/types.h>
 #include <stdint.h>
-#include <unistd.h>
 #include <glob.h>
 #include <ctype.h>
-#include <fcntl.h>
 #include <math.h>
 
 #ifdef __cplusplus
 typedef bool boolean;
 #else
 typedef enum { false, true } boolean;
-#endif
-
-#ifndef O_BINARY
-#define O_BINARY 0
 #endif
 
 #include "version.h"
@@ -82,8 +75,10 @@ extern const byte gamepal[];
 int MS_CheckParm(char *string);
 void Quit(char *error);
 
+#define TickBase	70	/* 70Hz per tick */
+
 #undef PI
-#define PI     3.1415926535897932384626433832795028841971693993751058209749445920
+#define PI		3.1415926535897932384626433832795028841971693993751058209749445920
 
 #define	MAXTICS		10
 #define DEMOTICS	4
@@ -92,9 +87,5 @@ extern int tics;
 
 #define mapwidth	64
 #define mapheight	64
-
-extern byte fontcolor, backcolor;
-
-#define SETFONTCOLOR(f, b) { fontcolor = f; backcolor = b; }
 
 #endif

@@ -4,10 +4,9 @@ P R - create a better "read direction" for menu movement
 P M - convert while (Keyboard[sc_Blah]) IN_CheckAck() to IN_WaitKeyDown(sc..
 P I - finish changing the game movement to the new style
 P R - update input menus/config
-P M - rewrite menu code
+P M - cleanup/rewrite menu code
 P R - update sound menus/config
 P I - rewrite sound code: get rid of packed structs, clean up thread stuff
-P R - openal sound
 P I - fix issues (speed, hacks) with variable screen size
 P M - BSP trees (or something similar), then OpenGL support
 M R - port menu code (after fixed up) 
@@ -20,7 +19,7 @@ B R - decide if to keep SVGA/X11 targets
 B M - configure scripts?
 B M - port to dreamcast?
 B M - add compression to savegames/config
-B I - play through (w/ sound and music) to make sure things work
+B I - play through game (w/ sound and music) to make sure things work
 B M - use stdint.h where appropiate
 B M - finish serializing reads/writes, endian issues
 P I - fix raycast bug where at certain points you can see through corners
@@ -34,10 +33,39 @@ P I - add sound "emulation" to the necessary targets so WaitSoundDone works
 B R - autoconf/automake
 P R - change boolean SD_PlaySound to void SD_PlaySound
 P M - position pushwall sounds
+P M - id_ca.c cache code: fix/readd/rewrite the "garbage collection" system
+P M - rewrite id_ca.c: uniform memory handling system
+P M - either move id_heads into wl_def or split header files apart
+P R - rewrite fmopl.c to avoid licensing issues
 
 Complete:
 P I - fix or remove fizzle fade
     - Removed [nice, but very hacky effect]
+P R - openal sound
+    - almost complete
+------------------------------------------------------------------------------
+* what exactly is the point of all the DigiMode checks in wl_act2.c?
+* add ylookup?
+* remove farmapylookup?
+* would be nice if Quit() used vsnprintf, etc
+* actor walking through door is drawn in front of door: near end of E1M1 for
+example (is this reproducible?)
+* use static and const where appropriate
+* clean up header files, especially wl_def.h, where some declarations aren't 
+in the right place
+* change the current parameter handling code to something like getopt
+* remove check for debugmode?
+* check filehandling (ex, file missing, bad file type, and such)
+PlayDemoFromFile specifically
+* deathcam went by too fast, same with the spear of destiny ending animation
+  - probably due to waiting for sounds to finish
+* split wl_draw into two files (draw independent, draw dependent)
+* when window loses focus, it should clear the keys
+* rename visable to visible
+------------------------------------------------------------------------------
+fix:
+void ControlMovement(objtype *ob) (wl_agent.c)
+void UpdateInput() / void PollControls() (wl_play.c)
 ------------------------------------------------------------------------------
 Control Menu:
 * TODO
@@ -53,30 +81,6 @@ Sound Menu:
 * Music:
 - On [AdLib/OPL2]
 - Off
-------------------------------------------------------------------------------
-* add ylookup?
-* remove farmapylookup?
-* would be nice if Quit() used vsnprintf, etc
-* actor walking through door is drawn in front of door: near end of E1M1 for
-example (is this reproducible?)
-* use static and const where appropriate
-* menu code is a mess, always does things differently than the rest of the
-code, it really needs to be cleaned up
-* id_ca.c cache code: fix/readd/rewrite the "garbage collection" system?
-* rewrite id_ca.c: uniform memory handling system
-* clean up header files, especially wl_def.h, where some declarations aren't 
-in the right place
-* change the current parameter handling code to something like getopt
-* remove check for debugmode?
-* check filehandling (ex, file missing, bad file type, and such)
-PlayDemoFromFile specifically
-* deathcam went by too fast, same with the spear of destiny ending animation
-  - probably due to waiting for sounds to finish
-* split wl_draw into two files (draw independent, draw dependent)
-* when window loses focus, it should clear the keys
-* rename visable to visible
-* create 'sound channels' with priority.. ie a door can only make one sound
-at a time
 ------------------------------------------------------------------------------
 Save game header:
 8 bytes: WOLF3D, 0, 0
@@ -117,7 +121,3 @@ Version 0x00000000 Data: (Official)
 Version 0x00000001 Data: (Official)
 <undetermined but will be compressed>
 
-------------------------------------------------------------------------------
-fix:
-void ControlMovement(objtype *ob) (wl_agent.c)
-void UpdateInput() / void PollControls() (wl_play.c)

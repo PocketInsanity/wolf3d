@@ -22,7 +22,7 @@ OBJS += sd_null.o
 #OBJS += sd_oss.o fmopl.o
 #CFLAGS += -D_REENTRANT
 #LFLAGS += -lpthread
-#OBJS += sd_oal.o
+#OBJS += sd_oal.o fmopl.o
 #CFLAGS += -D_REENTRANT -I/home/relnev/cvs/oal/include/
 #LFLAGS += -lpthread -ldl -L/home/relnev/cvs/oal/linux/src/ -lopenal # /home/relnev/cvs/oal/linux/src/libopenal.a
 
@@ -31,7 +31,7 @@ OBJS += sd_null.o
 CFLAGS += `sdl-config --cflags`
 
 SLFLAGS = $(LFLAGS) -lvga
-XLFLAGS = $(LFLAGS) -L/usr/X11R6/lib -lX11 -lXext -lXxf86vm -lXxf86dga
+XLFLAGS = $(LFLAGS) -L/usr/X11R6/lib -lX11 -lXext
 DLFLAGS = $(LFLAGS) `sdl-config --libs` -L/usr/X11R6/lib -lX11 -lXext
 
 NASM = nasm

@@ -16,7 +16,6 @@ byte *gfxbuf = NULL;
 
 void Quit(char *error)
 {
-	/* TODO: blah blah blah */
 	memptr screen = NULL;
 
 	if (!error || !*error) {
@@ -31,7 +30,7 @@ void Quit(char *error)
 	ShutdownId();
 	
 	if (screen) {
-		printf("TODO: spiffy ansi screen goes here..\n");
+		/* printf("spiffy ansi screen goes here..\n"); */
 	}
 	
 	if (error && *error) {

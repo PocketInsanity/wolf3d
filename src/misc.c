@@ -1,8 +1,13 @@
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <unistd.h>
+#include <fcntl.h>
               
 #include "wl_def.h"
+
+#ifndef O_BINARY
+#define O_BINARY 0
+#endif
 
 /* TimeCount from David Haslam -- dch@sirius.demon.co.uk */
 
