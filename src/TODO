@@ -23,8 +23,10 @@ SD_StartMusic(chunk);
 * use int16_t, etc (stdint)
 * finish serializing reads/writes, endian issues
 * fix fix fix different size stuff
-works alright at some res, but breaks on most others currently
-* add ylookup
+works alright at some res, but breaks on others currently
+add support for resolution changing at any time?
+probably will only support 320x200, 640x400, 960x600
+* add ylookup?
 * remove farmapylookup?
 * would be nice if Quit() used vsnprintf, etc
 * actor walking through door is drawn in front of door: near end of E1M1 for
@@ -38,15 +40,11 @@ code, it really needs to be cleaned up
 * rewrite id_ca.c: uniform memory handling system
 * clean up header files, especially wl_def.h, where some declarations aren't 
 in the right place
-* is that memory intro screen needed anymore? 
-no, will be removed soon
 * fix the input code, everything is spread out... ideally everything should
 work the same, let the input handler do it all instead
 i think its safe for now to go with the scancodes as being the "universal"
 key type, and for everything not scancode-based, have a function to
 translate
-* wl_menu uses specific scancodes for names, config file will have to use
-metaname like sc_Left etc or something
 * add a ViewMap? (could be done similar to mac version)
 * change the current parameter handling code to something like getopt
 * remove check for debugmode?

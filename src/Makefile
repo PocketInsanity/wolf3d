@@ -43,13 +43,13 @@ $(DOBJS): version.h id_heads.h wl_def.h
 	$(NASM) -f elf -o $@ $<
 
 swolf3d: $(SOBJS)
-	gcc -o swolf3d $(SOBJS) $(SLFLAGS) 
+	$(CC) -o swolf3d $(SOBJS) $(SLFLAGS) 
 
 xwolf3d: $(XOBJS)
-	gcc -o xwolf3d $(XOBJS) $(XLFLAGS)
+	$(CC) -o xwolf3d $(XOBJS) $(XLFLAGS)
 
 sdlwolf3d: $(DOBJS)
-	gcc -o sdlwolf3d $(DOBJS) $(DLFLAGS)
+	$(CC) -o sdlwolf3d $(DOBJS) $(DLFLAGS)
 
 clean:
 	rm -rf swolf3d xwolf3d sdlwolf3d *.o

@@ -1210,63 +1210,6 @@ void DoJukebox()
 /*
 ==========================
 =
-= SignonScreen
-=
-==========================
-*/
-
-void SignonScreen()
-{
-	VL_SetPalette(gamepal);
-	VL_MemToScreen(introscn, 320, 200, 0, 0);
-	VW_UpdateScreen();
-}
-
-
-/*
-==========================
-=
-= FinishSignon
-=
-==========================
-*/
-
-void FinishSignon()
-{
-#ifndef SPEAR
-	VW_Bar(0, 189, 300, 11, introscn[0]);
-	WindowX = 0;
-	WindowW = 320;
-	PrintY = 190;
-
-	SETFONTCOLOR(14,4);
-
-	US_CPrint("Press a key");
-	VW_UpdateScreen();
-	
-	if (!NoWait)
-		IN_Ack ();
-
-	VW_Bar(0, 189, 300, 11, introscn[0]);
-
-	PrintY = 190;
-	SETFONTCOLOR(10,4);
-
-	US_CPrint("Working...");
-	VW_UpdateScreen();
-	
-	SETFONTCOLOR(0,15);
-#else
-	if (!NoWait)
-		VW_WaitVBL(3*70);
-#endif
-}
-
-/* ======================================================================== */
-
-/*
-==========================
-=
 = ShutdownId
 =
 = Shuts down all ID_?? managers
@@ -1333,8 +1276,6 @@ void InitGame()
 	SD_Startup();
 	US_Startup();
 	
-//	SignonScreen();
-	
 //
 // build some tables
 //
@@ -1373,8 +1314,6 @@ void InitGame()
 	if (IN_KeyDown(sc_M))
 		DoJukebox();
 #endif
-
-//	FinishSignon();
 }
 
 /*

@@ -27,8 +27,6 @@ extern char extension[5];
 
 /* ======================================================================== */
 
-boolean CA_FarRead(int handle, byte *dest, long length);
-boolean CA_FarWrite(int handle, byte *source, long length);
 boolean CA_LoadFile(char *filename, memptr *ptr);
 boolean CA_WriteFile(char *filename, void *ptr, long length);
 

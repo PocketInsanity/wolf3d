@@ -406,6 +406,8 @@ void VL_SetPalette(const byte *palette)
 {
 	int i;
 
+	VL_WaitVBL(1);
+	
 	if (indexmode) {
 		for (i = 0; i < 256; i++) {
 			clr[i].red = palette[i*3+0] << 10;

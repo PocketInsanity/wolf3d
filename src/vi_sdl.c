@@ -134,6 +134,8 @@ void VL_SetPalette(const byte *palette)
 	SDL_Color colors[256];
 	int i;
 	
+	VL_WaitVBL(1);
+	
 	for (i = 0; i < 256; i++)
 	{
 		colors[i].r = palette[i*3+0] << 2;

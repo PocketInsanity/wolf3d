@@ -33,8 +33,6 @@ void VWB_DrawPic(int x, int y, int chunknum);
 
 extern boolean screenfaded;
 
-#define VW_Startup		VL_Startup
-#define VW_Shutdown		VL_Shutdown
 #define VW_Hlin(x,z,y,c)	VL_Hlin(x,y,(z)-(x)+1,c)
 #define VW_Vlin(y,z,x,c)	VL_Vlin(x,y,(z)-(y)+1,c)
 #define VW_WaitVBL		VL_WaitVBL
@@ -54,5 +52,8 @@ void LoadLatchMem();
 void VL_CacheScreen(int chunk);
 
 void VW_Bar(int x, int y, int width, int height, int color);
+
+void VW_Startup();
+void VW_Shutdown();
 
 #endif

@@ -4,6 +4,7 @@
 #include <vgakeyboard.h>
 
 byte *gfxbuf = NULL;
+byte *graphmem = NULL;
 
 /*
 ==========================
@@ -58,7 +59,7 @@ void VL_WaitVBL(int vbls)
 void VW_UpdateScreen()
 {
 	VL_WaitVBL(1); 
-	memcpy(graph_mem, gfxbuf, 64000);
+	memcpy(graphmem, gfxbuf, vwidth*vheight);
 }
 
 /*
@@ -71,16 +72,33 @@ void VW_UpdateScreen()
 
 void VL_Startup()
 {
-	if (gfxbuf == NULL) 
-		gfxbuf = malloc(320 * 200 * 1);
-		
+	int mode;
+	
 	vga_init(); /* TODO: maybe move into main or such? */
 	
-	if (vga_hasmode(G320x200x256) == 0) 
+	if (MS_CheckParm("x2")) {
+		mode = G640x400x256;
+		vwidth = 640;
+		vheight = 400;
+	} else {
+		mode = G320x200x256;
+		vwidth = 320;
+		vheight = 200;
+	}
+
+	if (gfxbuf == NULL) 
+		gfxbuf = malloc(vwidth * vheight * 1);
+		
+	if (vga_hasmode(mode) == 0) 
 		Quit("vga_hasmode failed!");
 			
-	if (vga_setmode(G320x200x256) != 0)
+	if (vga_setmode(mode) != 0)
 		Quit("vga_setmode failed!");
+		
+	if ((mode != G320x200x256) && (vga_setlinearaddressing() == -1))
+		Quit("vga_setlinearaddressing failed!");
+		
+	graphmem = vga_getgraphmem();
 }
 
 /*
@@ -114,6 +132,8 @@ void VL_SetPalette(const byte *palette)
 {
 	int i;
 	
+	VL_WaitVBL(1);
+	
 	for (i = 0; i < 256; i++)
 		vga_setpalette(i, palette[i*3+0], palette[i*3+1], palette[i*3+2]);
 }
@@ -140,7 +160,7 @@ void VL_GetPalette(byte *palette)
 
 void VL_DirectPlot(int x1, int y1, int x2, int y2)
 {
-	*(graph_mem + x1 + y1 * 320) = *(gfxbuf + x2 + y2 * 320);
+	*(graphmem + x1 + y1 * vwidth) = *(gfxbuf + x2 + y2 * vwidth);
 }
 
 void VL_DirectPlotFlush()

@@ -14,7 +14,7 @@ typedef struct
 =============================================================================
 */
 
-int RLEWtag;
+unsigned int RLEWtag;
 int mapon;
 
 word	*mapsegs[MAPPLANES];

@@ -6,7 +6,7 @@
 **
 ** Version 0.37
 **
-** Modified for Wolf 3D by Steven Fuller
+** Modified for Wolfenstein 3D by Steven Fuller
 */
 
 #include <stdio.h>
@@ -17,7 +17,7 @@
 
 #include "fmopl.h"
 
-#define INLINE inline
+#define INLINE static /* inline */
 
 void logerror(const char *text, ...);
 

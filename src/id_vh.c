@@ -10,6 +10,8 @@ boolean	screenfaded;
 
 static byte palette1[256][3], palette2[256][3];
 
+int xfrac, yfrac;
+
 /* ======================================================================== */
 
 /*
@@ -152,7 +154,6 @@ void VL_FadeOut(int start, int end, int red, int green, int blue, int steps)
 			*newptr++ = orig + delta * i / steps;
 		}
 
-		VL_WaitVBL(1);
 		VL_SetPalette(&palette2[0][0]);
 	}
 
@@ -174,7 +175,7 @@ void VL_FadeOut(int start, int end, int red, int green, int blue, int steps)
 
 void VL_FadeIn(int start, int end, const byte *palette, int steps)
 {
-	int		i,j,delta;
+	int i, j, delta;
 
 	VL_GetPalette(&palette1[0][0]);
 	memcpy(&palette2[0][0],&palette1[0][0],sizeof(palette1));
@@ -185,15 +186,14 @@ void VL_FadeIn(int start, int end, const byte *palette, int steps)
 //
 // fade through intermediate frames
 //
-	for (i=0;i<steps;i++)
+	for (i = 0; i < steps; i++)
 	{
-		for (j=start;j<=end;j++)
+		for (j = start;j <= end; j++)
 		{
 			delta = palette[j]-palette1[0][j];
 			palette2[0][j] = palette1[0][j] + delta * i / steps;
 		}
 
-		VL_WaitVBL(1);
 		VL_SetPalette(&palette2[0][0]);
 	}
 
@@ -221,7 +221,8 @@ void VL_DeModeXize(byte *buf, int width, int height)
 		return;
 	}
 	
-	mem = malloc(width * height);
+	MM_GetPtr((memptr)&mem, width *height);
+	
 	ptr = buf;
 
 	for (plane = 0; plane < 4; plane++) {
@@ -234,7 +235,8 @@ void VL_DeModeXize(byte *buf, int width, int height)
 	}
 
 	memcpy(buf, mem, width * height);
-	free(mem);
+	
+	MM_FreePtr((memptr)&mem);
 }
 
 /*
@@ -247,52 +249,29 @@ void VL_DeModeXize(byte *buf, int width, int height)
 
 static void VL_Plot(int x, int y, int color)
 {
-	int xend, yend, xfrac, yfrac, xs, ys;
+	int xend, yend, xs, ys;
 	
 	xend = x + 1;
 	yend = y + 1;
-
-	xfrac = (vwidth << 16) / 320;
-	yfrac = (vheight << 16) / 200;
 	
 	x *= xfrac;
 	y *= yfrac;
 	xend *= xfrac;
 	yend *= yfrac;
-	xfrac = (320 << 16) / vwidth;
-	yfrac = (200 << 16) / vheight;
-
-	for (xs = x; xs < xend; xs += xfrac)
-		for (ys = y; ys < yend; ys += yfrac)
-			*(gfxbuf + (ys >> 16) * vwidth + (xs >> 16)) = color;
-/*	
-	*(gfxbuf + vwidth * y + x) = color;
-*/
+	
+	x >>= 16;
+	y >>= 16;
+	xend >>= 16;
+	yend >>= 16;
+	
+	for (xs = x; xs < xend; xs++)
+		for (ys = y; ys < yend; ys++)
+			*(gfxbuf + ys * vwidth + xs) = color;
 }
 
 void VW_Plot(int x, int y, int color)
 {
-	int xend, yend, xfrac, yfrac, xs, ys;
-	
-	xend = x + 1;
-	yend = y + 1;
-
-	xfrac = (vwidth << 16) / 320;
-	yfrac = (vheight << 16) / 200;
-	
-	x *= xfrac;
-	y *= yfrac;
-	xend *= xfrac;
-	yend *= yfrac;
-	xfrac = (320 << 16) / vwidth;
-	yfrac = (200 << 16) / vheight;
-
-	for (xs = x; xs < xend; xs += xfrac)
-		for (ys = y; ys < yend; ys += yfrac)
-			*(gfxbuf + (ys >> 16) * vwidth + (xs >> 16)) = color;
-/*	
-	*(gfxbuf + vwidth * y + x) = color;
-*/
+	VL_Plot(x, y, color);
 }
 
 void VW_DrawPropString(char *string)
@@ -387,15 +366,13 @@ void VWB_DrawPic(int x, int y, int chunknum)
 
 void VL_Hlin(unsigned x, unsigned y, unsigned width, unsigned color)
 {
-	int xend, yend, xfrac, yfrac;
+/*
+	int xend, yend;
 	int w, h;
 	byte *ptr;
 	
 	xend = x + width;
 	yend = y + 1;
-	
-	xfrac = (vwidth << 16) / 320;
-	yfrac = (vheight << 16) / 200;
 	
 	x *= xfrac;
 	y *= yfrac;
@@ -411,15 +388,13 @@ void VL_Hlin(unsigned x, unsigned y, unsigned width, unsigned color)
 		memset(ptr, color, w);
 		ptr += vwidth;
 	}
-/*
+*/
+
 	int w;
 	
 	for (w = 0; w < width; w++)
 		VL_Plot(x+w, y, color);
-*/		
-/*	
-	memset(gfxbuf + vwidth * y + x, color, width);
-*/
+		
 }
 
 /*
@@ -432,15 +407,13 @@ void VL_Hlin(unsigned x, unsigned y, unsigned width, unsigned color)
 
 void VL_Vlin(int x, int y, int height, int color)
 {
-	int xend, yend, xfrac, yfrac;
+/*
+	int xend, yend;
 	int w, h;
 	byte *ptr;
 	
 	xend = x + 1;
 	yend = y + height;
-	
-	xfrac = (vwidth << 16) / 320;
-	yfrac = (vheight << 16) / 200;
 	
 	x *= xfrac;
 	y *= yfrac;
@@ -456,19 +429,11 @@ void VL_Vlin(int x, int y, int height, int color)
 		memset(ptr, color, w);
 		ptr += vwidth;
 	}
-/*
+*/
 	int h;
 	
 	for (h = 0; h < height; h++)
 		VL_Plot(x, y+h, color);
-*/		
-/*
-	byte *ptr = gfxbuf + vwidth * y + x;
-	while (height--) {
-		*ptr = color;
-		ptr += vwidth;
-	}
-*/
 }
 
 /*
@@ -481,60 +446,21 @@ void VL_Vlin(int x, int y, int height, int color)
 
 void VW_Bar(int x, int y, int width, int height, int color)
 {
-	//int xend, yend;
-	int xfrac, yfrac;
 	int w, h;
 	byte *ptr;
 	
-	//xend = x + width;
-	//yend = y + height;
-
-	xfrac = (vwidth << 16) / 320;
-	yfrac = (vheight << 16) / 200;
-	
 	x *= xfrac;
 	y *= yfrac;
-	//xend *= xfrac;
-	//yend *= yfrac;
-
-	//w = (xend - x) >> 16;
-	//h = (yend - y) >> 16;
 
 	w = (width * xfrac) >> 16;
 	h = (height * yfrac) >> 16;
 	
-	//if ((w != ((width * xfrac) >> 16)) || (h != ((height * yfrac) >> 16)))
-	//	printf("test\n");
-		
 	ptr = gfxbuf + vwidth * (y >> 16) + (x >> 16);
 	
 	while (h--) {
 		memset(ptr, color, w);
 		ptr += vwidth;
 	}
-				
-/*	
-	int w, h;
-	
-	for (w = 0; w < width; w++)
-		for (h = 0; h < height; h++)
-			VL_Plot(x+w, y+h, color);
-*/	
-/*	
-	byte *ptr;
-	width *= vwidth / 320;
-	height *= vheight / 200;
-	
-	x *= vwidth / 320;
-	y *= vheight / 200;
-	
-	ptr = gfxbuf + vwidth * y + x;
-	
-	while (height--) {
-		memset(ptr, color, width);
-		ptr += vwidth;
-	}
-*/	
 }
 
 void VL_Bar(int x, int y, int width, int height, int color)
@@ -563,12 +489,17 @@ void VL_MemToScreen(const byte *source, int width, int height, int x, int y)
 	for (w = 0; w < width; w++)
 		for (h = 0; h < height; h++)
 			VL_Plot(x+w, y+h, source[h*width+w]);
-/*
-	byte *ptr = gfxbuf + vwidth * y + x;
-	while(height--) {
-		memcpy(ptr, source, width);
-		source += width;
-		ptr += vwidth;
-	}
-*/
+}
+
+void VW_Startup()
+{
+	VL_Startup();
+	
+	xfrac = (vwidth << 16) / 320;
+	yfrac = (vheight << 16) / 200;
+}
+
+void VW_Shutdown()
+{
+	VL_Shutdown();
 }

@@ -114,7 +114,6 @@ typedef	struct {
 #include "id_vh.h"
 #include "id_us.h"
 
-extern const byte introscn[];
 extern const byte gamepal[];
 
 int MS_CheckParm(char *string);
