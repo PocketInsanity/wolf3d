@@ -1,8 +1,3 @@
-// ID_MM.H
-
-#ifndef __ID_CA__
-
-#define __ID_CA__
 
 #define SAVENEARHEAP	0x400		// space to leave in data segment
 #define SAVEFARHEAP		0			// space to leave in far heap
@@ -55,7 +50,7 @@
 
 //==========================================================================
 
-typedef void _seg * memptr;
+typedef void * memptr;
 
 typedef struct
 {
@@ -93,4 +88,3 @@ void MM_BombOnError (boolean bomb);
 
 void MML_UseSpace (unsigned segstart, unsigned seglength);
 
-#endif

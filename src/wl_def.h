@@ -22,14 +22,8 @@
 =============================================================================
 */
 
-
-#define COLORBORDER(color)		asm{mov	dx,STATUS_REGISTER_1;in al,dx;\
-	mov dx,ATR_INDEX;mov al,ATR_OVERSCAN;out dx,al;mov al,color;out	dx,al;\
-	mov	al,32;out dx,al};
-
 #define MAPSPOT(x,y,plane)		(*(mapsegs[plane]+farmapylookup[y]+x))
 
-#define SIGN(x) 	((x)>0?1:-1)
 #define ABS(x) 		((int)(x)>0?(x):-(x))
 #define LABS(x) 	((long)(x)>0?(x):-(x))
 
@@ -66,19 +60,9 @@
 
 #define EXTRAPOINTS		40000
 
-#define PLAYERSPEED		3000
 #define RUNSPEED   		6000
 
-#define	SCREENSEG		0xa000
-
 #define SCREENBWIDE		80
-
-#define HEIGHTRATIO		0.50		// also defined in id_mm.c
-
-#define BORDERCOLOR	3
-#define FLASHCOLOR	5
-#define FLASHTICS	4
-
 
 #define PLAYERSIZE		MINDIST			// player radius
 #define MINACTORDIST	0x10000l		// minimum dist from player center
@@ -87,21 +71,12 @@
 
 #define GLOBAL1		(1l<<16)
 #define TILEGLOBAL  GLOBAL1
-#define PIXGLOBAL	(GLOBAL1/64)
 #define TILESHIFT		16l
 #define UNSIGNEDSHIFT	8
 
 #define ANGLES		360					// must be divisable by 4
 #define ANGLEQUAD	(ANGLES/4)
 #define FINEANGLES	3600
-#define ANG90		(FINEANGLES/4)
-#define ANG180		(ANG90*2)
-#define ANG270		(ANG90*3)
-#define ANG360		(ANG90*4)
-#define VANG90		(ANGLES/4)
-#define VANG180		(VANG90*2)
-#define VANG270		(VANG90*3)
-#define VANG360		(VANG90*4)
 
 #define MINDIST		(0x5800l)
 
@@ -111,11 +86,6 @@
 #define MAXVIEWWIDTH		320
 
 #define MAPSIZE		64					// maps are 64*64 max
-#define NORTH	0
-#define EAST	1
-#define SOUTH	2
-#define WEST	3
-
 
 #define STATUSLINES		40
 
@@ -125,11 +95,7 @@
 #define PAGE3START		(SCREENSIZE*2u)
 #define	FREESTART		(SCREENSIZE*3u)
 
-
-#define PIXRADIUS		512
-
 #define STARTAMMO		8
-
 
 // object flag values
 
@@ -141,7 +107,6 @@
 #define FL_FIRSTATTACK	32
 #define FL_AMBUSH		64
 #define FL_NONMARK		128
-
 
 //
 // sprite constants
@@ -590,13 +555,13 @@ typedef enum {
 } enemy_t;
 
 
-typedef struct	statestruct
+typedef struct statestruct
 {
 	boolean	rotate;
-	int		shapenum;			// a shapenum of -1 means get from ob->temp1
+	int		shapenum; /* a shapenum of -1 means get from ob->temp1 */
 	int		tictime;
 	void	(*think) (),(*action) ();
-	struct	statestruct	*next;
+	struct statestruct *next;
 } statetype;
 
 
@@ -615,7 +580,6 @@ typedef struct statstruct
 	byte	itemnumber;
 } statobj_t;
 
-
 //---------------------
 //
 // door actor structure
@@ -630,7 +594,6 @@ typedef struct doorstruct
 	enum	{dr_open,dr_closed,dr_opening,dr_closing}	action;
 	int		ticcount;
 } doorobj_t;
-
 
 //--------------------
 //
@@ -747,15 +710,11 @@ typedef	enum	{
 =============================================================================
 */
 
-extern	boolean		MS_CheckParm (char far *string);
+extern	boolean		MS_CheckParm (char *string);
 
 extern	char		str[80],str2[20];
 extern	int			tedlevelnum;
 extern	boolean		tedlevel;
-extern	boolean		nospr;
-extern	boolean		IsA386;
-
-extern	byte far	*scalermemory;
 
 extern	fixed		focallength;
 extern	unsigned	viewangles;
@@ -772,20 +731,18 @@ extern	int		mouseadjustment;
 //
 // math tables
 //
-extern	int			pixelangle[MAXVIEWWIDTH];
-extern	long		far finetangent[FINEANGLES/4];
-extern	fixed 		far sintable[],far *costable;
+extern	int pixelangle[MAXVIEWWIDTH];
+extern	long finetangent[FINEANGLES/4];
+extern	fixed sintable[], *costable;
 
 //
 // derived constants
 //
-extern	fixed 	scale,maxslope;
+extern	fixed 	scale, maxslope;
 extern	long	heightnumerator;
 extern	int		minheightdiv;
 
 extern	char	configname[13];
-
-
 
 void		HelpScreens (void);
 void		OrderingInfo (void);
@@ -833,8 +790,6 @@ void DrawAllPlayBorder (void);
 void	DrawHighScores(void);
 void DrawAllPlayBorderSides (void);
 
-
-// JAB
 #define	PlaySoundLocTile(s,tx,ty)	PlaySoundLocGlobal(s,(((long)(tx) << TILESHIFT) + (1L << (TILESHIFT - 1))),(((long)ty << TILESHIFT) + (1L << (TILESHIFT - 1))))
 #define	PlaySoundLocActor(s,ob)		PlaySoundLocGlobal(s,(ob)->x,(ob)->y)
 void	PlaySoundLocGlobal(word s,fixed gx,fixed gy);
@@ -896,7 +851,7 @@ extern	int			controlx,controly;		// range from -100 to 100
 extern	boolean		buttonstate[NUMBUTTONS];
 
 extern	boolean		demorecord,demoplayback;
-extern	char		far *demoptr, far *lastdemoptr;
+extern	char		*demoptr, *lastdemoptr;
 extern	memptr		demobuffer;
 
 
@@ -967,8 +922,8 @@ extern	fixed	mindist;
 // math tables
 //
 extern	int			pixelangle[MAXVIEWWIDTH];
-extern	long		far finetangent[FINEANGLES/4];
-extern	fixed 		far sintable[],far *costable;
+extern	long		finetangent[FINEANGLES/4];
+extern	fixed 		sintable[], *costable;
 
 //
 // derived constants
@@ -1064,7 +1019,7 @@ typedef struct
 }	t_compshape;
 
 
-extern	t_compscale _seg *scaledirectory[MAXSCALEHEIGHT+1];
+extern	t_compscale *scaledirectory[MAXSCALEHEIGHT+1];
 extern	long			fullscalefarcall[MAXSCALEHEIGHT+1];
 
 extern	byte		bitmasks1[8][8];
@@ -1134,7 +1089,7 @@ extern	int			doornum;
 
 extern	unsigned	doorposition[MAXDOORS],pwallstate;
 
-extern	byte		far areaconnect[NUMAREAS][NUMAREAS];
+extern	byte		areaconnect[NUMAREAS][NUMAREAS];
 
 extern	boolean		areabyplayer[NUMAREAS];
 

@@ -14,8 +14,6 @@ loaded into the data segment
 
 #include "id_heads.h"
 
-#define THREEBYTEGRSTARTS
-
 /*
 =============================================================================
 
@@ -46,15 +44,15 @@ typedef struct
 =============================================================================
 */
 
-byte 		_seg	*tinf;
+byte 			*tinf;
 int			mapon;
 
-unsigned	_seg	*mapsegs[MAPPLANES];
-maptype		_seg	*mapheaderseg[NUMMAPS];
-byte		_seg	*audiosegs[NUMSNDCHUNKS];
-void		_seg	*grsegs[NUMCHUNKS];
+unsigned		*mapsegs[MAPPLANES];
+maptype			*mapheaderseg[NUMMAPS];
+byte			*audiosegs[NUMSNDCHUNKS];
+void			*grsegs[NUMCHUNKS];
 
-byte		far	grneeded[NUMCHUNKS];
+byte			grneeded[NUMCHUNKS];
 byte		ca_levelbit,ca_levelnum;
 
 int			profilehandle,debughandle;
@@ -90,8 +88,8 @@ char extension[5],	// Need a string, not constant to change cache files
 
 void CA_CannotOpen(char *string);
 
-long		_seg *grstarts;	// array of offsets in egagraph, -1 for sparse
-long		_seg *audiostarts;	// array of offsets in audio / audiot
+long		 *grstarts;	// array of offsets in vgagraph, -1 for sparse
+long		 *audiostarts;	// array of offsets in audio / audiot
 
 huffnode	grhuffman[255];
 
@@ -105,15 +103,13 @@ long chunkcomplen, chunkexplen;
 
 SDMode oldsoundmode;
 
-
-
 void	CAL_CarmackExpand (unsigned far *source, unsigned far *dest,
 		unsigned length);
 
 
-#ifdef THREEBYTEGRSTARTS
 #define FILEPOSSIZE	3
-//#define	GRFILEPOS(c) (*(long far *)(((byte far *)grstarts)+(c)*3)&0xffffff)
+
+//#define	GRFILEPOS(c) (*(long *)(((byte *)grstarts)+(c)*3)&0xffffff)
 long GRFILEPOS(int c)
 {
 	long value;
@@ -121,7 +117,7 @@ long GRFILEPOS(int c)
 
 	offset = c*3;
 
-	value = *(long far *)(((byte far *)grstarts)+offset);
+	value = *(long *)(((byte *)grstarts)+offset);
 
 	value &= 0x00ffffffl;
 
@@ -130,10 +126,6 @@ long GRFILEPOS(int c)
 
 	return value;
 };
-#else
-#define FILEPOSSIZE	4
-#define	GRFILEPOS(c) (grstarts[c])
-#endif
 
 /*
 =============================================================================
@@ -142,29 +134,6 @@ long GRFILEPOS(int c)
 
 =============================================================================
 */
-
-/*
-============================
-=
-= CA_OpenDebug / CA_CloseDebug
-=
-= Opens a binary file with the handle "debughandle"
-=
-============================
-*/
-
-void CA_OpenDebug (void)
-{
-	unlink ("DEBUG.TXT");
-	debughandle = open("DEBUG.TXT", O_CREAT | O_WRONLY | O_TEXT);
-}
-
-void CA_CloseDebug (void)
-{
-	close (debughandle);
-}
-
-
 
 /*
 ============================
@@ -937,7 +906,7 @@ void CAL_SetupMapFile (void)
 	close(handle);
 #else
 
-	tinf = (byte _seg *)FP_SEG(&maphead);
+	tinf = (byte *)FP_SEG(&maphead);
 
 #endif
 
@@ -965,7 +934,7 @@ void CAL_SetupMapFile (void)
 //
 	for (i=0;i<NUMMAPS;i++)
 	{
-		pos = ((mapfiletype	_seg *)tinf)->headeroffsets[i];
+		pos = ((mapfiletype *)tinf)->headeroffsets[i];
 		if (pos<0)						// $FFFFFFFF start is a sparse map
 			continue;
 
@@ -1247,7 +1216,7 @@ void CA_CacheGrChunk (int chunk)
 {
 	long	pos,compressed;
 	memptr	bigbufferseg;
-	byte	far *source;
+	byte	*source;
 	int		next;
 
 	grneeded[chunk] |= ca_levelbit;		// make sure it doesn't get removed
@@ -1402,7 +1371,7 @@ void CA_CacheMap (int mapnum)
 		MM_GetPtr (&buffer2seg,expanded);
 		CAL_CarmackExpand (source, (unsigned far *)buffer2seg,expanded);
 		CA_RLEWexpand (((unsigned far *)buffer2seg)+1,*dest,size,
-		((mapfiletype _seg *)tinf)->RLEWtag);
+		((mapfiletype *)tinf)->RLEWtag);
 		MM_FreePtr (&buffer2seg);
 
 #else
@@ -1410,7 +1379,7 @@ void CA_CacheMap (int mapnum)
 		// unRLEW, skipping expanded length
 		//
 		CA_RLEWexpand (source+1, *dest,size,
-		((mapfiletype _seg *)tinf)->RLEWtag);
+		((mapfiletype *)tinf)->RLEWtag);
 #endif
 
 		if (compressed>BUFFERSIZE)
@@ -1631,7 +1600,7 @@ void CA_CacheMarks (void)
 				&& bufferend>= endpos)
 				{
 				// data is allready in buffer
-					source = (byte _seg *)bufferseg+(pos-bufferstart);
+					source = (byte *)bufferseg+(pos-bufferstart);
 				}
 				else
 				{

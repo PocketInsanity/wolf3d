@@ -8,10 +8,6 @@
 #ifndef	__ID_IN__
 #define	__ID_IN__
 
-#ifdef	__DEBUG__
-#define	__DEBUG_InputMgr__
-#endif
-
 #define	MaxPlayers	4
 #define	MaxKbds		2
 #define	MaxJoys		2
@@ -164,12 +160,12 @@ extern	JoystickDef	JoyDefs[];
 extern	ControlType	Controls[MaxPlayers];
 
 extern	Demo		DemoMode;
-extern	byte _seg	*DemoBuffer;
+extern	byte 		*DemoBuffer;
 extern	word		DemoOffset,DemoSize;
 
 // Function prototypes
 #define	IN_KeyDown(code)	(Keyboard[(code)])
-#define	IN_ClearKey(code)	{Keyboard[code] = false;\
+#define	IN_ClearKey(code)	{Keyboard[code] = false; \
 							if (code == LastScan) LastScan = sc_None;}
 
 // DEBUG - put names in prototypes

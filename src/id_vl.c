@@ -19,7 +19,6 @@ unsigned	linewidth;
 unsigned	ylookup[MAXSCANLINES];
 
 boolean		screenfaded;
-unsigned	bordercolor;
 
 boolean		fastpalette;				// if true, use outsb to set
 

@@ -1,12 +1,6 @@
-// WL_GAME.C
+/* wl_game.c */
 
-#include "WL_DEF.H"
-#pragma hdrstop
-
-#ifdef MYPROFILE
-#include <TIME.H>
-#endif
-
+#include "wl_def.h"
 
 /*
 =============================================================================
@@ -163,8 +157,6 @@ SetSoundLoc(fixed gx,fixed gy)
 =	values are then passed to the Sound Manager so that they'll be used for
 =	the next sound played (if possible).
 =
-= JAB
-=
 ==========================
 */
 void PlaySoundLocGlobal(word s,fixed gx,fixed gy)
@@ -186,11 +178,6 @@ void UpdateSoundLoc(void)
 		SD_SetPosition(leftchannel,rightchannel);
 	}
 }
-
-/*
-**	JAB End
-*/
-
 
 /*
 ==========================
@@ -238,7 +225,7 @@ void ScanInfoPlane (void)
 			case 20:
 			case 21:
 			case 22:
-				SpawnPlayer(x,y,NORTH+tile-19);
+				SpawnPlayer(x, y, tile-19);
 				break;
 
 			case 23:
@@ -1240,9 +1227,6 @@ void GameLoop (void)
 	int i,xl,yl,xh,yh;
 	char num[20];
 	boolean	died;
-#ifdef MYPROFILE
-	clock_t start,end;
-#endif
 
 restartgame:
 	ClearMemory ();
@@ -1368,12 +1352,10 @@ startplayloop:
 
 				CheckHighScore (gamestate.score,gamestate.mapon+1);
 
-				#pragma warn -sus
 				#ifndef JAPAN
-				_fstrcpy(MainMenu[viewscores].string,STR_VS);
+				strcpy(MainMenu[viewscores].string,STR_VS);
 				#endif
 				MainMenu[viewscores].routine = CP_ViewScores;
-				#pragma warn +sus
 
 				return;
 			}
