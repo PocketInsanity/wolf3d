@@ -63,9 +63,12 @@ void CA_SetGrPurge (void);
 void CA_CacheAudioChunk (int chunk);
 void CA_LoadAllSounds (void);
 
+void CA_CacheMap (int mapnum);
+void CA_CacheGrChunk (int chunk);
+
 void CA_UpLevel (void);
 void CA_DownLevel (void);
-
+/*
 void CA_SetAllPurge (void);
 
 void CA_ClearMarks (void);
@@ -73,14 +76,10 @@ void CA_ClearAllMarks (void);
 
 #define CA_MarkGrChunk(chunk)	grneeded[chunk]|=ca_levelbit
 
-void CA_CacheGrChunk (int chunk);
-void CA_CacheMap (int mapnum);
-
 void CA_CacheMarks (void);
+*/
 
 void CA_CacheScreen (int chunk);
-
-#define	BUFFERSIZE		0x1000		// miscelanious, allways available buffer
 
 //==========================================================================
 

@@ -42,7 +42,6 @@ int                     dirangle[9] = {0,ANGLES/8,2*ANGLES/8,3*ANGLES/8,4*ANGLES
 // proejection variables
 //
 fixed           focallength;
-unsigned        screenofs;
 int             viewwidth;
 int             viewheight;
 int             centerx;
@@ -1048,17 +1047,16 @@ void InitGame (void)
 	else
 		virtualreality = false;
 
-	MM_Startup ();                  // so the signon screen can be freed
-
-	SignonScreen ();
-
+	MM_Startup (); 
 	VW_Startup ();
 	IN_Startup ();
 	PM_Startup ();
 	SD_Startup ();
 	CA_Startup ();
 	US_Startup ();
-
+	
+	SignonScreen ();
+	
 //
 // build some tables
 //
@@ -1129,7 +1127,6 @@ boolean SetViewSize (unsigned width, unsigned height)
 	viewheight = height&~1;                 // must be even
 	centerx = viewwidth/2-1;
 	shootdelta = viewwidth/10;
-	screenofs = ((200-STATUSLINES-viewheight)/2*SCREENWIDTH+(320-viewwidth)/8);
 	
 	yoffset =  (200-STATUSLINES-viewheight)/2;
 	xoffset = (320-viewwidth)/2;
@@ -1196,25 +1193,27 @@ void NewViewSize (int width)
 
 void Quit (char *error)
 {
-	unsigned        finscreen;
-	memptr	screen;
+	memptr screen;
 
-	ClearMemory ();
 	if (!*error)
 	{
 	 #ifndef JAPAN
-	 CA_CacheGrChunk (ORDERSCREEN);
+	 CA_CacheGrChunk(ORDERSCREEN);
 	 screen = grsegs[ORDERSCREEN];
 	 #endif
 	 WriteConfig ();
 	}
 	else
 	{
-	 CA_CacheGrChunk (ERRORSCREEN);
+	 CA_CacheGrChunk(ERRORSCREEN);
 	 screen = grsegs[ERRORSCREEN];
 	}
-
+	
 	ShutdownId ();
+	
+	if (screen) {
+		/* blah blah */
+	}
 	
 	if (error && *error)
 		printf("Quit: %s\n", error);

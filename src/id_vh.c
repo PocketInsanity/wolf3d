@@ -111,7 +111,7 @@ void VWB_Vlin(int y1, int y2, int x, int color)
 
 void VW_UpdateScreen(void)
 {
-	VH_UpdateScreen ();
+	VL_UpdateScreen ();
 }
 
 /*

@@ -2,13 +2,17 @@
 
 #include "id_heads.h"
 
-boolean		screenfaded;
+boolean	screenfaded;
 
-byte		palette1[256][3], palette2[256][3];
+byte palette1[256][3], palette2[256][3];
 
-byte *gfxbuf;
+byte *gfxbuf = NULL;
 
 void VL_WaitVBL(int vbls)
+{
+}
+
+void VL_UpdateScreen()
 {
 }
 
@@ -22,6 +26,8 @@ void VL_WaitVBL(int vbls)
 
 void VL_Startup (void)
 {
+	if (gfxbuf == NULL) 
+		gfxbuf = malloc(320 * 200 * 1);
 }
 
 /*
@@ -34,6 +40,10 @@ void VL_Startup (void)
 
 void VL_Shutdown (void)
 {
+	if (gfxbuf != NULL) {
+		free(gfxbuf);
+		gfxbuf = NULL;
+	}
 }
 
 //===========================================================================
@@ -71,7 +81,7 @@ void VL_ClearVideo (byte color)
 =================
 */
 
-void VL_FillPalette (int red, int green, int blue)
+void VL_FillPalette(int red, int green, int blue)
 {
 }
 
@@ -431,46 +441,3 @@ asm	mov	ds,ax
 	VGAWRITEMODE(0);
 #endif
 }
-
-/* ======================================================================== */
-
-#if 0
-
-/*
-=================
-=
-= VL_ScreenToScreen
-=
-=================
-*/
-
-void VL_ScreenToScreen (unsigned source, unsigned dest,int width, int height)
-{
-	VGAWRITEMODE(1);
-	VGAMAPMASK(15);
-
-asm	mov	si,[source]
-asm	mov	di,[dest]
-asm	mov	ax,[width]
-asm	mov	bx,[linewidth]
-asm	sub	bx,ax
-asm	mov	dx,[height]
-asm	mov	cx,SCREENSEG
-asm	mov	ds,cx
-asm	mov	es,cx
-
-drawline:
-asm	mov	cx,ax
-asm	rep movsb
-asm	add	si,bx
-asm	add	di,bx
-asm	dec	dx
-asm	jnz	drawline
-
-asm	mov	ax,ss
-asm	mov	ds,ax
-
-	VGAWRITEMODE(0);
-}
-
-#endif

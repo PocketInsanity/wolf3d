@@ -639,7 +639,6 @@ void CheckKeys (void)
 		ClearMemory ();
 		CA_CacheGrChunk (STARTFONT+1);
 		ClearSplitVWB ();
-		VW_ScreenToScreen (displayofs,bufferofs,80,160);
 
 		Message(STR_CHEATER1"\n"
 				STR_CHEATER2"\n\n"
@@ -672,7 +671,6 @@ void CheckKeys (void)
 	 ClearMemory ();
 	 CA_CacheGrChunk (STARTFONT+1);
 	 ClearSplitVWB ();
-	 VW_ScreenToScreen (displayofs,bufferofs,80,160);
 
 	 Message("Debugging keys are\nnow available!");
 	 UNCACHEGRCHUNK(STARTFONT+1);
@@ -693,7 +691,6 @@ void CheckKeys (void)
 	 ClearMemory ();
 	 CA_CacheGrChunk (STARTFONT+1);
 	 ClearSplitVWB ();
-	 VW_ScreenToScreen (displayofs,bufferofs,80,160);
 
 	 Message("Commander Keen is also\n"
 			 "available from Apogee, but\n"
@@ -733,10 +730,9 @@ void CheckKeys (void)
 	{
 		ClearMemory ();
 		ClearSplitVWB ();
-		VW_ScreenToScreen (displayofs,bufferofs,80,160);
 		US_ControlPanel(scan);
 
-		 DrawAllPlayBorderSides ();
+		DrawAllPlayBorderSides ();
 
 		if (scan == sc_F9)
 		  StartMusic ();

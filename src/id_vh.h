@@ -26,11 +26,6 @@ extern	byte	fontcolor;
 extern	int	fontnumber;
 extern	int	px,py;
 
-//
-// Double buffer management routines
-//
-
-int	 VW_MarkUpdateBlock (int x1, int y1, int x2, int y2);
 void VW_UpdateScreen (void);
 
 //
@@ -52,7 +47,6 @@ extern byte gamepal;
 
 #define VW_Startup		VL_Startup
 #define VW_Shutdown		VL_Shutdown
-#define VW_SetScreen	VL_SetScreen
 #define VW_Bar			VL_Bar
 #define VW_Plot			VL_Plot
 #define VW_Hlin(x,z,y,c)	VL_Hlin(x,y,(z)-(x)+1,c)
@@ -61,15 +55,14 @@ extern byte gamepal;
 #define VW_WaitVBL		VL_WaitVBL
 #define VW_FadeIn()		VL_FadeIn(0,255,&gamepal,30);
 #define VW_FadeOut()	VL_FadeOut(0,255,0,0,0,30);
-#define VW_ScreenToScreen	VL_ScreenToScreen
 void	VW_MeasurePropString(char *string, word *width, word *height);
 
 #define LatchDrawChar(x,y,p) VL_LatchToScreen(latchpics[0]+(p)*16,2,8,x,y)
 #define LatchDrawTile(x,y,p) VL_LatchToScreen(latchpics[1]+(p)*64,4,16,x,y)
 
-void LatchDrawPic (unsigned x, unsigned y, unsigned picnum);
-void 	LoadLatchMem (void);
-boolean 	FizzleFade (byte *source, unsigned width,unsigned height, unsigned frames,boolean abortable);
+void LatchDrawPic(unsigned x, unsigned y, unsigned picnum);
+void LoadLatchMem(void);
+boolean FizzleFade(byte *source, unsigned width,unsigned height, unsigned frames,boolean abortable);
 
 #define NUMLATCHPICS	100
 extern	unsigned	latchpics[NUMLATCHPICS];

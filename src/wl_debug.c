@@ -154,15 +154,9 @@ void PicturePause (void)
 // vga stuff...
 //
 
-	ClearMemory ();
-	CA_SetAllPurge();
-
 	/* TODO: save picture to file */
 	
 	VL_SetPalette (&gamepal);
-
-
-	IN_Shutdown ();
 
 	VW_WaitVBL(70);
 	VW_WaitVBL(70);

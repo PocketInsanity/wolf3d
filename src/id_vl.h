@@ -3,18 +3,9 @@
 
 //===========================================================================
 
-#define SCREENWIDTH		80			// default screen width in bytes
-
-#define TILEWIDTH		4
-
-//===========================================================================
-
 extern byte *gfxbuf;
 
-extern	unsigned	bufferofs;			// all drawing is reletive to this
-extern	unsigned	displayofs;	// last setscreen coordinates
-
-extern	boolean		screenfaded;
+extern boolean screenfaded;
 
 //===========================================================================
 
@@ -40,7 +31,6 @@ void VL_Vlin (int x, int y, int height, int color);
 void VL_Bar (int x, int y, int width, int height, int color);
 
 void VL_MemToLatch (byte *source, int width, int height, word dest);
-void VL_ScreenToScreen (unsigned source, unsigned dest,int width, int height);
 void VL_MemToScreen (byte *source, int width, int height, int x, int y);
 
 void VL_DrawPropString (char *str, unsigned tile8ptr, int printx, int printy);

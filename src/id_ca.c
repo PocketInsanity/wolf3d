@@ -41,8 +41,6 @@ void			*grsegs[NUMCHUNKS];
 byte			grneeded[NUMCHUNKS];
 byte		ca_levelbit,ca_levelnum;
 
-memptr bufferseg;
-
 /*
 =============================================================================
 
@@ -843,13 +841,16 @@ void CAL_ExpandGrChunk (int chunk, byte *source)
 ======================
 */
 
-void CA_CacheGrChunk (int chunk)
+void CA_CacheGrChunk(int chunk)
 {
 	long	pos,compressed;
 	memptr	bigbufferseg;
 	byte	*source;
 	int		next;
 
+	if ( (grhandle == 0) || (grhandle == -1) ) /* make sure this works ok */
+		return;
+		
 	grneeded[chunk] |= ca_levelbit;	/* make sure it doesn't get removed */
 	if (grsegs[chunk])
 	{
@@ -873,23 +874,14 @@ void CA_CacheGrChunk (int chunk)
 
 	lseek(grhandle,pos,SEEK_SET);
 
-	if (compressed<=BUFFERSIZE)
-	{
-		CA_FarRead(grhandle,bufferseg,compressed);
-		source = bufferseg;
-	}
-	else
-	{
-		MM_GetPtr(&bigbufferseg,compressed);
-		MM_SetLock (&bigbufferseg,true);
-		CA_FarRead(grhandle,bigbufferseg,compressed);
-		source = bigbufferseg;
-	}
+	MM_GetPtr(&bigbufferseg,compressed);
+	MM_SetLock (&bigbufferseg,true);
+	CA_FarRead(grhandle,bigbufferseg,compressed);
+	source = bigbufferseg;
 
 	CAL_ExpandGrChunk (chunk,source);
 
-	if (compressed>BUFFERSIZE)
-		MM_FreePtr(&bigbufferseg);
+	MM_FreePtr(&bigbufferseg);
 }
 
 
@@ -978,14 +970,9 @@ void CA_CacheMap(int mapnum)
 		dest = (memptr)&mapsegs[plane];
 
 		lseek(maphandle,pos,SEEK_SET);
-		if (compressed<=BUFFERSIZE)
-			source = bufferseg;
-		else
-		{
-			MM_GetPtr(&bigbufferseg,compressed);
-			MM_SetLock (&bigbufferseg,true);
-			source = bigbufferseg;
-		}
+		MM_GetPtr(&bigbufferseg,compressed);
+		MM_SetLock (&bigbufferseg,true);
+		source = bigbufferseg;
 
 		CA_FarRead(maphandle,(byte *)source,compressed);
 		/*
@@ -1002,8 +989,7 @@ void CA_CacheMap(int mapnum)
 		((mapfiletype *)tinf)->RLEWtag);
 		MM_FreePtr (&buffer2seg);
 
-		if (compressed>BUFFERSIZE)
-			MM_FreePtr(&bigbufferseg);
+		MM_FreePtr(&bigbufferseg);
 	}
 }
 
@@ -1022,6 +1008,7 @@ void CA_CacheMap(int mapnum)
 
 void CA_UpLevel (void)
 {
+/*
 	int	i;
 
 	if (ca_levelnum==7)
@@ -1032,6 +1019,7 @@ void CA_UpLevel (void)
 			MM_SetPurge ((memptr)&grsegs[i],3);
 	ca_levelbit<<=1;
 	ca_levelnum++;
+*/
 }
 
 //===========================================================================
@@ -1049,11 +1037,13 @@ void CA_UpLevel (void)
 
 void CA_DownLevel (void)
 {
+/*
 	if (!ca_levelnum)
 		Quit ("CA_DownLevel: Down past level 0!");
 	ca_levelbit>>=1;
 	ca_levelnum--;
 	CA_CacheMarks();
+*/
 }
 
 //===========================================================================
@@ -1067,7 +1057,7 @@ void CA_DownLevel (void)
 =
 ======================
 */
-
+#if 0
 void CA_ClearMarks (void)
 {
 	int i;
@@ -1075,7 +1065,7 @@ void CA_ClearMarks (void)
 	for (i=0;i<NUMCHUNKS;i++)
 		grneeded[i]&=~ca_levelbit;
 }
-
+#endif
 
 //===========================================================================
 
@@ -1088,14 +1078,14 @@ void CA_ClearMarks (void)
 =
 ======================
 */
-
+#if 0
 void CA_ClearAllMarks (void)
 {
 	memset (grneeded,0,sizeof(grneeded));
 	ca_levelbit = 1;
 	ca_levelnum = 0;
 }
-
+#endif
 
 //===========================================================================
 
@@ -1106,7 +1096,7 @@ void CA_ClearAllMarks (void)
 =
 ======================
 */
-
+#if 0
 void CA_SetGrPurge (void)
 {
 	int i;
@@ -1120,7 +1110,7 @@ void CA_SetGrPurge (void)
 		if (grsegs[i])
 			MM_SetPurge ((memptr)&grsegs[i],3);
 }
-
+#endif
 /*
 ======================
 =
@@ -1130,7 +1120,7 @@ void CA_SetGrPurge (void)
 =
 ======================
 */
-
+#if 0
 void CA_SetAllPurge (void)
 {
 	int i;
@@ -1148,10 +1138,10 @@ void CA_SetAllPurge (void)
 //
 	CA_SetGrPurge ();
 }
-
+#endif
 
 //===========================================================================
-
+#if 0
 /*
 ======================
 =
@@ -1265,6 +1255,7 @@ void CA_CacheMarks (void)
 
 		}
 }
+#endif
 
 void CA_CannotOpen(char *string)
 {
@@ -1297,7 +1288,6 @@ void CA_CannotOpen(char *string)
 
 void MM_Startup (void)
 {
-	MM_GetPtr (&bufferseg, BUFFERSIZE);
 }
 
 /*
@@ -1312,8 +1302,6 @@ void MM_Startup (void)
 
 void MM_Shutdown(void)
 {
-	MM_FreePtr(bufferseg);
-	bufferseg = NULL;
 }
 
 /*
