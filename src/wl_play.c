@@ -68,15 +68,11 @@ void PlayLoop();
 =============================================================================
 */
 
-//
-// LIST OF SONGS FOR EACH VERSION
-//
-int songs[]=
+/* LIST OF SONGS FOR EACH VERSION */
+static int songs[]=
 {
 #ifndef SPEAR
- //
- // Episode One
- //
+/* Episode One */
  GETTHEM_MUS,
  SEARCHN_MUS,
  POW_MUS,
@@ -85,13 +81,10 @@ int songs[]=
  SEARCHN_MUS,
  POW_MUS,
  SUSPENSE_MUS,
+ WARMARCH_MUS,	/* Boss level */
+ CORNER_MUS,	/* Secret level */
 
- WARMARCH_MUS,	// Boss level
- CORNER_MUS,	// Secret level
-
- //
- // Episode Two
- //
+/* Episode Two */
  NAZI_OMI_MUS,
  PREGNANT_MUS,
  GOINGAFT_MUS,
@@ -100,13 +93,10 @@ int songs[]=
  PREGNANT_MUS,
  HEADACHE_MUS,
  GOINGAFT_MUS,
+ WARMARCH_MUS,	/* Boss level */
+ DUNGEON_MUS,	/* Secret level */
 
- WARMARCH_MUS,	// Boss level
- DUNGEON_MUS,	// Secret level
-
- //
- // Episode Three
- //
+/*  Episode Three */
  INTROCW3_MUS,
  NAZI_RAP_MUS,
  TWELFTH_MUS,
@@ -115,13 +105,10 @@ int songs[]=
  NAZI_RAP_MUS,
  TWELFTH_MUS,
  ZEROHOUR_MUS,
+ ULTIMATE_MUS,	/* Boss level */
+ PACMAN_MUS,	/* Secret level */
 
- ULTIMATE_MUS,	// Boss level
- PACMAN_MUS,	// Secret level
-
- //
- // Episode Four
- //
+/* Episode Four */
  GETTHEM_MUS,
  SEARCHN_MUS,
  POW_MUS,
@@ -130,13 +117,10 @@ int songs[]=
  SEARCHN_MUS,
  POW_MUS,
  SUSPENSE_MUS,
+ WARMARCH_MUS,	/* Boss level */
+ CORNER_MUS,	/* Secret level */
 
- WARMARCH_MUS,	// Boss level
- CORNER_MUS,	// Secret level
-
- //
- // Episode Five
- //
+/* Episode Five */
  NAZI_OMI_MUS,
  PREGNANT_MUS,
  GOINGAFT_MUS,
@@ -145,13 +129,10 @@ int songs[]=
  PREGNANT_MUS,
  HEADACHE_MUS,
  GOINGAFT_MUS,
+ WARMARCH_MUS,	/* Boss level */
+ DUNGEON_MUS,	/* Secret level */
 
- WARMARCH_MUS,	// Boss level
- DUNGEON_MUS,	// Secret level
-
- //
- // Episode Six
- //
+ /* Episode Six */
  INTROCW3_MUS,
  NAZI_RAP_MUS,
  TWELFTH_MUS,
@@ -160,9 +141,8 @@ int songs[]=
  NAZI_RAP_MUS,
  TWELFTH_MUS,
  ZEROHOUR_MUS,
-
- ULTIMATE_MUS,	// Boss level
- FUNKYOU_MUS		// Secret level
+ ULTIMATE_MUS,	/* Boss level */
+ FUNKYOU_MUS	/* Secret level */
 #else
 
  //////////////////////////////////////////////////////////////
@@ -173,29 +153,29 @@ int songs[]=
  XTIPTOE_MUS,
  XFUNKIE_MUS,
  XDEATH_MUS,
- XGETYOU_MUS,		// DON'T KNOW
- ULTIMATE_MUS,	// Trans Gr”sse
+ XGETYOU_MUS,
+ ULTIMATE_MUS,	/* Trans Gr”sse */
 
  DUNGEON_MUS,
  GOINGAFT_MUS,
  POW_MUS,
  TWELFTH_MUS,
- ULTIMATE_MUS,	// Barnacle Wilhelm BOSS
+ ULTIMATE_MUS,	/* Barnacle Wilhelm BOSS */
 
  NAZI_OMI_MUS,
  GETTHEM_MUS,
  SUSPENSE_MUS,
  SEARCHN_MUS,
  ZEROHOUR_MUS,
- ULTIMATE_MUS,	// Super Mutant BOSS
+ ULTIMATE_MUS,	/* Super Mutant BOSS */
 
  XPUTIT_MUS,
- ULTIMATE_MUS,	// Death Knight BOSS
+ ULTIMATE_MUS,	/* Death Knight BOSS */
 
- XJAZNAZI_MUS,	// Secret level
- XFUNKIE_MUS,	// Secret level (DON'T KNOW)
+ XJAZNAZI_MUS,	/* Secret level */
+ XFUNKIE_MUS,	/* Secret level */
 
- XEVIL_MUS		// Angel of Death BOSS
+ XEVIL_MUS	/* Angel of Death BOSS */
 
 #endif
 };
@@ -252,7 +232,6 @@ void PollMouseButtons()
 	if (buttons&4)
 		buttonstate[buttonmouse[2]] = true;
 }
-
 
 
 /*
@@ -754,15 +733,16 @@ next element.
 =========================
 */
 
-void InitActorList (void)
+void InitActorList()
 {
 	int	i;
 
 //
 // init the actor lists
 //
-	for (i=0;i<MAXACTORS;i++)
+	for (i = 0; i < MAXACTORS; i++)
 	{
+		objlist[i].id = i;
 		objlist[i].prev = &objlist[i+1];
 		objlist[i].next = NULL;
 	}
@@ -775,7 +755,7 @@ void InitActorList (void)
 //
 // give the player the first free spots
 //
-	GetNewActor ();
+	GetNewActor();
 	player = new;
 
 }
@@ -796,18 +776,18 @@ void InitActorList (void)
 =========================
 */
 
-void GetNewActor (void)
+void GetNewActor()
 {
 	if (!objfreelist)
-		Quit ("GetNewActor: No free spots in objlist!");
+		Quit("GetNewActor: No free spots in objlist!");
 
 	new = objfreelist;
 	objfreelist = new->prev;
-	memset (new,0,sizeof(*new));
+	memset(new, 0, sizeof(*new));
 
 	if (lastobj)
 		lastobj->next = new;
-	new->prev = lastobj;	// new->next is allready NULL from memset
+	new->prev = lastobj;	// new->next is already NULL from memset
 
 	new->active = false;
 	lastobj = new;
@@ -1047,19 +1027,16 @@ void UpdatePaletteShifts()
 
 	if (red)
 	{
-		VW_WaitVBL(1);
-		VL_SetPalette (redshifts[red-1]);
+		VL_SetPalette(redshifts[red-1]);
 		palshifted = true;
 	}
 	else if (white)
 	{
-		VW_WaitVBL(1);
-		VL_SetPalette (whiteshifts[white-1]);
+		VL_SetPalette(whiteshifts[white-1]);
 		palshifted = true;
 	}
 	else if (palshifted)
 	{
-		VW_WaitVBL(1);
 		VL_SetPalette(gamepal);		// back to normal
 		palshifted = false;
 	}
@@ -1076,12 +1053,11 @@ void UpdatePaletteShifts()
 =====================
 */
 
-void FinishPaletteShifts (void)
+void FinishPaletteShifts()
 {
 	if (palshifted)
 	{
 		palshifted = 0;
-		VW_WaitVBL(1);
 		VL_SetPalette(gamepal);
 	}
 }
@@ -1111,8 +1087,8 @@ void DoActor(objtype *ob)
 	if (!ob->active && !areabyplayer[ob->areanumber])
 		return;
 
-	if (!(ob->flags&(FL_NONMARK|FL_NEVERMARK)) )
-		actorat[ob->tilex][ob->tiley] = NULL;
+	if (!(ob->flags & (FL_NONMARK|FL_NEVERMARK)))
+		actorat[ob->tilex][ob->tiley] = 0;
 
 //
 // non transitional object
@@ -1220,6 +1196,7 @@ void PlayLoop()
 	anglefrac = 0;
 	facecount = 0;
 	funnyticount = 0;
+	
 	memset (buttonstate,0,sizeof(buttonstate));
 	ClearPaletteShifts();
 	
@@ -1244,9 +1221,9 @@ void PlayLoop()
 		MoveDoors();
 		MovePWalls();
 
-		for (obj = player;obj;obj = obj->next)
-			DoActor (obj);
-
+		for (obj = player; obj; obj = obj->next)
+			DoActor(obj);
+		
 		UpdatePaletteShifts();
 
 		ThreeDRefresh();

@@ -15,7 +15,7 @@ struct
 {
 	int	picnum;
 	stat_t	type;
-} statinfo[] =
+} static const statinfo[] =
 {
 {SPR_STAT_0},					// puddle          spr1v
 {SPR_STAT_1,block},				// Green Barrel    "

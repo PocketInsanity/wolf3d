@@ -553,8 +553,8 @@ typedef struct doorstruct
 	byte	tilex,tiley;
 	boolean	vertical;
 	byte	lock;
-	enum	{dr_open,dr_closed,dr_opening,dr_closing}	action;
-	int		ticcount;
+	enum	{dr_open,dr_closed,dr_opening,dr_closing} action;
+	int	ticcount;
 } doorobj_t;
 
 //--------------------
@@ -565,6 +565,8 @@ typedef struct doorstruct
 
 typedef struct objstruct
 {
+	int		id;
+	
 	activetype	active;
 	int		ticcount;
 	classtype	obclass;
@@ -630,27 +632,27 @@ enum {
 
 typedef	struct
 {
-	int			difficulty;
-	int			mapon;
+	int		difficulty;
+	int		mapon;
 	long		oldscore,score,nextextra;
-	int			lives;
-	int			health;
-	int			ammo;
-	int			keys;
-	weapontype		bestweapon,weapon,chosenweapon;
+	int		lives;
+	int		health;
+	int		ammo;
+	int		keys;
+	weapontype	bestweapon,weapon,chosenweapon;
 
-	int			faceframe;
-	int			attackframe,attackcount,weaponframe;
+	int		faceframe;
+	int		attackframe,attackcount,weaponframe;
 
-	int			episode,secretcount,treasurecount,killcount,
-				secrettotal,treasuretotal,killtotal;
+	int		episode,secretcount,treasurecount,killcount,
+			secrettotal,treasuretotal,killtotal;
 	long		TimeCount;
 	long		killx,killy;
 	boolean		victoryflag;		// set during victory animations
 } gametype;
 
 
-typedef	enum	{
+typedef	enum {
 	ex_stillplaying,
 	ex_completed,
 	ex_died,

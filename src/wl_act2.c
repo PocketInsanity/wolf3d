@@ -21,7 +21,7 @@
 =============================================================================
 */
 
-int starthitpoints[4][NUMENEMIES] =
+static const int starthitpoints[4][NUMENEMIES] =
 	 //
 	 // BABY MODE
 	 //
@@ -134,8 +134,7 @@ int starthitpoints[4][NUMENEMIES] =
 	  1400,	// en_uber,
 	  1300,	// en_will,
 	  1600	// en_death
-	  }}
-	  ;
+}};
 
 /*
 =================
