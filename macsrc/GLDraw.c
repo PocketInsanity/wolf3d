@@ -20,6 +20,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
 #include <math.h>
 
 #include <GL/gl.h>
@@ -32,6 +34,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #endif
 
 int UseSharedTexturePalette = 0;
+PFNGLCOLORTABLEEXTPROC pglColorTableEXT;
+Byte Pal[768];
 
 /*
 Utility Functions
@@ -50,6 +54,23 @@ void xgluPerspective(GLdouble fovx, GLdouble aspect, GLdouble zNear, GLdouble zF
 	glFrustum(xmin, xmax, ymin, ymax, zNear, zFar);
 }
 
+int CheckToken(const char *str, const char *item)
+{
+	const char *p;
+	int len = strlen(item);
+	
+	p = str;
+	while ((p = strstr(p, item)) != NULL) {
+		char x = *(p + len);
+		char y = (p == str) ? 0 : *(p-1);
+		if ( ((y == 0) || (isspace(y))) && ((x == 0) || (isspace(x))) )
+			return 1;
+		p += len;
+	}
+	
+	return 0;
+}
+
 /*
 Temp Stuff
 */
@@ -57,8 +78,6 @@ Temp Stuff
 void DisplayScreen(Word res)
 {
 }
-
-extern Byte Pal[768];
 
 void FadeToPtr(unsigned char *PalPtr)
 {
@@ -68,6 +87,11 @@ void FadeToPtr(unsigned char *PalPtr)
 void SetAPalettePtr(unsigned char *PalPtr)
 {
 	SetPalette(PalPtr);
+}
+
+void SetPalette(Byte *pal)
+{
+	memcpy(Pal, pal, 768);
 }
 
 void ClearTheScreen(Word c)
@@ -145,7 +169,7 @@ void IO_DrawStatusBar(void)
 void IO_DisplayViewBuffer(void)
 {
 	BlastScreen();
-		if (firstframe) {
+	if (firstframe) {
 		FadeTo(rGamePal);
 		firstframe = 0;
 	}

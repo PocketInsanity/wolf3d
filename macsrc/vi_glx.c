@@ -40,7 +40,8 @@ XVisualInfo *vi;
 GLXContext ctx;
 Atom wmDeleteWindow;
 
-Byte Pal[768];
+extern int UseSharedTexturePalette;
+extern PFNGLCOLORTABLEEXTPROC pglColorTableEXT;
 
 int attrib[] = {
 	GLX_RGBA,
@@ -199,11 +200,6 @@ void Quit(char *str)
 	exit(EXIT_SUCCESS);
 }
 
-void SetPalette(Byte *pal)
-{
-	memcpy(Pal, pal, 768);
-}
-	
 void BlastScreen2(Rect *BlastRect)
 {
 	BlastScreen();

@@ -21,6 +21,7 @@ TODO:
   - When all drawing is implemented, remove any unnecessary state/matrix
     changes.
   - Split up GLDraw.c
+  - GL_EXT_shared_texture_palette
 * Save/Load Games
 * Documentation
 * Sound!
@@ -43,7 +44,10 @@ TODO:
 * Different depths/visuals for software clients.
   + Different functions to draw with different bpps.
     - 15 bpp uses same draw routes as 16 but different palette one
-    - not sure how to do palette fades
+    + not sure how to do palette fades
+      - don't support them generally
+      - MacPlay->Id Logo: have some sort of redraw.
+      - Fades in game can just call renderview each time
 * Get it to compile/work with g++ if it is not too much trouble.
 * SDL version (software)
 * Mouse
