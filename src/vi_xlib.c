@@ -2,6 +2,9 @@
 
 #include "id_heads.h"
 
+#include <X11/Xlib.h>
+#include <X11/keysym.h>
+
 boolean	screenfaded;
 
 byte palette1[256][3], palette2[256][3];
@@ -10,13 +13,10 @@ byte *gfxbuf = NULL;
 
 void VL_WaitVBL(int vbls)
 {
-	vga_waitretrace();
 }
 
 void VW_UpdateScreen()
 {
-	/* VL_WaitVBL(1); */
-	memcpy(graph_mem, gfxbuf, 64000);
 }
 
 /*
@@ -31,9 +31,6 @@ void VL_Startup (void)
 {
 	if (gfxbuf == NULL) 
 		gfxbuf = malloc(320 * 200 * 1);
-		
-	vga_init(); /* TODO: maybe move into main or such? */
-	vga_setmode(G320x200x256);
 }
 
 /*
@@ -50,7 +47,6 @@ void VL_Shutdown (void)
 		free(gfxbuf);
 		gfxbuf = NULL;
 	}
-	vga_setmode(TEXT);
 }
 
 //===========================================================================
@@ -92,10 +88,7 @@ void VL_ClearVideo(byte color)
 void VL_FillPalette(int red, int green, int blue)
 {
 	int i;
-	
-	for (i = 0; i < 256; i++) 
-		vga_setpalette(i, red, green, blue);	
-}
+}	
 
 //===========================================================================
 
@@ -109,7 +102,6 @@ void VL_FillPalette(int red, int green, int blue)
 
 void VL_SetColor(int color, int red, int green, int blue)
 {
-	vga_setpalette(color, red, green, blue);
 }
 
 //===========================================================================
@@ -124,7 +116,6 @@ void VL_SetColor(int color, int red, int green, int blue)
 
 void VL_GetColor(int color, int *red, int *green, int *blue)
 {
-	vga_getpalette(color, red, green, blue);
 }
 
 //===========================================================================
@@ -139,10 +130,6 @@ void VL_GetColor(int color, int *red, int *green, int *blue)
 
 void VL_SetPalette(byte *palette)
 {
-	int i;
-	
-	for (i = 0; i < 256; i++)
-		vga_setpalette(i, palette[i*3+0], palette[i*3+1], palette[i*3+2]);
 }
 
 
@@ -161,7 +148,6 @@ void VL_GetPalette(byte *palette)
 	int i, r, g, b;
 	
 	for (i = 0; i < 256; i++) {
-		vga_getpalette(i, &r, &g, &b);
 		palette[i*3+0] = r;
 		palette[i*3+1] = g;
 		palette[i*3+2] = b;
@@ -398,7 +384,6 @@ void VL_DeModeXize(byte *buf, int width, int height)
 
 void VL_DirectPlot(int x1, int y1, int x2, int y2)
 {
-	*(graph_mem + x1 + y1 * 320) = *(gfxbuf + x2 + y2 * 320);
 }
 
 /*
@@ -484,69 +469,6 @@ static	Direction	DirTable[] =		// Quick lookup for total direction
 static	char			*ParmStrings[] = {"nojoys","nomouse",nil};
 
 //	Internal routines
-
-///////////////////////////////////////////////////////////////////////////
-//
-//	INL_KeyService() - Handles a keyboard interrupt (key up/down)
-//
-///////////////////////////////////////////////////////////////////////////
-static void INL_KeyService(void)
-{
-	static boolean special;
-	byte k, c, temp;
-	int i;
-
-	/* k = inportb(0x60);	// Get the scan code */
-
-	if (k == 0xe0)		// Special key prefix
-		special = true;
-	else if (k == 0xe1)	// Handle Pause key
-		Paused = true;
-	else
-	{
-		if (k & 0x80)	// Break code
-		{
-			k &= 0x7f;
-
-// DEBUG - handle special keys: ctl-alt-delete, print scrn
-
-			Keyboard[k] = false;
-		}
-		else			// Make code
-		{
-			LastCode = CurCode;
-			CurCode = LastScan = k;
-			Keyboard[k] = true;
-
-			if (special)
-				c = SpecialNames[k];
-			else
-			{
-				if (k == sc_CapsLock)
-				{
-					CapsLock ^= true;
-				}
-
-				if (Keyboard[sc_LShift] || Keyboard[sc_RShift])	// If shifted
-				{
-					c = ShiftNames[k];
-					if ((c >= 'A') && (c <= 'Z') && CapsLock)
-						c += 'a' - 'A';
-				}
-				else
-				{
-					c = ASCIINames[k];
-					if ((c >= 'a') && (c <= 'z') && CapsLock)
-						c -= 'a' - 'A';
-				}
-			}
-			if (c)
-				LastASCII = c;
-		}
-
-		special = false;
-	}
-}
 
 void keyboard_handler(int code, int press)
 {
@@ -670,8 +592,6 @@ static word INL_GetJoyButtons(word joy)
 ///////////////////////////////////////////////////////////////////////////
 static void INL_StartKbd(void)
 {
-	keyboard_init();
-	keyboard_seteventhandler(keyboard_handler);
 	IN_ClearKeysDown();
 }
 
@@ -682,7 +602,6 @@ static void INL_StartKbd(void)
 ///////////////////////////////////////////////////////////////////////////
 static void INL_ShutKbd(void)
 {
-	keyboard_close();
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -825,7 +744,6 @@ void IN_ReadControl(int player,ControlInfo *info)
 	buttons = 0;
 
 //keyboard_update();
-IN_CheckAck();
 
 		switch (type = Controls[player])
 		{
@@ -921,11 +839,19 @@ void IN_StartAck(void)
 			btnstate[i] = true;
 }
 
+int flipz;
+
 boolean IN_CheckAck (void)
 {
 	unsigned	i,buttons;
+
+	if (flipz == 1) {
+		flipz = 0;
+		return false;
+	}
+	flipz++;
 	
-while (keyboard_update()) ; /* get all events */
+//while (keyboard_update()) ; /* get all events */
 
 	if (LastScan)
 		return true;

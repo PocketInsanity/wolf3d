@@ -1,5 +1,5 @@
-#ifndef __VI_SVGA_H__
-#define __VI_SVGA_H__
+#ifndef __VI_COMM_H__
+#define __VI_COMM_H__
 
 //===========================================================================
 
@@ -35,6 +35,8 @@ void VL_MemToLatch(byte *source, int width, int height, word dest);
 void VL_MemToScreen(byte *source, int width, int height, int x, int y);
 
 void VL_DeModeXize(byte *buf, int width, int height);
+
+void VL_DirectPlot(int x1, int y1, int x2, int y2);
 
 #define	MaxPlayers	4
 #define	MaxJoys		2

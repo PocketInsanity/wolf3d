@@ -3,30 +3,38 @@ CC = gcc
 #CFLAGS = -g -Wall -pedantic
 CFLAGS = -g
 #CFLAGS = -Os
-OBJS = objs.o misc.o id_ca.o id_sd.o id_vh.o id_us.o vi_svga.o \
+OBJS = objs.o misc.o id_ca.o id_sd.o id_vh.o id_us.o \
 	wl_scale.o wl_draw.o wl_act1.o wl_act2.o wl_agent.o wl_game.o \
 	wl_inter.o wl_menu.o wl_play.o wl_state.o wl_text.o wl_main.o \
 	wl_debug.o
+SOBJS = $(OBJS) vi_svga.o
+XOBJS = $(OBJS) vi_xlib.o
 
-LFLAGS = -lm -lvga
+LFLAGS = -lm 
 #LFLAGS = -lm -lvga ElectricFence-2.2.2/libefence.a -lpthread
+SLFLAGS = $(LFLAGS) -lvga
+XLFLAGS = $(LFLAGS) -L/usr/X11R6/lib -lX11
 
 NASM = nasm
 
 .SUFFIXES: .asm
 
-all:	wolf3d
+all:	swolf3d xwolf3d
 
-$(OBJS): version.h id_heads.h
+$(SOBJS): version.h id_heads.h
+$(XOBJS): version.h id_heads.h
 
 .asm.o:
 	$(NASM) -f elf -o $@ $<
 
-wolf3d: $(OBJS)
-	gcc -o wolf3d $(OBJS) $(LFLAGS) 
+swolf3d: $(SOBJS)
+	gcc -o swolf3d $(SOBJS) $(SLFLAGS) 
+
+xwolf3d: $(XOBJS)
+	gcc -o xwolf3d $(XOBJS) $(XLFLAGS)
 
 clean:
-	rm -rf wolf3d *.o
+	rm -rf swolf3d xwolf3d *.o
 
 distclean: clean
 	rm -rf *~ DEADJOE

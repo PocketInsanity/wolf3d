@@ -242,7 +242,9 @@ boolean FizzleFade(unsigned xx, unsigned yy, unsigned width,unsigned height, uns
 			if ((x>width) || (y>height))
 				continue;
 
-			*(graph_mem + (xx+x) + (yy+y) * 320) = *(gfxbuf + (xx+x) + (yy+y) * 320);
+			VL_DirectPlot(xx+x, yy+y, xx+x, yy+y);
+			
+			//*(graph_mem + (xx+x) + (yy+y) * 320) = *(gfxbuf + (xx+x) + (yy+y) * 320);
 
 			if (rndval == 1) /* entire sequence has been completed */
 				return false;
