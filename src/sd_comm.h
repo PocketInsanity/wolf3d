@@ -45,7 +45,7 @@ extern boolean AdLibPresent, SoundBlasterPresent;
 extern	SDMode		SoundMode;
 extern	SDSMode		DigiMode;
 extern	SMMode		MusicMode;
-extern	int		DigiMap[];
+
 
 extern void SD_Startup();
 extern void SD_Shutdown();
@@ -58,15 +58,18 @@ extern void SD_StopSound(),
 				SD_MusicOff(),
 				SD_FadeOutMusic();
 
-extern	boolean	SD_MusicPlaying(),
-				SD_SetSoundMode(SDMode mode),
-				SD_SetMusicMode(SMMode mode);
-extern	word	SD_SoundPlaying();
+extern boolean SD_MusicPlaying(), SD_SetSoundMode(SDMode mode),
+		SD_SetMusicMode(SMMode mode);
+		
+extern word SD_SoundPlaying();
 
 extern void SD_SetDigiDevice(SDSMode);
-extern void SD_Poll();
 
 void PlaySoundLocGlobal(word s, int id, fixed gx, fixed gy);
 void UpdateSoundLoc(fixed x, fixed y, int angle);
+
+
+extern int DigiMap[];
+void InitDigiMap();
 
 #endif

@@ -369,34 +369,6 @@ void US_ControlPanel(byte scancode)
 				break;
 
 			case backtodemo:
-				#ifdef SPEAR
-				/* TODO: why was this added for spear only? */
-				if (!ingame)
-				{
-					int start, i;
-					//
-					// DEALLOCATE ALL SOUNDS!
-					//
-					switch (SoundMode)
-					{
-						case sdm_PC:
-							start = STARTPCSOUNDS;
-							break;
-						case sdm_AdLib:
-							start = STARTADLIBSOUNDS;
-							break;
-						default:
-							start = 0;
-							break;
-					}
-
-					if (SoundMode != sdm_Off)
-						for (i=0;i<NUMSOUNDS;i++,start++)
-							if (audiosegs[start])
-								MM_SetPurge ((memptr)&audiosegs[start],3);		// make purgable
-				}
-				#endif
-
 				MM_SortMem();
 				StartGame=1;
 				if (!ingame)
@@ -439,7 +411,7 @@ void US_ControlPanel(byte scancode)
 	// RETURN/START GAME EXECUTION
 		
 #ifdef SPEAR
-	UnCacheLump (OPTIONS_LUMP_START,OPTIONS_LUMP_END);
+	UnCacheLump(OPTIONS_LUMP_START, OPTIONS_LUMP_END);
 	MM_SortMem();
 #endif
 }
@@ -3177,18 +3149,12 @@ void StartCPMusic(int song)
 	
 	lastmusic = song;
 
-	CA_CacheAudioChunk(STARTMUSIC + song);
 	SD_StartMusic(STARTMUSIC + song);
 }
 
 void FreeMusic()
 {
 	SD_MusicOff();
-	
-	if (lastmusic >= 0) {
-		CA_UnCacheAudioChunk(STARTMUSIC + lastmusic);
-		lastmusic = -1;
-	}
 }
 
 ///////////////////////////////////////////////////////////////////////////

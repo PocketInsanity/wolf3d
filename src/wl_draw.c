@@ -1041,18 +1041,15 @@ static void HitVertPWall()
 #define DEG270	2700
 #define DEG360	3600
 
-#define xpartialbyystep() FixedByFrac(xpartial, ystep)
-#define ypartialbyxstep() FixedByFrac(ypartial, xstep)
-
 static int samex(int intercept, int tile)
 {
 	if (xtilestep > 0) {
-		if ((intercept>>16) >= tile)
+		if ((intercept>>TILESHIFT) >= tile)
 			return 0;
 		else
 			return 1;
 	} else {
-		if ((intercept>>16) <= tile)
+		if ((intercept>>TILESHIFT) <= tile)
 			return 0;
 		else
 			return 1;
@@ -1062,12 +1059,12 @@ static int samex(int intercept, int tile)
 static int samey(int intercept, int tile)
 {
 	if (ytilestep > 0) {
-		if ((intercept>>16) >= tile)
+		if ((intercept>>TILESHIFT) >= tile)
 			return 0;
 		else
 			return 1;
 	} else {
-		if ((intercept>>16) <= tile)
+		if ((intercept>>TILESHIFT) <= tile)
 			return 0;
 		else
 			return 1;
@@ -1139,16 +1136,15 @@ for (postx = 0; postx < viewwidth; postx++) {
 		goto entry90;
 	}
 	
-	/* add tilestep to fix raycasting problems? */
-	yintercept = viewy + xpartialbyystep(); // + xtilestep;
+	yintercept = viewy + FixedByFrac(xpartial, ystep); // + xtilestep;
 	xtile = focaltx + xtilestep;
 
-	xintercept = viewx + ypartialbyxstep(); // + ytilestep;
+	xintercept = viewx + FixedByFrac(ypartial, xstep); // + ytilestep;
 	ytile = focalty + ytilestep;
 
 /* CORE LOOP */
 
-#define TILE(n) ((n)>>16)
+#define TILE(n) ((n)>>TILESHIFT)
 
 	/* check intersections with vertical walls */
 vertcheck:
@@ -1169,7 +1165,7 @@ vertentry:
 					goto passvert;
 					
 				yintercept = doorhit;
-				xintercept = xtile << 16;
+				xintercept = xtile << TILESHIFT;
 				HitVertPWall();
 			} else {
 				/* vertdoor */
@@ -1183,11 +1179,11 @@ vertentry:
 					goto passvert;
 				
 				yintercept = doorhit;
-				xintercept = (xtile << 16) + 32768;
+				xintercept = (xtile << TILESHIFT) + TILEGLOBAL/2;
 				HitVertDoor();
 			}
 		} else {
-			xintercept = xtile << 16;
+			xintercept = xtile << TILESHIFT;
 			HitVertWall();
 		}
 		continue;
@@ -1218,7 +1214,7 @@ horizentry:
 					goto passhoriz;
 				
 				xintercept = doorhit;
-				yintercept = ytile << 16; 
+				yintercept = ytile << TILESHIFT; 
 				HitHorizPWall();
 			} else {
 				doorhit = xintercept + xstep / 2;
@@ -1231,11 +1227,11 @@ horizentry:
 					goto passhoriz;
 				
 				xintercept = doorhit;
-				yintercept = (ytile << 16) + 32768;
+				yintercept = (ytile << TILESHIFT) + TILEGLOBAL/2;
 				HitHorizDoor();
 			}
 		} else {
-			yintercept = ytile << 16;
+			yintercept = ytile << TILESHIFT;
 			HitHorizWall();
 		}
 		continue;

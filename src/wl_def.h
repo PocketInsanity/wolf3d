@@ -45,12 +45,11 @@ extern int vwidth, vheight; /* size of screen */
 #define PLAYERSIZE	MINDIST		/* player radius */
 #define MINACTORDIST	0x10000		/* minimum dist from player center */
 					/* to any actor center */
-						
-#define GLOBAL1		0x10000
+#define TILESHIFT	16
+#define UNSIGNEDSHIFT	(TILESHIFT-8)
+#define GLOBAL1		(1<<TILESHIFT)
 #define TILEGLOBAL  	GLOBAL1
 #define VIEWGLOBAL	GLOBAL1
-#define TILESHIFT	16
-#define UNSIGNEDSHIFT	8
 
 #define ANGLES		360		/* must be divisible by 4 */
 #define ANGLEQUAD	(ANGLES/4)
@@ -741,7 +740,7 @@ void DrawPlayBorder();
 void DrawPlayBorderSides();
 void DrawStatusBar();
 
-#define	PlaySoundLocTile(s,tx,ty)	PlaySoundLocGlobal(s,(int)((tx<<6)|(ty)),(((long)(tx) << TILESHIFT) + (1L << (TILESHIFT - 1))),(((long)ty << TILESHIFT) + (1L << (TILESHIFT - 1))))
+#define	PlaySoundLocTile(s,tx,ty)	PlaySoundLocGlobal(s,(int)((tx<<6)|(ty)), (tx << TILESHIFT) + (1 << (TILESHIFT - 1)), (ty << TILESHIFT) + (1L << (TILESHIFT - 1)))
 #define	PlaySoundLocActor(s,ob)		PlaySoundLocGlobal(s,(int)ob,(ob)->x,(ob)->y)
 
 /*

@@ -31,6 +31,9 @@ B I - add mouse support
 B M - add joystick/gamepad support
 P I - fill in the new fizzlefade function
 P I - add sound "emulation" to the necessary targets so WaitSoundDone works
+B R - autoconf/automake
+P R - change boolean SD_PlaySound to void SD_PlaySound
+P M - position pushwall sounds
 
 Complete:
 P I - fix or remove fizzle fade

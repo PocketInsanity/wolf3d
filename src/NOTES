@@ -6,7 +6,7 @@ Just some random facts/thoughts/ideas/musings:
   - SNES
   - Macintosh
   - Jaguar
-  - Apple IIGS [http://www.sheppyware.com/products/a2/wolf3d/]
+  - Apple IIGS: http://www.sheppyware.com/products/a2/wolf3d/
   - 3DO
 
 * Rumored/Never Released?
@@ -18,10 +18,12 @@ Just some random facts/thoughts/ideas/musings:
 
 * Unofficial ports:
   - Linux (this, xwolf, wolfgl)
-    XWolf: http://www.sirius.demon.co.uk/xwolf/
+    XWolf:   http://www.sirius.demon.co.uk/xwolf/
   - Amiga (port of my first pc wolf3d linux port)
-    [http://www.silab.dsi.unimi.it/~cs556770/wolf3d/]
-  - Windows (wolfgl) [http://www.sourceforge.net/projects/wolfgl/]
+    http://www.silab.dsi.unimi.it/~cs556770/wolf3d/
+  - Windows
+    WolfGL:  http://www.sourceforge.net/projects/wolfgl/
+    Wolf DX: http://www.phoebe.co.uk/glwolf/
   - Acorn/Archemedes
  
 * PC source released August(?) ??, 1995:
@@ -32,10 +34,10 @@ Just some random facts/thoughts/ideas/musings:
     - http://www.wolf3dmansion.com/index.phtml
 * Macintosh source released January 21, 2000
   - http://www.maccentral.com/news/0001/24.wolf3d.shtml
-* TED5 source (editor used for tons of games including wolf3d)
+* TED5 source (map editor used for tons of games including wolf3d)
   - ftp://ftp.3drealms.com/misc/ted5.zip
 * Games which used the Wolfenstein 3D Engine:
-  - Blake Stone
+  - Blake Stone (Aliens of Gold, Planet Strike)
   - Corridor 7
   - Operation Body Count
 

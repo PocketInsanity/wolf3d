@@ -87,8 +87,8 @@ void VL_Startup()
 	
 	//if (gfxbuf == NULL) 
 	//	gfxbuf = malloc(vwidth * vheight * 1);
-		
-	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+/* TODO: renable parachute for release version? */		
+	if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_NOPARACHUTE) < 0) {
 		Quit("Couldn't init SDL");
 	}
 

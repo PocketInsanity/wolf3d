@@ -10,7 +10,7 @@ CFLAGS = -g -Wall -pedantic
 OBJS = objs.o misc.o id_ca.o id_vh.o id_us.o \
 	wl_act1.o wl_act2.o wl_act3.o wl_agent.o wl_game.o \
 	wl_inter.o wl_menu.o wl_play.o wl_state.o wl_text.o wl_main.o \
-	wl_debug.o vi_comm.o
+	wl_debug.o vi_comm.o sd_comm.o
 ROBJS = wl_draw.o
 SOBJS = $(OBJS) $(ROBJS) vi_svga.o
 XOBJS = $(OBJS) $(ROBJS) vi_xlib.o
@@ -23,8 +23,10 @@ OBJS += sd_null.o
 #CFLAGS += -D_REENTRANT
 #LFLAGS += -lpthread
 #OBJS += sd_oal.o
-#CFLAGS += -D_REENTRANT
-#LFLAGS += -lpthread #-lopenal
+#CFLAGS += -D_REENTRANT -I/home/relnev/cvs/oal/include/
+#LFLAGS += -lpthread -ldl -L/home/relnev/cvs/oal/linux/src/ -lopenal # /home/relnev/cvs/oal/linux/src/libopenal.a
+
+#LFLAGS += -lpthread /home/relnev/ElectricFence-2.2.2/libefence.a
 
 CFLAGS += `sdl-config --cflags`
 

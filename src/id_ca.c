@@ -833,15 +833,20 @@ memptr PM_GetPage(int pagenum)
 	return page->addr;
 }
 
-void PM_Preload(boolean (*update)(int current, int total))
+void PM_FreePage(int pagenum)
 {
-	int i;
+	PageListStruct *page;
 	
-	for (i = 0; i < 50; i++)
-		update(i, 50); /* yay */
-	update(50, 50);
+	if (pagenum >= ChunksInFile)
+		Quit("PM_FreePage: Invalid page request");
+	
+	page = &PMPages[pagenum];
+	if (page->addr != NULL) {
+		MM_FreePtr((memptr)&page->addr);
+		page->addr = NULL;
+	}
 }
-
+	
 void PM_Startup()
 {
 	if (PMStarted)

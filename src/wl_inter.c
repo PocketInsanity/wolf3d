@@ -17,7 +17,7 @@ void ClearSplitVWB()
 }
 
 
-//==========================================================================
+/* ======================================================================== */
 
 #if defined(SPEAR) && !defined(SPEARDEMO)
 ////////////////////////////////////////////////////////
@@ -90,7 +90,7 @@ void EndSpear()
 }
 #endif
 
-//==========================================================================
+/* ======================================================================== */
 
 /*
 ==================
@@ -236,11 +236,10 @@ void Victory()
 	EndSpear();
 #endif
 
-#endif // SPEARDEMO
+#endif /* SPEARDEMO */
 }
 
-
-//==========================================================================
+/* ======================================================================== */
 
 /*
 ==================
@@ -331,7 +330,7 @@ void Write(int x,int y,char *string)
 //
 // Breathe Mr. BJ!!!
 //
-void BJ_Breathe(void)
+void BJ_Breathe()
 {
 	static int which=0,max=10;
 	int pics[2]={L_GUYPIC,L_GUY2PIC};
@@ -851,8 +850,6 @@ void LevelCompleted()
 =
 = PreloadGraphics
 =
-= Fill the cache up
-=
 =================
 */
 
@@ -873,6 +870,8 @@ boolean PreloadUpdate(int current, int total)
 
 void PreloadGraphics()
 {
+	int i;
+	
 	DrawLevel();
 	ClearSplitVWB();
 
@@ -887,7 +886,10 @@ void PreloadGraphics()
 	VW_UpdateScreen();
 	VW_FadeIn();
 
-	PM_Preload(PreloadUpdate);
+	for (i = 0; i <= 40; i++)
+		PreloadUpdate(i, 50);
+	PreloadUpdate(50, 50);
+
 	IN_UserInput(70);
 	VW_FadeOut();
 

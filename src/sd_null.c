@@ -5,16 +5,10 @@ boolean AdLibPresent, SoundBlasterPresent;
 SDMode SoundMode, MusicMode;
 SDSMode DigiMode;
 
-int DigiMap[LASTSOUND];
-
 static boolean SD_Started;
 
 static boolean sqActive;
 
-
-void SD_Poll()
-{
-}
 
 void SD_SetDigiDevice(SDSMode mode)
 {
@@ -49,6 +43,8 @@ void SD_Startup()
 {
 	if (SD_Started)
 		return;
+	
+	InitDigiMap();
 }
 
 ///////////////////////////////////////////////////////////////////////////

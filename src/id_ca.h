@@ -72,11 +72,10 @@ extern PageListStruct *PMPages;
 
 #define	PM_GetSoundPage(v)	PM_GetPage(PMSoundStart + (v))
 #define	PM_GetSpritePage(v)	PM_GetPage(PMSpriteStart + (v))
+memptr PM_GetPage(int pagenum);
+void PM_FreePage(int pagenum);
 
 void PM_Startup();
 void PM_Shutdown();
-void PM_Preload(boolean (*update)(int current, int total));
-	
-memptr PM_GetPage(int pagenum);
 
 #endif

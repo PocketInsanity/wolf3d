@@ -19,8 +19,6 @@ static int leftchannel, rightchannel;
 
 static volatile boolean SoundPositioned;
 
-int DigiMap[LASTSOUND];
-
 static word *DigiList;
 
 static volatile boolean SD_Started;
@@ -258,15 +256,13 @@ void SD_Startup()
 {
 	audio_buf_info info;
 	int want, set;
-	int i;
 	
 	if (SD_Started)
 		return;
 
 	Blah();
 	
-	for (i = 0; i < LASTSOUND; i++)
-		DigiMap[i] = -1;
+	InitDigiMap();
 	
 	OPL = OPLCreate(OPL_TYPE_YM3812, 3579545, 44100);
 	
@@ -573,6 +569,8 @@ void SD_MusicOff()
 ///////////////////////////////////////////////////////////////////////////
 void SD_StartMusic(int music)
 {
+	CA_CacheAudioChunk(music);
+	
 	SD_MusicOff();
 	SD_MusicOn();
 	Music = (MusicGroup *)audiosegs[music];
@@ -599,10 +597,6 @@ void SD_FadeOutMusic()
 boolean SD_MusicPlaying()
 {
 	return sqActive;
-}
-
-void SD_Poll()
-{
 }
 
 void SD_SetDigiDevice(SDSMode mode)
