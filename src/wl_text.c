@@ -659,11 +659,11 @@ void ShowArticle(const char *article)
 void HelpScreens()
 {
 	int artnum;
-	char *text;
+	const char *text;
 
 	artnum = helpextern;
 	CA_CacheGrChunk(artnum);
-	text = (char *)grsegs[artnum];
+	text = (const char *)grsegs[artnum];
 
 	ShowArticle(text);
 
@@ -680,13 +680,13 @@ void HelpScreens()
 void EndText()
 {
 	int artnum;
-	char *text;
+	const char *text;
 
 	ClearMemory();
 
 	artnum = endextern+gamestate.episode;
 	CA_CacheGrChunk(artnum);
-	text = (char *)grsegs[artnum];
+	text = (const char *)grsegs[artnum];
 
 	ShowArticle(text);
 
