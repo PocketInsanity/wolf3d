@@ -2,9 +2,10 @@
 
 #include "SDL.h"
 
-byte *gfxbuf = NULL;
-SDL_Surface *surface;
+static SDL_Surface *surface;
+static unsigned int sdl_palettemode;
 
+byte *gfxbuf = NULL;
 
 extern void keyboard_handler(int code, int press);
 extern boolean InternalKeyboard[NumCodes];
@@ -58,10 +59,6 @@ void VL_WaitVBL(int vbls)
 
 void VW_UpdateScreen()
 {
-	//VL_WaitVBL(1); 
-	//memcpy(surface->pixels, gfxbuf, vwidth*vheight);
-	//SDL_UpdateRect(surface, 0, 0, 0, 0);
-	
 	SDL_Flip(surface);
 }
 
@@ -75,6 +72,9 @@ void VW_UpdateScreen()
 
 void VL_Startup()
 {
+	const SDL_VideoInfo *vinfo;
+	int flags;
+	
 	vwidth = 320;
 	vheight = 200;
 	
@@ -86,23 +86,22 @@ void VL_Startup()
 		vheight *= 3;
 	}
 	
-	//if (gfxbuf == NULL) 
-	//	gfxbuf = malloc(vwidth * vheight * 1);
-/* TODO: renable parachute for release version? */		
 	if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_NOPARACHUTE) < 0) {
 		Quit("Couldn't init SDL");
 	}
 
+	vinfo = SDL_GetVideoInfo();
+	sdl_palettemode = (vinfo->vfmt->BitsPerPixel == 8) ? (SDL_PHYSPAL|SDL_LOGPAL) : SDL_LOGPAL;
+	
+	flags = SDL_SWSURFACE|SDL_HWPALETTE|SDL_DOUBLEBUF;
 	if (MS_CheckParm("fullscreen"))
-		//surface = SDL_SetVideoMode(vwidth, vheight, 8, SDL_SWSURFACE|SDL_HWPALETTE|SDL_FULLSCREEN);
-		surface = SDL_SetVideoMode(vwidth, vheight, 8, SDL_SWSURFACE|SDL_HWPALETTE|SDL_FULLSCREEN|SDL_DOUBLEBUF);
-	else
-		//surface = SDL_SetVideoMode(vwidth, vheight, 8, SDL_SWSURFACE|SDL_HWPALETTE);
-		surface = SDL_SetVideoMode(vwidth, vheight, 8, SDL_SWSURFACE|SDL_HWPALETTE|SDL_DOUBLEBUF);
+		flags |= SDL_FULLSCREEN;
+		
+	surface = SDL_SetVideoMode(vwidth, vheight, 8, flags);
 		
 	if (surface == NULL) {
 		SDL_Quit();
-		Quit("Couldn't set 320x200 mode");
+		Quit("(SDL) Couldn't set video mode");
 	}
 	gfxbuf = surface->pixels;
 	
@@ -122,10 +121,6 @@ void VL_Startup()
 
 void VL_Shutdown()
 {
-	//if (gfxbuf != NULL) {
-	//	free(gfxbuf);
-	//	gfxbuf = NULL;
-	//}
 	SDL_Quit();
 }
 
@@ -152,7 +147,7 @@ void VL_SetPalette(const byte *palette)
 		colors[i].g = palette[i*3+1] << 2;
 		colors[i].b = palette[i*3+2] << 2;
 	}
-	SDL_SetColors(surface, colors, 0, 256);
+	SDL_SetPalette(surface, sdl_palettemode, colors, 0, 256);
 }
 
 /*

@@ -29,6 +29,7 @@ void VL_FillPalette(int red, int green, int blue)
 		pal[i*3+2] = blue;
 	}
 	VL_SetPalette(pal);
+	VW_UpdateScreen();
 }
 
 /*
@@ -71,6 +72,7 @@ void VL_FadeOut(int start, int end, int red, int green, int blue, int steps)
 		}
 
 		VL_SetPalette(&palette2[0][0]);
+		VW_UpdateScreen();
 	}
 
 /* final color */
@@ -111,6 +113,7 @@ void VL_FadeIn(int start, int end, const byte *palette, int steps)
 		}
 
 		VL_SetPalette(&palette2[0][0]);
+		VW_UpdateScreen();
 	}
 
 /* final color */
