@@ -302,7 +302,7 @@ void VL_Hlin(unsigned x, unsigned y, unsigned width, unsigned color)
 	}
 */
 
-	int w;
+	unsigned int w;
 	
 	for (w = 0; w < width; w++)
 		VL_Plot(x+w, y, color);

@@ -9,6 +9,9 @@
 //
 // PRIVATE PROTOTYPES
 //
+
+enum {MOUSE,JOYSTICK,KEYBOARDBTNS,KEYBOARDMOVE};        // FOR INPUT TYPES
+
 void CP_ReadThis();
 
 #ifdef UPLOAD
@@ -153,8 +156,8 @@ static const int color_norml[] = { DEACTIVE, TEXTCOLOR, READCOLOR, 0x6b };
 static int EpisodeSelect[6] = { 1 };
 #endif
 
-int SaveGamesAvail[10],StartGame,SoundStatus=1,pickquick;
-char SaveGameNames[10][32],SaveName[13]="savegam?.";
+static int SaveGamesAvail[10],StartGame,SoundStatus=1,pickquick;
+static char SaveGameNames[10][32],SaveName[13]="savegam?.";
 
 
 ////////////////////////////////////////////////////////////////////
@@ -216,13 +219,6 @@ static const char
 	"?","?","?","?","?","?","?","?","?","?","?","?","?","?","?","?",
 	"?","?","?","?","?","?","?","?","?","?","?","?","?","?","?","?"
 					},	// DEBUG - consolidate these
-					ExtScanCodes[] =	// Scan codes with >1 char names
-					{
-	1,0xe,0xf,0x1d,sc_LShift,0x39,0x3a,0x3b,0x3c,0x3d,0x3e,
-	0x3f,0x40,0x41,0x42,0x43,0x44,0x57,0x59,0x46,0x1c,sc_RShift,
-	0x37,0x38,sc_Home,sc_PgUp,sc_End,sc_PgDn,sc_Insert,sc_Delete,0x45,sc_UpArrow,
-	sc_DownArrow,sc_LeftArrow,sc_RightArrow,0x00
-					},
 					*ExtScanNames[] =	// Names corresponding to ExtScanCodes
 					{
 	"Esc","BkSp","Tab","Ctrl","LShft","Space","CapsLk","F1","F2","F3","F4",
@@ -231,12 +227,21 @@ static const char
 	"Down","Left","Right",""
 					};
 
+static const ScanCode
+					ExtScanCodes[] =	// Scan codes with >1 char names
+					{
+	1,0xe,0xf,0x1d,sc_LShift,0x39,0x3a,0x3b,0x3c,0x3d,0x3e,
+	0x3f,0x40,0x41,0x42,0x43,0x44,0x57,0x59,0x46,0x1c,sc_RShift,
+	0x37,0x38,sc_Home,sc_PgUp,sc_End,sc_PgDn,sc_Insert,sc_Delete,0x45,sc_UpArrow,
+	sc_DownArrow,sc_LeftArrow,sc_RightArrow,0x00
+					};
+
 const char *IN_GetScanName(ScanCode scan)
 {
-	char **p;
-	ScanCode *s;
+	const char **p;
+	const ScanCode *s;
 
-	for (s = (ScanCode *)ExtScanCodes, p = (char **)ExtScanNames; *s; p++, s++)
+	for (s = ExtScanCodes, p = ExtScanNames; *s; p++, s++)
 		if (*s == scan)
 			return *p;
 

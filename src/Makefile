@@ -4,7 +4,7 @@ CC = gcc
 #CFLAGS = -g -Wall
 CFLAGS = -g -O2 -Wall
 #CFLAGS = -Wall -O6 -fomit-frame-pointer -ffast-math -funroll-loops -march=pentiumpro
-#CFLAGS = -g -Wall -pedantic -std=gnu99
+#CFLAGS = -g -Wall -W -pedantic -std=c99
 #CFLAGS = -Os -Wall -pedantic
 #CFLAGS = -Os -Wall -fomit-frame-pointer -ffast-math -march=pentiumpro
 #CFLAGS=-O3 -xiMK -tpp6 -c99 -wp_ipo -g

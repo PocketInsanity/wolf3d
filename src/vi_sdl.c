@@ -53,7 +53,7 @@ void Quit(const char *error)
 
 void VL_WaitVBL(int vbls)
 {
-	long last = get_TimeCount() + vbls;
+	unsigned long last = get_TimeCount() + vbls;
 	while (last > get_TimeCount()) ;
 }
 

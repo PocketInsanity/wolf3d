@@ -41,10 +41,10 @@ objtype		*LastAttacker;
 */
 
 
-struct atkinf
+static const struct atkinf
 {
 	signed char tics, attack, frame; 	// attack is 1 for gun, 2 for knife
-} static const attackinfo[4][14] =
+} attackinfo[4][14] =
 {
 { {6,0,1},{6,2,2},{6,0,3},{6,-1,4} },
 { {6,0,1},{6,1,2},{6,0,3},{6,-1,4} },
