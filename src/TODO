@@ -21,30 +21,25 @@ SD_StartMusic((MusicGroup *)audiosegs[STARTMUSIC + chunk]);
 SD_StartMusic(chunk);
 ------------------------------------------------------------------------------
 * use int16_t, etc (stdint)
-* serialize reads/writes
+* finish serializing reads/writes, endian issues
 * fix fix fix different size stuff
 works alright at some res, but breaks on most others currently
 * add ylookup
 * remove farmapylookup?
 * would be nice if Quit() used vsnprintf, etc
 * actor walking through door is drawn in front of door: near end of E1M1 for
-example
+example (is this reproducible?)
 * getenv so that you can point an env. var to the proper dir
 * rewrite hw (sound, input) code, remove stuff like SD_SetSoundMode
-* fix config file and savegames
 * use static and const where appropriate
-* convert uses of open() to fopen(), etc maybe
-move fileio code to a seperate file
 * menu code is a mess, always does things differently than the rest of the
 code, it really needs to be cleaned up
 * id_ca.c cache code: fix/readd/rewrite the "garbage collection" system?
 * rewrite id_ca.c: uniform memory handling system
 * clean up header files, especially wl_def.h, where some declarations aren't 
 in the right place
-* is that memory intro screen needed anymore? probably not, although it
-would be nice to show what version is loaded, but doom just printed text
-and the intro screen which came with wolf3d has copyrighted/trademarked images
-maybe make a new intro screen...
+* is that memory intro screen needed anymore? 
+no, will be removed soon
 * fix the input code, everything is spread out... ideally everything should
 work the same, let the input handler do it all instead
 i think its safe for now to go with the scancodes as being the "universal"
@@ -53,13 +48,12 @@ translate
 * wl_menu uses specific scancodes for names, config file will have to use
 metaname like sc_Left etc or something
 * add a ViewMap? (could be done similar to mac version)
-* find and remove any function stubs (functions which just call another
-function with same parameters, only difference is the name)
 * change the current parameter handling code to something like getopt
 * remove check for debugmode?
 * fizzlefade is hackish, stipple buf would work ok in opengl, maybe only
 update once per frame or such...
 no idea how to do fizzlefade in TrueColor X
+fix fizzlefade for non 320x200 resolutions
 * check filehandling (ex, file missing, bad file type, and such)
 PlayDemoFromFile specifically
 * deathcam went by too fast, and right before the fizzlefade was being done
@@ -67,8 +61,6 @@ on the border
 same with the spear of destiny animation part of ending
 * reduce code duplication in the vi_* files.
 * split wl_draw into two files (draw independent, draw dependent)
-* make sure none of the non-loader code tries to handle gfx/sound data 
-directly
 * when window loses focus, it should clear the keys
 * rename visable to visible
 * create 'sound channels' with priority.. ie a door can only make one sound
@@ -87,7 +79,14 @@ Save game header:
 4 bytes: checksum for the data (after text string)
 32 bytes: text string
 
-< data follows >
+Version 0xFFFFFFFF Data: (Unofficial Save Game data)
+<see wl_main.c>
+
+Version 0x00000000 Data: (Official)
+<undetermined>
+
+Version 0x00000001 Data: (Official)
+<undetermined but will be compressed>
 
 ---
 
@@ -105,5 +104,8 @@ Version 0xFFFFFFFF Data: (Unofficial Config data)
 
 Version 0x00000000 Data: (Official)
 <undetermined>
+
+Version 0x00000001 Data: (Official)
+<undetermined but will be compressed>
 
 ------------------------------------------------------------------------------
