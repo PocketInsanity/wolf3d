@@ -786,18 +786,6 @@ void VL_DirectPlot(int x1, int y1, int x2, int y2)
 		XSetForeground(dpy, gc, *(gfxbuf + x1 + y1 * 320));
 		XDrawPoint(dpy, win, gc, x2, y2);
 	} else {
-		#if 0
-		unsigned char pix = *(gfxbuf + x1 + y1 * 320);
-		XColor c;
-		c.pixel = 0;
-		c.flags = DoRed|DoGreen|DoBlue;
-		c.red = mypal[pix*3+0] << 10;
-		c.green = mypal[pix*3+1] << 10;
-		c.blue = mypal[pix*3+2] << 10;
-		XStoreColor(dpy, cmap, &c);
-		XSetForeground(dpy, gc, 0);
-		XDrawPoint(dpy, win, gc, x2, y2);
-		#endif
 	#if 0
 		unsigned char pix = *(gfxbuf + x1 + y1 * 320);
 		XColor c;
@@ -807,7 +795,6 @@ void VL_DirectPlot(int x1, int y1, int x2, int y2)
 		c.green = mypal[pix*3+1] << 10;
 		c.blue = mypal[pix*3+2] << 10;
 		XAllocColor(dpy, cmap, &c);
-		//XStoreColor(dpy, cmap, &c);
 		XSetForeground(dpy, gc, c.pixel);
 		XDrawPoint(dpy, win, gc, x2, y2);
 	#endif

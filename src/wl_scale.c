@@ -94,13 +94,6 @@ void SetupScaling(int maxscaleheight)
 =
 = height should be even
 =
-= Call with
-= ---------
-= DS:SI		Source for scale
-= ES:DI		Dest for scale
-=
-= Calling the compiled scaler only destroys AL
-=
 ========================
 */
 
@@ -150,8 +143,6 @@ void xBuildCompScale(int height, byte *source, int x)
 =
 = ScaleLine
 =
-= linescale should have the high word set to the segment of the scaler
-=
 =======================
 */
 
@@ -166,34 +157,26 @@ t_compshape *shapeptr;
    slinex - screen coord of first column
 */
 
-void ScaleLine (void)
+void ScaleLine()
 {
-    int x, y, ys;
-    int n, ny;
-    int y0, y1;
-    unsigned char *pixels;
+	int x, y, ys;
+	int n, ny;
+	int y0, y1;
+	unsigned char *pixels;
 	unsigned char color;
-#ifdef DEBUGx
-    printf ("ScaleLine\n");
-    printf ("  slinex = %d, slinewidth = %d\n", slinex, slinewidth);
-#endif
 
     while (linecmds[0]) {
 	y0 = linecmds[2]/2;
 	y1 = linecmds[0]/2 - 1;
 	pixels = (unsigned char *) shapeptr + y0 + linecmds[1];
-#ifdef DEBUGx
-	printf ("  y0,y1 = %d,%d  pixels = 0x%8x\n", y0, y1, pixels);
-#endif
+
 	for (y=y0; y<=y1; y++) {
 	    ys = scaledata[linescale].desty[y];
 	    color = *pixels++;
 	    if (ys >= 0) {
-		//color = *pixels++;
 		for (ny=0; ny<scaledata[linescale].count[y]; ny++) {
-		    for (n=0,x=slinex; n<slinewidth; n++, x++) {
-// 			fprintf(stderr, "    (%d,%d)\n", x, ys+ny);
-			//if (ys < 0) continue; 
+		if ( (ys+ny) >= viewheight ) break; /* TODO: fix BuildCompScale so this isn't necessary */
+		    for (n = 0, x = slinex; n < slinewidth; n++, x++) {
 			VL_Plot(x+xoffset, ys+ny+yoffset, color);
 		    }
 		}
@@ -215,12 +198,6 @@ void ScaleLine (void)
 = 	top of virtual line with segment in proper place
 =	start of segment pixel*2, used to jsl into compiled scaler
 =	<repeat>
-=
-= Setup for call
-= --------------
-= GC_MODE			read mode 1, write mode 2
-= GC_COLORDONTCARE  set to 0, so all reads from video memory return 0xff
-= GC_INDEX			pointing at GC_BITMASK
 =
 =======================
 */
@@ -415,12 +392,6 @@ void ScaleShape(int xcenter, int shapenum, unsigned height)
 = 	top of virtual line with segment in proper place
 =	start of segment pixel*2, used to jsl into compiled scaler
 =	<repeat>
-=
-= Setup for call
-= --------------
-= GC_MODE			read mode 1, write mode 2
-= GC_COLORDONTCARE  set to 0, so all reads from video memory return 0xff
-= GC_INDEX			pointing at GC_BITMASK
 =
 =======================
 */

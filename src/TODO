@@ -25,8 +25,10 @@ work the same, let the input handler do it all instead
 i think its safe for now to go with the scancodes as being the "universal"
 key type, and for everything not scancode-based, have a function to
 translate
-* maybe there are sprite drawing/clipping bugs that will cause it to draw
-outside the viewarea, leaving artifacts
+* fix BuildCompScale so that the clipping code is not neccessary in
+BuildCompScale, so you can remove if ((ny+ys) >= viewheight)) ...
+else there are sprite drawing/clipping bugs that will cause it to draw
+outside the viewarea (at least at the bottom), leaving artifacts
 * remove GOODTIMES?
 * Consider removing the SOD manual check
 * perhaps rename UPLOAD
@@ -88,3 +90,4 @@ at a time
 * beos is c++ (and uses gcc as a compiler i think) but wolf3d will need many
 cleanups for c++
 either that or use extern "C" { ... } in the header files
+* change wl_scale to use mac wolf3d's version of scaling
