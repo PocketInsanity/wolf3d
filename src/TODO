@@ -1,8 +1,8 @@
 Priority Levels: I > R > M (I, R required to be complete before full release)
 Program: P=PC Wolf3D, M=Mac Wolf3D, B=Both
-P R - create a better "read direction" for menu movement
+P M - create a better "read direction" for menu movement
 P M - convert while (Keyboard[sc_Blah]) IN_CheckAck() to IN_WaitKeyDown(sc..
-P I - finish changing the game movement to the new style
+P M - finish changing the game movement to the new style
 P R - update input menus/config
 P M - cleanup/rewrite menu code
 P R - update sound menus/config
@@ -17,11 +17,9 @@ B I - complete savegame, config formats
 M I - add SDL
 B R - decide if to keep SVGA/X11 targets
 B M - configure scripts? (autoconf/automake/etc)
-B M - port to dreamcast?
-B M - add compression to savegames/config
 B I - play through game (w/ sound and music) to make sure things work
 B M - use stdint.h where appropiate
-B M - finish serializing reads/writes, endian issues.
+B R - finish serializing reads/writes, endian issues.
       - PC version should be OK for loading -- savegames not yet tested.
 P M - fix raycast bug where at certain points you can see through corners
 B I - merge other TODO lists into this list
@@ -29,14 +27,12 @@ B M - use something like config file or getenv to point at data directories
 P I - finish handling/mapping for all keys in sys. specific code
 B I - add mouse support
 B M - add joystick/gamepad support
-P I - fill in the new fizzlefade function
 P I - add sound "emulation" to the necessary targets so WaitSoundDone works
 P R - change boolean SD_PlaySound to void SD_PlaySound
 P M - position pushwall sounds
 P M - id_ca.c cache code: fix/readd/rewrite the "garbage collection" system
 P M - rewrite id_ca.c: uniform memory handling system
 P M - either move id_heads into wl_def or split header files apart
-P R - rewrite fmopl.c to avoid licensing issues (or provide as a separate patch? may not be advisable since id owns copyright on wolf code)
 P R - remove CA_LoadAllSounds now that the sound code does everything
 B I - README, etc.
 B M - Code Documentation
@@ -49,7 +45,6 @@ B M - [X11] use the data in the visual/image for formatting colors
 
 Complete:
 P I - fix or remove fizzle fade
-      - Removed [nice, but very hacky effect]
 ------------------------------------------------------------------------------
 * what exactly is the point of all the DigiMode checks in wl_act2.c?
 * add ylookup?
@@ -85,16 +80,11 @@ Sound Menu:
 - On [AdLib/OPL2]
 - Off
 ------------------------------------------------------------------------------
-Where to Look for/Save Files:
-
-~/.wolf3d
-cwd
-/usr/games/share
-$ENVIRONMENT_VARIABLE
-
-Need to establish where to look, order to look, strict/lenient loading (load
-all files from the determined game directory, or look in order for each
-file), and where to put savegames and config files.
+File searchpath:
+1. ~/.wolf3d <- always used for saving
+2. $WOLF3D_DATA
+3. realpath
+4. cwd
 ------------------------------------------------------------------------------
 Save game header:
 8 bytes: WOLF3D, 0, 0
@@ -102,15 +92,13 @@ Save game header:
 4 bytes: version (integer)
 4 bytes: game type (WL1, WL6, SDM, SOD)
 4 bytes: seconds past 1970 (time(NULL))
-4 bytes: padding
+4 bytes: padding (filesize?)
 4 bytes: checksum for the data (after text string)
 32 bytes: text string
 
-Version 0xFFFFFFFF Data: (Unofficial Save Game data)
+Version 0xFFFFFFFF Data: (Official) \ These are the same.
+Version 0x00000000 Data: (Official) /
 <see wl_main.c>
-
-Version 0x00000000 Data: (Official)
-<undetermined>
 
 Version 0x00000001 Data: (Official)
 <undetermined but will be compressed>
@@ -123,14 +111,13 @@ Config header:
 4 bytes: version (integer)
 4 bytes: game type (WL1, WL6, SDM, SOD)
 4 bytes: seconds past 1970 (time(NULL))
-4 bytes: padding
+4 bytes: padding (filesize?)
 4 bytes: checksum for the data
 
-Version 0xFFFFFFFF Data: (Unofficial Config data)
-<see wl_main.c>
+Version 0xFFFFFFFF Data: (Old Config data)
 
 Version 0x00000000 Data: (Official)
-<undetermined>
+<see wl_main.c>
 
 Version 0x00000001 Data: (Official)
 <undetermined but will be compressed>

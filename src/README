@@ -6,6 +6,8 @@ the file formats may change at any time).
 
 NOTE: This requires SDL 1.2 (http://www.libsdl.org)
 
+NOTE: edit version.h to change the gametype.
+
 How to use:
 
 About:

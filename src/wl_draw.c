@@ -606,7 +606,7 @@ void DrawPlanes()
 
 /* ======================================================================== */
 
-static unsigned int Ceiling[]=
+static const unsigned int Ceiling[]=
 {
 #ifndef SPEAR
  0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0xbfbf,
@@ -655,7 +655,6 @@ static void ClearScreen()
  
 void ThreeDRefresh()
 {
-
 /* clear out the traced array */
 	memset(spotvis, 0, sizeof(spotvis));
 
@@ -1248,101 +1247,91 @@ passhoriz:
 
 void FizzleFade(boolean abortable, int frames, int color)
 {
-}
-
-#if 0
-static int xarr[1280];
-static int yarr[1280];
-
-static int myrand()
-{
-	return rand();
-}
-
-static void fillarray(int *arr, int len)
-{
-	int i;
-	
-	for (i = 0; i < len; i++)
-		arr[i] = i;
-}
-
-static void randarray(int *arr, int len)
-{
-	int i, j, k;
-	
-	for (i = 0; i < len; i++) {
-		j = myrand() % len;
-		
-		k = arr[i];
-		arr[i] = arr[j];
-		arr[j] = k;
-	}
-}
-			
-void FizzleFade(boolean abortable, int frames, int color)
-{
-	boolean retr;
 	int pixperframe;
-	int x, y, xc, yc;
-	int count, p, frame;
+	unsigned x, y, p, frame;
+	int multiplier;
+	int width, height;
+	long rndval;
+	int retr;
 		
-	count = viewwidth * viewheight;
-	pixperframe = count / frames;
+	rndval = 1;
+	pixperframe = 64000/frames;
 	
-	srand(time(NULL));
-		
-	fillarray(xarr, viewwidth);
-	randarray(xarr, viewwidth);
-	
-	fillarray(yarr, viewheight - 1);
-	randarray(yarr, viewheight - 1);
-
 	IN_StartAck();
 
 	frame = 0;
 	set_TimeCount(0);
 	
-	xc = 0;
-	yc = 0;
-	x = 0;
-	y = 0;
+	if (vwidth % 320 || vheight % 200)
+		return;
+	if ((vwidth / 320) != (vheight / 200))
+		return;
+	multiplier = vwidth / 320;
+	if (multiplier > 3)
+		return;
+		
+	width = viewwidth / multiplier;
+	height = viewheight / multiplier;
 	
-	retr = false;
+	retr = -1;
+		
 	do {
 		if (abortable && IN_CheckAck())
 			retr = true;
 		else
 		for (p = 0; p < pixperframe; p++) {
+			y = (rndval & 0x00FF) - 1;
+			x = (rndval & 0x00FFFF00) >> 8;
+			
+			if (rndval & 1) {
+				rndval >>= 1;
+				rndval ^= 0x00012000;
+			} else
+				rndval >>= 1;
 				
-			gfxbuf[(xarr[x]+xoffset)+(yarr[y]+yoffset)*vwidth] = color;
-			
-			count--;
-			
-			x++;
-			if (x >= viewwidth)
-				x = 0;
-			
-			y++;
-			if (y >= (viewheight-1))
-				y = 0;
-			
-			yc++;	
-			if (yc >= (viewheight-1)) {
-				yc = 0;
-				y++;
-				
-				if (y >= (viewheight-1))
-					y = 0;
+			if ((x >= width) || (y >= height))
+				continue;
+
+			switch(multiplier) {
+				case 3:
+					x *= 3;
+					y *= 3;
+					gfxbuf[(x+0+xoffset)+(y+0+yoffset)*vwidth] = color;
+					gfxbuf[(x+0+xoffset)+(y+0+yoffset)*vwidth] = color;
+					gfxbuf[(x+1+xoffset)+(y+0+yoffset)*vwidth] = color;
+					gfxbuf[(x+1+xoffset)+(y+1+yoffset)*vwidth] = color;
+					gfxbuf[(x+0+xoffset)+(y+1+yoffset)*vwidth] = color;
+					gfxbuf[(x+2+xoffset)+(y+0+yoffset)*vwidth] = color;
+					gfxbuf[(x+2+xoffset)+(y+1+yoffset)*vwidth] = color;
+					gfxbuf[(x+2+xoffset)+(y+2+yoffset)*vwidth] = color;
+					gfxbuf[(x+1+xoffset)+(y+2+yoffset)*vwidth] = color;
+					gfxbuf[(x+0+xoffset)+(y+2+yoffset)*vwidth] = color;
+					break;
+				case 2:
+					x *= 2;
+					y *= 2;
+					gfxbuf[(x+0+xoffset)+(y+0+yoffset)*vwidth] = color;
+					gfxbuf[(x+1+xoffset)+(y+0+yoffset)*vwidth] = color;
+					gfxbuf[(x+1+xoffset)+(y+1+yoffset)*vwidth] = color;
+					gfxbuf[(x+0+xoffset)+(y+1+yoffset)*vwidth] = color;
+					break;
+				case 1:
+					gfxbuf[(x+0+xoffset)+(y+0+yoffset)*vwidth] = color;
+					break;
 			}
+			
+			if (rndval == 1) { 
+				/* entire sequence has been completed */
+				retr = false;
+				break;
+			}
+
 		}
-		
 		VW_UpdateScreen();
-		
+				
 		frame++;
 		while (get_TimeCount() < frame);
-	} while (!retr && (count > 0));
-	
-	VW_UpdateScreen();
+	} while (retr == -1);
+
+	VW_UpdateScreen();	
 }
-#endif
