@@ -49,7 +49,7 @@ void VW_DrawPropString(char *string);
 boolean FizzleFade(unsigned xoffset, unsigned yoffset, unsigned width,unsigned height, unsigned frames,boolean abortable);
 
 void VL_FadeOut(int start, int end, int red, int green, int blue, int steps);
-void VL_FadeIn(int start, int end, byte *palette, int steps);
+void VL_FadeIn(int start, int end, const byte *palette, int steps);
 
 void LatchDrawPic(unsigned x, unsigned y, unsigned picnum);
 void LoadLatchMem(void);

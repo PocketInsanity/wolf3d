@@ -9,7 +9,7 @@ CFLAGS = -g -Wall -I/home/relnev/cvs/oal/include
 OBJS = objs.o misc.o id_ca.o id_vh.o id_us.o \
 	wl_act1.o wl_act2.o wl_agent.o wl_game.o \
 	wl_inter.o wl_menu.o wl_play.o wl_state.o wl_text.o wl_main.o \
-	wl_debug.o sd_oal.o # sd_null.o
+	wl_debug.o gfxsave.o sd_oal.o # sd_null.o
 ROBJS = wl_draw.o wl_scale.o
 SOBJS = $(OBJS) $(ROBJS) vi_svga.o
 XOBJS = $(OBJS) $(ROBJS) vi_xlib.o

@@ -224,7 +224,7 @@ void VL_FadeOut(int start, int end, int red, int green, int blue, int steps)
 =================
 */
 
-void VL_FadeIn(int start, int end, byte *palette, int steps)
+void VL_FadeIn(int start, int end, const byte *palette, int steps)
 {
 	int		i,j,delta;
 

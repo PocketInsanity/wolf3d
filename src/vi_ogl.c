@@ -91,8 +91,8 @@ byte *Pal_256_RGBA(byte *source)
 	return dest;
 }
 	
-int *sprtex, sprcount;
-int *waltex, walcount;
+GLuint *sprtex, sprcount;
+GLuint *waltex, walcount;
 
 void Init3D()
 {
@@ -101,14 +101,18 @@ void Init3D()
 	printf("start init\n");
 	
 	walcount = PMSpriteStart;
-	waltex = (int *)malloc(sizeof(int) * walcount);
+	waltex = (int *)malloc(sizeof(GLuint) * walcount);
 	sprcount = PMSoundStart - PMSpriteStart;
-	sprtex = (int *)malloc(sizeof(int) * sprcount);
+	sprtex = (int *)malloc(sizeof(GLuint) * sprcount);
 	
+	printf("creating %d walls, %d sprites\n", walcount, sprcount);
+		
+	walcount = 2;
+	sprcount = 2;
 	glGenTextures(walcount, waltex);
 	glGenTextures(sprcount, sprtex);
-	
-	for (i = 0; i < 2 /*walcount*/; i++) {
+		
+	for (i = 0; i < walcount; i++) {
 		glBindTexture(GL_TEXTURE_2D, waltex[i]);
 	        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -118,7 +122,7 @@ void Init3D()
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 64, 64, 0, GL_RGB, GL_UNSIGNED_BYTE, Pal_256_RGB(PM_GetPage(i)));
 	}
 	
-	for (i = 0; i < 2 /*sprcount*/; i++) {
+	for (i = 0; i < sprcount; i++) {
 		glBindTexture(GL_TEXTURE_2D, sprtex[i]);
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -136,29 +140,33 @@ void SetupScaling(int maxheight)
 }
 
 int weaponscale[NUMWEAPONS] = {SPR_KNIFEREADY,SPR_PISTOLREADY,SPR_MACHINEGUNREADY,SPR_CHAINREADY};
-
+#include <X11/Xlib.h>
+extern Display *dpy;
+extern Window win;
 void DrawPlayerWeapon()
 {
 	int shapenum;
-	
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
+	glEnable(GL_TEXTURE_2D);
 	if (gamestate.weapon != -1) {
 		shapenum = weaponscale[gamestate.weapon]+gamestate.weaponframe;
 		
-		glBindTexture(GL_TEXTURE_2D, waltex[0]);
+		glBindTexture(GL_TEXTURE_2D, waltex[1]);
 		glBegin(GL_QUADS);
 		glTexCoord2d(0.0,1.0); glVertex2d(-1.0,-1.0);
 		glTexCoord2d(1.0,1.0); glVertex2d(+1.0,-1.0);
 		glTexCoord2d(1.0,0.0); glVertex2d(+1.0,+1.0);
 		glTexCoord2d(0.0,0.0); glVertex2d(-1.0,+1.0);
 		glEnd();                                                                                                		
-	}	
+	}
+	glXSwapBuffers(dpy, win);	
 }
 
 void ThreeDRefresh()
 {	
 	int error;
 	
-	glViewport(xoffset, yoffset+viewheight, viewwidth, viewheight);
+	//glViewport(xoffset, yoffset+viewheight, viewwidth, viewheight);
 	
 	DrawPlayerWeapon();
 	

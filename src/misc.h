@@ -4,6 +4,9 @@
 extern int _argc;
 extern char **_argv;
 
+void SavePCX256ToFile(unsigned char *buf, int width, int height, unsigned char *pal, char *name);
+void SavePCXRGBToFile(unsigned char *buf, int width, int height, char *name);
+
 void set_TimeCount(unsigned long t);
 unsigned long get_TimeCount();
 

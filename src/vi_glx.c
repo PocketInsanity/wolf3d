@@ -29,8 +29,8 @@ int attrib[] = {
 	GLX_RED_SIZE,           5,
 	GLX_GREEN_SIZE,         5,
 	GLX_BLUE_SIZE,          5,
-	GLX_DEPTH_SIZE,         16,
-//	GLX_DOUBLEBUFFER,
+//	GLX_DEPTH_SIZE,         16,
+	GLX_DOUBLEBUFFER,
         None
 };
 
@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
 		printf("GLX_EXTENSIONS: %s\n", glXQueryExtensionsString(dpy, DefaultScreen(dpy)));
 	}
 	
-	vi = glXChooseVisual(dpy, DefaultScreen(dpy), attrib);
+	vi = glXChooseVisual(dpy, screen, attrib);
 	
 	if (vi == NULL) {
 		Quit("No suitable GL visual found!");
@@ -99,10 +99,11 @@ int main(int argc, char *argv[])
 	cmap = XCreateColormap(dpy, root, vi->visual, AllocNone);
 	                      	
 	attr.colormap = cmap;		   
+	attr.background_pixel = BlackPixel(dpy, screen);
 	attr.event_mask = KeyPressMask | KeyReleaseMask | ExposureMask |
 			  StructureNotifyMask;
-	attrmask = CWColormap | CWEventMask;
-	win = XCreateWindow(dpy, root, 0, 0, 320, 200, 0, CopyFromParent, 
+	attrmask = CWColormap | CWEventMask | CWBackPixel;
+	win = XCreateWindow(dpy, root, 0, 0, 320, 200, 0, vi->depth, 
 			    InputOutput, vi->visual, attrmask, &attr);
 	
 	if (win == None) {
@@ -132,16 +133,18 @@ int main(int argc, char *argv[])
 	cursor = XCreatePixmapCursor(dpy, bitmap, bitmap, &fg, &bg, 0, 0);
 	XDefineCursor(dpy, win, cursor);
 	
-	XFlush(dpy);
-	
 	glXMakeCurrent(dpy, win, ctx);
 	
+	XMapWindow(dpy, win);
+	
+	XFlush(dpy);
+		
 	printf("GL Library:\n");
 	printf("GL_VENDOR: %s\n", glGetString(GL_VENDOR));
 	printf("GL_RENDERER: %s\n", glGetString(GL_RENDERER));
 	printf("GL_VERSION: %s\n", glGetString(GL_VERSION));
 	printf("GL_EXTENSIONS: %s\n", glGetString(GL_EXTENSIONS));
-	
+
 	return WolfMain(argc, argv);
 }
 
@@ -173,7 +176,7 @@ void VL_Startup()
 	if (gfxbuf == NULL) 
 		gfxbuf = malloc(320 * 200 * 1);
 				   
-	XMapWindow(dpy, win);
+//	XMapWindow(dpy, win);
 	
 	glColor4f(0.0f, 0.0f, 0.0f, 0.0f);
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -184,7 +187,12 @@ void VL_Startup()
 	glLoadIdentity();
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-
+	glMatrixMode(GL_TEXTURE);
+	glLoadIdentity();
+	
+	glDisable(GL_CULL_FACE);
+	glDisable(GL_DEPTH_TEST);
+	
 	Init3D();		
 }
 
@@ -254,7 +262,7 @@ void VL_FillPalette(int red, int green, int blue)
 =================
 */
 
-void VL_SetPalette(byte *palette)
+void VL_SetPalette(const byte *palette)
 {
 }
 

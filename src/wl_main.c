@@ -753,7 +753,7 @@ int MS_CheckParm(char *check)
 			if (!*parm++)
 				break;          // hit end of string without an alphanum
 
-		if ( !strcasecmp(check,parm) )
+		if ( !stricmp(check,parm) )
 			return i;
 	}
 

@@ -14,7 +14,7 @@ void VL_WaitVBL(int vbls);
 void VW_UpdateScreen();
 
 void VL_FillPalette(int red, int green, int blue);
-void VL_SetPalette(byte *palette);
+void VL_SetPalette(const byte *palette);
 void VL_GetPalette(byte *palette);
 
 void VL_Plot(int x, int y, int color);

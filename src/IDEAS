@@ -3,11 +3,7 @@
 * A key to change viewsize while playing (note: max == 20, min == 5 or so...)
 * Game able to cope at any virtual resolution in software mode. OpenGL
   handles this transparently
-* Audio support using OpenAL
-  - Problem is, that SDL and OpenAL would need pthread, which with SVGAlib is
-    a no-go... oh well. Using DGA (if possible at 320x200) would fulfill the
-    desire for full screen mode, and SVGAlib users can deal with some sort
-    hackish sound support.
+* Audio support using OpenAL (somewhat decently supported at the moment)
 * Add support for the Mac version, if possible
 * Network support!
 * Fully compile with no warnings/errors using -Wall -ansi -pedantic and with
@@ -22,7 +18,8 @@
   code
 * Have some sort of way of playing both digital and adlib sounds on all
   platforms
-* Test with other (compatible) available mods
+* Test with other available mods (that were compatible with the original
+  game)
 * Unified input handling
 * Configuration files and save games which work regardless of operating
   system/processor/binary build

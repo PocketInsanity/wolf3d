@@ -111,7 +111,7 @@ void VL_FillPalette(int red, int green, int blue)
 =================
 */
 
-void VL_SetPalette(byte *palette)
+void VL_SetPalette(const byte *palette)
 {
 	int i;
 	
