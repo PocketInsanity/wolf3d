@@ -145,6 +145,35 @@ void *LoadAResource2(Word RezNum, LongWord Type)
 	exit(EXIT_FAILURE);
 }
 
+
+void *FindResource(Word RezNum, LongWord Type)
+{
+	ResItem *c = lr;
+	
+	while (c != NULL) {
+		if ( (c->type == Type) && (c->item == RezNum) ) {
+			if (c->buf == NULL) {
+				c->buf = malloc(c->size);
+				memcpy(c->buf, c->dat, c->size);
+			} else {
+				/* DEBUG: we want a fresh copy... */
+				printf("DEBUG: Item %ld/%d already loaded!\n", Type, RezNum);
+				free(c->buf);
+				c->buf = malloc(c->size);
+				memcpy(c->buf, c->dat, c->size);
+			}
+			
+			if (c->buf == NULL) 
+				Quit("MALLOC FAILED?");
+				
+			return c->buf;
+		}
+		c = c->next;		
+	}
+
+	return NULL;	
+}
+
 void ReleaseAResource2(Word RezNum, LongWord Type)
 {
 	ResItem *c = lr;

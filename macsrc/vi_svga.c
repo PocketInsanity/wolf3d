@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <getopt.h>
 
 #include <vga.h>
 #include <vgakeyboard.h>
@@ -30,24 +31,65 @@ Byte *gfxbuf;
 
 void keyboard_handler(int key, int press);
 
+int VidModes[] = { G320x200x256, G512x384x256, G640x400x256, G640x480x256 };
 
 int main(int argc, char *argv[])
 {
-	if (argc != 2) {
+	int opt, vidmode = 0;
+	int i;
+	
+	while ((opt = getopt(argc, argv, "s:")) != -1) {
+		switch(opt) {
+		case 's': /* Set video mode (resolution) */
+			vidmode = atoi(optarg);
+			if ((vidmode < 0) && (vidmode > 3)) {
+				fprintf(stderr, "Invalid video mode %d\n", vidmode);
+				exit(EXIT_FAILURE);
+			}
+			break;
+		case ':':
+			fprintf(stderr, "option needs a parameter: %c\n", optopt);
+			break;
+		case '?':
+			fprintf(stderr, "unknown option: %c\n", optopt);
+			break;
+		default:
+			fprintf(stderr, "%d (%c) is unknown to me\n", opt, opt);
+			break;
+		}
+	}
+	
+	if ((argc - optind) != 1) {
 		fprintf(stderr, "usage: %s <mac wolf3d resource fork>\n", argv[0]);
 		exit(EXIT_FAILURE);
 	}
 	
 	vga_init();
-	 
-	if (InitResources(argv[1])) {
-		fprintf(stderr, "could not load %s\n", argv[1]);
+	
+	if (!vga_hasmode(G320x200x256)) {
+		fprintf(stderr, "SVGAlib says 320x200x256 is not supported...\n");
+		exit(EXIT_FAILURE);
+	}
+	
+	for (i = 1; i < 4; i++) {
+		if (!vga_hasmode(VidModes[i]))
+			VidModes[i] = -1;
+	}
+	
+	if (VidModes[vidmode] == -1) {
+		fprintf(stderr, "Video mode %d is not supported...\n", vidmode);
+		exit(EXIT_FAILURE);
+	}
+	
+	if (InitResources(argv[optind])) {
+		fprintf(stderr, "could not load %s\n", argv[optind]);
 		exit(EXIT_FAILURE);
 	}
 	
 	InitData();
 	
-	NewGameWindow(0); /* 320x200 */
+	GameViewSize = vidmode;
+	NewGameWindow(GameViewSize);
 
 	keyboard_init(); /* keyboard must be init'd after vga_setmode .. */
 	keyboard_seteventhandler(keyboard_handler);
@@ -81,10 +123,9 @@ void SetPalette(Byte *pal)
 	int i;
 
 	vga_waitretrace();
-#ifndef NOVGA	
+
 	for (i = 0; i < 256; i++) 
 		vga_setpalette(i, pal[i*3+0] >> 2, pal[i*3+1] >> 2, pal[i*3+2] >> 2);	
-#endif
 }
 	
 void BlastScreen2(Rect *BlastRect)
@@ -97,21 +138,21 @@ int VidWidth, VidHeight, ViewHeight;
 #define h VidHeight
 #define v ViewHeight
 
+int vh, vw;
+
 void BlastScreen()
 {
-	Byte *ptrs = gfxbuf, *ptrd = graph_mem;
- 	int i;
+	Byte *ptrs = gfxbuf, *ptrd = vga_getgraphmem();
+ 	int i, hm, wm;
 
-#ifndef NOVGA	
-
-	for (i = 0; i < 200; i++) {
-		memcpy(ptrd, ptrs, 320);
+	wm = (w > vw) ? vw : w;
+	hm = (h > vh) ? vh : h;
+	
+	for (i = 0; i < hm; i++) {
+		memcpy(ptrd, ptrs, wm);
 		ptrs += w;
-		ptrd += 320;
+		ptrd += vw;
 	}
-
-/*	memcpy(ptrd, ptrs, w * h); */
-#endif
 }
 
 Word VidXs[] = {320,512,640,640};       /* Screen sizes to play with */
@@ -119,8 +160,7 @@ Word VidYs[] = {200,384,400,480};
 Word VidVs[] = {160,320,320,400};
 Word VidPics[] = {rFaceShapes,rFace512,rFace640,rFace640};
 Word VidSize = -1;
-
-int VidModes[] = { G320x200x256, G512x384x256, G640x400x256, G640x480x256 };
+Word x512Hack = 0;
 
 Word NewGameWindow(Word NewVidSize)
 {
@@ -128,37 +168,57 @@ Word NewGameWindow(Word NewVidSize)
 	Byte *DestPtr;
 	int i;
 	
-	printf("Called: %d\n", NewVidSize);
-	
-	if (NewVidSize == VidSize)
-		return VidSize;
-	
-	printf("Setting Size: %d (from %d)\n", NewVidSize, VidSize);
-		
-	if (NewVidSize < 4) {
-		w = VidXs[NewVidSize];
-		h = VidYs[NewVidSize];
-		v = VidVs[NewVidSize];
-	} else {
-		fprintf(stderr, "Vid size: %d\n", NewVidSize);
+	/* printf("Called: %d\n", NewVidSize); */
+
+	if (NewVidSize == -1) {
+		fprintf(stderr, "Invalid vid size: %d\n", NewVidSize);
 		exit(EXIT_FAILURE);
+	}	
+	
+	if (!x512Hack && (NewVidSize == VidSize))
+		return VidSize;
+
+	if ((NewVidSize == 1) && (VidModes[1] == -1)) {		
+		if (VidSize == -1) {
+			fprintf(stderr, "Trying to set 512Hack before setting a real value!\n");
+			exit(EXIT_FAILURE);
+		}
+		
+		if (x512Hack)
+			return VidSize;
+			
+		x512Hack = 1;
+	} else {
+		x512Hack = 0;
 	}
 	
+ 	/* printf("Setting Size: %d (from %d)\n", NewVidSize, VidSize); */
+		
+	if (NewVidSize < 4) {
+		if (!x512Hack && VidModes[NewVidSize] == -1) {
+			fprintf(stderr, "Trying to set to an unsupported mode (%d)!\n", NewVidSize);
+			exit(EXIT_FAILURE);
+		}
+		w = VidXs[NewVidSize];
+		h = VidYs[NewVidSize];
+		v = VidVs[NewVidSize];	
+	} else {
+		fprintf(stderr, "Invalid vid size: %d\n", NewVidSize);
+		exit(EXIT_FAILURE);
+	}
+
 	if (gfxbuf)
 		free(gfxbuf);
 		
 	gfxbuf = (Byte *)malloc(w * h);
 	
-#ifndef NOVGA	
-/*
-	if (!vga_hasmode(VidModes[NewVidSize]))
-		Quit("SVGAlib does not support this mode");
-				
-	vga_setmode(VidModes[NewVidSize]);
-	vga_setlinearaddressing();
-*/
-	vga_setmode(G320x200x256);
-#endif
+	if (!x512Hack) {
+		vw = w;
+		vh = h;
+		vga_setmode(VidModes[NewVidSize]);
+		vga_setlinearaddressing();
+		vga_clear();
+	}
 	
 	VideoPointer = gfxbuf;
 	VideoWidth = w;
@@ -167,7 +227,7 @@ Word NewGameWindow(Word NewVidSize)
 	ClearTheScreen(BLACK);
 	BlastScreen();
 	
-	LongPtr = (LongWord *) LoadAResource(VidPics[NewVidSize]);
+	LongPtr = (LongWord *)LoadAResource(VidPics[NewVidSize]);
 
 	if (GameShapes)
 		FreeSomeMem(GameShapes);

@@ -607,9 +607,9 @@ void P_DrawSeg (saveseg_t *seg)
 	Word	door;
 	door_t	*door_p;
 	unsigned short	span, tspan;
-	unsigned short	angle1, angle2;
+	unsigned short	angle1 = 0, angle2 = 0;
 	int		texslide;
-	int		distance;
+	int		distance = 0;
 	
 	if (seg->dir & DIR_DISABLEDFLAG) {	/* Segment shut down? */
 		return;		/* pushwall part*/

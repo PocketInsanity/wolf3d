@@ -117,6 +117,7 @@ void FixMapList(maplist_t *m)
 
 void InitData()
 {	
+
 /*
 InitSoundMusicSystem(8,8,5, 11025);
 SoundListPtr = (Word *) LoadAResource(MySoundList);	

@@ -124,7 +124,7 @@ void DrawAutomap(Word tx,Word ty)
 {
 	Word i, tile;
 	saveseg_t *seg;
-	Word x,y,xstep,ystep,count;
+	Word x = 0, y = 0, xstep = 0, ystep = 0, count;
 	Word min,max;
 	Word maxtx, maxty;
 	Word NodeCount;
@@ -378,7 +378,7 @@ void NewMap(void)
 void StartPushWall(void)
 {
 	Word i;
-	Word segdir,segplane,segmin;
+	Word segdir = 0, segplane = 0, segmin = 0;
 	saveseg_t *SavePtr;				/* Temp pointer */
 
 	pwallseg = 0;	/* No pushwalls in progress */

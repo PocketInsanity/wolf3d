@@ -70,12 +70,12 @@ int main(int argc, char *argv[])
 	
 	while ((opt = getopt(argc, argv, "v")) != -1) {
 		switch(opt) {
-			case 'v':
-				verbose = 1;
-				break;
-			default:
-				fprintf(stderr, "%d (%c) is unknown to me\n", opt, opt);
-				break;
+		case 'v':
+			verbose = 1;
+			break;
+		default:
+			fprintf(stderr, "%d (%c) is unknown to me\n", opt, opt);
+			break;
 		}
 	}
 	

@@ -888,8 +888,8 @@ void P_DrawSeg(saveseg_t *seg)
 	Word	segplane;
 	Word    door;
 	door_t  *door_p;
-	unsigned short	span, tspan;
-	unsigned short	angle1, angle2;
+	unsigned short span, tspan;
+	unsigned short angle1 = 0, angle2 = 0;
 	
 	WallSeen = 0;
 	
