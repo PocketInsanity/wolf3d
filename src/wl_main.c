@@ -523,7 +523,7 @@ int ReadSaveTag(char *fn, char *tag)
 		goto rstfail;
 	
 	v = ReadInt32(fd);
-	if (v != 0xFFFFFFFF)
+	if (v != 0xFFFFFFFF && v != 0x00000000) /* -1 and 0 are the same */
 		goto rstfail;
 	
 	ReadBytes(fd, (byte *)buf, 4);
