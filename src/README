@@ -4,6 +4,8 @@ NOTE: save games and configuration files now have version fields. Version
 0xFFFFFFFF is only for non-release/debug/snapshot versions (in other words, 
 the file formats may change at any time).
 
+NOTE: This requires SDL 1.2 (http://www.libsdl.org)
+
 How to use:
 
 About:
@@ -21,4 +23,5 @@ Thanks:
 
 -----
 Steven Fuller
-relnev@atdot.org
+relnev@icculus.org
+

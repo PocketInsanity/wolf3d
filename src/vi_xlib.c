@@ -627,6 +627,15 @@ static int XKeysymToScancode(KeySym keysym)
 	}
 }
 
+byte IN_MouseButtons()
+{
+	return 0;
+}
+
+void IN_GetMouseDelta(int *dx, int *dy)
+{
+}
+
 void INL_Update()
 {
 	HandleXEvents();

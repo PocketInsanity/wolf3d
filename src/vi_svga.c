@@ -205,6 +205,15 @@ void keyboard_handlerx(int code, int press)
 	keyboard_handler(SVGALibToScancode(code), press);
 }
 
+byte IN_MouseButtons()
+{
+	return 0;
+}
+
+void IN_GetMouseDelta(int *dx, int *dy)
+{
+}
+
 void INL_Update()
 {
 	while (keyboard_update()) ; /* get all events */

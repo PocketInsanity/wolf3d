@@ -24,11 +24,11 @@ OBJS += sd_null.o
 #CFLAGS += -D_REENTRANT
 #LFLAGS += -lpthread
 
-CFLAGS += `sdl-config --cflags`
+CFLAGS += $(shell sdl-config --cflags)
 
 SLFLAGS = $(LFLAGS) -lvga
 XLFLAGS = $(LFLAGS) -L/usr/X11R6/lib -lX11 -lXext
-DLFLAGS = $(LFLAGS) `sdl-config --libs` -L/usr/X11R6/lib -lX11 -lXext
+DLFLAGS = $(LFLAGS) $(shell sdl-config --libs) -L/usr/X11R6/lib -lX11 -lXext
 
 NASM = nasm
 
