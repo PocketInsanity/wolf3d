@@ -815,6 +815,17 @@ static void PML_ClosePageFile()
 		CloseRead(PageFile);
 		
 	if (PMPages) {
+		int i;
+		
+		for (i = 0; i < ChunksInFile; i++) {
+			PageListStruct *page;
+			
+			page = &PMPages[i];
+			if (page->addr != NULL) {
+				MM_FreePtr((memptr)&page->addr);
+			}
+		}
+		
 		MM_SetLock((memptr)&PMPages,false);
 		MM_FreePtr((memptr)&PMPages);
 	}
