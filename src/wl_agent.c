@@ -1,5 +1,3 @@
-/* wl_agent.c */
-
 #include "wl_def.h"
 
 /*

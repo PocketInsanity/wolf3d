@@ -1,5 +1,3 @@
-/* wl_main.c */
-
 #include "wl_def.h"
 
 /*
@@ -1214,7 +1212,7 @@ void DemoLoop()
 
 			CA_UnCacheGrChunk (TITLEPALETTE);
 #else
-			CA_CacheScreen (TITLEPIC);
+			VL_CacheScreen(TITLEPIC);
 			VW_UpdateScreen ();
 			VW_FadeIn();
 #endif
@@ -1224,7 +1222,7 @@ void DemoLoop()
 //
 // credits page
 //
-			CA_CacheScreen (CREDITSPIC);
+			VL_CacheScreen(CREDITSPIC);
 			VW_UpdateScreen();
 			VW_FadeIn ();
 			if (IN_UserInput(TickBase*10))

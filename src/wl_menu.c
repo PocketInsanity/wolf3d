@@ -9,7 +9,7 @@
 //
 // PRIVATE PROTOTYPES
 //
-void CP_ReadThis(void);
+void CP_ReadThis();
 
 #ifdef UPLOAD
 #define STARTITEM	readthis
@@ -17,19 +17,8 @@ void CP_ReadThis(void);
 #define STARTITEM	newgame
 #endif
 
-char endStrings[9][80]=
+static char endStrings[9][80]=
 {
-#ifndef SPEAR
-	{"Dost thou wish to\nleave with such hasty\nabandon?"},
-	{"Chickening out...\nalready?"},
-	{"Press N for more carnage.\nPress Y to be a weenie."},
-	{"So, you think you can\nquit this easily, huh?"},
-	{"Press N to save the world.\nPress Y to abandon it in\nits hour of need."},
-	{"Press N if you are brave.\nPress Y to cower in shame."},
-	{"Heroes, press N.\nWimps, press Y."},
-	{"You are at an intersection.\nA sign says, 'Press Y to quit.'\n>"},
-	{"For guns and glory, press N.\nFor work and worry, press Y."}
-#else
 	ENDSTR1,
 	ENDSTR2,
 	ENDSTR3,
@@ -39,7 +28,6 @@ char endStrings[9][80]=
 	ENDSTR7,
 	ENDSTR8,
 	ENDSTR9
-#endif
 };
 
 CP_iteminfo
@@ -155,14 +143,13 @@ CusMenu[]=
 	{1,"",0},
 	{0,"",0},
 	{1,"",0}
-}
-;
+};
 
 
-int color_hlite[] = { DEACTIVE, HIGHLIGHT, READHCOLOR, 0x67 };
-int color_norml[] = { DEACTIVE, TEXTCOLOR, READCOLOR, 0x6b };
+static int color_hlite[] = { DEACTIVE, HIGHLIGHT, READHCOLOR, 0x67 };
+static int color_norml[] = { DEACTIVE, TEXTCOLOR, READCOLOR, 0x6b };
 
-int EpisodeSelect[6]={1};
+static int EpisodeSelect[6]={1};
 
 
 int SaveGamesAvail[10],StartGame,SoundStatus=1,pickquick;
@@ -328,8 +315,7 @@ void US_ControlPanel(byte scancode)
 	{
 		which=HandleMenu(&MainItems,&MainMenu[0],NULL);
 
-		#ifdef SPEAR
-		#ifndef SPEARDEMO
+		#if defined(SPEAR) && !defined(SPEARDEMO)
 		//
 		// EASTER EGG FOR SPEAR OF DESTINY!
 		//
@@ -351,8 +337,8 @@ void US_ControlPanel(byte scancode)
 
 			VW_UpdateScreen();
 
-			CA_CacheGrChunk (IDGUYSPALETTE);
-			VL_FadeIn(0,255,grsegs[IDGUYSPALETTE],30);
+			CA_CacheGrChunk(IDGUYSPALETTE);
+			VL_FadeIn(0, 255, grsegs[IDGUYSPALETTE], 30);
 			CA_UnCacheGrChunk(IDGUYSPALETTE);
 
 			while (IN_KeyDown(sc_I) || IN_KeyDown(sc_D)) IN_CheckAck();
@@ -368,7 +354,6 @@ void US_ControlPanel(byte scancode)
 			StartCPMusic (MENUSONG);
 			MenuFadeIn();
 		}
-		#endif
 		#endif
 
 		switch(which)
@@ -463,7 +448,7 @@ void US_ControlPanel(byte scancode)
 //
 // DRAW MAIN MENU SCREEN
 //
-void DrawMainMenu(void)
+void DrawMainMenu()
 {
 	ClearMScreen();
 
@@ -500,7 +485,7 @@ void DrawMainMenu(void)
 // READ THIS!
 //
 ////////////////////////////////////////////////////////////////////
-void CP_ReadThis(void)
+void CP_ReadThis()
 {
 	StartCPMusic(CORNER_MUS);
 	HelpScreens();
@@ -512,7 +497,7 @@ void CP_ReadThis(void)
 // BOSS KEY
 //
 ////////////////////////////////////////////////////////////////////
-void BossKey(void)
+void BossKey()
 {
 }
 #endif
@@ -709,7 +694,7 @@ int CP_CheckQuick(unsigned scancode)
 // END THE CURRENT GAME
 //
 ////////////////////////////////////////////////////////////////////
-int CP_EndGame(void)
+int CP_EndGame()
 {
 	if (!Confirm(ENDGAMESTR))
 		return 0;
@@ -730,19 +715,19 @@ int CP_EndGame(void)
 // VIEW THE HIGH SCORES
 //
 ////////////////////////////////////////////////////////////////////
-void CP_ViewScores(void)
+void CP_ViewScores()
 {
 	fontnumber=0;
 
 #ifdef SPEAR
-	UnCacheLump (OPTIONS_LUMP_START,OPTIONS_LUMP_END);
-	StartCPMusic (XAWARD_MUS);
+	UnCacheLump(OPTIONS_LUMP_START,OPTIONS_LUMP_END);
+	StartCPMusic(XAWARD_MUS);
 #else
-	StartCPMusic (ROSTER_MUS);
+	StartCPMusic(ROSTER_MUS);
 #endif
 
-	DrawHighScores ();
-	VW_UpdateScreen ();
+	DrawHighScores();
+	VW_UpdateScreen();
 	MenuFadeIn();
 	fontnumber=1;
 
@@ -763,7 +748,7 @@ void CP_ViewScores(void)
 // START A NEW GAME
 //
 ////////////////////////////////////////////////////////////////////
-void CP_NewGame(void)
+void CP_NewGame()
 {
 	int which,episode;
 
@@ -1460,7 +1445,7 @@ int CP_SaveGame(int quick)
 // CALIBRATE JOYSTICK
 //
 ////////////////////////////////////////////////////////////////////
-int CalibrateJoystick(void)
+int CalibrateJoystick()
 {
 	#define CALX	85
 	#define CALY	40
@@ -1547,7 +1532,7 @@ int CalibrateJoystick(void)
 // DEFINE CONTROLS
 //
 ////////////////////////////////////////////////////////////////////
-void CP_Control(void)
+void CP_Control()
 {
 	enum {MOUSEENABLE,JOYENABLE,USEPORT2,PADENABLE,MOUSESENS,CUSTOMIZE};
 	int which;
@@ -1613,7 +1598,7 @@ void CP_Control(void)
 //
 // DRAW MOUSE SENSITIVITY SCREEN
 //
-void DrawMouseSens(void)
+void DrawMouseSens()
 {
 	ClearMScreen();
 	VWB_DrawPic(112,184,C_MOUSELBACKPIC);
@@ -1646,7 +1631,7 @@ void DrawMouseSens(void)
 //
 // ADJUST MOUSE SENSITIVITY
 //
-void MouseSensitivity(void)
+void MouseSensitivity()
 {
 	ControlInfo ci;
 	int exit=0,oldMA;

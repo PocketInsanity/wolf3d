@@ -1,5 +1,3 @@
-/* wl_play.c */
-
 #include "wl_def.h"
 
 /*

@@ -18,16 +18,25 @@ Just some random facts/thoughts/ideas/musings:
 
 * Unofficial ports:
   - Linux (this, xwolf, wolfgl)
+    XWolf: http://www.sirius.demon.co.uk/xwolf/
   - Amiga (port of my first pc wolf3d linux port)
+    [http://www.silab.dsi.unimi.it/~cs556770/wolf3d/]
   - Windows (wolfgl) [http://www.sourceforge.net/projects/wolfgl/]
   - Acorn/Archemedes
  
 * PC source released on:
   - now many ports, projects, etc
   - urls
+  - http://www.abraxis.com/brucel/wolf3d.html
+  - http://www.wolf3dbunker.com
 * Macintosh source released January 22(?), 2000
   - url
 * TED source (editor used for tons of games including wolf3d)
+
+* Games which used the Wolfenstein 3D Engine:
+  - Blake Stone
+  - Corridor 7
+  - Operation Body Count
 
 Wolfenstein 3D was originally planned to be a much more complex game. ...
 ... lots of unused code ... possibly from previous projects and incarnations

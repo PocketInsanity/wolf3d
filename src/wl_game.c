@@ -1,5 +1,3 @@
-/* wl_game.c */
-
 #include "wl_def.h"
 
 /*
@@ -477,14 +475,14 @@ void SetupGameLevel()
 //
 // load the level
 //
-	CA_CacheMap (gamestate.mapon+10*gamestate.episode);
+	CA_CacheMap(gamestate.mapon+10*gamestate.episode);
 	mapon-=gamestate.episode*10;
 
 	mapwidth = mapheaderseg[mapon]->width;
 	mapheight = mapheaderseg[mapon]->height;
 
 	if (mapwidth != 64 || mapheight != 64)
-		Quit ("Map not 64*64!");
+		Quit("Map not 64*64!");
 
 
 //
@@ -503,7 +501,7 @@ void SetupGameLevel()
 				(unsigned)actorat[x][y] = tile;
 			} else { // area floor
 				tilemap[x][y] = 0;
-				(unsigned)actorat[x][y] = 0;
+				actorat[x][y] = NULL;
 			}
 		}
 
@@ -547,7 +545,7 @@ void SetupGameLevel()
 //
 // spawn actors
 //
-	ScanInfoPlane ();
+	ScanInfoPlane();
 
 //
 // take out the ambush markers
@@ -576,14 +574,7 @@ void SetupGameLevel()
 			}
 		}
 
-
-
-//
-// have the caching manager load and purge stuff to make sure all marks
-// are in memory
-//
 	CA_LoadAllSounds();
-
 }
 
 
@@ -740,8 +731,6 @@ void FinishDemoRecord()
 	MM_FreePtr(&demobuffer);
 }
 
-//==========================================================================
-
 /*
 ==================
 =
@@ -805,8 +794,6 @@ void RecordDemo()
 
 	FinishDemoRecord ();
 }
-
-//==========================================================================
 
 /*
 ==================

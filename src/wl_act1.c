@@ -1,5 +1,3 @@
-/* wl_act1.c */
-
 #include "wl_def.h"
 
 /*
@@ -182,7 +180,6 @@ void SpawnStatic(int tilex, int tiley, int type)
 		Quit ("Too many static objects!\n");
 }
 
-
 /*
 ===============
 =
@@ -238,8 +235,6 @@ void PlaceItemType(int itemtype, int tilex, int tiley)
 	spot->itemnumber = statinfo[type].type;
 }
 
-
-
 /*
 =============================================================================
 
@@ -265,7 +260,6 @@ Every time a door opens or closes the areabyplayer matrix gets recalculated.
 =============================================================================
 */
 
-#define DOORWIDTH	0x7800
 #define OPENTICS	300
 
 doorobj_t	doorobjlist[MAXDOORS],*lastdoorobj;
@@ -303,7 +297,6 @@ void RecursiveConnect(int areanumber)
 	}
 }
 
-
 void ConnectAreas()
 {
 	memset(areabyplayer, 0, sizeof(areabyplayer));
@@ -311,14 +304,11 @@ void ConnectAreas()
 	RecursiveConnect(player->areanumber);
 }
 
-
 void InitAreas()
 {
 	memset(areabyplayer, 0, sizeof(areabyplayer));
 	areabyplayer[player->areanumber] = true;
 }
-
-
 
 /*
 ===============
@@ -330,13 +320,12 @@ void InitAreas()
 
 void InitDoorList()
 {
-	memset (areabyplayer,0,sizeof(areabyplayer));
-	memset (areaconnect,0,sizeof(areaconnect));
+	memset(areabyplayer, 0, sizeof(areabyplayer));
+	memset(areaconnect, 0, sizeof(areaconnect));
 
 	lastdoorobj = &doorobjlist[0];
 	doornum = 0;
 }
-
 
 /*
 ===============
@@ -385,8 +374,6 @@ void SpawnDoor(int tilex, int tiley, boolean vertical, int lock)
 	lastdoorobj++;
 }
 
-//===========================================================================
-
 /*
 =====================
 =
@@ -402,7 +389,6 @@ void OpenDoor(int door)
 	else
 		doorobjlist[door].action = dr_opening;	// start it opening
 }
-
 
 /*
 =====================
@@ -481,8 +467,6 @@ void CloseDoor(int door)
 		= door | 0x80;
 }
 
-
-
 /*
 =====================
 =
@@ -519,9 +503,6 @@ void OperateDoor(int door)
 		break;
 	}
 }
-
-
-//===========================================================================
 
 /*
 ===============

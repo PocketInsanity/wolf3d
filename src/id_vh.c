@@ -1,5 +1,3 @@
-/* id_vh.c */
-
 #include "id_heads.h"
 
 /* ======================================================================== */
@@ -253,4 +251,11 @@ void VL_FadeIn(int start, int end, const byte *palette, int steps)
 //
 	VL_SetPalette(palette);
 	screenfaded = false;
+}
+
+void VL_CacheScreen(int chunk)
+{
+	CA_CacheGrChunk(chunk);
+	VL_MemToScreen(grsegs[chunk], 320, 200, 0, 0);
+	CA_UnCacheGrChunk(chunk);
 }

@@ -26,7 +26,7 @@ extern	byte	fontcolor;
 extern	int	fontnumber;
 extern	int	px,py;
 
-void VW_UpdateScreen (void);
+void VW_UpdateScreen();
 
 void VWB_DrawTile8(int x, int y, int tile);
 void VWB_DrawPic(int x, int y, int chunknum);
@@ -52,6 +52,8 @@ void VL_FadeOut(int start, int end, int red, int green, int blue, int steps);
 void VL_FadeIn(int start, int end, const byte *palette, int steps);
 
 void LatchDrawPic(unsigned x, unsigned y, unsigned picnum);
-void LoadLatchMem(void);
+void LoadLatchMem();
+
+void VL_CacheScreen(int chunk);
 
 #endif

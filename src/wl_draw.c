@@ -266,7 +266,11 @@ static int CalcRotate(objtype *ob)
 =====================
 */
 
-#define MAXVISABLE	64
+#ifdef DUMBTEST
+#define MAXVISABLE	640
+#else
+#define MAXVISABLE      64
+#endif
 
 typedef struct {
 	int viewx;
@@ -1252,5 +1256,7 @@ passhoriz:
 	xintercept += xstep;
 	goto horizcheck;
 }
-
+#ifdef DUMBTEST
+	memset(spotvis, 1, sizeof(spotvis));
+#endif
 }

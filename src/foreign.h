@@ -1,9 +1,6 @@
 #ifndef __FOREIGN_H__
 #define __FOREIGN_H__
 
-#define QUITSUR	"Are you sure you want\n"\
-		"to quit this great game?"
-
 #define CURGAME	"You are currently in\n"\
 		"a game. Continuing will\n"\
 		"erase old game. Ok?"
@@ -126,6 +123,18 @@
 #define STR_ENDGAME2	"You have served your country well."
 #define STR_ENDGAME3	"With the spear gone, the Allies will finally"
 #define STR_ENDGAME4	"by able to destroy Hitler..."
+
+#else
+
+#define ENDSTR1 "Dost thou wish to\nleave with such hasty\nabandon?"
+#define ENDSTR2 "Chickening out...\nalready?"
+#define ENDSTR3 "Press N for more carnage.\nPress Y to be a weenie."
+#define ENDSTR4 "So, you think you can\nquit this easily, huh?"
+#define ENDSTR5 "Press N to save the world.\nPress Y to abandon it in\nits hour of need."
+#define ENDSTR6 "Press N if you are brave.\nPress Y to cower in shame."
+#define ENDSTR7 "Heroes, press N.\nWimps, press Y."
+#define ENDSTR8 "You are at an intersection.\nA sign says, 'Press Y to quit.'\n>"
+#define ENDSTR9 "For guns and glory, press N.\nFor work and worry, press Y."
 #endif
 
 #endif

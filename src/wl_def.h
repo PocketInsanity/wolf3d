@@ -1056,7 +1056,6 @@ void SpawnBJVictory(void);
 
 void SpawnStand (enemy_t which, int tilex, int tiley, int dir);
 void SpawnPatrol (enemy_t which, int tilex, int tiley, int dir);
-void KillActor (objtype *ob);
 
 void US_ControlPanel(byte);
 

@@ -1,6 +1,6 @@
-/* wl_text.c */
-
 #include "wl_def.h"
+
+#ifndef SPEAR
 
 /*
 =============================================================================
@@ -23,8 +23,6 @@ TEXT FORMATTING COMMANDS
 
 =============================================================================
 */
-
-#ifndef SPEAR
 
 #define BACKCOLOR		0x11
 
@@ -151,7 +149,7 @@ void ParseTimedCommand()
 =====================
 */
 
-void TimedPicCommand (void)
+void TimedPicCommand()
 {
 	ParseTimedCommand ();
 
@@ -181,7 +179,7 @@ void TimedPicCommand (void)
 =====================
 */
 
-void HandleCommand (void)
+void HandleCommand()
 {
 	int	i,margin,top,bottom;
 	int	picwidth,picheight,picmid;
@@ -284,7 +282,7 @@ void HandleCommand (void)
 =====================
 */
 
-void NewLine (void)
+void NewLine()
 {
 	char	ch;
 
@@ -324,7 +322,7 @@ void NewLine (void)
 =====================
 */
 
-void HandleCtrls (void)
+void HandleCtrls()
 {
 	char	ch;
 
@@ -406,7 +404,7 @@ void HandleWord()
 =====================
 */
 
-void PageLayout (boolean shownumber)
+void PageLayout(boolean shownumber)
 {
 	int		i,oldfontcolor;
 	char	ch;
@@ -418,11 +416,11 @@ void PageLayout (boolean shownumber)
 //
 // clear the screen
 //
-	VW_Bar (0,0,320,200,BACKCOLOR);
-	VWB_DrawPic (0,0,H_TOPWINDOWPIC);
-	VWB_DrawPic (0,8,H_LEFTWINDOWPIC);
-	VWB_DrawPic (312,8,H_RIGHTWINDOWPIC);
-	VWB_DrawPic (8,176,H_BOTTOMINFOPIC);
+	VW_Bar(0,0,320,200,BACKCOLOR);
+	VWB_DrawPic(0,0,H_TOPWINDOWPIC);
+	VWB_DrawPic(0,8,H_LEFTWINDOWPIC);
+	VWB_DrawPic(312,8,H_RIGHTWINDOWPIC);
+	VWB_DrawPic(8,176,H_BOTTOMINFOPIC);
 
 
 	for (i=0;i<TEXTROWS;i++)
@@ -503,7 +501,7 @@ void PageLayout (boolean shownumber)
 =====================
 */
 
-void BackPage (void)
+void BackPage()
 {
 	pagenum--;
 	do
@@ -528,7 +526,7 @@ void BackPage (void)
 =
 =====================
 */
-void CacheLayoutGraphics (void)
+void CacheLayoutGraphics()
 {
 	char	*bombpoint, *textstart;
 	char	ch;
@@ -652,9 +650,7 @@ void ShowArticle(char *article)
 //===========================================================================
 
 int endextern = T_ENDART1;
-#ifndef SPEAR
 int helpextern = T_HELPART;
-#endif
 
 /*
 =================

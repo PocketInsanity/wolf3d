@@ -726,31 +726,12 @@ void CA_UnCacheGrChunk(int chunk)
 	grsegs[chunk] = 0;
 }
 
-/*
-======================
-=
-= CA_CacheScreen
-=
-= Decompresses a chunk from disk straight onto the screen
-=
-======================
-*/
-
-void CA_CacheScreen(int chunk)
-{
-	CA_CacheGrChunk(chunk);
-	VL_MemToScreen(grsegs[chunk], 320, 200, 0, 0);
-	CA_UnCacheGrChunk(chunk);
-}
-
 /* ======================================================================== */
 
 /*
 ======================
 =
 = CA_CacheMap
-=
-= WOLF: This is specialized for a 64*64 map size
 =
 ======================
 */

@@ -1,5 +1,3 @@
-/* wl_inter.c */
-
 #include "wl_def.h"
 
 //==========================================================================
@@ -23,36 +21,37 @@ void ClearSplitVWB()
 
 //==========================================================================
 
-#ifdef SPEAR
-#ifndef SPEARDEMO
+#if defined(SPEAR) && !defined(SPEARDEMO)
 ////////////////////////////////////////////////////////
 //
 // End of Spear of Destiny
 //
 ////////////////////////////////////////////////////////
 
-void EndScreen (int palette, int screen)
+void EndScreen(int palette, int screen)
 {
-	CA_CacheScreen (screen);
-	VW_UpdateScreen ();
-	CA_CacheGrChunk (palette);
-	VL_FadeIn(0,255,grsegs[palette],30);
-	CA_UnCacheGrChunk (palette);
-	IN_ClearKeysDown ();
-	IN_Ack ();
-	VW_FadeOut ();
+	VL_CacheScreen(screen);
+	VW_UpdateScreen();
+	CA_CacheGrChunk(palette);
+	VL_FadeIn(0, 255, grsegs[palette], 30);
+	CA_UnCacheGrChunk(palette);
+	
+	IN_ClearKeysDown();
+	IN_Ack();
+	VW_FadeOut();
 }
 
 
-void EndSpear(void)
+void EndSpear()
 {
-	EndScreen (END1PALETTE, ENDSCREEN11PIC);
+	EndScreen(END1PALETTE, ENDSCREEN11PIC);
 
-	CA_CacheScreen (ENDSCREEN3PIC);
-	VW_UpdateScreen ();
-	CA_CacheGrChunk (END3PALETTE);
-	VL_FadeIn(0,255,grsegs[END3PALETTE],30);
-	CA_UnCacheGrChunk (END3PALETTE);
+	VL_CacheScreen(ENDSCREEN3PIC);
+	VW_UpdateScreen();
+	CA_CacheGrChunk(END3PALETTE);
+	VL_FadeIn(0, 255, grsegs[END3PALETTE], 30);
+	CA_UnCacheGrChunk(END3PALETTE);
+	
 	fontnumber = 0;
 	fontcolor = 0xd0;
 	WindowX = 0;
@@ -90,7 +89,6 @@ void EndSpear(void)
 	MainMenu[savegame].active = 0;
 }
 #endif
-#endif
 
 //==========================================================================
 
@@ -116,7 +114,7 @@ void Victory()
 
 
 #ifdef SPEAR
-	StartCPMusic (XTHEEND_MUS);
+	StartCPMusic(XTHEEND_MUS);
 
 	CA_CacheGrChunk(BJCOLLAPSE1PIC);
 	CA_CacheGrChunk(BJCOLLAPSE2PIC);

@@ -1,5 +1,3 @@
-/* id_sd.c */
-
 #include "id_heads.h"
 
 boolean SoundSourcePresent, AdLibPresent, SoundBlasterPresent;
@@ -159,18 +157,6 @@ boolean SD_MusicPlaying()
 	return false;
 }
 
-//===========================================================================
-
-/*
-==========================
-=
-= SetSoundLocGlobal - Sets up globalsoundx & globalsoundy and then calls
-=	UpdateSoundLoc() to transform that into relative channel volumes. Those
-=	values are then passed to the Sound Manager so that they'll be used for
-=	the next sound played (if possible).
-=
-==========================
-*/
 void PlaySoundLocGlobal(word s,fixed gx,fixed gy)
 {
 	SD_PlaySound(s);

@@ -48,8 +48,6 @@ void CA_UnCacheGrChunk(int chunk);
 void CA_UpLevel();
 void CA_DownLevel();
 
-void CA_CacheScreen(int chunk);
-
 /* ======================================================================= */
 
 void MM_Startup();

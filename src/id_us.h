@@ -14,20 +14,19 @@ typedef	struct {
 
 #define	MaxString	128	// Maximum input string size
 
-extern	boolean		ingame,		// Set by game code if a game is in progress
-			loadedgame,	// Set if the current game was loaded
-			NoWait;
+extern	boolean NoWait;
 extern	word		PrintX,PrintY;	// Current printing location in the window
 extern	word		WindowX,WindowY,// Current location of window
 			WindowW,WindowH;// Current size of window
 
-extern	void		(*USL_MeasureString)(char *,word *,word *),
-					(*USL_DrawString)(char *);
+#define USL_MeasureString       VW_MeasurePropString
+#define USL_DrawString          VW_DrawPropString
+
 
 extern	HighScore	Scores[];
 
-void US_Startup(void),
-				US_Shutdown(void),
+void US_Startup(),
+				US_Shutdown(),
 				US_InitRndT(boolean randomize),
 				US_DrawWindow(word x,word y,word w,word h),
 				US_ClearWindow(void),

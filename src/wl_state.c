@@ -1,5 +1,3 @@
-/* wl_state.c */
-
 #include "wl_def.h"
 
 /*
@@ -27,19 +25,7 @@ static dirtype diagonal[9][9] =
 			{nodir,nodir,nodir,nodir,nodir,nodir,nodir,nodir,nodir}
 };
 
-
-void	SpawnNewObj (unsigned tilex, unsigned tiley, statetype *state);
-void	NewState (objtype *ob, statetype *state);
-
-boolean TryWalk (objtype *ob);
-void	MoveObj (objtype *ob, long move);
-
-void	KillActor (objtype *ob);
-void	DamageActor (objtype *ob, unsigned damage);
-
-boolean CheckLine (objtype *ob);
 void FirstSighting (objtype *ob);
-boolean	CheckSight (objtype *ob);
 
 //===========================================================================
 
@@ -56,9 +42,10 @@ boolean	CheckSight (objtype *ob);
 ===================
 */
 
-void SpawnNewObj (unsigned tilex, unsigned tiley, statetype *state)
+void SpawnNewObj(unsigned tilex, unsigned tiley, statetype *state)
 {
-	GetNewActor ();
+	GetNewActor();
+	
 	new->state = state;
 	if (state->tictime)
 		new->ticcount = US_RndT () % state->tictime;
@@ -76,8 +63,6 @@ void SpawnNewObj (unsigned tilex, unsigned tiley, statetype *state)
 		*(mapsegs[0] + farmapylookup[new->tiley]+new->tilex) - AREATILE;
 }
 
-
-
 /*
 ===================
 =
@@ -88,13 +73,11 @@ void SpawnNewObj (unsigned tilex, unsigned tiley, statetype *state)
 ===================
 */
 
-void NewState (objtype *ob, statetype *state)
+void NewState(objtype *ob, statetype *state)
 {
 	ob->state = state;
 	ob->ticcount = state->tictime;
 }
-
-
 
 /*
 =============================================================================
@@ -156,10 +139,10 @@ void NewState (objtype *ob, statetype *state)
 }
 
 
-boolean TryWalk (objtype *ob)
+boolean TryWalk(objtype *ob)
 {
-	int		doornum;
-	unsigned	temp;
+	int doornum;
+	unsigned temp;
 
 	doornum = -1;
 
@@ -312,8 +295,6 @@ boolean TryWalk (objtype *ob)
 	return true;
 }
 
-
-
 /*
 ==================================
 =
@@ -442,7 +423,6 @@ void SelectDodgeDir(objtype *ob)
 	ob->dir = nodir;
 }
 
-
 /*
 ============================
 =
@@ -552,7 +532,6 @@ void SelectChaseDir(objtype *ob)
 	ob->dir = nodir;		// can't move
 }
 
-
 /*
 ============================
 =
@@ -620,7 +599,6 @@ void SelectRunDir (objtype *ob)
 
 	ob->dir = nodir;		// can't move
 }
-
 
 /*
 =================

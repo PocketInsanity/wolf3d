@@ -1,5 +1,3 @@
-/* id_vl.c */
-
 /* input/video output "/dev/null" support */
 
 /* this file does nothing but sit there and look pretty dumb */

@@ -1,5 +1,3 @@
-/* wl_debug.c */
-
 #include "wl_def.h"
 
 /*
