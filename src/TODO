@@ -36,7 +36,7 @@ P M - position pushwall sounds
 P M - id_ca.c cache code: fix/readd/rewrite the "garbage collection" system
 P M - rewrite id_ca.c: uniform memory handling system
 P M - either move id_heads into wl_def or split header files apart
-P R - rewrite fmopl.c to avoid licensing issues
+P R - rewrite fmopl.c to avoid licensing issues (or provide as a separate patch? may not be advisable since id owns copyright on wolf code)
 P R - remove CA_LoadAllSounds now that the sound code does everything
 B I - README, etc.
 B M - Code Documentation

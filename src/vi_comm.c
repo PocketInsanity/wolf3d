@@ -16,6 +16,7 @@ boolean		JoysPresent[MaxJoys];
 
 // 	Global variables
 boolean		Keyboard[NumCodes];
+boolean		InternalKeyboard[NumCodes];
 boolean		Paused;
 char		LastASCII;
 ScanCode	LastScan;
@@ -81,12 +82,15 @@ void keyboard_handler(int code, int press)
 		if (press == 0)	
 		{
 			Keyboard[k] = false;
+			InternalKeyboard[k] = false;
 		}
 		else			// Make code
 		{
 			LastCode = CurCode;
 			CurCode = LastScan = k;
+			
 			Keyboard[k] = true;
+			InternalKeyboard[k] = true;
 
 			if (k == sc_CapsLock)
 			{
@@ -140,48 +144,12 @@ boolean IN_UserInput(longword delay)
 /*
 ===================
 =
-= IN_MouseButtons
-=
-===================
-*/
-
-byte IN_MouseButtons()
-{
-	return 0;
-}
-
-/*
-===================
-=
 = IN_JoyButtons
 =
 ===================
 */
 
 byte IN_JoyButtons()
-{
-	return 0;
-}
-
-///////////////////////////////////////////////////////////////////////////
-//
-//	INL_GetMouseDelta() - Gets the amount that the mouse has moved from the
-//		mouse driver
-//
-///////////////////////////////////////////////////////////////////////////
-static void INL_GetMouseDelta(int *x,int *y)
-{
-	*x = 0;
-	*y = 0;
-}
-
-///////////////////////////////////////////////////////////////////////////
-//
-//	INL_GetMouseButtons() - Gets the status of the mouse buttons from the
-//		mouse driver
-//
-///////////////////////////////////////////////////////////////////////////
-static word INL_GetMouseButtons(void)
 {
 	return 0;
 }
@@ -241,16 +209,6 @@ static void INL_ShutKbd(void)
 
 ///////////////////////////////////////////////////////////////////////////
 //
-//	INL_StartMouse() - Detects and sets up the mouse
-//
-///////////////////////////////////////////////////////////////////////////
-static boolean INL_StartMouse(void)
-{
-	return false;
-}
-
-///////////////////////////////////////////////////////////////////////////
-//
 //	INL_ShutMouse() - Cleans up after the mouse
 //
 ///////////////////////////////////////////////////////////////////////////
@@ -297,22 +255,22 @@ static void INL_ShutJoy(word joy)
 ///////////////////////////////////////////////////////////////////////////
 void IN_Startup(void)
 {
-	boolean	checkjoys,checkmouse;
+	boolean	checkjoys;
 	word	i;
 
 	if (IN_Started)
 		return;
 
 	checkjoys = true;
-	checkmouse = true;
 	
 	if (MS_CheckParm("nojoy"))
 		checkjoys = false;
 	if (MS_CheckParm("nomouse"))
-		checkmouse = false;
-		
+		MousePresent = false;
+	else
+		MousePresent = true;
+
 	INL_StartKbd();
-	MousePresent = checkmouse ? INL_StartMouse() : false;
 
 	for (i = 0;i < MaxJoys;i++)
 		JoysPresent[i] = checkjoys ? INL_StartJoy(i) : false;
@@ -410,8 +368,8 @@ IN_CheckAck();
 			realdelta = true;
 			break;
 		case ctrl_Mouse:
-			INL_GetMouseDelta(&dx,&dy);
-			buttons = INL_GetMouseButtons();
+			IN_GetMouseDelta(&dx,&dy);
+			buttons = IN_MouseButtons();
 			realdelta = true;
 			break;
 		}

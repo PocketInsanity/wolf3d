@@ -34,7 +34,8 @@ NASM = nasm
 
 .SUFFIXES: .asm
 
-all:	swolf3d xwolf3d sdlwolf3d
+#all:	swolf3d xwolf3d sdlwolf3d
+all:	sdlwolf3d
 
 $(SOBJS): version.h id_heads.h wl_def.h
 $(XOBJS): version.h id_heads.h wl_def.h

@@ -1896,7 +1896,7 @@ void EnterCtrlData(int index,CustomCtrls *cust,void (*DrawRtn)(int),void (*Print
 	switch(type)
 	{
 	 case MOUSE:
-	 	button = 0; /* TODO */
+	 	button = IN_MouseButtons();
 	   switch(button)
 	   {
 	case 1: result=1; break;

@@ -310,6 +310,8 @@ void PollMouseMove()
 {
 	int mousexmove = 0, mouseymove = 0;
 
+	IN_GetMouseDelta(&mousexmove, &mouseymove);
+	
 	controlx += mousexmove*10/(13-mouseadjustment);
 	controly += mouseymove*20/(13-mouseadjustment);
 }

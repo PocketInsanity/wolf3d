@@ -166,7 +166,9 @@ extern char *IN_GetScanName(ScanCode);
 byte IN_MouseButtons();
 byte IN_JoyButtons();
 
+void IN_GetMouseDelta(int *dx, int *dy);
 void INL_GetJoyDelta(word joy,int *dx,int *dy);
+
 void IN_StartAck();
 boolean IN_CheckAck();
 
