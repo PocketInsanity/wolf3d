@@ -615,7 +615,9 @@ void CheckKeys()
 		IN_ClearKeysDown();
 		SD_MusicOn();
 		
-		Paused = false;
+		IN_GetMouseDelta(NULL, NULL); // Clear accumulated mouse movement
+		
+		Paused = false;		
 		return;
 	}
 
@@ -669,6 +671,8 @@ void CheckKeys()
 			playstate = ex_abort;
 		lasttimecount = get_TimeCount();
 		
+		IN_GetMouseDelta(NULL, NULL); // Clear accumulated mouse movement
+		
 		return;
 	}
 
@@ -681,6 +685,9 @@ void CheckKeys()
 		SETFONTCOLOR(0,15);
 		DebugKeys();
 		lasttimecount = get_TimeCount();
+		
+		IN_GetMouseDelta(NULL, NULL); // Clear accumulated mouse movement
+		
 		return;
 	}
 
@@ -1188,7 +1195,9 @@ void PlayLoop()
 	
 	memset (buttonstate,0,sizeof(buttonstate));
 	ClearPaletteShifts();
-	
+
+	IN_GetMouseDelta(NULL, NULL); // Clear accumulated mouse movement
+		
 	if (demoplayback)
 		IN_StartAck();
 
