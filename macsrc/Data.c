@@ -73,7 +73,6 @@ Byte *rw_texture;
 LongWord rw_scale;
 Byte *ArtData[64];
 void *SpriteArray[S_LASTONE];
-Word MacVidSize = -1;
 Word SlowDown = 1;			/* Force the game to 15 hz */
 Word MouseEnabled = 0;		/* Allow mouse control */
 Word GameViewSize = 0;		/* Size of the game screen */
@@ -81,7 +80,6 @@ Word NoWeaponDraw=1;			/* Flag to not draw the weapon on the screen */
 maplist_t *MapListPtr;		/* Pointer to map info record */
 unsigned short *SongListPtr;	/* Pointer to song list record */
 unsigned short *WallListPtr;	/* Pointer to wall list record */
-Word MaxScaler = 1;			/* Maximum number of VALID scalers */
 Boolean ShowPush;			/* Cheat for pushwalls */
 Byte textures[MAPSIZE*2+5][MAPSIZE];	/* Texture indexes */
 Word NaziSound[] = {SND_ESEE,SND_ESEE2,SND_ESEE3,SND_ESEE4};

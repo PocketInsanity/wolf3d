@@ -281,10 +281,14 @@ void SpawnStand(Word x,Word y,class_t which)
 	Word *TilePtr;
 	Word tile;
 	
+	if (numactors >= MAXACTORS) {
+		fprintf("SpawnStand DEBUG (%d, %d)\n", numactors, MAXACTORS);
+	}
+	
 	if (numactors==MAXACTORS) {	/* Too many actors already? */
 		return;					/* Exit */
 	}
-
+	
 	EnemyHits[which] = 1;
 	info = &classinfo[which];	/* Get the pointer to the basic info */
 	state = info->standstate;	/* Get the state logic value */
@@ -323,6 +327,10 @@ void SpawnStand(Word x,Word y,class_t which)
 void SpawnAmbush(Word x,Word y,class_t which)
 {
 	actor_t *ActorPtr;
+	
+	if (numactors >= MAXACTORS) {
+		fprintf("SpawnAmbush DEBUG (%d, %d)\n", numactors, MAXACTORS);
+	}
 	
 	ActorPtr = &actors[numactors];	/* Get the pointer to the new actor entry */
 	SpawnStand(x,y,which);		/* Fill in all the entries */
@@ -458,16 +466,19 @@ void SpawnThings(void)
 	Word *EnemyPtr;
 	
 	memset(EnemyHits,0,sizeof(EnemyHits));
+	
 	spawn_p = (Byte *)MapPtr+MapPtr->spawnlistofs;	/* Point to the spawn table */
 	Count = MapPtr->numspawn;		/* How many items to spawn? */
 	if (!Count) {
 		return;
 	}
+
 	do {
 		x = spawn_p[0];		/* Get the X */
 		y = spawn_p[1];		/* Get the y */
 		type = spawn_p[2];	/* Get the type */
 		spawn_p+=3;			/* Index past the record */
+
 		if (type<19) {
 			continue;
 		} else if (type<23) {	/* 19-22 */

@@ -1,11 +1,17 @@
 * remove NOVGA when other ports are added. NOVGA is a hack for using
 ElectricFence (since svgalib doesn't work too well with it)
-* fix return value of DoEvents
-* when you die, where do all the sprites go?
 * drawing seems like its imprecise, stationary sprites move back and forth,
 and walls 'swim' when you move around, or sprites pop into different sizes
 when are far enough and get closer/farther away
 * Word is 16bit damnit, wonder why in the MAC version its 32bits?!
 * How about adding red/white shifts (from PC wolf3d)? 
 * it crashes somewhere, no reason why...
+#0  0x804fa55 in DrawXMShape (x=128, y=96, ShapePtr=0x8c8c8c8c) at
+Burger.c:198
+But what is trashing GameShapes's memory?
+I don't think GameShapes itself is being ran over, just the memory allocated
+to it...
 * Pause key
+* menu type stuff in svgalib version (would use the Fx keys to save game
+etc, text menus for options?)
+* when saving/loading games, run them through htons/etc.

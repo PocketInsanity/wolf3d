@@ -59,7 +59,6 @@ typedef unsigned short ufixed_t;	/* 8.8 unsigned fixed point number */
 #define	NUMBUTTONS	10		/* Number of control buttons */
 #define WALLHEIGHT 128		/* Height,width of walls */
 #define SPRITEHEIGHT 64		/* Height,width of a sprite */
-#define MAXSCALER 960		/* Number of scalers to create */
 
 #define	PLAYERSIZE	88		/* radius of player in 8.8 fixed point */
 #define	PROJECTIONSCALE	(SCREENWIDTH/2)*0x90l
@@ -222,19 +221,6 @@ typedef enum {		/* actor class info*/
 } class_t;
 
 enum {BSPTOP,BSPBOTTOM,BSPLEFT,BSPRIGHT};	/* BSP quadrants */
-
-/**********************************
-
-	Compiled scaler
-	
-**********************************/
-
-typedef struct {
-	unsigned short codeofs[WALLHEIGHT+1];		/* Entry to the code for sprites */
-	Byte FixA1[WALLHEIGHT+1];		/* A1 adjust for the screen */
-	Byte Pad[1];			/* Long word align it... */
-	Byte code[1];					/* Scaler code */
-} t_compscale;
 
 /**********************************
 
@@ -543,12 +529,8 @@ extern Boolean	rw_downside;		/* True for dir_east and dir_south*/
 extern Byte *ArtData[64];
 extern Byte textures[MAPSIZE*2+5][MAPSIZE]; /* 0-63 is horizontal, 64-127 is vertical*/
 
-extern void InitTools(void);
 extern void BlastScreen(void);
 extern void BlastScreen2(Rect *BlastRect);
-extern void DoMacEvents(void);
-extern void BailOut(void);
-extern void GoodBye(void);
 extern void ReadSystemJoystick(void);
 extern Word NewGameWindow(Word NewVidSize);
 extern void ShowGetPsyched(void);
@@ -818,7 +800,6 @@ extern Word nummissiles;					/* Number of active missiles */
 extern missile_t missiles[MAXMISSILES];		/* Data for the missile items */
 extern Word numactors;						/* Number of active actors */
 extern actor_t actors[MAXACTORS];			/* Data for the actors */
-extern t_compscale *AllScalers[MAXSCALER];	/* Pointers to all the compiled scalers */	
 extern Byte **GameShapes;		/* Pointer to the game shape array */
 extern Word difficulty;					/* 0 = easy, 1= normal, 2=hard*/
 extern gametype_t gamestate;			/* Status of the game (Save game) */
@@ -863,7 +844,6 @@ extern Boolean areavis[MAXAREAS];	/* Area visible */
 extern Word bspcoord[4];			/* Rect for the BSP search */
 extern Word TicCount;				/* Ticks since last screen draw */
 extern Word LastTicCount;			/* Tick value at start of render */
-extern Word MacVidSize;		/* Current 0 = 320, 1 = 512, 2 = 640 */
 extern Word SlowDown;		/* If true, then limit game to 30hz */
 extern Word MouseEnabled;	/* Allow mouse control */
 extern Word GameViewSize;	/* Size of the game screen */
@@ -872,7 +852,6 @@ extern Word NoWeaponDraw;		/* Flag to not draw the weapon on the screen */
 extern maplist_t *MapListPtr;		/* Pointer to map info record */
 extern unsigned short *SongListPtr;	/* Pointer to song list record */
 extern unsigned short *WallListPtr;	/* Pointer to wall list record */
-extern Word MaxScaler;			/* Maximum number of VALID scalers */
 extern Word NaziSound[];		/* Sounds for nazis starting */
 extern Boolean ShowPush;		/* Cheat for showing pushwalls on automap */
 

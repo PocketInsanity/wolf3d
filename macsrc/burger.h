@@ -93,4 +93,3 @@ void KillAResource(Word RezNum);
 void *LoadAResource2(Word RezNum,LongWord Type);
 void ReleaseAResource2(Word RezNum,LongWord Type);
 void KillAResource2(Word RezNum,LongWord Type);
-void SaveJunk(void *AckPtr,Word Length);

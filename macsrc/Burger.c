@@ -642,24 +642,6 @@ void KillAResource(Word RezNum)
 	KillAResource2(RezNum, BRGR);
 }
 
-void SaveJunk(void *AckPtr,Word Length)
-{
-static Word Count=1;
-	FILE *fp;
-	char SaveName[40];
-	sprintf(SaveName,"SprRec%d",Count);
-	fp = fopen(SaveName,"wb");
-	fwrite(AckPtr,1,Length,fp);
-	fclose(fp);
-	++Count;
-}
-
-/**********************************
-
-	Kill a global resource
-
-**********************************/
-
 unsigned short SwapUShort(unsigned short Val)
 {
 	return ((Val<<8) | (Val>>8));
@@ -690,6 +672,7 @@ void DLZSS(Byte *Dest,Byte *Src,LongWord Length)
 			++Dest;
 			--Length;
 		} else {
+			/* TODO - sounds have this line the other way around */
 			RunCount = (Word) Src[0] | ((Word) Src[1]<<8);
 			Fun = 0x1000-(RunCount&0xfff);
 			BackPtr = Dest-Fun;
@@ -720,9 +703,9 @@ void DLZSS(Byte *Dest,Byte *Src,LongWord Length)
 
 **********************************/
 
-/* TODO */
-       #include <sys/types.h>
-              #include <signal.h>
+/* TODO - cheap way to find MSB problems */
+#include <sys/types.h>
+#include <signal.h>
               
 void *AllocSomeMem(LongWord Size)
 {
@@ -730,33 +713,6 @@ void *AllocSomeMem(LongWord Size)
 		kill(getpid(), SIGSEGV);
 		
 	return (void *)malloc(Size);
-}
-
-/**********************************
-
-	Allocate some memory
-
-**********************************/
-
-static Word FreeStage(Word Stage,LongWord Size) 
-{
-	switch (Stage) {
-	case 1:
-		PurgeAllSounds(Size);		/* Kill off sounds until I can get memory */
-		break;
-	case 2:
-		PlaySound(0);				/* Shut down all sounds... */
-		PurgeAllSounds(Size);		/* Purge them */
-		break;
-	case 3:
-		PlaySong(0);				/* Kill music */
-		FreeSong();					/* Purge it */
-		PurgeAllSounds(Size);		/* Make SURE it's gone! */
-		break;
-	case 4:
-		return 0;
-	}
-	return Stage+1;
 }
 
 /**********************************

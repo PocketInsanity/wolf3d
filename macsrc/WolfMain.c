@@ -296,7 +296,7 @@ void PrepPlayLoop (void)
 Again:
 			ReleaseMap();		/* Oh oh... */
 			if (!GameViewSize) {	/* Smallest screen? */
-				BailOut();		/* Leave... */
+				Quit("PrepPlayLoop failed"); /* Leave... */
 			}
 			--GameViewSize;		/* Smaller screen size */
 			GameViewSize = NewGameWindow(GameViewSize);
@@ -424,6 +424,7 @@ skipbrief:
 		ShowGetPsyched();
 		PrepPlayLoop();		/* Init internal variables */
 		EndGetPsyched();
+		FlushKeys();
 		PlayLoop();			/* Play the game */
 		if (playstate == EX_DIED) {		/* Did you die? */
 			--gamestate.lives;			/* Remove a life */

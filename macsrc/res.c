@@ -9,6 +9,9 @@ typedef struct ResItem_t
 	Word item;
 	
 	Byte *dat;
+	int size;
+	
+	Byte *buf;
 	
 	struct ResItem_t *next;
 } ResItem;
@@ -76,6 +79,8 @@ int InitResources(char *name)
 			
 			t->dat = (Byte *)malloc(datalen);
 			fread(t->dat, datalen, 1, fp);
+			t->size = datalen;
+			t->buf = NULL;
 			
 			*cur = t;
 			
@@ -97,12 +102,27 @@ void *LoadAResource2(Word RezNum, LongWord Type)
 	ResItem *c = lr;
 	
 	while (c != NULL) {
-		if ( (c->type == Type) && (c->item == RezNum) ) 
-			return c->dat;
+		if ( (c->type == Type) && (c->item == RezNum) ) {
+			if (c->buf == NULL) {
+				c->buf = malloc(c->size);
+				memcpy(c->buf, c->dat, c->size);
+			} else {
+				/* DEBUG: we want a fresh copy... */
+				printf("DEBUG: Item %d/%d already loaded!\n", Type, RezNum);
+				free(c->buf);
+				c->buf = malloc(c->size);
+				memcpy(c->buf, c->dat, c->size);
+			}
+			
+			if (c->buf == NULL) 
+				Quit("MALLOC FAILED?");
+				
+			return c->buf;
+		}
 		c = c->next;		
 	}
 	
-	fprintf(stderr, "ERROR: %ld/%d was not found!\n", Type, RezNum);
+	fprintf(stderr, "ERROR (LoadAResource2): %ld/%d was not found!\n", Type, RezNum);
 	AllocSomeMem(666666666); /* TODO: hack! */
 	exit(EXIT_FAILURE);
 }
@@ -112,17 +132,22 @@ void ReleaseAResource2(Word RezNum, LongWord Type)
 	ResItem *c = lr;
 	
 	while (c != NULL) {
+		if ( (c->type == Type) && (c->item == RezNum) ) {
+			if (c->buf)
+				free(c->buf);
+			c->buf = NULL;
+			return;
+		}
 		c = c->next;
 	}
+	fprintf(stderr, "ERROR (ReleaseAResource2): %ld/%d was not found!\n", Type, RezNum);
+	AllocSomeMem(666666666); /* TODO: hack! */
+	exit(EXIT_FAILURE);
 }
 
 void KillAResource2(Word RezNum, LongWord Type)
 {
-	ResItem *c = lr;
-	
-	while (c != NULL) {
-		c = c->next;
-	}
+	ReleaseAResource2(RezNum, Type);
 }
 
 void FreeResources()
@@ -135,6 +160,9 @@ void FreeResources()
 		if (c->dat)
 			free(c->dat);
 		
+		if (c->buf)
+			free(c->buf);
+			
 		c = c->next;
 		
 		free(t);		

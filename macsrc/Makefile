@@ -4,8 +4,8 @@ CC = gcc
 #CFLAGS = -g -Wall -O6 -fomit-frame-pointer -ffast-math -funroll-loops -mpentiumpro -mcpu=pentiumpro -march=pentiumpro 
 #CFLAGS = -g -Wall
 #CFLAGS = -g -DNOVGA
-CFLAGS = -g
-#CFLAGS = -Os -g
+#CFLAGS = -g
+CFLAGS = -Os -g
 #CFLAGS = -g -Wall -I/home/relnev/cvs/oal/include
 
 OBJS =  Data.o Doors.o EnMove.o EnThink.o Intro.o Level.o \

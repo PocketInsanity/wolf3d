@@ -106,11 +106,14 @@ void BlastScreen()
  	int i;
 
 #ifndef NOVGA	
+
 	for (i = 0; i < 200; i++) {
 		memcpy(ptrd, ptrs, 320);
 		ptrs += w;
 		ptrd += 320;
 	}
+
+/*	memcpy(ptrd, ptrs, w * h); */
 #endif
 }
 
@@ -120,6 +123,7 @@ Word VidVs[] = {160,320,320,400};
 Word VidPics[] = {rFaceShapes,rFace512,rFace640,rFace640};
 Word VidSize = -1;
 
+int VidModes[] = { G320x200x256, G512x384x256, G640x400x256, G640x480x256 };
 Word ScaleX(Word x) 
 {
 	switch(VidSize) {
@@ -174,8 +178,15 @@ Word NewGameWindow(Word NewVidSize)
 		free(gfxbuf);
 		
 	gfxbuf = (Byte *)malloc(w * h);
-
+	
 #ifndef NOVGA	
+/*
+	if (!vga_hasmode(VidModes[NewVidSize]))
+		Quit("SVGAlib does not support this mode");
+				
+	vga_setmode(VidModes[NewVidSize]);
+	vga_setlinearaddressing();
+*/
 	vga_setmode(G320x200x256);
 #endif
 	
@@ -187,25 +198,23 @@ Word NewGameWindow(Word NewVidSize)
 	BlastScreen();
 	
 	LongPtr = (LongWord *) LoadAResource(VidPics[NewVidSize]);
-	
+
 	if (GameShapes)
 		FreeSomeMem(GameShapes);
 		
-	GameShapes = (Byte **) AllocSomeMem(lMSB(LongPtr[0]));
-	DLZSS((Byte *)GameShapes,(Byte *) &LongPtr[1],lMSB(LongPtr[0]));
-	ReleaseAResource(rFaceShapes);
+	GameShapes = (Byte **)AllocSomeMem(lMSB(LongPtr[0]));
+	DLZSS((Byte *)GameShapes, (Byte *)&LongPtr[1], lMSB(LongPtr[0]));
+	ReleaseAResource(VidPics[NewVidSize]);
 	
 	LongPtr = (LongWord *)GameShapes;
 	DestPtr = (Byte *)GameShapes;
 	for (i = 0; i < ((NewVidSize == 1) ? 57 : 47); i++) 
 		GameShapes[i] = DestPtr + lMSB(LongPtr[i]);
-		
+	
 	VidSize = NewVidSize;
 	
 	return VidSize;
 }
-
-LongWord ScaleDiv[2048];
 
 void ScaledDraw(Byte *gfx, Word scale, Byte *vid, LongWord TheFrac, Word TheInt, Word Width, LongWord Delta)
 {	
@@ -246,7 +255,7 @@ void IO_ScaleWallColumn(Word x, Word scale, Word tile, Word column)
 			
 		}
 		y = (scale-VIEWHEIGHT)/2;
-		y = y*TheFrac;
+		y *= TheFrac;
 		TheInt = TheFrac>>24;
 		TheFrac <<= 8;
 		
@@ -279,8 +288,10 @@ void IO_ScaleMaskedColumn(Word x,Word scale, unsigned short *CharPtr,Word column
 		return;
 		
 	CharPtr2 = (Byte *) CharPtr;
-	TheFrac = ScaleDiv[scale];
-	RunPtr = (SpriteRun *) &CharPtr[sMSB(CharPtr[column+1])/2]; 
+	
+	TheFrac = 0x40000000/scale;
+	
+	RunPtr = (SpriteRun *)&CharPtr[sMSB(CharPtr[column+1])/2]; 
 	Screenad = &VideoPointer[x];
 	TFrac = TheFrac<<8;
 	TInt = TheFrac>>24;
@@ -288,14 +299,14 @@ void IO_ScaleMaskedColumn(Word x,Word scale, unsigned short *CharPtr,Word column
 	
 	while (RunPtr->Topy != 0xFFFF) {
 		Y1 = scale*(LongWord)sMSB(RunPtr->Topy)/128+TopY;
-		if (Y1<(int)VIEWHEIGHT) {
+		if (Y1 < VIEWHEIGHT) {
 			Y2 = scale*(LongWord)sMSB(RunPtr->Boty)/128+TopY;
-			if (Y2>0) {
-				if (Y2>(int)VIEWHEIGHT) 
+			if (Y2 > 0) {
+				if (Y2 > VIEWHEIGHT) 
 					Y2 = VIEWHEIGHT;
 				Index = sMSB(RunPtr->Shape)+sMSB(RunPtr->Topy)/2;
 				Delta = 0;
-				if (Y1<0) {
+				if (Y1 < 0) {
 					Delta = (0-(LongWord)Y1)*TheFrac;
 					Index += (Delta>>24);
 					Delta <<= 8;
@@ -311,17 +322,8 @@ void IO_ScaleMaskedColumn(Word x,Word scale, unsigned short *CharPtr,Word column
 	}
 }
 
-Boolean SetupScalers(void)
+Boolean SetupScalers()
 {
-	Word i;
-	if (!ScaleDiv[1]) { 
-		i = 1;
-		do {
-			ScaleDiv[i] = 0x40000000/i;
-		} while (++i<2048);
-		MaxScaler = 2048;
-	}
-	return 1;
 }
 
 void ReleaseScalers()
@@ -330,12 +332,14 @@ void ReleaseScalers()
 
 /* Keyboard Hack */
 static int RSJ;
+
 static int keys[128];
 
 void FlushKeys()
 {
 	while (keyboard_update()) ;
 	
+	joystick1 = 0;
 	memset(keys, 0, sizeof(keys));
 }
 
@@ -364,9 +368,9 @@ void keyboard_handler(int key, int press)
 	if (key == SCANCODE_ESCAPE) 
 		Quit(0);
 
-	if (RSJ) {
-		keys[key] = press;
-		
+	keys[key] = press;
+	
+	if (RSJ) {		
 		if (press == 0) {
 			for (i = 0; i < CheatCount; i++) {
 				if (CheatCodes[i].code[CheatIndex] == key) {
@@ -512,24 +516,19 @@ void keyboard_handler(int key, int press)
 void ReadSystemJoystick(void)
 {
 	RSJ = 1;
-//#ifndef NOVGA
-	keyboard_update();
-//#endif
+	/* keyboard_update(); */
+	while (keyboard_update()) ;
 }
-
-/* 
-Handle events, and return:
-last keypress (if any) in ascii
-mouse button events == 1
-zero means none of the above
-*/
 
 int DoEvents()
 {
 	RSJ = 0;
-//#ifndef NOVGA
-	keyboard_update();
-//#endif
-	/* TODO: hack */
-	return 'B';
+	if (keyboard_update()) {
+		while (keyboard_update()) ;
+		if (keys[SCANCODE_B]) {
+			return 'B';
+		}
+		return 1;
+	}
+	return 0;
 }

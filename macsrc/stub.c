@@ -100,21 +100,25 @@ void DrawSmall(Word x,Word y,Word tile)
 	} while (++Height<16);	
 }
 
+LongWord PsyTime;
+
 void ShowGetPsyched(void)
 {
 	LongWord *PackPtr;
 	Byte *ShapePtr;
 	LongWord PackLength;
 	Word X,Y;
-                                
+        
+        PsyTime = ReadTick() + 60*2;
+          
 	ClearTheScreen(BLACK);
 	BlastScreen();
 	PackPtr = LoadAResource(rGetPsychPic);
 	PackLength = lMSB(PackPtr[0]);
 	ShapePtr = AllocSomeMem(PackLength);
 	DLZSS(ShapePtr,(Byte *) &PackPtr[1],PackLength);
-	X = 10; /* TODO */
-	Y = 100;
+	X = (VidWidth-224)/2;
+	Y = (ViewHeight-56)/2;
 	DrawShape(X,Y,ShapePtr);
 	FreeSomeMem(ShapePtr);
 	ReleaseAResource(rGetPsychPic);
@@ -130,6 +134,8 @@ void DrawPsyched(Word Index)
 
 void EndGetPsyched(void)
 {
+	while (PsyTime > ReadTick()) ;
+	
 	SetAPalette(rBlackPal);
 }
 
@@ -240,12 +246,6 @@ void EndAllSound(void)
 
 void PurgeAllSounds(unsigned long minMemory)
 {
-}
-
-void BailOut()
-{
-	printf("BailOut()\n");
-	exit(1);
 }
 
 Word ChooseGameDiff(void)
