@@ -24,7 +24,7 @@ typedef unsigned int Word;
 typedef unsigned long LongWord;
 typedef unsigned char Byte;
 typedef unsigned char Boolean;
-typedef unsigned short int SWord;
+typedef unsigned short int ShortWord;
 
 #define BLACK 255
 #define DARKGREY 250

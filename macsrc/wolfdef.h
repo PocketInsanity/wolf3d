@@ -30,10 +30,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define PACKED __attribute__((packed))
 
 typedef struct {
-	int left;
 	int top;
-	int right;
+	int left;
 	int bottom;
+	int right;
 } Rect;
 
 
@@ -584,6 +584,7 @@ extern Boolean	rw_downside;		/* True for dir_east and dir_south*/
 extern Byte *ArtData[64];
 extern Byte textures[MAPSIZE*2+5][MAPSIZE]; /* 0-63 is horizontal, 64-127 is vertical*/
 
+
 extern void SetPalette(Byte *pal);
 extern void DisplayScreen(Word res, Word pal);
 extern void InitRenderView();
@@ -597,6 +598,10 @@ extern void FreeResources();
 extern void RedrawScreen();
 extern Boolean SaveGame(char *file);
 extern Boolean LoadGame(char *file);
+extern void InitInterMisPic();
+extern void DrawInterMisPic(Word index);
+extern void FreeInitMisPic();
+
 
 extern void BlastScreen(void);
 extern void BlastScreen2(Rect *BlastRect);

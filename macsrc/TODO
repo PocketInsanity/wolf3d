@@ -23,9 +23,9 @@ TODO:
   - Is GL_REPLACE faster than GL_MODULATE for textures?
   - Save "draw state" so redrawing works right when screen is
     resized/exposed
-  - What about using CVAs for the Walls - when loading level create a
-    CVA with every wall entry, then just reference the right one (go by BSP
-    number)
+  - GLX 1.3?
+  - As an experiement, see if adding CVAs to the wall code will speed
+    anything up?
 * Documentation
 * Sound!
   - Need to write sound playing code (probably access /dev/dsp directly

@@ -22,8 +22,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 extern Word NumberIndex;	/* Hack for drawing numbers */
 static LongWord BJTime;	/* Time to draw BJ? */
 static Word WhichBJ;	/* Which BJ to show */
-static LongWord Indexs[3];		/* Offsets to BJ's true shapes */
-static Byte *BJPtr;			/* Pointer to BJ's shapes */
 static Word ParTime;		/* Par time for level */
 static LongWord BonusScore;	/* Additional points */
 
@@ -46,7 +44,6 @@ static LongWord BonusScore;	/* Additional points */
 	
 **********************************/
 
-static Rect BJRect = {48,73,48+142,73+131};	/* Rect for BJ's picture */
 static void ShowBJ(void) 
 {		
 	if ((ReadTick()-BJTime) >= 20) {		/* Time to draw a BJ? */
@@ -54,8 +51,7 @@ static void ShowBJ(void)
 		if (WhichBJ!=2) {			/* Thumbs up? */
 			WhichBJ ^= 1;			/* Nope, toggle breathing */
 		}
-		DrawShape(73,48,&BJPtr[Indexs[WhichBJ]]);		/* Draw BJ */
-		BlastScreen2(&BJRect);				/* Update video */
+		DrawInterMisPic(WhichBJ);
 	}
 }
 
@@ -229,8 +225,6 @@ static void RollRatio(Word x,Word y,Word ratio)
 void LevelCompleted(void)
 {
 	Word k;
-	LongWord *PackPtr;
-	LongWord PackLength;
 
 /* setup */
 
@@ -244,17 +238,8 @@ void LevelCompleted(void)
 	DisplayScreen(rIntermission, rInterPal);
 	BlastScreen();
 	
-	PackPtr = LoadAResource(rInterPics);
-	PackLength = lMSB(PackPtr[0]);
-	BJPtr = (Byte *)AllocSomeMem(PackLength);
-	DLZSS(BJPtr,(Byte *) &PackPtr[1],PackLength);
-	ReleaseAResource(rInterPics);
-	memcpy(Indexs,BJPtr,12);		/* Copy the index table */
-	
-	Indexs[0] = lMSB(Indexs[0]);
-	Indexs[1] = lMSB(Indexs[1]);
-	Indexs[2] = lMSB(Indexs[2]);
-	
+	InitInterMisPic();
+		
 	WhichBJ = 0;		/* Init BJ */
 	BJTime = ReadTick()-50;		/* Force a redraw */
 	BlastScreen();		/* Draw the screen */
@@ -315,8 +300,10 @@ void LevelCompleted(void)
 	do {
 		ShowBJ();		/* Animate BJ */
 	} while (!WaitTicksEvent(1));		/* Wait for a keypress */
-	FreeSomeMem(BJPtr);		/* Release BJ's shapes */
+	
 	FadeToBlack();		/* Fade away */
+	
+	FreeInitMisPic();
 	IntermissionHack = FALSE;		/* Release the hack */
 	NumberIndex = 36;			/* Restore the index */
 }

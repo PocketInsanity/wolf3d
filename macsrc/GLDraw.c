@@ -185,11 +185,27 @@ void RedrawScreen()
 	BlastScreen();
 }
 
-void DrawShape(Word x, Word y, void *ShapePtr)
+void ShowGetPsyched()
 {
 }
 
 void DrawPsyched(Word Index)
+{
+}
+
+void EndGetPsyched()
+{
+}
+                
+void InitInterMisPic()
+{
+}
+
+void DrawInterMisPic(Word index)
+{
+}
+
+void FreeInitMisPic()
 {
 }
 
@@ -813,19 +829,31 @@ void IO_AttackShape(Word shape)
 
 void DrawSprite(thing_t *t)
 {
+	static GLfloat arr[16] = { 1.0, 0.0, 0.5, 1.0, 1.0, 1.0, 0.5, -1.0,
+				   0.0, 1.0, -0.5, -1.0, 0.0, 0.0, -0.5, 1.0 
+				 };
 	glPushMatrix();
 	
 	glTranslatef(-(GLfloat)t->x / 256.0, 0, -(GLfloat)t->y / 256.0);
 	glRotatef(90.0+((GLfloat)gamestate.viewangle / (GLfloat)ANGLES * 360.0), 0.0, 1.0, 0.0);
 	
 	ChangeTextureSimple(sprtex[t->sprite]);
-	
+
 	glBegin(GL_QUADS);
+#if 0
 	glTexCoord2f(1.0, 0.0); glVertex2f( 0.5,  1); 
 	glTexCoord2f(1.0, 1.0); glVertex2f( 0.5, -1);
 	glTexCoord2f(0.0, 1.0); glVertex2f(-0.5, -1);
 	glTexCoord2f(0.0, 0.0); glVertex2f(-0.5,  1);
+#else
+	glTexCoord2fv(&arr[0]); glVertex2fv(&arr[2]);
+	glTexCoord2fv(&arr[4]); glVertex2fv(&arr[6]);
+	glTexCoord2fv(&arr[8]); glVertex2fv(&arr[10]);
+	glTexCoord2fv(&arr[12]); glVertex2fv(&arr[14]);
+#endif
 	glEnd();
+
+
 
 	glPopMatrix();
 }

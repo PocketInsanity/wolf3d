@@ -4,7 +4,7 @@ Wolfenstein 3D is an Id Software game.  This is a port of the Macintosh
 version that was released by MacPlay in 1994.  You can find information about
 the source release at: http://www.maccentral.com/news/0001/24.wolf3d.shtml 
 WolfReadMe.txt, from that Mac Wolf3d source release, is also included with
-this port.
+this port.  This port is not supported by id Software.
 
 Goals of this Project (Just what am I trying to do?):  Like the PC verison,
 this game (I consider the PC and Mac versions as different games) was only 
@@ -59,19 +59,20 @@ the specifics.
 
 Specifically:
 swolf3d : The SVGAlib Version.  Only supports 320x200x256 at the moment, so
-only parts of the intro screens are shown (they are 512x384).
+only parts of the intro screens are shown (they are 512x384). [Actually
+now you can use different resolutions, but I'm not sure how stable it is.]
 
-xwolf3d : The Xlib Version.  Only supports 8bpp PseudoColor visuals.
+xwolf3d : The Xlib Version.  Only supports 8bpp PseudoColor visuals.  Window
+only at this time.
 
 gwolf3d : The gtk+ Version.  Only supports 8bpp visuals, but has a menu that
 has a Quit option.  I currently don't really like gtk+; anyone know of a
 more complete api reference than the one on http://www.gtk.org?  But I'll
-use it so I can have menus and dialogs without having to create them in Xlib.
-Any suggestions?
+have to use it so I can have menus and dialogs without having to create them
+in Xlib.  Any suggestions?
 
 glwolf3d: The OpenGL Version (written using Xlib w/ GLX).  I like it.  Not
-all graphics are currently shown (So when you have a blank screen, press
-enter a few times to get passed the screens).
+all graphics are currently shown, and a few things are still rough.
 
 Note: The available targets (binaries) may change over time as I decide
 which APIs work the best, etc.

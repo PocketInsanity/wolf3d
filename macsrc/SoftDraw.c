@@ -36,6 +36,75 @@ void InitYTable(void)
 	} while (++i<480);
 }
 
+static LongWord PsyTime;
+
+void ShowGetPsyched(void)
+{
+	LongWord *PackPtr;
+	Byte *ShapePtr;
+	LongWord PackLength;
+	Word X,Y;
+        
+        PsyTime = ReadTick() + 60*2;
+          
+	ClearTheScreen(BLACK);
+	BlastScreen();
+	PackPtr = LoadAResource(rGetPsychPic);
+	PackLength = lMSB(PackPtr[0]);
+	ShapePtr = AllocSomeMem(PackLength);
+	DLZSS(ShapePtr,(Byte *) &PackPtr[1],PackLength);
+	X = (VidWidth-224)/2;
+	Y = (ViewHeight-56)/2;
+	DrawShape(X,Y,ShapePtr);
+	FreeSomeMem(ShapePtr);
+	ReleaseAResource(rGetPsychPic);
+	BlastScreen();
+	SetAPalette(rGamePal);	
+}
+
+void EndGetPsyched(void)
+{
+	while (PsyTime > ReadTick()) ;
+	
+	SetAPalette(rBlackPal);
+}
+
+/*
+The intermission picture (BJ)
+*/
+
+static LongWord Indexs[3];              /* Offsets to BJ's true shapes */
+static Byte *BJPtr;                     /* Pointer to BJ's shapes */
+
+void InitInterMisPic()
+{
+	LongWord *PackPtr;
+	LongWord PackLength;
+	
+	PackPtr = LoadAResource(rInterPics);
+	PackLength = lMSB(PackPtr[0]);
+	BJPtr = (Byte *)AllocSomeMem(PackLength);
+	DLZSS(BJPtr, (Byte *)&PackPtr[1], PackLength);
+	ReleaseAResource(rInterPics);
+	memcpy(Indexs,BJPtr,12);                /* Copy the index table */
+	
+	Indexs[0] = lMSB(Indexs[0]);
+	Indexs[1] = lMSB(Indexs[1]);
+	Indexs[2] = lMSB(Indexs[2]);
+}
+
+static Rect BJRect = {48,73,48+142,73+131};     /* Rect for BJ's picture */
+void DrawInterMisPic(Word index)
+{
+	DrawShape(BJRect.left, BJRect.top, &BJPtr[Indexs[index]]);
+	BlastScreen2(&BJRect);
+}
+
+void FreeInitMisPic()
+{
+	FreeSomeMem(BJPtr);             /* Release BJ's shapes */
+}
+
 void DisplayScreen(Word res, Word pal)
 {
 	LongWord *PackPtr;
@@ -201,9 +270,9 @@ void IO_ScaleWallColumn(Word x, Word scale, Word tile, Word column)
 }
 
 typedef struct {
-	SWord Topy;
-	SWord Boty;
-	SWord Shape;
+	ShortWord Topy;
+	ShortWord Boty;
+	ShortWord Shape;
 } PACKED SpriteRun;
                         
 void IO_ScaleMaskedColumn(Word x,Word scale, unsigned short *CharPtr,Word column)

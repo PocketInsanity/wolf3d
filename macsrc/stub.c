@@ -81,39 +81,6 @@ void PrintTimeCounter(TimeCounter *t, char *header)
 	printf("Min: %lu, max:%lu\n", t->mintime, t->maxtime);
 }
 
-LongWord PsyTime;
-
-void ShowGetPsyched(void)
-{
-	LongWord *PackPtr;
-	Byte *ShapePtr;
-	LongWord PackLength;
-	Word X,Y;
-        
-        PsyTime = ReadTick() + 60*2;
-          
-	ClearTheScreen(BLACK);
-	BlastScreen();
-	PackPtr = LoadAResource(rGetPsychPic);
-	PackLength = lMSB(PackPtr[0]);
-	ShapePtr = AllocSomeMem(PackLength);
-	DLZSS(ShapePtr,(Byte *) &PackPtr[1],PackLength);
-	X = (VidWidth-224)/2;
-	Y = (ViewHeight-56)/2;
-	DrawShape(X,Y,ShapePtr);
-	FreeSomeMem(ShapePtr);
-	ReleaseAResource(rGetPsychPic);
-	BlastScreen();
-	SetAPalette(rGamePal);	
-}
-
-void EndGetPsyched(void)
-{
-	while (PsyTime > ReadTick()) ;
-	
-	SetAPalette(rBlackPal);
-}
-
 void ShareWareEnd(void)
 {
         SetAPalette(rGamePal);
