@@ -3975,11 +3975,4 @@ void CheckForEpisodes(void)
 	strcat(PageFileName,extension);
 	strcat(audioname,extension);
 	strcat(demoname,extension);
-#ifndef SPEAR
-#ifndef GOODTIMES
-	strcat(helpfilename,extension);
-#endif
-	strcat(endfilename,extension);
-#endif
-#endif
 }

@@ -127,7 +127,7 @@ static	Direction	DirTable[] =		// Quick lookup for total direction
 					};
 
 static	void			(*INL_KeyHook)(void);
-static	void interrupt	(*OldKeyVect)(void);
+static	void (*OldKeyVect)(void);
 
 static	char			*ParmStrings[] = {"nojoys","nomouse",nil};
 
@@ -138,8 +138,7 @@ static	char			*ParmStrings[] = {"nojoys","nomouse",nil};
 //	INL_KeyService() - Handles a keyboard interrupt (key up/down)
 //
 ///////////////////////////////////////////////////////////////////////////
-static void interrupt
-INL_KeyService(void)
+static void INL_KeyService(void)
 {
 static	boolean	special;
 		byte	k,c,

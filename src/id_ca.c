@@ -625,8 +625,8 @@ void CAL_SetupMapFile (void)
 		if (pos<0)	// $FFFFFFFF start is a sparse map
 			continue;
 
-		MM_GetPtr(&(memptr)mapheaderseg[i],sizeof(maptype));
-		MM_SetLock(&(memptr)mapheaderseg[i],true);
+		MM_GetPtr((memptr)&mapheaderseg[i],sizeof(maptype));
+		MM_SetLock((memptr)&mapheaderseg[i],true);
 		lseek(maphandle,pos,SEEK_SET);
 		CA_FarRead (maphandle,(memptr)mapheaderseg[i],sizeof(maptype));
 	}
@@ -636,8 +636,8 @@ void CAL_SetupMapFile (void)
 //
 	for (i=0;i<MAPPLANES;i++)
 	{
-		MM_GetPtr (&(memptr)mapsegs[i],64*64*2);
-		MM_SetLock (&(memptr)mapsegs[i],true);
+		MM_GetPtr ((memptr)&mapsegs[i],64*64*2);
+		MM_SetLock ((memptr)&mapsegs[i],true);
 	}
 }
 
@@ -670,7 +670,7 @@ void CAL_SetupAudioFile (void)
 		CA_CannotOpen(fname);
 
 	length = filelength(handle);
-	MM_GetPtr (&(memptr)audiostarts,length);
+	MM_GetPtr ((memptr)&audiostarts,length);
 	CA_FarRead(handle, (byte *)audiostarts, length);
 	close(handle);
 
@@ -755,7 +755,7 @@ void CA_CacheAudioChunk (int chunk)
 
 	if (audiosegs[chunk])
 	{
-		MM_SetPurge (&(memptr)audiosegs[chunk],0);
+		MM_SetPurge ((memptr)&audiosegs[chunk],0);
 		return;							// allready in memory
 	}
 
@@ -769,7 +769,7 @@ void CA_CacheAudioChunk (int chunk)
 	lseek(audiohandle,pos,SEEK_SET);
 
 
-	MM_GetPtr (&(memptr)audiosegs[chunk],compressed);
+	MM_GetPtr ((memptr)&audiosegs[chunk],compressed);
 	if (mmerror)
 		return;
 
@@ -807,7 +807,8 @@ void CA_LoadAllSounds (void)
 
 	for (i=0;i<NUMSOUNDS;i++,start++)
 		if (audiosegs[start])
-			MM_SetPurge (&(memptr)audiosegs[start],3);		// make purgable
+			MM_SetPurge ((memptr)&audiosegs[start],3);		
+			// make purgable
 
 cachein:
 
@@ -993,7 +994,7 @@ void CA_CacheScreen (int chunk)
 // Sprites need to have shifts made and various other junk
 //
 	/* TODO: show screen! */
-	CAL_HuffExpand (source,MK_FP(SCREENSEG,bufferofs),expanded,grhuffman);
+	CAL_HuffExpand (source, MK_FP(SCREENSEG,bufferofs),expanded,grhuffman);
 	VW_MarkUpdateBlock (0,0,319,199);
 	MM_FreePtr(&bigbufferseg);
 }
@@ -1032,7 +1033,7 @@ void CA_CacheMap (int mapnum)
 		pos = mapheaderseg[mapnum]->planestart[plane];
 		compressed = mapheaderseg[mapnum]->planelength[plane];
 
-		dest = &(memptr)mapsegs[plane];
+		dest = (memptr)&mapsegs[plane];
 
 		lseek(maphandle,pos,SEEK_SET);
 		if (compressed<=BUFFERSIZE)
@@ -1202,7 +1203,7 @@ void CA_SetAllPurge (void)
 //
 	for (i=0;i<NUMSNDCHUNKS;i++)
 		if (audiosegs[i])
-			MM_SetPurge (&(memptr)audiosegs[i],3);
+			MM_SetPurge ((memptr)&audiosegs[i],3);
 
 //
 // free graphics
@@ -1456,8 +1457,6 @@ void MML_ClearBlock (void)
 =
 ===================
 */
-
-static	char *ParmStrings[] = {"noems","noxms",""};
 
 void MM_Startup (void)
 {
@@ -1812,7 +1811,7 @@ void MM_SortMem (void)
 			playing += STARTADLIBSOUNDS;
 			break;
 		}
-		MM_SetLock(&(memptr)audiosegs[playing],true);
+		MM_SetLock((memptr)&audiosegs[playing],true);
 	}
 
 
@@ -1883,7 +1882,7 @@ void MM_SortMem (void)
 		aftersort();
 
 	if (playing)
-		MM_SetLock(&(memptr)audiosegs[playing],false);
+		MM_SetLock((memptr)&audiosegs[playing],false);
 }
 
 
@@ -2120,8 +2119,6 @@ void MM_BombOnError (boolean bomb)
 	long			PMFrameCount;
 	PageListStruct *PMPages, *PMSegPages;
 
-static	char		*ParmStrings[] = {"nomain","noems","noxms",nil};
-
 /////////////////////////////////////////////////////////////////////////////
 //
 //	Main memory code
@@ -2306,10 +2303,10 @@ void PML_OpenPageFile(void)
 
 	// Allocate and clear the page list
 	PMNumBlocks = ChunksInFile;
-	MM_GetPtr(&(memptr)PMSegPages,sizeof(PageListStruct) * PMNumBlocks);
-	MM_SetLock(&(memptr)PMSegPages,true);
+	MM_GetPtr((memptr)&PMSegPages,sizeof(PageListStruct) * PMNumBlocks);
+	MM_SetLock((memptr)&PMSegPages,true);
 	PMPages = (PageListStruct *)PMSegPages;
-	_fmemset(PMPages,0,sizeof(PageListStruct) * PMNumBlocks);
+	memset(PMPages,0,sizeof(PageListStruct) * PMNumBlocks);
 
 	// Read in the chunk offsets
 	size = sizeof(longword) * ChunksInFile;
@@ -2341,8 +2338,8 @@ void PML_ClosePageFile(void)
 		close(PageFile);
 	if (PMSegPages)
 	{
-		MM_SetLock(&(memptr)PMSegPages,false);
-		MM_FreePtr(&(void *)PMSegPages);
+		MM_SetLock((memptr)&PMSegPages,false);
+		MM_FreePtr((memptr)&PMSegPages);
 	}
 }
 
@@ -2891,40 +2888,13 @@ void PM_Reset(void)
 //
 void PM_Startup(void)
 {
-	boolean	nomain,noems,noxms;
 	int		i;
 
 	if (PMStarted)
 		return;
 
-	nomain = noems = noxms = false;
-	for (i = 1;i < _argc;i++)
-	{
-		switch (US_CheckParm(_argv[i],ParmStrings))
-		{
-		case 0:
-			nomain = true;
-			break;
-		case 1:
-			noems = true;
-			break;
-		case 2:
-			noxms = true;
-			break;
-		}
-	}
-
 	PML_OpenPageFile();
-
-	if (!noems)
-		PML_StartupEMS();
-	if (!noxms)
-		PML_StartupXMS();
-
-	if (nomain && !EMSPresent)
-		Quit("PM_Startup: No main or EMS");
-	else
-		PML_StartupMainMem();
+	PML_StartupMainMem();
 
 	PM_Reset();
 

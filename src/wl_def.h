@@ -1212,7 +1212,5 @@ void SpawnHitler (int tilex, int tiley);
 =============================================================================
 */
 
-extern	char	helpfilename[],endfilename[];
-
 extern	void	HelpScreens(void);
 extern	void	EndText(void);

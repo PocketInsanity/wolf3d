@@ -730,8 +730,6 @@ int 	endextern = T_ENDART1;
 #ifndef SPEAR
 int		helpextern = T_HELPART;
 #endif
-char helpfilename[13] = "HELPART.",
-	 endfilename[13] = "ENDART1.";
 #endif
 
 /*
