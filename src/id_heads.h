@@ -27,6 +27,7 @@
 #define O_BINARY 0
 #endif
 
+int WolfMain(int argc, char *argv[]);
 
 /* ------------------------------------------------------------------------ */
 
@@ -80,10 +81,10 @@ typedef	struct
 
 #define	nil	((void *)0)
 
+#include "vi_comm.h"
+
 #include "id_ca.h"
-#include "id_vl.h"
 #include "id_vh.h"
-#include "id_in.h"
 #include "id_sd.h"
 #include "id_us.h"
 
