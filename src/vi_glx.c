@@ -29,7 +29,7 @@ int attrib[] = {
 	GLX_RED_SIZE,           5,
 	GLX_GREEN_SIZE,         5,
 	GLX_BLUE_SIZE,          5,
-//	GLX_DEPTH_SIZE,         16,
+	GLX_DEPTH_SIZE,         16,
 	GLX_DOUBLEBUFFER,
         None
 };
@@ -135,7 +135,7 @@ int main(int argc, char *argv[])
 	
 	glXMakeCurrent(dpy, win, ctx);
 	
-	XMapWindow(dpy, win);
+//	XMapWindow(dpy, win);
 	
 	XFlush(dpy);
 		
@@ -157,8 +157,8 @@ void VL_WaitVBL(int vbls)
 
 void VW_UpdateScreen()
 {
-//	glXSwapBuffers(dpy, win);
-//	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glXSwapBuffers(dpy, win);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 /*
@@ -176,15 +176,17 @@ void VL_Startup()
 	if (gfxbuf == NULL) 
 		gfxbuf = malloc(320 * 200 * 1);
 				   
-//	XMapWindow(dpy, win);
+	XMapWindow(dpy, win);
 	
 	glColor4f(0.0f, 0.0f, 0.0f, 0.0f);
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	
 	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_DEPTH_TEST);
 	
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
+	glFrustum(-0.286751, 0.286751, -0.288675, 0.288675, 0.500000, 182.000000);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	glMatrixMode(GL_TEXTURE);
@@ -517,6 +519,14 @@ int XKeysymToScancode(unsigned int keysym)
 		case XK_KP_Enter:
 		case XK_Return:
 			return sc_Enter;
+		case XK_1:
+			return sc_1;
+		case XK_2:
+			return sc_2;
+		case XK_3:
+			return sc_3;
+		case XK_4:
+			return sc_4;
 		case XK_y:
 			return sc_Y;
 		case XK_n:

@@ -75,7 +75,11 @@ screen update
 * GL_shared_texture_palette for opengl
 * if window looses focus, should it clear the keys ?
 * add DGA, clean up vi_xlib.c, fix vid mode changing
-* fix broken opengl
+* fix broken opengl.. argh wolf3d updates lots of stuff used in other parts
+of the game (namely stuff used for hit testing when firing weapon) in the
+draw loop.. start by cp wl_draw.c vi_ogl.c and just take out the actual
+drawing bits and replace with opengl.
+* change visable -> visible
 
 Specific:
 * memory/sound intro screen goes
