@@ -225,18 +225,22 @@ void LevelCompleted (void)
 	NumberIndex = 47;		/* Hack to draw score using an alternate number set */
 	NewGameWindow(1);		/* Force 512 mode screen */
 	PackPtr = LoadAResource(rIntermission);
-	PackLength = PackPtr[0];
+	PackLength = lMSB(PackPtr[0]);
 	ShapePtr = (Byte *) AllocSomeMem(PackLength);
 	DLZSS(ShapePtr,(Byte *) &PackPtr[1],PackLength);
 	DrawShape(0,0,ShapePtr);
 	FreeSomeMem(ShapePtr);
 	ReleaseAResource(rIntermission);
 	PackPtr = LoadAResource(rInterPics);
-	PackLength = PackPtr[0];
+	PackLength = lMSB(PackPtr[0]);
 	BJPtr = (Byte *)AllocSomeMem(PackLength);
 	DLZSS(BJPtr,(Byte *) &PackPtr[1],PackLength);
 	ReleaseAResource(rInterPics);
 	memcpy(Indexs,BJPtr,12);		/* Copy the index table */
+	
+	Indexs[0] = lMSB(Indexs[0]);
+	Indexs[1] = lMSB(Indexs[1]);
+	Indexs[2] = lMSB(Indexs[2]);
 	
 	WhichBJ = 0;		/* Init BJ */
 	BJTime = ReadTick()-50;		/* Force a redraw */

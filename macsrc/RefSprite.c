@@ -186,7 +186,7 @@ void AddSprite (thing_t *thing,Word actornum)
 
 	patch = SpriteArray[thing->sprite];	/* Pointer to the sprite info */
 	
-	width =((LongWord)patch[0]*scale)>>6; 	/* Get the width of the shape */
+	width =((LongWord)sMSB(patch[0])*scale)>>6; 	/* Get the width of the shape */
 	if (!width) {
 		return;		/* too far away*/
 	}
@@ -203,7 +203,7 @@ void AddSprite (thing_t *thing,Word actornum)
 	VisPtr->x1 = x1;			/* Min x */
 	VisPtr->x2 = x2;			/* Max x */
 	VisPtr->clipscale = scale;	/* Size to draw */
-	VisPtr->columnstep = (patch[0]<<8)/width; /* Step for width scale */
+	VisPtr->columnstep = (sMSB(patch[0])<<8)/width; /* Step for width scale */
 	VisPtr->actornum = actornum;	/* Actor who this is (0 for static) */
 
 /* pack the vissprite number into the low 6 bits of the scale for sorting */
@@ -231,7 +231,7 @@ void DrawTopSprite(void)
 
 		patch = SpriteArray[topspritenum];		/* Get the info on the shape */
 		
-		width = (patch[0]*topspritescale)>>7;		/* Adjust the width */
+		width = (sMSB(patch[0])*topspritescale)>>7;		/* Adjust the width */
 		if (!width) {	
 			return;		/* Too far away */
 		}
@@ -247,7 +247,7 @@ void DrawTopSprite(void)
 		VisRecord.x1 = x1;			/* Left edge */
 		VisRecord.x2 = x2;			/* Right edge */
 		VisRecord.clipscale = topspritescale;	/* Size */
-		VisRecord.columnstep = (patch[0]<<8)/(x2-x1+1);	/* Width step */
+		VisRecord.columnstep = (sMSB(patch[0])<<8)/(x2-x1+1);	/* Width step */
 
 /* Make sure it is sorted to be drawn last */
 

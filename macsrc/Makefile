@@ -2,6 +2,7 @@ CC = gcc
 
 #CFLAGS = -Wall -O6 -fomit-frame-pointer -ffast-math -funroll-loops -mpentiumpro -mcpu=pentiumpro -march=pentiumpro 
 #CFLAGS = -g -Wall
+#CFLAGS = -g -DNOVGA
 CFLAGS = -g
 #CFLAGS = -Os
 #CFLAGS = -g -Wall -I/home/relnev/cvs/oal/include
@@ -16,6 +17,7 @@ GOBJS = $(OBJS)
 
 LFLAGS = -lm 
 #LFLAGS = -lm -L/home/relnev/cvs/oal/linux/src -lopenal -lpthread -ldl
+#LFLAGS = -lm /home/relnev/ElectricFence-2.2.2/libefence.a -lpthread
 
 SLFLAGS = $(LFLAGS) -lvga
 XLFLAGS = $(LFLAGS) -L/usr/X11R6/lib -lX11 -lXext -lXxf86vm -lXxf86dga

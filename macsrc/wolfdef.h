@@ -8,6 +8,8 @@
 #define FALSE 0
 #endif
 
+#define PACKED __attribute__((packed))
+
 typedef struct {
 	int left;
 	int top;
@@ -272,7 +274,7 @@ typedef struct {
 	unsigned short numnodes;		/* Must be short */
 	unsigned short nodelistofs;		/* Must be short */
 	Byte data[1];		/* nodes, and spawn list */
-} loadmap_t;
+} PACKED loadmap_t;
 
 typedef struct {
 	unsigned short NextLevel;		/* Normal warp level */
@@ -280,13 +282,13 @@ typedef struct {
 	unsigned short ParTime;			/* Time for par */
 	unsigned short ScenarioNum;		/* Scenario number */
 	unsigned short FloorNum;		/* Floor number */
-} MapInfo_t;
+} PACKED MapInfo_t;
 
 typedef struct {
 	unsigned short MaxMap;			/* Maximum number of maps */
 	unsigned short MapRezNum;		/* Basic resource # */
 	MapInfo_t InfoArray[1];	/* Next map to jump to */
-} maplist_t;
+} PACKED maplist_t;
 
 /**********************************
 
@@ -327,16 +329,16 @@ typedef struct {
 	Byte plane;
 	Byte dir;
 	unsigned short children[2];
-} savenode_t;
+} PACKED savenode_t;
 
-#ifndef __BIGENDIAN__
+#ifndef __BIGENDIAN__ 
 typedef struct {
 	Byte	plane;		/* in half tiles*/
 	Byte	dir;
 	Byte	min,max;	/* in half tiles*/
 	Byte	texture;
 	Byte	area;
-} saveseg_t;
+} PACKED saveseg_t;
 #else
 typedef struct {
 	Byte	plane;			/* in half tiles*/
@@ -344,7 +346,7 @@ typedef struct {
 	Byte	max,min;		/* in half tiles*/
 	Byte	area;
 	Byte	texture;
-} saveseg_t;
+} PACKED saveseg_t;
 #endif
 
 /**********************************
@@ -356,8 +358,9 @@ typedef struct {
 
 /* Used by the renderer, must match the header of static_t, actor_t, missile_t */
 
+/* TODO: hrm */
 typedef struct {
-	int	x,y;		/* Item's x,y */
+	Word	x,y;		/* Item's x,y */
 	Word sprite;	/* Item's shape */
 	Word areanumber;	/* Item's visible area */
 } thing_t;
@@ -697,7 +700,7 @@ extern void IO_DisplayViewBuffer(void);
 extern Boolean BuildCompScale (Word height, void **finalspot,Byte *WorkPtr);
 extern Boolean SetupScalers(void);
 extern void ReleaseScalers(void);
-extern void IO_ScaleMaskedColumn(Word x,Word scale,unsigned short *sprite,Word column);
+extern void IO_ScaleMaskedColumn(Word x,Word scale, unsigned short *sprite,Word column);
 extern void DrawSmall(Word x,Word y,Word tile);
 extern void MakeSmallFont(void);
 extern void KillSmallFont(void);

@@ -592,7 +592,7 @@ Boolean SetupGameLevel(void)
 	dest = &tilemap[0][0];
 	Count = 0;
 	do {	
-		tile = src[Count];		/* Get the byte tile */
+		tile = src[Count];
 		if (tile & TI_BLOCKMOVE) {
 			tile |= TI_BLOCKSIGHT;	/* Mark as blocking my sight */
 			WallHits[(tile-1)&0x1F]=1;

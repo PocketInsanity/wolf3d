@@ -216,7 +216,7 @@ Boolean StartupRendering(Word NewSize)
 
 /* viewangle tangent table*/
 
-	if (MathSize==-1) {		/* Only needs to be done once */
+	if (MathSize== (Word)-1) {		/* Only needs to be done once */
 		i = 0;
 		do {
 			a = (i-FINEANGLES/4+0.1)*PI*2/FINEANGLES;
