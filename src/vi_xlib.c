@@ -27,8 +27,6 @@ Atom wmDeleteWindow;
 XColor clr[256];
 
 int indexmode;
-int rbias, gbias, bbias;
-int rmask, gmask, bmask;
 unsigned char mypal[768];
 
 Colormap GetVisual()
@@ -59,14 +57,16 @@ Colormap GetVisual()
 	
 	vitemp.depth = 15;
 	vitemp.class = TrueColor;
-	
+	vitemp.red_mask = 0x7C00;
+	vitemp.green_mask = 0x03E0;
+	vitemp.blue_mask = 0x001F;
 	vi = XGetVisualInfo(dpy, VisualScreenMask | VisualDepthMask |
 			    VisualClassMask, &vitemp, &numVisuals);
 	
 	if (vi && (numVisuals > 0)) {
 		indexmode = 0;
 		
-		printf("15: rm:%d gm:%d bm:%d cs:%d bpr:%d\n", vi->red_mask,
+		printf("15: rm:%04X gm:%04X bm:%04X cs:%04X bpr:%04X\n", vi->red_mask,
 			vi->green_mask, vi->blue_mask, vi->colormap_size,
 			vi->bits_per_rgb);
 			
@@ -76,15 +76,16 @@ Colormap GetVisual()
 	} 
 	
 	vitemp.depth = 16;
-	vitemp.class = TrueColor;
-	
+	vitemp.red_mask = 0xF800;
+	vitemp.green_mask = 0x07E0;
+	vitemp.blue_mask = 0x001F;
 	vi = XGetVisualInfo(dpy, VisualScreenMask | VisualDepthMask |
 			    VisualClassMask, &vitemp, &numVisuals);
 	
 	if (vi && (numVisuals > 0)) {
 		indexmode = 0;
 
-		printf("16: rm:%d gm:%d bm:%d cs:%d bpr:%d\n", vi->red_mask,
+		printf("16: rm:%04X gm:%04X bm:%04X cs:%04X bpr:%04X\n", vi->red_mask,
 			vi->green_mask, vi->blue_mask, vi->colormap_size,
 			vi->bits_per_rgb);
 		
@@ -94,15 +95,16 @@ Colormap GetVisual()
 	}
 	
 	vitemp.depth = 24;
-	vitemp.class = TrueColor;
-	
+	vitemp.red_mask = 0xFF0000;
+	vitemp.green_mask = 0x00FF00;
+	vitemp.blue_mask = 0x0000FF;
 	vi = XGetVisualInfo(dpy, VisualScreenMask | VisualDepthMask |
 			    VisualClassMask, &vitemp, &numVisuals);
 	
 	if (vi && (numVisuals > 0)) {
 		indexmode = 0;
 
-		printf("24: rm:%d gm:%d bm:%d cs:%d bpr:%d\n", vi->red_mask,
+		printf("24: rm:%04X gm:%04X bm:%04X cs:%04X bpr:%04X\n", vi->red_mask,
 			vi->green_mask, vi->blue_mask, vi->colormap_size,
 			vi->bits_per_rgb);
 		
@@ -110,7 +112,8 @@ Colormap GetVisual()
 		
 		return cmap;
 	}
-	
+
+#if 0	
 	vitemp.depth = 32;
 	vitemp.class = TrueColor;
 	
@@ -120,7 +123,7 @@ Colormap GetVisual()
 	if (vi && (numVisuals > 0)) {
 		indexmode = 0;
 
-		printf("32: rm:%d gm:%d bm:%d cs:%d bpr:%d\n", vi->red_mask,
+		printf("32: rm:%04X gm:%04X bm:%04X cs:%04X bpr:%04X\n", vi->red_mask,
 			vi->green_mask, vi->blue_mask, vi->colormap_size,
 			vi->bits_per_rgb);
 		
@@ -130,6 +133,7 @@ Colormap GetVisual()
 	}
 	
 	Quit("No usable visual found!");
+#endif
 		
 }
 
@@ -211,12 +215,41 @@ void VL_WaitVBL(int vbls)
 
 void VW_UpdateScreen()
 {
+	word *ptrs;
+	byte *ptrb;
+	
 	int i;
 	
 	if (indexmode == 0) {
-		for (i = 0; i < 64000; i++) {
+		switch(vi->depth) {
+		case 15:
+			ptrs = (word *)disbuf;
+			for (i = 0; i < 64000; i++) {
+				*ptrs = (mypal[gfxbuf[i]*3+0] >> 1) << 10 |
+					(mypal[gfxbuf[i]*3+1] >> 1) << 5  |
+					(mypal[gfxbuf[i]*3+2] >> 1);
+				ptrs++;
+			}
+			break;
+		case 16:
+			ptrs = (word *)disbuf;
+			for (i = 0; i < 64000; i++) {
+				*ptrs = (mypal[gfxbuf[i]*3+0] >> 1) << 11 |
+					(mypal[gfxbuf[i]*3+1] >> 0) << 5  |
+					(mypal[gfxbuf[i]*3+2] >> 1);
+				ptrs++;
+			}
+			break;
+		case 24:
+			ptrb = disbuf;
+			for (i = 0; i < 64000; i++) {
+				*ptrb = mypal[gfxbuf[i]*3+2] << 2; ptrb++;
+				*ptrb = mypal[gfxbuf[i]*3+1] << 2; ptrb++;
+				*ptrb = mypal[gfxbuf[i]*3+0] << 2; ptrb++;
+				ptrb++;
+			}
+			break;
 		}
-		memcpy(disbuf, gfxbuf, 64000);
 	}
 	
 	XPutImage(dpy, win, gc, img, 0, 0, 0, 0, 320, 200);
@@ -234,11 +267,13 @@ void VW_UpdateScreen()
 int BPP(int d)
 {
 	switch(d) {
+		case 8:
+			return 1;
 		case 15:
 		case 16:
 			return 2;
-		case 24:
-			return 3;
+		case 24: /* TODO: ??? the nvidia xserver really gave me AGBR? */
+			return 4;
 		case 32:
 			return 4;
 		default:
@@ -421,6 +456,7 @@ void VL_SetPalette(byte *palette)
 			mypal[i*3+1] = palette[i*3+1];
 			mypal[i*3+2] = palette[i*3+2];
 		}
+		VW_UpdateScreen();
 	}		
 }
 

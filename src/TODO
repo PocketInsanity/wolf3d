@@ -79,7 +79,11 @@ by putting in code from id_vh (either by using Plot or just copying it in)
 we can stop the large conversion before each UpdateScreen
 * pause key
 * what are special keys... ?
-
+* no fizzlefade in 15-24bit
+also, the higher bitrates are a hack since a palette lookup has to be done
+for every byte when transferring to the pixmap, palette fades require a
+screen update
+* mitshm
 
 Specific:
 * memory/sound intro screen goes
