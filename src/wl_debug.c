@@ -44,35 +44,6 @@ void ViewMap (void);
 /*
 ==================
 =
-= DebugMemory
-=
-==================
-*/
-
-void DebugMemory (void)
-{
-	int	i;
-	char    scratch[80],str[10];
-	long	mem;
-
-	CenterWindow (16,7);
-
-	US_CPrint ("Memory Usage");
-	US_CPrint ("------------");
-	US_Print ("k\nFree      :");
-	US_PrintUnsigned (MM_UnusedMemory()/1024);
-	US_Print ("k\nWith purge:");
-	US_PrintUnsigned (MM_TotalFree()/1024);
-	US_Print ("k\n");
-	VW_UpdateScreen();
-	IN_Ack ();
-}
-
-//===========================================================================
-
-/*
-==================
-=
 = CountObjects
 =
 ==================
@@ -174,6 +145,7 @@ void PicturePause (void)
 
 void ShapeTest (void)
 {
+#if 0 /* TODO: this code want to access the raycasting renderer directly */
 extern	word	NumDigi;
 extern	word	*DigiList;
 static	char	buf[10];
@@ -190,7 +162,6 @@ static	char	buf[10];
 	for (i = 0,done = false;!done;)
 	{
 		US_ClearWindow();
-//		sound = -1;
 
 		page = &PMPages[i];
 		US_Print(" Page #");
@@ -268,7 +239,6 @@ static	char	buf[10];
 				}
 				if (j < NumDigi)
 				{
-//					sound = j;
 					US_Print("\n Sound #");
 					US_PrintUnsigned(j);
 					US_Print("\n Segment #");
@@ -294,8 +264,10 @@ static	char	buf[10];
 
 		VW_UpdateScreen();
 
-		while (!(scan = LastScan))
+		while (!(scan = LastScan)) {
 			SD_Poll();
+			IN_CheckAck();
+		}
 
 		IN_ClearKey(scan);
 		switch (scan)
@@ -337,6 +309,7 @@ static	char	buf[10];
 		}
 	}
 	SD_StopDigitized();
+#endif
 }
 
 //===========================================================================
@@ -414,11 +387,6 @@ int DebugKeys()
 		IN_Ack ();
 		return 1;
 	}
-	else if (Keyboard[sc_M])			// M = memory info
-	{
-		DebugMemory();
-		return 1;
-	}
 	else if (Keyboard[sc_N])			// N = no clip
 	{
 		noclip^=1;
@@ -444,7 +412,7 @@ int DebugKeys()
 		return 1;
 	}
 	else if (Keyboard[sc_Q])			// Q = fast quit
-		Quit (NULL);
+		Quit(NULL);
 	else if (Keyboard[sc_S])			// S = slow motion
 	{
 		singlestep^=1;

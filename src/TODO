@@ -84,6 +84,7 @@ also, the higher bitrates are a hack since a palette lookup has to be done
 for every byte when transferring to the pixmap, palette fades require a
 screen update
 * mitshm
+* make sure none of the code tries to handle gfx/sound data directly
 
 Specific:
 * memory/sound intro screen goes

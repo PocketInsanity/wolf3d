@@ -25,7 +25,7 @@ typedef enum {
 		H_LEFTWINDOWPIC,             // 18
 		H_RIGHTWINDOWPIC,            // 19
 		H_BOTTOMINFOPIC,             // 20
-		H_SPEARINFO, /* TODO: this ruins the numbers :) */ // 21
+		H_SPEARINFO, 			// 21
 		// Lump Start
 		C_OPTIONSPIC,                // 22
 		C_CURSOR1PIC,                // 23

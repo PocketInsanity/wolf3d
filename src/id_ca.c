@@ -1429,36 +1429,6 @@ void MM_SortMem (void)
 {
 }
 
-/*
-======================
-=
-= MM_UnusedMemory
-=
-= Returns the total free space without purging
-=
-======================
-*/
-
-long MM_UnusedMemory(void)
-{
-	return 0;
-}
-
-/*
-======================
-=
-= MM_TotalFree
-=
-= Returns the total free space with purging
-=
-======================
-*/
-
-long MM_TotalFree (void)
-{
-	return 0;
-}
-
 	boolean PMStarted;
 	char			PageFileName[13] = {"vswap."};
 	int				PageFile = -1;

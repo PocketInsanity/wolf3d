@@ -4,12 +4,13 @@ CC = gcc
 CFLAGS = -g
 #CFLAGS = -Os
 OBJS = objs.o misc.o id_ca.o id_sd.o id_vh.o id_us.o \
-	wl_scale.o wl_draw.o wl_act1.o wl_act2.o wl_agent.o wl_game.o \
+	wl_act1.o wl_act2.o wl_agent.o wl_game.o \
 	wl_inter.o wl_menu.o wl_play.o wl_state.o wl_text.o wl_main.o \
 	wl_debug.o
-SOBJS = $(OBJS) vi_svga.o
-XOBJS = $(OBJS) vi_xlib.o
-GOBJS = $(OBJS) vi_glx.o
+ROBJS = wl_draw.o wl_scale.o
+SOBJS = $(OBJS) $(ROBJS) vi_svga.o
+XOBJS = $(OBJS) $(ROBJS) vi_xlib.o
+GOBJS = $(OBJS) vi_ogl.o vi_glx.o
 
 LFLAGS = -lm 
 #LFLAGS = -lm -lvga ElectricFence-2.2.2/libefence.a -lpthread

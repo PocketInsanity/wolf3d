@@ -95,9 +95,6 @@ void MM_SetPurge (memptr *baseptr, int purge);
 void MM_SetLock (memptr *baseptr, boolean locked);
 void MM_SortMem (void);
 
-long MM_UnusedMemory (void);
-long MM_TotalFree (void);
-
 #define PMPageSize              4096
 
 typedef	enum

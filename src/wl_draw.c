@@ -9,34 +9,18 @@
 
 #define ACTORSIZE	0x4000
 
-long 	lasttimecount;
-long 	frameon;
-
 unsigned	wallheight[MAXVIEWWIDTH];
 
 #define mindist	MINDIST
 
-//
-// math tables
-//
-int 		pixelangle[MAXVIEWWIDTH];
-long		finetangent[FINEANGLES/4];
-fixed 		sintable[ANGLES+ANGLES/4+1],*costable = sintable+(ANGLES/4);
+//int 		pixelangle[MAXVIEWWIDTH]; /* TODO: i put these in wl_main */
+//long		finetangent[FINEANGLES/4];
 
 //
 // refresh variables
 //
 fixed	viewx,viewy;			// the focal point
 int		viewangle;
-fixed	viewsin,viewcos;
-
-void	TransformActor (objtype *ob);
-void	BuildTables (void);
-void	ClearScreen (void);
-int		CalcRotate (objtype *ob);
-void	DrawScaleds (void);
-void	CalcTics (void);
-void	ThreeDRefresh (void);
 
 //
 // ray tracing variables
@@ -55,32 +39,9 @@ int		xtilestep,ytilestep;
 long	xintercept,yintercept;
 long	xstep,ystep;
 
-int		horizwall[MAXWALLTILES],vertwall[MAXWALLTILES];
-
 extern unsigned xoffset, yoffset;
 
 void AsmRefresh (void);
-
-/*
-========================
-=
-= FixedByFrac
-=
-= multiply a 16/16 bit, 2's complement fixed point number by a 16 bit
-= fraction, passed as a signed magnitude 32 bit number
-=
-========================
-*/
-fixed FixedByFrac (fixed a, fixed b)
-{
-	long long ra = a;
-	long long rb = b;
- 	long long r;
-
-	r = ra * rb;
-	r >>= 16;
-	return (fixed)r;
-}
 
 //==========================================================================
 
@@ -102,7 +63,6 @@ fixed FixedByFrac (fixed a, fixed b)
 =
 ========================
 */
-
 
 //
 // transform actor
@@ -366,7 +326,7 @@ void HitVertDoor (void)
 
 //==========================================================================
 
-unsigned vgaCeiling[]=
+unsigned Ceiling[]=
 {
 #ifndef SPEAR
  0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0xbfbf,
@@ -385,14 +345,14 @@ unsigned vgaCeiling[]=
 /*
 =====================
 =
-= VGAClearScreen
+= ClearScreen
 =
 =====================
 */
 
-void VGAClearScreen (void)
+void ClearScreen()
 {
-    unsigned ceiling = vgaCeiling[gamestate.episode*10+mapon] & 0xFF;
+    unsigned ceiling = Ceiling[gamestate.episode*10+mapon] & 0xFF;
     unsigned floor = 0x19;
 
    VL_Bar(xoffset, yoffset, viewwidth, viewheight / 2, ceiling);
@@ -409,7 +369,7 @@ void VGAClearScreen (void)
 =====================
 */
 
-int	CalcRotate (objtype *ob)
+int CalcRotate(objtype *ob)
 {
 	int	angle,viewangle;
 
@@ -499,7 +459,7 @@ void DrawScaleds (void)
 	for (obj = player->next;obj;obj=obj->next)
 	{
 		if (!(visptr->shapenum = obj->state->shapenum))
-			continue;						// no shape
+			continue;  // no shape
 
 		spotloc = (obj->tilex<<6)+obj->tiley;	// optimize: keep in struct?
 		visspot = &spotvis[0][0]+spotloc;
@@ -610,43 +570,6 @@ void DrawPlayerWeapon (void)
 
 //==========================================================================
 
-
-/*
-=====================
-=
-= CalcTics
-=
-=====================
-*/
-
-void CalcTics (void)
-{
-	long	newtime;
-
-//
-// calculate tics since last refresh for adaptive timing
-//
-	if (lasttimecount > get_TimeCount())
-		set_TimeCount(lasttimecount);		// if the game was paused a LONG time
-
-	do
-	{
-		newtime = get_TimeCount();
-		tics = newtime-lasttimecount;
-	} while (!tics);			// make sure at least one tic passes
-
-	lasttimecount = newtime;
-
-	if (tics>MAXTICS)
-	{
-		set_TimeCount(get_TimeCount() - (tics-MAXTICS));
-		tics = MAXTICS;
-	}
-}
-
-//==========================================================================
-
-
 /*
 ====================
 =
@@ -688,7 +611,7 @@ void WallRefresh (void)
 ========================
 */
 
-void	ThreeDRefresh (void)
+void ThreeDRefresh()
 {
 
 //
@@ -700,7 +623,7 @@ void	ThreeDRefresh (void)
 // follow the walls from there to the right, drawwing as we go
 //
 	DrawPlayBorder();
-	VGAClearScreen ();
+	ClearScreen();
 
 	WallRefresh ();
 
@@ -708,7 +631,7 @@ void	ThreeDRefresh (void)
 // draw all the scaled images
 //
 	DrawScaleds();			// draw scaled stuff
-	DrawPlayerWeapon ();	/* draw player's hands */
+	DrawPlayerWeapon();	/* draw player's hands */
 
 //
 // show screen and time last cycle

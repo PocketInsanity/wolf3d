@@ -2,6 +2,9 @@
 
 #include "id_heads.h"
 
+#include <vga.h>
+#include <vgakeyboard.h>
+
 byte *gfxbuf = NULL;
 
 void VL_WaitVBL(int vbls)

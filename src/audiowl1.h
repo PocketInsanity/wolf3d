@@ -84,7 +84,8 @@ typedef enum {
 		LASTSOUND
 	     } soundnames;
 
-#define YEAHSND NOWAYSND // TODO: YEAHSND not defined in here
+/* TODO: YEAHSND not defined in here */
+#define YEAHSND NOWAYSND
 
 //
 // Base offsets

@@ -205,8 +205,8 @@ void PlaceItemType (int itemtype, int tilex, int tiley)
 //
 	for (type=0 ;  ; type++)
 	{
-		if (statinfo[type].picnum == -1)		// end of list
-			Quit ("PlaceItemType: couldn't find type!");
+		if (statinfo[type].picnum == -1) /* end of list */
+			Quit("PlaceItemType: couldn't find type!");
 		if (statinfo[type].type == itemtype)
 			break;
 	}
@@ -219,12 +219,12 @@ void PlaceItemType (int itemtype, int tilex, int tiley)
 		if (spot==laststatobj)
 		{
 			if (spot == &statobjlist[MAXSTATS])
-				return;							// no free spots
-			laststatobj++;						// space at end
+				return;	/* no free spots */
+			laststatobj++;	/* space at end */
 			break;
 		}
 
-		if (spot->shapenum == -1)				// -1 is a free spot
+		if (spot->shapenum == -1) /* -1 is a free spot */
 			break;
 	}
 //

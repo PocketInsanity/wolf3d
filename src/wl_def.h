@@ -414,7 +414,7 @@ enum	{
 		SPR_MACHINEGUNATK4,
 
 		SPR_CHAINREADY,SPR_CHAINATK1,SPR_CHAINATK2,SPR_CHAINATK3,
-		SPR_CHAINATK4
+		SPR_CHAINATK4, SPR_NULLSPRITE
 
 		};
 
@@ -724,11 +724,6 @@ extern int pixelangle[MAXVIEWWIDTH];
 extern long finetangent[FINEANGLES/4];
 extern fixed sintable[], *costable;
 
-//
-// derived constants
-//
-extern	fixed maxslope;
-
 extern	char	configname[13];
 
 void		HelpScreens (void);
@@ -921,7 +916,6 @@ extern	unsigned	pwallpos;
 fixed	FixedByFrac (fixed a, fixed b);
 void	TransformActor (objtype *ob);
 void	BuildTables (void);
-void	ClearScreen (void);
 int		CalcRotate (objtype *ob);
 void	DrawScaleds (void);
 void	CalcTics (void);

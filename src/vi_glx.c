@@ -165,6 +165,8 @@ void VW_UpdateScreen()
 =======================
 */
 
+void Init3D();
+
 void VL_Startup()
 {
 	if (gfxbuf == NULL) 
@@ -181,7 +183,8 @@ void VL_Startup()
 	glLoadIdentity();
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-		
+
+	Init3D();		
 }
 
 /*

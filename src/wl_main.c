@@ -46,7 +46,7 @@ int             viewwidth;
 int             viewheight;
 int             centerx;
 int             shootdelta;                     // pixels away from centerx a target can be
-fixed           scale,maxslope;
+fixed           scale;
 long            heightnumerator;
 
 void            Quit(char *error);
@@ -54,7 +54,18 @@ void            Quit(char *error);
 boolean         startgame,loadedgame;
 int             mouseadjustment;
 
-char	configname[13]="config.";
+/* These are refuges from wl_draw.c */
+long frameon;
+long lasttimecount;
+fixed viewsin, viewcos;
+fixed viewx, viewy;                    // the focal point
+int pixelangle[MAXVIEWWIDTH];
+long finetangent[FINEANGLES/4];
+int horizwall[MAXWALLTILES], vertwall[MAXWALLTILES];
+
+char configname[13] = "config.";
+
+fixed sintable[ANGLES+ANGLES/4+1], *costable = sintable+(ANGLES/4);
 
 unsigned xoffset, yoffset;
 
@@ -62,13 +73,55 @@ int _argc;
 char **_argv;
 
 /*
-=============================================================================
-
-						 LOCAL VARIABLES
-
-=============================================================================
+========================
+=
+= FixedByFrac
+=
+= multiply a 16/16 bit, 2's complement fixed point number by a 16 bit
+= fraction, passed as a signed magnitude 32 bit number
+=
+========================
 */
 
+fixed FixedByFrac(fixed a, fixed b)
+{
+	long long ra = a;
+	long long rb = b;
+	long long r;
+	
+	r = ra * rb;
+	r >>= 16;
+	return (fixed)r;
+}
+
+/*
+=====================
+=
+= CalcTics
+=
+=====================
+*/
+
+void CalcTics()
+{
+	long newtime;
+	
+	/* calculate tics since last refresh for adaptive timing */
+	if (lasttimecount > get_TimeCount())
+		set_TimeCount(lasttimecount); /* if paused for a long time */
+		
+	do {
+		newtime = get_TimeCount();
+		tics = newtime - lasttimecount;
+	} while (!tics); /* make sure at least one tic passes */
+	
+	lasttimecount = newtime;
+	
+	if (tics > MAXTICS) {
+		set_TimeCount(get_TimeCount() - (tics - MAXTICS));
+		tics = MAXTICS;
+	}
+}
 
 /*
 ====================
@@ -592,13 +645,6 @@ void CalcProjection (long focal)
 		pixelangle[halfview-1-i] = intang;
 		pixelangle[halfview+i] = -intang;
 	}
-
-//
-// if a point's abs(y/x) is greater than maxslope, the point is outside
-// the view area
-//
-	maxslope = finetangent[pixelangle[0]];
-	maxslope >>= 8;
 }
 
 
@@ -1019,15 +1065,15 @@ void InitGame(void)
 {
 	int i;
 
-	MM_Startup (); 
-	VW_Startup ();
-	IN_Startup ();
-	PM_Startup ();
-	SD_Startup ();
-	CA_Startup ();
-	US_Startup ();
+	MM_Startup(); 
+	PM_Startup();
+	CA_Startup();
+	VW_Startup();
+	IN_Startup();
+	SD_Startup();
+	US_Startup();
 	
-	SignonScreen ();
+	SignonScreen();
 	
 //
 // build some tables
@@ -1086,7 +1132,7 @@ void InitGame(void)
 ==========================
 */
 
-boolean SetViewSize (unsigned width, unsigned height)
+boolean SetViewSize(unsigned width, unsigned height)
 {
 	viewwidth = width&~15;                  // must be divisable by 16
 	viewheight = height&~1;                 // must be even
@@ -1104,7 +1150,7 @@ boolean SetViewSize (unsigned width, unsigned height)
 //
 // build all needed compiled scalers
 //
-	SetupScaling (viewwidth*1.5);
+	SetupScaling(viewwidth*1.5);
 	return true;
 }
 

@@ -893,11 +893,10 @@ void VictoryTile (void)
 ===================
 */
 
-void Thrust (int angle, long speed)
+void Thrust(int angle, long speed)
 {
 	long xmove,ymove;
-	long	slowmax;
-	unsigned	offset;
+	unsigned offset;
 
 
 	//
@@ -927,7 +926,7 @@ void Thrust (int angle, long speed)
 	player->areanumber = *(mapsegs[0] + offset) -AREATILE;
 
 	if (*(mapsegs[1] + offset) == EXITTILE)
-		VictoryTile ();
+		VictoryTile();
 }
 
 
