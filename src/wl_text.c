@@ -476,21 +476,12 @@ void PageLayout (boolean shownumber)
 
 	if (shownumber)
 	{
-		#ifdef SPANISH
-		strcpy (str,"Hoja ");
-		itoa (pagenum,str2,10);
-		strcat (str,str2);
-		strcat (str," de ");
-		py = 183;
-		px = 208;
-		#else
 		strcpy (str,"pg ");
 		itoa (pagenum,str2,10);
 		strcat (str,str2);
 		strcat (str," of ");
 		py = 183;
 		px = 213;
-		#endif
 		itoa (numpages,str2,10);
 		strcat (str,str2);
 		fontcolor = 0x4f; 			   //12^BACKCOLOR;

@@ -29,3 +29,5 @@ clean:
 
 distclean: clean
 	rm -rf *~ DEADJOE
+
+forced: distclean wolf3d

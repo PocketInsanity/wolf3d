@@ -666,11 +666,7 @@ void FinishSignon (void)
 
 	SETFONTCOLOR(14,4);
 
-	#ifdef SPANISH
-	US_CPrint ("Oprima una tecla");
-	#else
 	US_CPrint ("Press a key");
-	#endif
 
 	if (!NoWait)
 		IN_Ack ();
@@ -680,11 +676,7 @@ void FinishSignon (void)
 	PrintY = 190;
 	SETFONTCOLOR(10,4);
 
-	#ifdef SPANISH
-	US_CPrint ("pensando...");
-	#else
 	US_CPrint ("Working...");
-	#endif
 
 	SETFONTCOLOR(0,15);
 #else

@@ -24,8 +24,6 @@ work the same, let the input handler do it all instead
 maybe there are clipping bugs that will cause it to fill over the top, left, 
 and right
 * remove DEMOEXTERN, and add ability to play demos from commandline 
-* remove SPANISH code (and spanish.h)? honestly i would rather have a german
-version than a spanish version
 * remove GOODTIMES (the piracy message is somewhat worthless)
 * then consider removing the SOD manual check
 * Use either US_CheckParm or MS_CheckParm.
@@ -50,20 +48,16 @@ data in vga memory. so figure it out, fix it, and remove
 just call a different function (most are left from the update block code)
 remove them
 * implement fizzlefade, and get that last pixel!
-* remove the time verification code (in wl_inter.c)
 * fix wl_debug.c, lots of junk code..
 * change the current parameter handling code to something like getopt
 * urgent: fix input (event handling), so that it makes sense
+* wl_menu.c does loops on Keyboard.  should call id_in functions instead
 
 Specific:
 * memory/sound intro screen goes
   - trademarked images, only came with wolf3d 1.4's (I believe)
-* spanish code goes
-  - Unable to find, doubtful if released
 * copy protection goes
   - Who needs a manual to look at the source?
-* time verification code goes
-  - The contest was killed before it was started.
 * put event handling in id_in.c
   - Most loops which take too long call some input function and can place a
     function call in the rest of the loops

@@ -150,11 +150,6 @@ void Victory (void)
 	CacheLump(LEVELEND_LUMP_START,LEVELEND_LUMP_END);
 	CA_CacheGrChunk(STARTFONT);
 
-#ifndef SPEAR
-	CA_CacheGrChunk(C_TIMECODEPIC);
-#endif
-
-
 	VWB_Bar (0,0,320,200-STATUSLINES,127);
 
 	Write(18,2,STR_YOUWIN);
@@ -163,15 +158,9 @@ void Victory (void)
 
 	Write(12,RATIOY-2,"averages");
 
-	#ifdef SPANISH
-	Write(RATIOX+2,  RATIOY,      STR_RATKILL);
-	Write(RATIOX+2,  RATIOY+2,  STR_RATSECRET);
-	Write(RATIOX+2,  RATIOY+4,STR_RATTREASURE);
-	#else
 	Write(RATIOX+8,RATIOY,      STR_RATKILL);
 	Write(RATIOX+4,RATIOY+2,  STR_RATSECRET);
 	Write(RATIOX,  RATIOY+4,STR_RATTREASURE);
-	#endif
 
 	VWB_DrawPic (8,4,L_BJWINSPIC);
 
@@ -227,32 +216,6 @@ void Victory (void)
 	x=RATIOX+24-strlen(tempstr)*2;
 	Write(x,RATIOY+4,tempstr);
 
-
-#ifndef SPANISH
-#ifndef UPLOAD
-#ifndef SPEAR
-	//
-	// TOTAL TIME VERIFICATION CODE
-	//
-	if (gamestate.difficulty>=gd_medium)
-	{
-		VWB_DrawPic (30*8,TIMEY*8,C_TIMECODEPIC);
-		fontnumber = 0;
-		fontcolor = READHCOLOR;
-		PrintX = 30*8-3;
-		PrintY = TIMEY*8+8;
-		PrintX+=4;
-		tempstr[0] = (((min/10)^(min%10))^0xa)+'A';
-		tempstr[1] = (((sec/10)^(sec%10))^0xa)+'A';
-		tempstr[2] = (tempstr[0]^tempstr[1])+'A';
-		tempstr[3] = 0;
-		US_Print(tempstr);
-	}
-#endif
-#endif
-#endif
-
-
 	fontnumber = 1;
 
 	VW_UpdateScreen ();
@@ -267,9 +230,6 @@ void Victory (void)
 
 	VW_FadeOut ();
 
-#ifndef SPEAR
-	UNCACHEGRCHUNK(C_TIMECODEPIC);
-#endif
 	UnCacheLump(LEVELEND_LUMP_START,LEVELEND_LUMP_END);
 
 #ifndef SPEAR
@@ -560,33 +520,19 @@ void LevelCompleted (void)
 		mapon < 17)
 #endif
 	{
-	 #ifdef SPANISH
-	 Write(14,2,"piso\ncompletado");
-	 #else
 	 Write(14,2,"floor\ncompleted");
-	 #endif
 
 	 Write(14,7,STR_BONUS"     0");
 	 Write(16,10,STR_TIME);
 	 Write(16,12,STR_PAR);
 
-	 #ifdef SPANISH
-	 Write(11,14,    STR_RAT2KILL);
-	 Write(11,16,  STR_RAT2SECRET);
-	 Write(11,18,STR_RAT2TREASURE);
-	 #else
 	 Write(9,14,    STR_RAT2KILL);
 	 Write(5,16,  STR_RAT2SECRET);
 	 Write(1,18,STR_RAT2TREASURE);
-	 #endif
 
 	 Write(26,2,itoa(gamestate.mapon+1,tempstr,10));
 
-	 #ifdef SPANISH
-	 Write(30,12,parTimes[gamestate.episode*10+mapon].timestr);
-	 #else
 	 Write(26,12,parTimes[gamestate.episode*10+mapon].timestr);
-	 #endif
 
 	 //
 	 // PRINT TIME
@@ -602,11 +548,7 @@ void LevelCompleted (void)
 	 min=sec/60;
 	 sec%=60;
 
-	 #ifdef SPANISH
-	 i=30*8;
-	 #else
 	 i=26*8;
-	 #endif
 	 VWB_DrawPic(i,10*8,L_NUM0PIC+(min/10));
 	 i+=2*8;
 	 VWB_DrawPic(i,10*8,L_NUM0PIC+(min%10));
@@ -660,11 +602,7 @@ void LevelCompleted (void)
 	 }
 
 
-	 #ifdef SPANISH
-	 #define RATIOXX		33
-	 #else
 	 #define RATIOXX		37
-	 #endif
 	 //
 	 // KILL RATIO
 	 //

@@ -4,12 +4,7 @@
 #include "id_heads.h"
 
 #include "wl_menu.h"
-
-#ifdef SPANISH
-#include "spanish.h"
-#else
 #include "foreign.h"
-#endif
 
 #ifdef SPEAR
 #include "f_spear.h"
