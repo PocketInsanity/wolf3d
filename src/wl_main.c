@@ -140,7 +140,7 @@ void ReadConfig()
 #if 0 /* TODO */
 	int file;
 	
-	if ( (file = open(configname,O_BINARY | O_RDONLY)) != -1)
+	if ((file = open(configname, O_BINARY | O_RDONLY)) != -1)
 	{
 	//
 	// valid config file
@@ -233,11 +233,11 @@ void ReadConfig()
 ====================
 */
 
-void WriteConfig(void)
+void WriteConfig()
 {
-	int                     file;
+	int file;
 
-	file = open(configname,O_CREAT | O_BINARY | O_WRONLY,
+	file = open(configname, O_CREAT | O_BINARY | O_WRONLY,
 				S_IREAD | S_IWRITE | S_IFREG);
 
 	if (file != -1)
@@ -278,9 +278,10 @@ void WriteConfig(void)
 =====================
 */
 
-void NewGame (int difficulty,int episode)
+void NewGame(int difficulty,int episode)
 {
-	memset (&gamestate,0,sizeof(gamestate));
+	memset(&gamestate,0,sizeof(gamestate));
+	
 	gamestate.difficulty = difficulty;
 	gamestate.weapon = gamestate.bestweapon
 		= gamestate.chosenweapon = wp_pistol;
@@ -293,27 +294,30 @@ void NewGame (int difficulty,int episode)
 	startgame = true;
 }
 
-//===========================================================================
+/* ======================================================================== */
 
-void DiskFlopAnim(int x,int y)
+void DiskFlopAnim(int x, int y)
 {
- static char which=0;
- if (!x && !y)
-   return;
- VWB_DrawPic(x,y,C_DISKLOADING1PIC+which);
- VW_UpdateScreen();
- which^=1;
+	static char which=0;
+	
+	if (!x && !y)
+		return;
+	
+	VWB_DrawPic(x,y,C_DISKLOADING1PIC+which);
+	VW_UpdateScreen();
+	
+	which ^= 1;
 }
 
 
-long DoChecksum(byte *source,unsigned size,long checksum)
+long DoChecksum(byte *source, unsigned size, long checksum)
 {
- unsigned i;
+	unsigned i;
 
- for (i=0;i<size-1;i++)
-   checksum += source[i]^source[i+1];
+	for (i=0;i<size-1;i++)
+		checksum += source[i]^source[i+1];
 
- return checksum;
+	return checksum;
 }
 
 
@@ -355,15 +359,14 @@ boolean SaveTheGame(int file,int x,int y)
 	CA_FarWrite (file,(void *)areaconnect,sizeof(areaconnect));
 	CA_FarWrite (file,(void *)areabyplayer,sizeof(areabyplayer));
 
-	for (ob = player ; ob ; ob=ob->next)
-	{
-	 DiskFlopAnim(x,y);
-	 CA_FarWrite (file,(void *)ob,sizeof(*ob));
+	for (ob = player; ob; ob=ob->next) {
+		DiskFlopAnim(x,y);
+		CA_FarWrite(file, (void *)ob, sizeof(*ob));
 	}
+	
 	nullobj.active = ac_badobject;          // end of file marker
 	DiskFlopAnim(x,y);
 	CA_FarWrite (file,(void *)&nullobj,sizeof(nullobj));
-
 
 
 	DiskFlopAnim(x,y);
@@ -395,9 +398,9 @@ boolean SaveTheGame(int file,int x,int y)
 	//
 	// WRITE OUT CHECKSUM
 	//
-	CA_FarWrite (file,(void *)&checksum,sizeof(checksum));
+	CA_FarWrite(file, (void *)&checksum, sizeof(checksum));
 
-	return(true);
+	return true;
 }
 
 //===========================================================================
@@ -450,15 +453,16 @@ boolean LoadTheGame(int file,int x,int y)
 
 	while (1)
 	{
-	 DiskFlopAnim(x,y);
-		CA_FarRead (file,(void *)&nullobj,sizeof(nullobj));
+		DiskFlopAnim(x,y);
+		CA_FarRead(file,(void *)&nullobj,sizeof(nullobj));
+		
 		if (nullobj.active == ac_badobject)
 			break;
+		
 		GetNewActor ();
 	 // don't copy over the links
-		memcpy (new,&nullobj,sizeof(nullobj)-4);
+		memcpy(new,&nullobj,sizeof(nullobj)-4);
 	}
-
 
 
 	DiskFlopAnim(x,y);
@@ -476,41 +480,41 @@ boolean LoadTheGame(int file,int x,int y)
 	checksum = DoChecksum((byte *)doorobjlist,sizeof(doorobjlist),checksum);
 
 	DiskFlopAnim(x,y);
-	CA_FarRead (file,(void *)&pwallstate,sizeof(pwallstate));
+	CA_FarRead(file,(void *)&pwallstate,sizeof(pwallstate));
 	checksum = DoChecksum((byte *)&pwallstate,sizeof(pwallstate),checksum);
-	CA_FarRead (file,(void *)&pwallx,sizeof(pwallx));
+	CA_FarRead(file,(void *)&pwallx,sizeof(pwallx));
 	checksum = DoChecksum((byte *)&pwallx,sizeof(pwallx),checksum);
-	CA_FarRead (file,(void *)&pwally,sizeof(pwally));
+	CA_FarRead(file,(void *)&pwally,sizeof(pwally));
 	checksum = DoChecksum((byte *)&pwally,sizeof(pwally),checksum);
-	CA_FarRead (file,(void *)&pwalldir,sizeof(pwalldir));
+	CA_FarRead(file,(void *)&pwalldir,sizeof(pwalldir));
 	checksum = DoChecksum((byte *)&pwalldir,sizeof(pwalldir),checksum);
-	CA_FarRead (file,(void *)&pwallpos,sizeof(pwallpos));
+	CA_FarRead(file,(void *)&pwallpos,sizeof(pwallpos));
 	checksum = DoChecksum((byte *)&pwallpos,sizeof(pwallpos),checksum);
 
-	CA_FarRead (file,(void *)&oldchecksum,sizeof(oldchecksum));
+	CA_FarRead(file, (void *)&oldchecksum, sizeof(oldchecksum));
 
 	if (oldchecksum != checksum)
 	{
-	 Message(STR_SAVECHT1"\n"
-			 STR_SAVECHT2"\n"
-			 STR_SAVECHT3"\n"
-			 STR_SAVECHT4);
+		Message(STR_SAVECHT1"\n"
+			STR_SAVECHT2"\n"
+			STR_SAVECHT3"\n"
+			STR_SAVECHT4);
+			
+		IN_ClearKeysDown();
+		IN_Ack();
 
-	 IN_ClearKeysDown();
-	 IN_Ack();
-
-	 gamestate.score = 0;
-	 gamestate.lives = 1;
-	 gamestate.weapon =
-	   gamestate.chosenweapon =
-	   gamestate.bestweapon = wp_pistol;
-	 gamestate.ammo = 8;
+		gamestate.score = 0;
+		gamestate.lives = 1;
+		gamestate.weapon =
+			gamestate.chosenweapon =
+			gamestate.bestweapon = wp_pistol;
+		gamestate.ammo = 8;
 	}
 
 	return true;
 }
 
-//===========================================================================
+/* ======================================================================== */
 
 /*
 ==========================
@@ -551,7 +555,7 @@ void ShutdownId()
 
 const float radtoint = (float)FINEANGLES/2.0f/PI;
 
-void BuildTables (void)
+void BuildTables()
 {
   int           i;
   float         angle,anglestep;
@@ -606,7 +610,7 @@ void BuildTables (void)
 ====================
 */
 
-void CalcProjection (long focal)
+void CalcProjection(long focal)
 {
 	int     i;
 	long    intang;

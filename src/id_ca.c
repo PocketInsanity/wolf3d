@@ -60,7 +60,7 @@ char extension[5],
 long *grstarts;	/* array of offsets in vgagraph, -1 for sparse */
 long *audiostarts; /* array of offsets in audio / audiot */
 
-huffnode	grhuffman[255];
+huffnode grhuffman[255];
 
 int grhandle; /* handle to VGAGRAPH */
 int maphandle; /* handle to MAPTEMP / GAMEMAPS */

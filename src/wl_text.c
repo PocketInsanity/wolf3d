@@ -31,13 +31,13 @@ TEXT FORMATTING COMMANDS
 #define WORDLIMIT		80
 #define FONTHEIGHT		10
 #define	TOPMARGIN		16
-#define BOTTOMMARGIN	32
+#define BOTTOMMARGIN		32
 #define LEFTMARGIN		16
 #define RIGHTMARGIN		16
 #define PICMARGIN		8
 #define TEXTROWS		((200-TOPMARGIN-BOTTOMMARGIN)/FONTHEIGHT)
 #define	SPACEWIDTH		7
-#define SCREENPIXWIDTH	320
+#define SCREENPIXWIDTH		320
 #define SCREENMID		(SCREENPIXWIDTH/2)
 
 /*
@@ -48,16 +48,16 @@ TEXT FORMATTING COMMANDS
 =============================================================================
 */
 
-int			pagenum,numpages;
+int		pagenum, numpages;
 
-unsigned	leftmargin[TEXTROWS],rightmargin[TEXTROWS];
+unsigned	leftmargin[TEXTROWS], rightmargin[TEXTROWS];
 char		*text;
 unsigned	rowon;
 
-int		picx,picy,picnum,picdelay;
+int		picx, picy, picnum, picdelay;
 boolean		layoutdone;
 
-//===========================================================================
+/* ======================================================================== */
 
 /*
 =====================
@@ -67,7 +67,7 @@ boolean		layoutdone;
 =====================
 */
 
-void RipToEOL (void)
+void RipToEOL()
 {
 	while (*text++ != '\n')		// scan to end of line
 	;
@@ -82,10 +82,10 @@ void RipToEOL (void)
 =====================
 */
 
-int	ParseNumber (void)
+int ParseNumber()
 {
-	char	ch;
-	char	num[80],*numptr;
+	char ch;
+	char num[80], *numptr;
 
 //
 // scan until a number is found
@@ -105,7 +105,7 @@ int	ParseNumber (void)
 	} while (ch >= '0' && ch <= '9');
 	*numptr = 0;
 
-	return atoi (num);
+	return atoi(num);
 }
 
 
@@ -121,22 +121,22 @@ int	ParseNumber (void)
 =====================
 */
 
-void	ParsePicCommand (void)
+void ParsePicCommand()
 {
-	picy=ParseNumber();
-	picx=ParseNumber();
-	picnum=ParseNumber();
-	RipToEOL ();
+	picy = ParseNumber();
+	picx = ParseNumber();
+	picnum = ParseNumber();
+	RipToEOL();
 }
 
 
-void	ParseTimedCommand (void)
+void ParseTimedCommand()
 {
-	picy=ParseNumber();
-	picx=ParseNumber();
-	picnum=ParseNumber();
-	picdelay=ParseNumber();
-	RipToEOL ();
+	picy = ParseNumber();
+	picx = ParseNumber();
+	picnum = ParseNumber();
+	picdelay = ParseNumber();
+	RipToEOL();
 }
 
 
