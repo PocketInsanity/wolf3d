@@ -630,6 +630,10 @@ static void MapRow()
 	while (mr_count--) {
 		ebx = ((esi & 0xFC000000) >> 25) | ((esi & 0xFC00) >> 3);
 		esi += edx;
+		//ebx = ((mr_yfrac & 0xFC00) >> (25-16)) | ((mr_xfrac & 0xFC00) >> 3);
+		//mr_yfrac += mr_ystep;
+		//mr_xfrac += mr_xstep;
+		
 	/*	
 		mr_dest[0] = planepics[0x1F00|(planepics[(ebx&0x1FFE)+0]&0xFF)];
 		mr_dest[mr_rowofs] = planepics[0x1F00|(planepics[(ebx&0x1FFE)+1]&0xFF)];
@@ -771,6 +775,10 @@ void DrawPlanes()
 ========================
 */
 
+#ifndef DRAWCEIL
+  //#define DRAWCEIL
+#endif
+ 
 void ThreeDRefresh()
 {
 
@@ -783,10 +791,12 @@ void ThreeDRefresh()
 // follow the walls from there to the right, drawwing as we go
 //
 	DrawPlayBorder();
+#ifndef DRAWCEIL	
 	ClearScreen();
+#endif	
 
 	WallRefresh();
-#if 0
+#ifdef DRAWCEIL
 	DrawPlanes();  /* silly floor/ceiling drawing */
 #endif
 //
@@ -816,7 +826,7 @@ void ThreeDRefresh()
 
 /* 
    xpartial = 16 bit fraction
-   ystep = 32 bit fixed 32,16
+   ystep = 32 bit fixed 16,16
 */
 
 static int samex(int intercept, int tile)
@@ -926,7 +936,7 @@ static void AsmRefresh()
 	    if (!samey (yintercept, ytile))
 		goto horizentry;
 	vertentry:
-	    tilehit = tilemap [xtile][TILE(yintercept)];
+	    tilehit = tilemap[xtile][TILE(yintercept)];
 
 	    if (tilehit != 0) {
 		if (tilehit & 0x80) {
@@ -959,16 +969,16 @@ static void AsmRefresh()
 		goto nextpix;
 	    }
     passvert:
-	    spotvis [xtile][TILE(yintercept)] = 1;
+	    spotvis[xtile][TILE(yintercept)] = 1;
 	    xtile += xtilestep;
 	    yintercept += ystep;
 	    goto vertcheck;
 	horizcheck:
 	    /* check intersections with horizontal walls */
-	    if (!samex (xintercept, xtile))
+	    if (!samex(xintercept, xtile))
 		goto vertentry;
 	horizentry:
-	    tilehit = tilemap [TILE(xintercept)][ytile];
+	    tilehit = tilemap[TILE(xintercept)][ytile];
 
 	    if (tilehit != 0) {
 		if (tilehit & 0x80) {

@@ -488,8 +488,9 @@ void SetupGameLevel()
 //
 // copy the wall data to a data segment array
 //
-	memset(tilemap,0,sizeof(tilemap));
-	memset(actorat,0,sizeof(actorat));
+	memset(tilemap, 0, sizeof(tilemap));
+	memset(actorat, 0, sizeof(actorat));
+	
 	map = mapsegs[0];
 	for (y=0;y<mapheight;y++)
 		for (x=0;x<mapwidth;x++)

@@ -15,9 +15,9 @@
 /* scaling data for a given height */
 typedef struct {
     /* number of destination pixels each source pixels maps to in x and y */
-    int count[65];
+    int count[64];
     /* the destination pixel for each source pixel row */
-    int desty[65];
+    int desty[64];
 } t_scaledata;
 
 static t_scaledata scaledata[MAXSCALEHEIGHT+1];
@@ -33,7 +33,6 @@ static void BuildCompScale(int height)
 	toppix = (viewheight - height) / 2;
 	fix = 0;
 		
-/* TODO: <= 64, or < 64? */
 	for (src = 0; src < 64; src++)
 	{
 		startpix = fix >> 16;
@@ -85,7 +84,7 @@ void SetupScaling(int maxscaleheight)
 
 }
 
-//===========================================================================
+/* ======================================================================== */
 
 /* TODO: this accesses gfxbuf directly! */
 static void ScaledDraw(byte *gfx, int scale, byte *vid, unsigned long tfrac, unsigned long tint, unsigned long delta)
@@ -98,6 +97,7 @@ static void ScaledDraw(byte *gfx, int scale, byte *vid, unsigned long tfrac, uns
 		OldDelta = delta;
 		delta += tfrac;
 		gfx += tint;
+
 		if (OldDelta > delta)
 			gfx += 1;
 	}
@@ -163,12 +163,9 @@ static void ScaleLine()
 
 	while (linecmds[0]) {
 		y0 = linecmds[2] / 2;
-		/* y1 = linecmds[0] / 2 - 1; */
 		y1 = linecmds[0] / 2;
 		pixels = (unsigned char *)shapeptr + y0 + linecmds[1];
-if (y1 >= 65) printf("overflow! %d\n", y1);
 
-		/* for (y = y0; y <= y1; y++) { */
 		for (y = y0; y < y1; y++) {
 			color = *pixels++;
 			ys = scaledata[linescale].desty[y];
@@ -189,12 +186,6 @@ if (y1 >= 65) printf("overflow! %d\n", y1);
 = ScaleShape
 =
 = Draws a compiled shape at [scale] pixels high
-=
-= each vertical line of the shape has a pointer to segment data:
-= 	end of segment pixel*2 (0 terminates line) used to patch rtl in scaler
-= 	top of virtual line with segment in proper place
-=	start of segment pixel*2, used to jsl into compiled scaler
-=	<repeat>
 =
 =======================
 */
@@ -385,12 +376,6 @@ void ScaleShape(int xcenter, int shapenum, unsigned height)
 = NO CLIPPING, height in pixels
 =
 = Draws a compiled shape at [scale] pixels high
-=
-= each vertical line of the shape has a pointer to segment data:
-= 	end of segment pixel*2 (0 terminates line) used to patch rtl in scaler
-= 	top of virtual line with segment in proper place
-=	start of segment pixel*2, used to jsl into compiled scaler
-=	<repeat>
 =
 =======================
 */

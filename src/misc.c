@@ -38,6 +38,7 @@ unsigned long get_TimeCount()
 	struct timeval t1;
 	long secs, usecs;
 	long tc;
+	//double d;
 	
 	gettimeofday(&t1, NULL);
 	secs = t1.tv_sec - t0.tv_sec;
@@ -46,7 +47,11 @@ unsigned long get_TimeCount()
 		usecs += 1000000;
 		secs--;
 	}
+	//d = (double)tc0 + (double)secs * 70.0 + (double)usecs * 70.0 / 1000000.0;
+	//d = (double)tc0 + ((double)secs * 1000000.0 + (double)usecs) / (1000000.0/70.0);
+	//tc = (long)d;
 	tc = tc0 + secs * 70 + usecs * 70 / 1000000;
+	
 	
 	return tc;
 }
