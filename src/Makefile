@@ -1,6 +1,7 @@
 CC = gcc
 #CFLAGS = -Wall -O6 -fomit-frame-pointer -mpentiumpro -mcpu=pentiumpro -march=pentiumpro -DUSEVGA
 CFLAGS = -g -DUSEVGA -fwritable-strings
+#CFLAGS = -Os -fwritable-strings
 #CFLAGS = -g -Wall -DUSEVGA -DDEBUG 
 #CFLAGS = -g -DUSEVGA -DDEBUG
 #CFLAGS = -g -pg -DDEBUG
@@ -9,8 +10,8 @@ OBJS = objs.o misc.o id_ca.o id_in.o id_sd.o id_vl.o id_vh.o id_us.o \
 	wl_inter.o wl_menu.o wl_play.o wl_state.o wl_text.o wl_main.o \
 	wl_debug.o
 
-#LFLAGS = -lm -lvga -pg
-LFLAGS = -lm -lvga ElectricFence-2.2.2/libefence.a -lpthread
+LFLAGS = -lm -lvga 
+#LFLAGS = -lm -lvga ElectricFence-2.2.2/libefence.a -lpthread
 
 NASM = nasm
 

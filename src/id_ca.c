@@ -380,7 +380,7 @@ void CAL_HuffExpand(byte *source, byte *dest, long length, huffnode *hufftable)
 #define NEARTAG	0xa7
 #define FARTAG	0xa8
 
-/* TODO: very correctness of byteinc */
+/* TODO: verify correctness of byteinc */
 void CAL_CarmackExpand(word *source, word *dest, word length)
 {
 	word ch, chhigh, count, offset;
@@ -852,7 +852,9 @@ cachein:
 void CAL_ExpandGrChunk(int chunk, byte *source)
 {
 	long expanded;
-
+	
+	int width = 0, height = 0;
+	
 	if (chunk >= STARTTILE8 && chunk < STARTEXTERNS)
 	{
 	//
@@ -874,22 +876,26 @@ void CAL_ExpandGrChunk(int chunk, byte *source)
 			expanded = BLOCK*16;
 		else
 			expanded = MASKBLOCK*16;
-	}
-	else
-	{
+	} else if (chunk >= STARTPICS && chunk < STARTSPRITES) {
+		width = pictable[chunk - STARTPICS].width;
+		height = pictable[chunk - STARTPICS].height;
+		expanded = *((long *)source);
+		source += 4;
+	} else {
 	//
 	// everything else has an explicit size longword
 	//
 		expanded = *((long *)source);
-		source += 4;			// skip over length
+		source += 4;
 	}
 
 //
-// allocate final space, decompress it, and free bigbuffer
-// Sprites need to have shifts made and various other junk
+// allocate final space and decompress it
 //
 	MM_GetPtr(&grsegs[chunk], expanded);
 	CAL_HuffExpand(source, grsegs[chunk], expanded, grhuffman);
+	if (width && height)
+		VL_DeModeXize(grsegs[chunk], width, height);
 }
 
 
@@ -1002,6 +1008,8 @@ void CA_CacheScreen(int chunk)
 //
 	/* TODO: this cheats and expands to the 320x200 screen buffer */
 	CAL_HuffExpand(source, gfxbuf, expanded, grhuffman);
+	/* and then fixes it also! */
+	VL_DeModeXize(gfxbuf, 320, 200);
 	MM_FreePtr(&bigbufferseg);
 }
 

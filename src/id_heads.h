@@ -14,6 +14,8 @@
 #include <glob.h>
 #include <math.h>
 
+#include <vga.h>
+
 #include "misc.h"
 
 #include "version.h"

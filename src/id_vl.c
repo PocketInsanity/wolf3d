@@ -10,10 +10,12 @@ byte *gfxbuf = NULL;
 
 void VL_WaitVBL(int vbls)
 {
+	vga_waitretrace();
 }
 
 void VL_UpdateScreen()
 {
+	memcpy(graph_mem, gfxbuf, 64000);
 }
 
 /*
@@ -28,6 +30,9 @@ void VL_Startup (void)
 {
 	if (gfxbuf == NULL) 
 		gfxbuf = malloc(320 * 200 * 1);
+		
+	vga_init();
+	vga_setmode(G320x200x256);
 }
 
 /*
@@ -44,6 +49,7 @@ void VL_Shutdown (void)
 		free(gfxbuf);
 		gfxbuf = NULL;
 	}
+	vga_setmode(TEXT);
 }
 
 //===========================================================================
@@ -58,8 +64,9 @@ void VL_Shutdown (void)
 =================
 */
 
-void VL_ClearVideo (byte color)
+void VL_ClearVideo(byte color)
 {
+	memset(gfxbuf, color, 64000);
 }
 
 /*
@@ -83,6 +90,10 @@ void VL_ClearVideo (byte color)
 
 void VL_FillPalette(int red, int green, int blue)
 {
+	int i;
+	
+	for (i = 0; i < 256; i++) 
+		vga_setpalette(i, red, green, blue);	
 }
 
 //===========================================================================
@@ -97,6 +108,7 @@ void VL_FillPalette(int red, int green, int blue)
 
 void VL_SetColor(int color, int red, int green, int blue)
 {
+	vga_setpalette(color, red, green, blue);
 }
 
 //===========================================================================
@@ -111,6 +123,7 @@ void VL_SetColor(int color, int red, int green, int blue)
 
 void VL_GetColor(int color, int *red, int *green, int *blue)
 {
+	vga_getpalette(color, red, green, blue);
 }
 
 //===========================================================================
@@ -120,14 +133,15 @@ void VL_GetColor(int color, int *red, int *green, int *blue)
 =
 = VL_SetPalette
 =
-= If fast palette setting has been tested for, it is used
-= (some cards don't like outsb palette setting)
-=
 =================
 */
 
 void VL_SetPalette(byte *palette)
 {
+	int i;
+	
+	for (i = 0; i < 256; i++)
+		vga_setpalette(i, palette[i*3+0], palette[i*3+1], palette[i*3+2]);
 }
 
 
@@ -138,14 +152,19 @@ void VL_SetPalette(byte *palette)
 =
 = VL_GetPalette
 =
-= This does not use the port string instructions,
-= due to some incompatabilities
-=
 =================
 */
 
 void VL_GetPalette(byte *palette)
 {
+	int i, r, g, b;
+	
+	for (i = 0; i < 256; i++) {
+		vga_getpalette(i, &r, &g, &b);
+		palette[i*3+0] = r;
+		palette[i*3+1] = g;
+		palette[i*3+2] = b;
+	}
 }
 
 
@@ -440,4 +459,28 @@ asm	mov	ds,ax
 
 	VGAWRITEMODE(0);
 #endif
+}
+
+void VL_DeModeXize(byte *buf, int width, int height)
+{
+	byte *mem, *ptr, *destline;
+	int plane, x, y;
+	
+	if (width & 3) {
+		printf("Not divisible by 4?\n");
+		return;
+	}
+	
+	mem = malloc(width * height);
+	ptr = buf;
+	for (plane = 0; plane < 4; plane++) {
+		destline = mem;
+		for (y = 0; y < height; y++) {
+			for (x = 0; x < width / 4; x++)
+				*(destline + x*4 + plane) = *ptr++;
+			destline += width;
+		}
+	}
+	memcpy(buf, mem, width * height);
+	free(mem);
 }
