@@ -364,10 +364,8 @@ void HandleWord()
 	}
 	words[wordindex] = 0;		// stick a null at end for C
 
-	//
-	// see if it fits on this line
-	//
-	VW_MeasurePropString (words, &wwidth, &wheight);
+	/* see if it fits on this line */
+	VW_MeasurePropString(words, &wwidth, &wheight);
 
 	while (px+wwidth > rightmargin[rowon])
 	{
@@ -380,7 +378,7 @@ void HandleWord()
 	// print it
 	//
 	newpos = px+wwidth;
-	VW_DrawPropString (words);
+	VW_DrawPropString(words);
 	px = newpos;
 
 	//

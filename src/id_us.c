@@ -117,10 +117,9 @@ void US_PrintUnsigned(longword n)
 ///////////////////////////////////////////////////////////////////////////
 void USL_PrintInCenter(char *s, Rect r)
 {
-	word	w,h,
-			rw,rh;
+	word w, h, rw, rh;
 
-	USL_MeasureString(s,&w,&h);
+	USL_MeasureString(s, &w, &h);
 	rw = r.lr.x - r.ul.x;
 	rh = r.lr.y - r.ul.y;
 
@@ -136,7 +135,7 @@ void USL_PrintInCenter(char *s, Rect r)
 ///////////////////////////////////////////////////////////////////////////
 void US_PrintCentered(char *s)
 {
-	Rect	r;
+	Rect r;
 
 	r.ul.x = WindowX;
 	r.ul.y = WindowY;
@@ -154,9 +153,9 @@ void US_PrintCentered(char *s)
 ///////////////////////////////////////////////////////////////////////////
 void US_CPrintLine(char *s)
 {
-	word	w,h;
+	word w, h;
 
-	USL_MeasureString(s,&w,&h);
+	USL_MeasureString(s, &w, &h);
 
 	if (w > WindowW)
 		Quit("US_CPrintLine() - String exceeds width");

@@ -1,6 +1,6 @@
 #include "wl_def.h"
 
-pictabletype *pictable;
+pictabletype pictable[NUMPICS];
 
 int px, py;
 byte fontcolor, backcolor;
@@ -327,10 +327,26 @@ void VW_DrawPropString(char *string)
 
 void VWL_MeasureString(char *string, word *width, word *height, fontstruct *font)
 {
-	/* proportional width */
+	int w, mw;
+	
+	w = 0;
+	mw = 0;
 	*height = font->height;
-	for (*width = 0; *string; string++)
-		*width += font->width[*((byte *)string)]; 
+	for (;*string; string++) {
+		if (*string == '\n') {
+			if (mw < w)
+				mw = w;
+
+			w = 0;
+			*height += font->height;
+		} else {
+			w += font->width[*((byte *)string)]; 
+		}
+	}
+	if (mw < w)
+		mw = w;
+		
+	*width = mw;
 }
 
 void VW_MeasurePropString(char *string, word *width, word *height)

@@ -558,21 +558,17 @@ void CheckKeys()
 		DrawAmmo();
 		DrawScore();
 
-		ClearMemory ();
-		CA_CacheGrChunk (STARTFONT+1);
-		ClearSplitVWB ();
+		ClearMemory();
+		CA_CacheGrChunk(STARTFONT+1);
+		ClearSplitVWB();
 
-		Message(STR_CHEATER1"\n"
-				STR_CHEATER2"\n\n"
-				STR_CHEATER3"\n"
-				STR_CHEATER4"\n"
-				STR_CHEATER5);
+		Message(STR_CHEATER);
 
 		CA_UnCacheGrChunk(STARTFONT+1);
 		IN_ClearKeysDown();
 		IN_Ack();
 
-		DrawPlayBorder ();
+		DrawPlayBorder();
 	}
 
 	//
@@ -581,15 +577,16 @@ void CheckKeys()
 	if (IN_KeyDown(sc_BackSpace) && IN_KeyDown(sc_LShift) &&
 		IN_KeyDown(sc_Alt) && MS_CheckParm("debugmode")) {
 	 ClearMemory();
-	 CA_CacheGrChunk (STARTFONT+1);
-	 ClearSplitVWB ();
+	 CA_CacheGrChunk(STARTFONT+1);
+	 ClearSplitVWB();
 
-	 Message("Debugging keys are\nnow available!");
+	 Message(STR_DEBUG);
+	 
 	 CA_UnCacheGrChunk(STARTFONT+1);
 	 IN_ClearKeysDown();
 	 IN_Ack();
 
-	 DrawPlayBorderSides ();
+	 DrawPlayBorderSides();
 	 DebugOk=1;
 	}
 
@@ -601,10 +598,7 @@ void CheckKeys()
 		CA_CacheGrChunk(STARTFONT+1);
 		ClearSplitVWB();
 
-		Message("Commander Keen is also\n"
-			"available from Apogee, but\n"
-			"then, you already know\n"
-			"that - right, Cheatmeister?!");
+		Message(STR_KEEN);
 
 		CA_UnCacheGrChunk(STARTFONT+1);
 		IN_ClearKeysDown();

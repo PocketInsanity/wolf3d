@@ -441,7 +441,7 @@ void ScanInfoPlane()
 		}
 }
 
-//==========================================================================
+/* ======================================================================== */
 
 /*
 ==================
@@ -471,22 +471,17 @@ void SetupGameLevel()
 	else
 		US_InitRndT(true);
 
-//
-// load the level
-//
+/* load the level */
 	CA_CacheMap(gamestate.mapon+10*gamestate.episode);
 	mapon -= gamestate.episode*10;
 
 	if ((mapheaderseg[mapon]->width != 64) || (mapheaderseg[mapon]->height != 64))
 		Quit("Map not 64*64!");
 
-
-//
-// copy the wall data to a data segment array
-//
 	memset(tilemap, 0, sizeof(tilemap));
 	memset(actorat, 0, sizeof(actorat));
-	
+
+/* copy the wall data to a data segment array */	
 	map = mapsegs[0];
 	for (y = 0; y < mapheight; y++)
 		for (x = 0; x < mapwidth; x++) {
@@ -499,14 +494,12 @@ void SetupGameLevel()
 				actorat[x][y] = 0;
 			}
 		}
-
-//
-// spawn doors
-//
+		
 	InitActorList();	/* start spawning things with a clean slate */
 	InitDoorList();
 	InitStaticList();
 
+/* spawn doors */
 	map = mapsegs[0];
 	for (y=0;y<mapheight;y++)
 		for (x=0;x<mapwidth;x++)
@@ -514,8 +507,8 @@ void SetupGameLevel()
 			tile = *map++;
 			if (tile >= 90 && tile <= 101)
 			{
-			// door
-				switch (tile)
+			/* door */
+				switch(tile)
 				{
 				case 90:
 				case 92:
@@ -523,7 +516,7 @@ void SetupGameLevel()
 				case 96:
 				case 98:
 				case 100:
-					SpawnDoor (x,y,1,(tile-90)/2);
+					SpawnDoor(x, y, 1, (tile-90)/2);
 					break;
 				case 91:
 				case 93:
@@ -531,20 +524,16 @@ void SetupGameLevel()
 				case 97:
 				case 99:
 				case 101:
-					SpawnDoor (x,y,0,(tile-91)/2);
+					SpawnDoor(x, y, 0,(tile-91)/2);
 					break;
 				}
 			}
 		}
 
-//
-// spawn actors
-//
+/* spawn actors */
 	ScanInfoPlane();
 
-//
-// take out the ambush markers
-//
+/* take out the ambush markers */
 	map = mapsegs[0];
 	for (y=0;y<mapheight;y++)
 		for (x=0;x<mapwidth;x++)
@@ -572,9 +561,7 @@ void SetupGameLevel()
 	CA_LoadAllSounds();
 }
 
-
-//==========================================================================
-
+/* ======================================================================== */
 
 /*
 ===================
@@ -667,7 +654,7 @@ void DrawPlayScreen()
 	DrawStatusBar();
 }
 
-//==========================================================================
+/* ======================================================================= */
 
 /*
 ==================
@@ -820,10 +807,10 @@ void PlayDemo(int demonumber)
 	CA_CacheGrChunk(dems[demonumber]);
 	demoptr = grsegs[dems[demonumber]];
 
-	NewGame (1,0);
+	NewGame(1, 0);
 	gamestate.mapon = *demoptr++;
 	gamestate.difficulty = gd_hard;
-	length = demoptr[0] | (demoptr[1] << 8); // *((word *)demoptr)++;
+	length = demoptr[0] | (demoptr[1] << 8);
 	demoptr += 3;
 	lastdemoptr = demoptr-4+length;
 
@@ -838,7 +825,7 @@ void PlayDemo(int demonumber)
 	startgame = false;
 	demoplayback = true;
 
-	SetupGameLevel ();
+	SetupGameLevel();
 	StartMusic();
 	fizzlein = true;
 
@@ -869,7 +856,7 @@ int PlayDemoFromFile(char *demoname)
 	NewGame(1,0);
 	gamestate.mapon = *demoptr++;
 	gamestate.difficulty = gd_hard;
-	length = demoptr[0] | (demoptr[1] << 8); // *((word *)demoptr)++;
+	length = demoptr[0] | (demoptr[1] << 8);
 	demoptr += 3;
 	lastdemoptr = demoptr-4+length;
 

@@ -24,6 +24,9 @@ char *ultoa(unsigned long value, char *string, int radix);
 
 #endif /* DOSISM */
 
+uint16_t SwapInt16L(uint16_t i);
+uint32_t SwapInt32L(uint32_t i);
+
 extern int OpenWrite(char *fn);
 extern int OpenWriteAppend(char *fn);
 extern void CloseWrite(int fp);

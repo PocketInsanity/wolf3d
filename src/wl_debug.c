@@ -229,5 +229,7 @@ int DebugKeys()
 		return 1;
 	}
 
+	DrawPlayBorder();
+	
 	return 0;
 }

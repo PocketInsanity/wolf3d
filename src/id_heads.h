@@ -21,9 +21,6 @@ typedef bool boolean;
 #define true TRUE
 #endif
 
-#define PACKED
-#pragma pack(1)
-
 #define ssize_t SSIZE_T
 
 #else 
@@ -33,8 +30,6 @@ typedef bool boolean;
 #include <sys/time.h>
 #include <values.h>
 #include <glob.h>
-
-#define PACKED __attribute__((packed))
 
 #ifdef __cplusplus
 typedef bool boolean;
@@ -88,10 +83,10 @@ typedef enum { false, true } boolean;
 
 /* ---------------- */
 
-typedef unsigned char byte;
-typedef unsigned short int word;
-typedef unsigned int longword;
-typedef unsigned long dword;
+typedef uint8_t		byte;
+typedef uint16_t	word;
+typedef uint32_t	longword;
+typedef uint32_t	dword;
 
 typedef long fixed;
 

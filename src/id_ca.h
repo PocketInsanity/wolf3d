@@ -61,8 +61,8 @@ void MM_SortMem();
 #define PMPageSize	4096
 
 typedef	struct {
-	longword offset;	// Offset of chunk into file
-	int length;		// Length of the chunk
+	int offset;	/* Offset of chunk into file */
+	int length;	/* Length of the chunk */
 	memptr addr;
 } PageListStruct;
 

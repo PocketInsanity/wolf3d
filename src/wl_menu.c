@@ -554,11 +554,11 @@ int CP_CheckQuick(unsigned scancode)
 				CA_CacheGrChunk(C_SAVEGAMEPIC);
 				CA_CacheGrChunk(C_MOUSELBACKPIC);
 				#else
-				CacheLump (BACKDROP_LUMP_START,BACKDROP_LUMP_END);
+				CacheLump(BACKDROP_LUMP_START,BACKDROP_LUMP_END);
 				CA_CacheGrChunk(C_CURSOR1PIC);
 				#endif
 
-				VW_FadeOut ();
+				VW_FadeOut();
 
 				StartCPMusic(MENUSONG);
 				pickquick=CP_SaveGame(0);
@@ -577,8 +577,6 @@ int CP_CheckQuick(unsigned scancode)
 					playstate = ex_abort;
 				lasttimecount = get_TimeCount();
 
-
-
 				#ifndef SPEAR
 				CA_UnCacheGrChunk(C_CURSOR1PIC);
 				CA_UnCacheGrChunk(C_CURSOR2PIC);
@@ -592,14 +590,11 @@ int CP_CheckQuick(unsigned scancode)
 			}
 			return 1;
 
-		//
-		// QUICKLOAD
-		//
+		/* QUICKLOAD */
 		case sc_F9:
 			if (SaveGamesAvail[LSItems.curpos] && pickquick)
 			{
 				char string[100]=STR_LGC;
-
 
 				CA_CacheGrChunk(STARTFONT+1);
 				fontnumber = 1;
@@ -2476,7 +2471,7 @@ void DrawChangeView(int view)
 // QUIT THIS INFERNAL GAME!
 //
 ////////////////////////////////////////////////////////////////////
-void CP_Quit(void)
+void CP_Quit()
 {
 	if (Confirm(endStrings[(US_RndT()&0x7)+(US_RndT()&1)]))
 	{
@@ -3109,7 +3104,6 @@ int Confirm(char *string)
 {
 	int xit=0,x,y,tick=0,whichsnd[2]={ESCPRESSEDSND,SHOOTSND};
 
-
 	Message(string);
 	IN_ClearKeysDown();
 
@@ -3164,28 +3158,14 @@ int Confirm(char *string)
 ////////////////////////////////////////////////////////////////////
 void Message(char *string)
 {
-	int h=0,w=0,mw=0,i;
-	fontstruct *font;
+	word h=0, mw=0;
 
-
-	CA_CacheGrChunk (STARTFONT+1);
+	CA_CacheGrChunk(STARTFONT+1);
 	fontnumber=1;
-	font= (fontstruct *)grsegs[STARTFONT+fontnumber];
-	h=font->height;
-	for (i=0;i<strlen(string);i++)
-		if (string[i]=='\n')
-		{
-			if (w>mw)
-				mw=w;
-			w=0;
-			h+=font->height;
-		}
-		else
-			w+=font->width[(int)string[i]];
 
-	if (w+10>mw)
-		mw=w+10;
-
+	VW_MeasurePropString(string, &mw, &h);
+	mw += 4;
+	
 	PrintY=(WindowH/2)-h/2;
 	PrintX=WindowX=160-mw/2;
 

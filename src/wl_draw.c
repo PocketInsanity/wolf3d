@@ -563,11 +563,9 @@ void DrawPlanes()
 	int x;
 
 	if ((viewheight>>1) != halfheight)
-		SetPlaneViewSize();		// screen size has changed
+		SetPlaneViewSize();	/* screen size has changed */
 
-//
-// loop over all columns
-//
+/* loop over all columns */
 	lastheight = halfheight;
 
 	for (x = 0; x < viewwidth; x++)
@@ -636,21 +634,18 @@ static void ClearScreen()
 */
 
 #ifndef DRAWCEIL
-  //#define DRAWCEIL
+  /* #define DRAWCEIL */
 #endif
  
 void ThreeDRefresh()
 {
 
-//
-// clear out the traced array
-//
+/* clear out the traced array */
 	memset(spotvis, 0, sizeof(spotvis));
 
-//
-// follow the walls from there to the right, drawwing as we go
-//
-	DrawPlayBorder();
+/* follow the walls from there to the right, drawing as we go */
+	
+	/* DrawPlayBorder(); */
 #ifndef DRAWCEIL	
 	ClearScreen();
 #endif	
@@ -659,21 +654,18 @@ void ThreeDRefresh()
 #ifdef DRAWCEIL
 	DrawPlanes();  /* silly floor/ceiling drawing */
 #endif
-//
-// draw all the scaled images
-//
+
+/* draw all the scaled images */
 	DrawScaleds();		/* draw scaled stuff */
 	DrawPlayerWeapon();	/* draw player's hands */
 
-//
-// show screen and time last cycle
-//
+/* show screen and time last cycle */
 	if (fizzlein)
 	{
 		FizzleFade(xoffset, yoffset, viewwidth, viewheight, 20, false);
 		fizzlein = false;
 
-		lasttimecount = 0;		/* don't make a big tic count */
+		lasttimecount = 0;	/* don't make a big tic count */
 		set_TimeCount(0);
 	}
 	

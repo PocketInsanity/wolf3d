@@ -1,6 +1,8 @@
 #ifndef	__SD_COMM_H__
 #define	__SD_COMM_H__
 
+#define PACKED __attribute__((packed))
+
 #define	TickBase	70	// 70Hz per tick
 
 typedef	enum	{

@@ -8,19 +8,19 @@
 
 typedef struct
 {
-	word width, height;
-} PACKED pictabletype;
+	int width, height;
+} pictabletype;
 
 typedef struct
 {
 	word height;
 	word location[256];
-	char width[256];
-} PACKED fontstruct;
+	byte width[256];
+} __attribute__((packed)) fontstruct;
 
 /* ======================================================================== */
 
-extern pictabletype *pictable;
+extern pictabletype pictable[NUMPICS];
 
 extern	byte	fontcolor;
 extern	int	fontnumber;

@@ -1,5 +1,7 @@
 #include "wl_def.h"
 
+#define PACKED __attribute__((packed))
+
 typedef struct pcx_header_type
 {
         char manufacturer;

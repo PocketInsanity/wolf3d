@@ -14,7 +14,7 @@ typedef struct
 =============================================================================
 */
 
-unsigned int RLEWtag;
+word RLEWtag;
 int mapon;
 
 word	*mapsegs[MAPPLANES];
@@ -62,47 +62,25 @@ static void CA_CannotOpen(char *string)
 /*
 ==========================
 =
-= CA_FarRead
+= CA_WriteFile
 =
-= Read from a file to a pointer
-=
-==========================
-*/
-
-boolean CA_FarRead(int handle, byte *dest, long length)
-{
-	ssize_t l;
-	
-	l = read(handle, dest, length);
-	
-	if (l == -1) {
-		perror("CA_FarRead");
-		return false;
-	} else if (l == 0) { 
-		fprintf(stderr, "CA_FarRead hit EOF?\n");
-		return false;
-	} else if (l != length) {
-		fprintf(stderr, "CA_FarRead only read %d out of %ld\n", l, length);
-		return false;
-	}
-	return true;
-}
-
-/*
-==========================
-=
-= CA_FarWrite
-=
-= Write from a file to a pointer
+= Writes a file from a memory buffer
 =
 ==========================
 */
 
-boolean CA_FarWrite(int handle, byte *source, long length)
+boolean CA_WriteFile(char *filename, void *ptr, long length)
 {
 	ssize_t l;
-	
-	l = write(handle, source, length);
+	int handle;
+
+	handle = open(filename, O_CREAT | O_BINARY | O_WRONLY, 
+			S_IREAD | S_IWRITE | S_IFREG);
+
+	if (handle == -1)
+		return false;
+
+	l = write(handle, ptr, length);
 	if (l == -1) {
 		perror("CA_FarWrite");
 		return false;
@@ -113,34 +91,7 @@ boolean CA_FarWrite(int handle, byte *source, long length)
 		fprintf(stderr, "CA_FarWrite only wrote %d out of %ld\n", l, length);
 		return false;
 	}
-	return true;
-}
 
-/*
-==========================
-=
-= CA_WriteFile
-=
-= Writes a file from a memory buffer
-=
-==========================
-*/
-
-boolean CA_WriteFile(char *filename, void *ptr, long length)
-{
-	int handle;
-
-	handle = open(filename, O_CREAT | O_BINARY | O_WRONLY, 
-			S_IREAD | S_IWRITE | S_IFREG);
-
-	if (handle == -1)
-		return false;
-
-	if (!CA_FarWrite(handle, ptr, length)) {
-		close(handle);
-		return false;
-	}
-	
 	close(handle);
 	return true;
 }
@@ -158,18 +109,28 @@ boolean CA_WriteFile(char *filename, void *ptr, long length)
 boolean CA_LoadFile(char *filename, memptr *ptr)
 {
 	int handle;
+	ssize_t l;
 	long size;
 
 	if ((handle = open(filename, O_RDONLY | O_BINARY)) == -1)
 		return false;
 
 	size = filelength(handle);
-	MM_GetPtr (ptr,size);
-	if (!CA_FarRead(handle,*ptr,size))
-	{
-		close (handle);
+	MM_GetPtr(ptr, size);
+	
+	l = read(handle, ptr, size);
+	
+	if (l == -1) {
+		perror("CA_FarRead");
+		return false;
+	} else if (l == 0) { 
+		fprintf(stderr, "CA_FarRead hit EOF?\n");
+		return false;
+	} else if (l != size) {
+		fprintf(stderr, "CA_FarRead only read %d out of %ld\n", l, size);
 		return false;
 	}
+	
 	close(handle);
 	return true;
 }
@@ -233,7 +194,7 @@ void CAL_HuffExpand(byte *source, byte *dest, long length, huffnode *htable)
 #define NEARTAG	0xa7
 #define FARTAG	0xa8
 
-void CAL_CarmackExpand(word *source, word *dest, word length)
+void CAL_CarmackExpand(byte *source, word *dest, word length)
 {
 	unsigned int offset;
 	word *copyptr, *outptr;	
@@ -241,7 +202,7 @@ void CAL_CarmackExpand(word *source, word *dest, word length)
 	
 	length /= 2;
 
-	inptr = (byte *)source;
+	inptr = source;
 	outptr = dest;
 
 	while (length) {		
@@ -308,10 +269,10 @@ void CA_RLEWexpand(word *source, word *dest, long length, word rlewtag)
 		
 		if (value != rlewtag)
 			/* uncompressed */
-			*dest++=value;
+			*dest++ = value;
 		else {
 			/* compressed string */
-			count = *source++;
+			count = SwapInt16L(*source); source++;
 			value = *source++;
 			for (i = 1; i <= count; i++)
 				*dest++ = value;
@@ -344,10 +305,7 @@ static void CAL_SetupGrFile()
 	byte *grtemp;
 	int i;
 
-//
-// load vgadict.ext (huffman dictionary for graphics files)
-//
-
+/* load vgadict.ext (huffman dictionary for graphics files) */
 	strcpy(fname, gdictname);
 	strcat(fname, extension);
 
@@ -362,9 +320,7 @@ static void CAL_SetupGrFile()
 	
 	CloseRead(handle);
 	
-//
-// load the data offsets from vgahead.ext
-//
+/* load the data offsets from vgahead.ext */
 	MM_GetPtr((memptr)&grstarts, (NUMCHUNKS+1)*4);
 	MM_GetPtr((memptr)&grtemp, (NUMCHUNKS+1)*3);
 	
@@ -384,9 +340,7 @@ static void CAL_SetupGrFile()
 	
 	CloseRead(handle);
 	
-//
-// Open the graphics file, leaving it open until the game is finished
-//
+/* Open the graphics file, leaving it open until the game is finished */
 	strcpy(fname, gfilename);
 	strcat(fname, extension);
 
@@ -394,10 +348,7 @@ static void CAL_SetupGrFile()
 	if (grhandle == -1)
 		CA_CannotOpen(fname);
 
-//
-// load the pic headers into pictable
-//
-	MM_GetPtr((memptr)&pictable, NUMPICS*sizeof(pictabletype));
+/* load the pic headers into pictable */
 	chunkcomplen = grstarts[STRUCTPIC+1] - grstarts[STRUCTPIC];
 	ReadSeek(grhandle, grstarts[STRUCTPIC], SEEK_SET);
 
@@ -405,11 +356,20 @@ static void CAL_SetupGrFile()
 
 	ReadBytes(grhandle, compseg, chunkcomplen);
 	
-	CAL_HuffExpand((byte *)compseg+4, (byte *)pictable, NUMPICS*sizeof(pictabletype), grhuffman);
+	/* pictable is word width, height */
+	MM_GetPtr((memptr)&grtemp, NUMPICS*4);
+	CAL_HuffExpand((byte *)compseg+4, (byte *)grtemp, NUMPICS*4, grhuffman);
 	MM_FreePtr(&compseg);
+	
+	for (i = 0; i < NUMPICS; i++) {
+		pictable[i].width = grtemp[i*4+0] | (grtemp[i*4+1] << 8);
+		pictable[i].height = grtemp[i*4+2] | (grtemp[i*4+3] << 8);
+	}
+	
+	MM_FreePtr((memptr)&grtemp);	
 }
 
-//==========================================================================
+/* ======================================================================== */
 
 
 /*
@@ -434,7 +394,8 @@ static void CAL_SetupMapFile()
 	if (handle == -1)
 		CA_CannotOpen(fname);
 
-	RLEWtag = ReadInt16(handle);
+	/* RLEWtag = ReadInt16(handle); */
+	ReadBytes(handle, (byte *)&RLEWtag, 2); /* RLEWtag = word */
 
 /* open the data file */
 	strcpy(fname, gmapsname);
@@ -444,9 +405,7 @@ static void CAL_SetupMapFile()
 	if (maphandle == -1)
 		CA_CannotOpen(fname);
 
-//
-// load all map header
-//
+/* load all map header */
 	for (i = 0; i < NUMMAPS; i++)
 	{
 		pos = ReadInt32(handle);
@@ -469,14 +428,12 @@ static void CAL_SetupMapFile()
 		mapheaderseg[i]->planelength[2] = ReadInt16(maphandle);
 		mapheaderseg[i]->width = ReadInt16(maphandle);
 		mapheaderseg[i]->height = ReadInt16(maphandle);
-		ReadBytes(maphandle, (byte *)mapheaderseg[i]->name, 16);
-		
+		ReadBytes(maphandle, (byte *)mapheaderseg[i]->name, 16);		
 	}
 
 	CloseRead(handle);
-//
-// allocate space for 2 64*64 planes
-//
+	
+/* allocate space for 2 64*64 planes */
 	for (i = 0;i < MAPPLANES; i++) {
 		MM_GetPtr((memptr)&mapsegs[i], 64*64*2);
 		MM_SetLock((memptr)&mapsegs[i], true);
@@ -565,7 +522,7 @@ void CA_Shutdown()
 	CloseRead(audiohandle);
 }
 
-//===========================================================================
+/* ======================================================================== */
 
 /*
 ======================
@@ -577,16 +534,11 @@ void CA_Shutdown()
 
 void CA_CacheAudioChunk(int chunk)
 {
-	long pos, length;
+	int pos, length;
 
-	if (audiosegs[chunk]) {
+	if (audiosegs[chunk])
 		return;	
-	}
 
-//
-// load the chunk into a buffer, either the miscbuffer if it fits, or allocate
-// a larger buffer
-//
 	pos = audiostarts[chunk];
 	length = audiostarts[chunk+1]-pos;
 
@@ -624,8 +576,7 @@ void CA_LoadAllSounds()
 		CA_CacheAudioChunk(start);
 }
 
-//===========================================================================
-
+/* ======================================================================== */
 
 /*
 ======================
@@ -646,29 +597,23 @@ static void CAL_ExpandGrChunk(int chunk, byte *source)
 	
 	if (chunk >= STARTTILE8 && chunk < STARTEXTERNS)
 	{
-	//
-	// expanded sizes of tile8 are implicit
-	//
-		expanded = (8*8)*NUMTILE8;
+	/* expanded sizes of tile8 are implicit */
+		expanded = 8*8*NUMTILE8;
 		width = 8;
 		height = 8;
 		tilecount = NUMTILE8;
 	} else if (chunk >= STARTPICS && chunk < STARTTILE8) {
 		width = pictable[chunk - STARTPICS].width;
 		height = pictable[chunk - STARTPICS].height;
-		expanded = *((long *)source);
+		expanded = source[0]|(source[1]<<8)|(source[2]<<16)|(source[3]<<24);
 		source += 4;
 	} else {
-	//
-	// everything else has an explicit size longword
-	//
-		expanded = *((long *)source);
+	/* everything else has an explicit size longword */
+		expanded = source[0]|(source[1]<<8)|(source[2]<<16)|(source[3]<<24);
 		source += 4;
 	}
 
-//
-// allocate final space and decompress it
-//
+/* allocate final space and decompress it */
 	MM_GetPtr((void *)&grsegs[chunk], expanded);
 	CAL_HuffExpand(source, grsegs[chunk], expanded, grhuffman);
 	if (width && height) {
@@ -695,7 +640,6 @@ void CA_CacheGrChunk(int chunk)
 	long pos, compressed;
 	byte *source;
 
-	/* this is due to Quit() wanting to cache the error screen before this has been set up! */
 	if (grhandle == -1)
 		return;
 		
@@ -703,9 +647,7 @@ void CA_CacheGrChunk(int chunk)
 		return;
 	}
 
-//
-// load the chunk into a buffer
-//
+/* load the chunk into a buffer */
 	pos = grstarts[chunk];
 
 	compressed = grstarts[chunk+1]-pos;
@@ -729,9 +671,9 @@ void CA_UnCacheGrChunk(int chunk)
 	
 	MM_FreePtr((memptr)&grsegs[chunk]);
 	
-	grsegs[chunk] = 0;
+	grsegs[chunk] = NULL;
 }
-
+	
 /* ======================================================================== */
 
 /*
@@ -744,48 +686,41 @@ void CA_UnCacheGrChunk(int chunk)
 
 void CA_CacheMap(int mapnum)
 {
-	long	pos,compressed;
-	int	plane;
-	memptr	*dest,bigbufferseg;
-	word	size;
-	word	*source;
-	memptr	buffer2seg;
-	long	expanded;
-
+	long pos,compressed;
+	int plane;
+	byte *source;
+	memptr buffer2seg;
+	long expanded;
+	int i;
+	
 	mapon = mapnum;
 
-//
-// load the planes into the allready allocated buffers
-//
-	size = 64*64*2;
+/* load the planes into the already allocated buffers */
 
 	for (plane = 0; plane < MAPPLANES; plane++)
 	{
 		pos = mapheaderseg[mapnum]->planestart[plane];
 		compressed = mapheaderseg[mapnum]->planelength[plane];
 
-		dest = (memptr)&mapsegs[plane];
+		ReadSeek(maphandle, pos, SEEK_SET);
+		
+		MM_GetPtr((void *)&source, compressed);
 
-		lseek(maphandle,pos,SEEK_SET);
-		MM_GetPtr(&bigbufferseg,compressed);
-		MM_SetLock (&bigbufferseg,true);
-		source = bigbufferseg;
-
-		CA_FarRead(maphandle,(byte *)source,compressed);
-		/*
-		 unhuffman, then unRLEW
-		 The huffman'd chunk has a two byte expanded length first
-		 The resulting RLEW chunk also does, even though it's not really
-		 needed
-		*/
-		expanded = *source;
-		source++;
+		ReadBytes(maphandle, (byte *)source, compressed);
+		
+		expanded = source[0] | (source[1] << 8);
 		MM_GetPtr(&buffer2seg, expanded);
-		CAL_CarmackExpand(source, (word *)buffer2seg,expanded);
-		CA_RLEWexpand(((word *)buffer2seg)+1,*dest,size, RLEWtag);
+		
+		CAL_CarmackExpand(source+2, (word *)buffer2seg, expanded);
+		MM_FreePtr((void *)&source);
+		
+		expanded = 64*64*2;
+		CA_RLEWexpand(((word *)buffer2seg)+1, mapsegs[plane], expanded, RLEWtag);
 		MM_FreePtr(&buffer2seg);
-
-		MM_FreePtr(&bigbufferseg);
+		
+		/* swap for big-endian */
+		for (i = 0; i < 64*64; i++)
+			mapsegs[plane][i] = SwapInt16L(mapsegs[plane][i]);		
 	}
 }
 
@@ -838,9 +773,6 @@ int ChunksInFile, PMSpriteStart, PMSoundStart;
 
 PageListStruct *PMPages;
 
-//
-//	PML_ReadFromFile() - Reads some data in from the page file
-//
 static void PML_ReadFromFile(byte *buf, long offset, word length)
 {
 	if (!buf)
@@ -853,9 +785,6 @@ static void PML_ReadFromFile(byte *buf, long offset, word length)
 		Quit("PML_ReadFromFile: Read failed");
 }
 
-//
-//	PML_OpenPageFile() - Opens the page file and sets up the page info
-//
 static void PML_OpenPageFile()
 {
 	int i;
@@ -869,29 +798,26 @@ static void PML_OpenPageFile()
 	if (PageFile == -1)
 		Quit("PML_OpenPageFile: Unable to open page file");
 
-	// Read in header variables
+	/* Read in header variables */
 	ChunksInFile = ReadInt16(PageFile);
 	PMSpriteStart = ReadInt16(PageFile);
 	PMSoundStart = ReadInt16(PageFile);
 
-	// Allocate and clear the page list
+	/* Allocate and clear the page list */
 	MM_GetPtr((memptr)&PMPages, sizeof(PageListStruct) * ChunksInFile);
 	MM_SetLock((memptr)&PMPages, true);
 	
 	memset(PMPages, 0, sizeof(PageListStruct) * ChunksInFile);
 
-	// Read in the chunk offsets
+	/* Read in the chunk offsets */
 	for (i = 0, page = PMPages; i < ChunksInFile; i++, page++)
 		page->offset = ReadInt32(PageFile);
 		
-	// Read in the chunk lengths
+	/* Read in the chunk lengths */
 	for (i = 0, page = PMPages; i < ChunksInFile; i++, page++)
 		page->length = ReadInt16(PageFile);
 }
 
-//
-//  PML_ClosePageFile() - Closes the page file
-//
 static void PML_ClosePageFile()
 {
 	if (PageFile != -1)
@@ -903,9 +829,6 @@ static void PML_ClosePageFile()
 	}
 }
 
-//
-//	PM_GetPage() - Returns the address of the page, loading it if necessary
-//
 memptr PM_GetPage(int pagenum)
 {
 	PageListStruct *page;
@@ -921,11 +844,6 @@ memptr PM_GetPage(int pagenum)
 	return page->addr;
 }
 
-//
-//	PM_Preload() - Loads as many pages as possible into all types of memory.
-//		Calls the update function after each load, indicating the current
-//		page, and the total pages that need to be loaded (for thermometer).
-//
 void PM_Preload(boolean (*update)(int current, int total))
 {
 	int i;
@@ -935,9 +853,6 @@ void PM_Preload(boolean (*update)(int current, int total))
 	update(50, 50);
 }
 
-//
-//	PM_Startup() - Start up the Page Mgr
-//
 void PM_Startup()
 {
 	if (PMStarted)
@@ -948,9 +863,6 @@ void PM_Startup()
 	PMStarted = true;
 }
 
-//
-//	PM_Shutdown() - Shut down the Page Mgr
-//
 void PM_Shutdown()
 {
 	if (!PMStarted)

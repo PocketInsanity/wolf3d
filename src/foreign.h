@@ -10,8 +10,8 @@
 		"      Overwrite?"
 
 #define ENDGAMESTR	"Are you sure you want\n"\
-					"to end the game you\n"\
-					"are playing? (Y or N):"
+			"to end the game you\n"\
+			"are playing? (Y or N):"
 
 #define STR_NG	"New Game"
 #define	STR_SD	"Sound"
@@ -34,7 +34,7 @@
 #define STR_CALIB	"Calibrate"
 #define STR_JOYST	"Joystick"
 #define STR_MOVEJOY	"Move joystick to\nupper left and\npress button 0\n"
-#define STR_MOVEJOY2 "Move joystick to\nlower right and\npress button 1\n"
+#define STR_MOVEJOY2	"Move joystick to\nlower right and\npress button 1\n"
 #define STR_ESCEXIT	"ESC to exit"
 
 #define STR_NONE	"None"
@@ -78,26 +78,34 @@
 
 #define STR_TOTALTIME	"total time"
 
-#define STR_RATKILL		    "kill    %"
-#define STR_RATSECRET  	  "secret    %"
+#define STR_RATKILL	"kill    %"
+#define STR_RATSECRET  	"secret    %"
 #define STR_RATTREASURE	"treasure    %"
 
 #define STR_BONUS	"bonus"
 #define STR_TIME	"time"
 #define STR_PAR		" par"
 
-#define STR_RAT2KILL            "kill ratio    %"
-#define STR_RAT2SECRET  	  "secret ratio    %"
+#define STR_RAT2KILL	"kill ratio    %"
+#define STR_RAT2SECRET	"secret ratio    %"
 #define STR_RAT2TREASURE	"treasure ratio    %"
 
 #define STR_DEFEATED	"defeated!"
 
-#define STR_CHEATER1	"You now have 100% Health,"
-#define STR_CHEATER2    "99 Ammo and both Keys!"
-#define STR_CHEATER3	"Note that you have basically"
-#define STR_CHEATER4	"eliminated your chances of"
-#define STR_CHEATER5	"getting a high score!"
+#define STR_CHEATER	"You now have 100% Health,\n"\
+			"99 Ammo and both Keys!\n\n"\
+			"Note that you have basically\n"\
+			"eliminated your chances of\n"\
+			"getting a high score!"
 
+#define STR_KEEN	"Commander Keen is also\n"\
+			"available from Apogee, but\n"\
+			"then, you already know\n"\
+			"that - right, Cheatmeister?!"
+
+#define STR_DEBUG	"Debugging keys are\n"\
+			"now available!"
+			
 #define STR_NOSPACE1	"There is not enough space"
 #define STR_NOSPACE2	"on your disk to Save Game!"
 
@@ -119,10 +127,10 @@
 #define ENDSTR8	"I'm thinkin' that\nyou might wanna press N\nto play more. You do it."
 #define ENDSTR9	"Sure. Fine. Quit.\nSee if we care.\nGet it over with.\nPress Y."
 
-#define STR_ENDGAME1	"We owe you a great debt, Mr. Blazkowicz."
-#define STR_ENDGAME2	"You have served your country well."
-#define STR_ENDGAME3	"With the spear gone, the Allies will finally"
-#define STR_ENDGAME4	"by able to destroy Hitler..."
+#define STR_ENDGAME1 "We owe you a great debt, Mr. Blazkowicz."
+#define STR_ENDGAME2 "You have served your country well."
+#define STR_ENDGAME3 "With the spear gone, the Allies will finally"
+#define STR_ENDGAME4 "by able to destroy Hitler..."
 
 #else
 

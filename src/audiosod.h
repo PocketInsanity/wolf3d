@@ -1,9 +1,7 @@
 #define NUMSOUNDS		81
 #define NUMSNDCHUNKS		267
 
-//
-// Sound names & indexes
-//
+/* Sound names & indexes */
 typedef enum {
 		HITWALLSND,              // 0
 		MISSILEHITSND,           // 1
@@ -89,16 +87,12 @@ typedef enum {
 		LASTSOUND
 	     } soundnames;
 
-//
-// Base offsets
-//
+/* Base offsets */
 #define STARTPCSOUNDS		0
 #define STARTADLIBSOUNDS	81
 #define STARTMUSIC		243
 
-//
-// Music names & indexes
-//
+/* Music names & indexes */
 typedef enum {
 		XFUNKIE_MUS,             // 0
 		DUNGEON_MUS,             // 1
