@@ -1,5 +1,3 @@
-/* id_vl.c */
-
 #include "wl_def.h"
 
 #include <sys/ipc.h>
@@ -41,6 +39,8 @@ int dga;
 byte *dgabuf;
 int dgawidth, dgabank, dgamem, vwidth, vheight;
 unsigned char mypal[768];
+
+int MyDepth;
 
 int main(int argc, char *argv[])
 {
@@ -131,10 +131,6 @@ void GetVisual()
 	if (vi && (numVisuals > 0)) {
 		indexmode = 0;
 		
-		printf("15: rm:%04lX gm:%04lX bm:%04lX cs:%04X bpr:%04X\n", vi->red_mask,
-			vi->green_mask, vi->blue_mask, vi->colormap_size,
-			vi->bits_per_rgb);
-			
 		cmap = XCreateColormap(dpy, root, vi->visual, AllocNone);
 		
 		return;
@@ -150,10 +146,6 @@ void GetVisual()
 	if (vi && (numVisuals > 0)) {
 		indexmode = 0;
 
-		printf("16: rm:%04lX gm:%04lX bm:%04lX cs:%04X bpr:%04X\n", vi->red_mask,
-			vi->green_mask, vi->blue_mask, vi->colormap_size,
-			vi->bits_per_rgb);
-		
 		cmap = XCreateColormap(dpy, root, vi->visual, AllocNone);
 		
 		return;
@@ -168,19 +160,13 @@ void GetVisual()
 	
 	if (vi && (numVisuals > 0)) {
 		indexmode = 0;
-
-		printf("24: rm:%04lX gm:%04lX bm:%04lX cs:%04X bpr:%04X\n", vi->red_mask,
-			vi->green_mask, vi->blue_mask, vi->colormap_size,
-			vi->bits_per_rgb);
 		
 		cmap = XCreateColormap(dpy, root, vi->visual, AllocNone);
 		
 		return;
 	}
 
-#if 0	
 	vitemp.depth = 32;
-	vitemp.class = TrueColor;
 	
 	vi = XGetVisualInfo(dpy, VisualScreenMask | VisualDepthMask |
 			    VisualClassMask, &vitemp, &numVisuals);
@@ -188,36 +174,45 @@ void GetVisual()
 	if (vi && (numVisuals > 0)) {
 		indexmode = 0;
 
-		printf("32: rm:%04lX gm:%04lX bm:%04lX cs:%04X bpr:%04X\n", vi->red_mask,
-			vi->green_mask, vi->blue_mask, vi->colormap_size,
-			vi->bits_per_rgb);
-		
 		cmap = XCreateColormap(dpy, root, vi->visual, AllocNone);
 		
 		return;
 	}
-#endif	
 
 	Quit("No usable visual found!");		
 }
 
-int BPP(int d)
+int GetBPP()
 {
-	switch(d) {
+	switch(img->depth) {
+		case 4:
+			break;
 		case 8:
-			return 1;
+			if (img->bits_per_pixel == 8)
+				return 8;
+			break;
 		case 15:
+			if (img->bits_per_pixel == 16)
+				return 15;
+			break;
 		case 16:
-			return 2;
-		case 24: /* TODO: ??? the nvidia xserver really gave me AGBR? */
-			/* need to check what the image says */
-			return 4;
+			if (img->bits_per_pixel == 16)
+				return 16;
+			break;
+		case 24:
+			if (img->bits_per_pixel == 24)
+				return 24;
+			else
+				return 32;
+			break;
 		case 32:
-			return 4;
-		default:
-			Quit("Sorry, BPP doesn't like that...");
-			return 0; /* heh */
+			if (img->bits_per_pixel == 32)
+				return 32;
+			break;
 	}
+	fprintf(stderr, "Unsupported combination of depth %d and bits per pixel %d...\n", img->depth, img->bits_per_pixel);
+	fprintf(stderr, "pad = %d, unit = %d, bits = %d, bpl = %d, rgb = %d, depth = %d (%d)\n", img->bitmap_pad, img->bitmap_unit, img->bits_per_pixel, img->bytes_per_line, vi->bits_per_rgb, img->depth, vi->depth);
+	exit(EXIT_FAILURE);
 }
 	
 void VL_Startup()
@@ -235,9 +230,10 @@ void VL_Startup()
 	int attrmask, eventn, errorn, i, vmc;
 	
 	disp = getenv("DISPLAY");
+	
 	dpy = XOpenDisplay(disp);
+	
 	if (dpy == NULL) {
-		/* TODO: quit function with vsnprintf */
 		fprintf(stderr, "Unable to open display %s!\n", XDisplayName(disp));
 		exit(EXIT_FAILURE);
 	}
@@ -247,6 +243,114 @@ void VL_Startup()
 	root = RootWindow(dpy, screen);
 	
 	GetVisual(); /* GetVisual will quit for us if no visual.. */                      	
+	
+	attr.colormap = cmap;		   
+	attr.event_mask = KeyPressMask | KeyReleaseMask | ExposureMask 
+		| FocusChangeMask | StructureNotifyMask;
+	attrmask = CWColormap | CWEventMask;
+	
+	if (fullscreen || dga) {
+		attrmask |= CWOverrideRedirect;
+		attr.override_redirect = True;	
+	}
+	
+	win = XCreateWindow(dpy, root, 0, 0, 320, 200, 0, CopyFromParent, 
+			    InputOutput, vi->visual, attrmask, &attr);
+	
+	if (win == None) {
+		Quit("Unable to create window!");
+	}
+	
+	
+	gcvalues.foreground = BlackPixel(dpy, screen);
+	gcvalues.background = WhitePixel(dpy, screen);
+	gc = XCreateGC(dpy, win, GCForeground | GCBackground, &gcvalues);
+	
+	sizehints.min_width = 320;
+	sizehints.min_height = 200;
+	sizehints.max_width = 320;
+	sizehints.max_height = 200;
+	sizehints.base_width = 320;
+	sizehints.base_height = 200;
+	sizehints.flags = PMinSize | PMaxSize | PBaseSize;
+	
+	XSetWMProperties(dpy, win, NULL, NULL, _argv, _argc, &sizehints, None, None); 
+	
+	XStoreName(dpy, win, GAMENAME);
+	XSetIconName(dpy, win, GAMENAME);
+	
+	wmDeleteWindow = XInternAtom(dpy, "WM_DELETE_WINDOW", False);
+	XSetWMProtocols(dpy, win, &wmDeleteWindow, 1);
+
+	bitmap = XCreateBitmapFromData(dpy, win, data, 8, 8);
+	cursor = XCreatePixmapCursor(dpy, bitmap, bitmap, &fg, &bg, 0, 0);
+	XDefineCursor(dpy, win, cursor);
+	
+	fullscreen = 0;
+	dga = 0;	
+	shmmode = 0;
+	
+	if (!MS_CheckParm("noshm") && !dga && (XShmQueryExtension(dpy) == True)) {
+		img = XShmCreateImage(dpy, vi->visual, vi->depth, ZPixmap, 
+				      NULL, &shminfo, 320, 200);
+
+		shminfo.shmid = shmget(IPC_PRIVATE, img->bytes_per_line * img->height, IPC_CREAT | 0777);
+		shminfo.shmaddr = img->data = shmat(shminfo.shmid, 0, 0);	
+		shminfo.readOnly = False;
+		disbuf = (byte *)img->data;
+			
+		if (indexmode)
+			gfxbuf = disbuf;
+		else
+			gfxbuf = malloc(320 * 200 * 1);
+			
+		if (XShmAttach(dpy, &shminfo) == True) {
+			printf("Using XShm Extension...\n");
+			shmmode = 1;
+			
+			shmctl(shminfo.shmid, IPC_RMID, 0);
+		} else {
+			printf("Error with XShm...\n");
+		}
+	}
+				
+	if (!dga && (img == NULL)) {
+		XImage *imgtmp;
+		char *gb;
+		
+		printf("Falling back on XImage...\n");
+		
+		
+		gb = (char *)malloc(320);
+		imgtmp = XCreateImage(dpy, vi->visual, vi->depth, ZPixmap, 0,
+				gfxbuf, 16, 1, 8, 16*4);
+		
+		if (gfxbuf == NULL) 
+			gfxbuf = malloc(320 * 200 * 1);
+		if (indexmode) 
+			disbuf = gfxbuf;
+		else 
+			disbuf = malloc(320 * 200 * (imgtmp->bits_per_pixel / 8));
+		
+		img = XCreateImage(dpy, vi->visual, vi->depth, ZPixmap, 0,
+			(char *)disbuf, 320, 200, 8, 320 * (imgtmp->bits_per_pixel / 8));
+	
+		if (img == NULL) {
+			Quit("XCreateImage returned NULL");
+		}
+		
+		XInitImage(img);
+		XDestroyImage(imgtmp);
+	}
+
+	if (img)
+		MyDepth = GetBPP();
+	
+	XMapRaised(dpy, win);
+}
+
+#if 0
+
 	
 	fullscreen = 0;
 	if (MS_CheckParm("fullscreen") && XF86VidModeQueryExtension(dpy, &eventn, &errorn)) {
@@ -295,105 +399,21 @@ void VL_Startup()
 			}		
 		}		
 	}
-	
-	attr.colormap = cmap;		   
-	attr.event_mask = KeyPressMask | KeyReleaseMask | ExposureMask;
-	attrmask = CWColormap | CWEventMask;
-	
-	if (fullscreen || dga) {
-		attrmask |= CWOverrideRedirect;
-		attr.override_redirect = True;	
-	}
-	
-	win = XCreateWindow(dpy, root, 0, 0, 320, 200, 0, CopyFromParent, 
-			    InputOutput, vi->visual, attrmask, &attr);
-	
-	if (win == None) {
-		Quit("Unable to create window!");
-	}
-	
+	XSetWindowColormap(dpy, win, cmap);
+
 	if (fullscreen || dga) {
 		XMapWindow(dpy, win);
 		XRaiseWindow(dpy, win);
-		XGrabKeyboard(dpy, win, True, GrabModeAsync, GrabModeAsync, CurrentTime);
-	}
-	
-	gcvalues.foreground = BlackPixel(dpy, screen);
-	gcvalues.background = WhitePixel(dpy, screen);
-	gc = XCreateGC(dpy, win, GCForeground | GCBackground, &gcvalues);
-	
-	sizehints.min_width = 320;
-	sizehints.min_height = 200;
-	sizehints.max_width = 320;
-	sizehints.max_height = 200;
-	sizehints.base_width = 320;
-	sizehints.base_height = 200;
-	sizehints.flags = PMinSize | PMaxSize | PBaseSize;
-	
-	XSetWMProperties(dpy, win, NULL, NULL, _argv, _argc, &sizehints, None, None); 
-	
-	XStoreName(dpy, win, GAMENAME);
-	XSetIconName(dpy, win, GAMENAME);
-	
-	wmDeleteWindow = XInternAtom(dpy, "WM_DELETE_WINDOW", False);
-	XSetWMProtocols(dpy, win, &wmDeleteWindow, 1);
-
-	bitmap = XCreateBitmapFromData(dpy, win, data, 8, 8);
-	cursor = XCreatePixmapCursor(dpy, bitmap, bitmap, &fg, &bg, 0, 0);
-	XDefineCursor(dpy, win, cursor);
-		
-	shmmode = 0;
-	
-	if ( !MS_CheckParm("noshm") && !dga && (XShmQueryExtension(dpy) == True) ) {
-		img = XShmCreateImage(dpy, vi->visual, vi->depth, ZPixmap, 
-				      NULL, &shminfo, 320, 200);
-		printf("Shm: bpl = %d, h = %d, bp = %d\n", img->bytes_per_line, img->height, img->bitmap_pad);
-		if ( img->bytes_per_line != (320 * BPP(vi->depth)) ) {
-			printf("Currently cannot handle irregular shm sizes...\n");
-		} else {
-			shminfo.shmid = shmget(IPC_PRIVATE, img->bytes_per_line * img->height, IPC_CREAT | 0777);
-			shminfo.shmaddr = img->data = shmat(shminfo.shmid, 0, 0);	
-			shminfo.readOnly = False;
-			disbuf = (byte *)img->data;
-			
-			if (indexmode)
-				gfxbuf = disbuf;
-			else
-				gfxbuf = malloc(320 * 200 * 1);
-				
-			if (XShmAttach(dpy, &shminfo) == True) {
-				printf("Using XShm Extension...\n");
-				shmmode = 1;
-			} else {
-				printf("Error with XShm...\n");
-			}
-		}
-	}
-				
-	if ( !dga && (img == NULL) ) {
-		printf("Falling back on XImage...\n");
-		
-		if (gfxbuf == NULL) 
-			gfxbuf = malloc(320 * 200 * 1);
-		if (indexmode) 
-			disbuf = gfxbuf;
-		else 
-			disbuf = malloc(320 * 200 * BPP(vi->depth));
-		
-		img = XCreateImage(dpy, vi->visual, vi->depth, ZPixmap, 0, (char *)disbuf, 320, 200,
-			   8, 320 * BPP(vi->depth));
-	
-		if (img == NULL) {
-			Quit("XCreateImage returned NULL");
-		}
+		//XGrabKeyboard(dpy, win, True, GrabModeAsync, GrabModeAsync, CurrentTime);
 	}				   
-	XMapWindow(dpy, win);
+	//XMapWindow(dpy, win);
 
 	if (fullscreen) {
-		XMoveWindow(dpy, win, 0, 0);
+		//XMoveWindow(dpy, win, 0, 0);
 		XRaiseWindow(dpy, win);
 		XWarpPointer(dpy, None, win, 0, 0, 0, 0, 0, 0);
-		XF86VidModeSetViewPort(dpy, screen, 0, 0);
+		//XF86VidModeSetViewPort(dpy, screen, 0, 0);
+		//XSetInputFocus(dpy, win, RevertToNone, CurrentTime);
 	}
 
 	if (dga) {
@@ -401,10 +421,11 @@ void VL_Startup()
 		XF86DGASetViewPort(dpy, screen, 0, 0);
 	}
 	
-	XSetWindowColormap(dpy, win, cmap);
+	printf("Mode: %s %s %s %s\n", fullscreen ? "Fullscreen" : "Windowed", dga ? "DGA" : "Standard", shmmode ? "Shm" : "NoShm", indexmode ? "Palette" : "TrueColor");
+	
 	
 	XFlush(dpy);
-}
+#endif
 
 /*
 =======================
@@ -477,7 +498,7 @@ void VW_UpdateScreen()
 					ptrbd += 320;
 				}
 				return;
-			#if 0
+			#if 0 
 			case 15:
 				ptrs = (word *)disbuf;
 				for (i = 0; i < 64000; i++) {
@@ -496,7 +517,7 @@ void VW_UpdateScreen()
 					ptrs++;
 				}
 				break;
-			case 24:
+			case 24: /* not correct size */
 				ptrb = disbuf;
 				for (i = 0; i < 64000; i++) {
 					*ptrb = mypal[gfxbuf[i]*3+2] << 2; ptrb++;
@@ -509,7 +530,7 @@ void VW_UpdateScreen()
 		} 	
 	}
 	if (indexmode == 0) {
-		switch(vi->depth) {
+		switch(MyDepth) {
 		case 15:
 			ptrs = (word *)disbuf;
 			for (i = 0; i < 64000; i++) {
@@ -529,6 +550,14 @@ void VW_UpdateScreen()
 			}
 			break;
 		case 24:
+			ptrb = disbuf;
+			for (i = 0; i < 64000; i++) {
+				*ptrb = mypal[gfxbuf[i]*3+2] << 2; ptrb++;
+				*ptrb = mypal[gfxbuf[i]*3+1] << 2; ptrb++;
+				*ptrb = mypal[gfxbuf[i]*3+0] << 2; ptrb++;
+			}
+			break;
+		case 32:
 			ptrb = disbuf;
 			for (i = 0; i < 64000; i++) {
 				*ptrb = mypal[gfxbuf[i]*3+2] << 2; ptrb++;

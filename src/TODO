@@ -19,6 +19,9 @@ SD_StartMusic((MusicGroup *)audiosegs[STARTMUSIC + chunk]);
 =>
 SD_StartMusic(chunk);
 
+* would be nice if Quit() used vsnprintf, etc
+* actor walking through door is drawn in front of door: near end of E1M1 for
+example
 * move DeModeXize so it does not have to be in every vi_ file
 * clean up vi_xlib.c: fix vid mode changing, fix dga for non8bit modes and
 the nonpalette setting stuff... lots of if statements
