@@ -12,7 +12,7 @@ TODO:
 * Finish moving all 2D code to SoftDraw.c
   - Should move some code so it is not such a large file (SoftDraw2.c)
 * Finish OpenGL
-  + Status bars, Introscreens [DrawShape]
+  + Status bars, Introscreens, Psyched [DrawShape]
     + Not exactly sure how I will implement this yet.
       - IO_Draw* (status bar versions) are stubbed, update statusbar when
         doing screen update
@@ -23,6 +23,8 @@ TODO:
   - Split up GLDraw.c
   - GL_EXT_shared_texture_palette
 * Save/Load Games
+  - Menu code does not exist yet -- so just have a compiled in default save
+    and load files
 * Documentation
 * Sound!
   - Need to write sound playing code (probably access /dev/dsp directly
@@ -49,9 +51,11 @@ TODO:
       - MacPlay->Id Logo: have some sort of redraw.
       - Fades in game can just call renderview each time
 * Get it to compile/work with g++ if it is not too much trouble.
+  - Have to rename class..
 * SDL version (software)
 * Mouse
 * Psyched bar
+* Finish GTK+ code
 
 BUGS:
 * Software Drawing seems like its imprecise, stationary sprites move back and 

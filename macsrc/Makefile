@@ -8,8 +8,8 @@ CFLAGS = -g -Wall -ansi -pedantic
 
 OBJS 	 = Data.o Doors.o EnMove.o EnThink.o Intro.o Level.o \
 	   Missiles.o Sounds.o PlMove.o PlStuff.o PlThink.o PushWall.o \
-	   RefBsp.o Refresh.o Refresh2.o Sight.o Main.o \
-	   StateDef.o WolfMain.o WolfIO.o InterMis.o Burger.o stub.o res.o
+	   RefBsp.o Refresh.o Refresh2.o Sight.o Main.o StateDef.o \
+	   WolfMain.o WolfIO.o InterMis.o SaveLoad.o Burger.o stub.o res.o
 SOFTOBJS = RefSprite.o SoftDraw.o SoftDraw2.o
 OGLOBJS	 = GLDraw.o
 SOBJS	 = $(OBJS) $(SOFTOBJS) vi_svga.o
