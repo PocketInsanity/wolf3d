@@ -212,18 +212,15 @@ void LoadLatchMem(void)
 ===================
 */
 
-boolean FizzleFade(byte *source, unsigned width,unsigned height, unsigned frames, boolean abortable)
+boolean FizzleFade(unsigned xx, unsigned yy, unsigned width,unsigned height, unsigned frames, boolean abortable)
 {
-	int			pixperframe;
-	unsigned	drawofs,pagedelta;
-	byte 		mask,maskb[8] = {1,2,4,8};
-	unsigned	x,y,p,frame;
-	long		rndval;
-
+	int pixperframe;
+	unsigned x, y, p, frame;
+	long rndval;
+		
 	rndval = 1;
-	y = 0;
 	pixperframe = 64000/frames;
-
+	
 	IN_StartAck ();
 
 	frame=0;
@@ -232,51 +229,21 @@ boolean FizzleFade(byte *source, unsigned width,unsigned height, unsigned frames
 	do {
 		if (abortable && IN_CheckAck ())
 			return true;
-
 		for (p=0;p<pixperframe;p++) {
-#if 0		
-			//
-			// seperate random value into x/y pair
-			//
-			asm	mov	ax,[WORD PTR rndval]
-			asm	mov	dx,[WORD PTR rndval+2]
-			asm	mov	bx,ax
-			asm	dec	bl
-			asm	mov	[BYTE PTR y],bl			// low 8 bits - 1 = y xoordinate
-			asm	mov	bx,ax
-			asm	mov	cx,dx
-			asm	mov	[BYTE PTR x],ah			// next 9 bits = x xoordinate
-			asm	mov	[BYTE PTR x+1],dl
-			//
-			// advance to next random element
-			//
-			asm	shr	dx,1
-			asm	rcr	ax,1
-			asm	jnc	noxor
-			asm	xor	dx,0x0001
-			asm	xor	ax,0x2000
-noxor:
-			asm	mov	[WORD PTR rndval],ax
-			asm	mov	[WORD PTR rndval+2],dx
-
-			if (x>width || y>height)
+			y = (rndval & 0x00FF) - 1;
+			x = (rndval & 0x00FFFF00) >> 8;
+			
+			if (rndval & 1) {
+				rndval >>= 1;
+				rndval ^= 0x00012000;
+			} else
+				rndval >>= 1;
+				
+			if ((x>width) || (y>height))
 				continue;
-			drawofs = source+ylookup[y] + (x>>2);
 
-			//
-			// copy one pixel
-			//
-			mask = x&3;
-			VGAREADMAP(mask);
-			mask = maskb[mask];
-			VGAMAPMASK(mask);
+			*(graph_mem + (xx+x) + (yy+y) * 320) = *(gfxbuf + (xx+x) + (yy+y) * 320);
 
-			asm	mov	di,[drawofs]
-			asm	mov	al,[es:di]
-			asm add	di,[pagedelta]
-			asm	mov	[es:di],al
-
-#endif
 			if (rndval == 1) /* entire sequence has been completed */
 				return false;
 

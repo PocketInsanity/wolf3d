@@ -19,6 +19,8 @@
 =============================================================================
 */
 
+extern unsigned xoffset, yoffset;
+
 boolean		ingame,fizzlein;
 gametype	gamestate;
 
@@ -1175,13 +1177,15 @@ void Died()
 //
 // fade to red
 //
-	FinishPaletteShifts ();
+	FinishPaletteShifts();
 
-	VW_Bar (0,0,viewwidth,viewheight,4);
-	IN_ClearKeysDown ();
-	FizzleFade(gfxbuf, viewwidth,viewheight,70,false);
+	VW_Bar(xoffset, yoffset, viewwidth, viewheight, 4);
+	
+	IN_ClearKeysDown();
+	FizzleFade(xoffset, yoffset, viewwidth, viewheight, 70, false);
+	
 	IN_UserInput(100);
-	SD_WaitSoundDone ();
+	SD_WaitSoundDone();
 
 	gamestate.lives--;
 

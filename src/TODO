@@ -48,7 +48,6 @@ data in vga memory. so figure it out, fix it, and remove
 * especially with the video functions, there are functions/defines which
 just call a different function (most are left from the update block code)
 rename/remove them
-* implement fizzlefade, and get that last pixel!
 * fix wl_debug.c, lots of junk code..
 * change the current parameter handling code to something like getopt
 * urgent: fix input (event handling), so that it makes sense
@@ -57,6 +56,12 @@ rename/remove them
 * for some reason, it feels sluggish, maybe its from having mikmod playing
 at the same time... especially when you pick up items
 * look for places where gfx needs to be redrawn, like back to game etc 
+* wl_menu uses specific scancodes for names, config file will have to use
+metaname like sc_Left etc or something
+* fizzlefade is hackish, stipple buf would work ok in opengl, maybe only
+update once per frame or such.. hm
+and where is that greenpixel coming from (when using end game with largest
+window size)
 
 Specific:
 * memory/sound intro screen goes

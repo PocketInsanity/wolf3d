@@ -715,7 +715,7 @@ void	ThreeDRefresh (void)
 //
 	if (fizzlein)
 	{
-		FizzleFade(gfxbuf, viewwidth,viewheight,20,false);
+		FizzleFade(xoffset, yoffset, viewwidth,viewheight,20,false);
 		fizzlein = false;
 
 		lasttimecount = 0;		/* don't make a big tic count */

@@ -51,7 +51,7 @@ extern byte gamepal;
 #define VW_FadeOut()		VL_FadeOut(0,255,0,0,0,30);
 void	VW_MeasurePropString(char *string, word *width, word *height);
 
-boolean FizzleFade(byte *source, unsigned width,unsigned height, unsigned frames,boolean abortable);
+boolean FizzleFade(unsigned xoffset, unsigned yoffset, unsigned width,unsigned height, unsigned frames,boolean abortable);
 
 void LatchDrawPic(unsigned x, unsigned y, unsigned picnum);
 void LoadLatchMem(void);
