@@ -116,17 +116,32 @@ static void DiskFlopAnim(int x, int y)
 
 static int32_t CalcFileChecksum(int fd, int len)
 {
-	int32_t cs;
-	int i;
-	int8_t c1, c2;
+	int8_t buf[4096];
 	
-	c1 = ReadInt8(fd);
+	int32_t cs;
+	int i, j;
+	int8_t c1;
+	
 	cs = 0;
-	for (i = 0; i < len - 1; i++) {
-		c2 = ReadInt8(fd);
-		cs += c1 ^ c2;
-		c1 = c2;
+	c1 = ReadInt8(fd);
+	
+	len--;
+	while (len > 0) {
+		i = 4096;
+		if (len < i) {
+			i = len;
+		}
+		
+		ReadBytes(fd, buf, i);
+		
+		for (j = 0; j < i; j++) {
+			cs += c1 ^ buf[j];
+			c1 = buf[j];
+		}
+		
+		len -= 4096;
 	}
+	
 	return cs;
 }
 
