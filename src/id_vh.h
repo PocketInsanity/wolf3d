@@ -51,7 +51,6 @@ boolean FizzleFade(unsigned xoffset, unsigned yoffset, unsigned width,unsigned h
 void VL_FadeOut(int start, int end, int red, int green, int blue, int steps);
 void VL_FadeIn(int start, int end, const byte *palette, int steps);
 
-void LatchDrawPic(unsigned x, unsigned y, unsigned picnum);
 void LoadLatchMem();
 
 void VL_CacheScreen(int chunk);

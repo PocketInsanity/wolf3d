@@ -202,7 +202,7 @@ void ControlMovement (objtype *ob)
 
 void StatusDrawPic(unsigned x, unsigned y, unsigned picnum)
 {
-	LatchDrawPic (x,y,picnum);
+	VWB_DrawPic(x*8, y+160, picnum);
 }
 
 
@@ -309,9 +309,9 @@ void LatchNumber(int x, int y, int width, long number)
 ===============
 */
 
-void	DrawHealth (void)
+void DrawHealth()
 {
-	LatchNumber (21,16,3,gamestate.health);
+	LatchNumber(21,16,3,gamestate.health);
 }
 
 
@@ -394,14 +394,14 @@ void HealSelf(int points)
 ===============
 */
 
-void	DrawLevel (void)
+void DrawLevel()
 {
 #ifdef SPEAR
 	if (gamestate.mapon == 20)
 		LatchNumber (2,16,2,18);
 	else
 #endif
-	LatchNumber (2,16,2,gamestate.mapon+1);
+	LatchNumber(2,16,2,gamestate.mapon+1);
 }
 
 //===========================================================================
@@ -415,9 +415,9 @@ void	DrawLevel (void)
 ===============
 */
 
-void	DrawLives (void)
+void DrawLives()
 {
-	LatchNumber (14,16,1,gamestate.lives);
+	LatchNumber(14,16,1,gamestate.lives);
 }
 
 
@@ -429,12 +429,12 @@ void	DrawLives (void)
 ===============
 */
 
-void	GiveExtraMan (void)
+void GiveExtraMan()
 {
 	if (gamestate.lives<9)
 		gamestate.lives++;
-	DrawLives ();
-	SD_PlaySound (BONUS1UPSND);
+	DrawLives();
+	SD_PlaySound(BONUS1UPSND);
 }
 
 //===========================================================================
@@ -447,7 +447,7 @@ void	GiveExtraMan (void)
 ===============
 */
 
-void	DrawScore (void)
+void DrawScore()
 {
 	LatchNumber (6,16,6,gamestate.score);
 }
@@ -460,15 +460,15 @@ void	DrawScore (void)
 ===============
 */
 
-void	GivePoints (long points)
+void GivePoints(long points)
 {
 	gamestate.score += points;
 	while (gamestate.score >= gamestate.nextextra)
 	{
 		gamestate.nextextra += EXTRAPOINTS;
-		GiveExtraMan ();
+		GiveExtraMan();
 	}
-	DrawScore ();
+	DrawScore();
 }
 
 //===========================================================================
@@ -481,9 +481,9 @@ void	GivePoints (long points)
 ==================
 */
 
-void DrawWeapon (void)
+void DrawWeapon()
 {
-	StatusDrawPic (32,8,KNIFEPIC+gamestate.weapon);
+	StatusDrawPic(32,8,KNIFEPIC+gamestate.weapon);
 }
 
 
@@ -495,17 +495,17 @@ void DrawWeapon (void)
 ==================
 */
 
-void DrawKeys (void)
+void DrawKeys()
 {
 	if (gamestate.keys & 1)
-		StatusDrawPic (30,4,GOLDKEYPIC);
+		StatusDrawPic(30,4,GOLDKEYPIC);
 	else
-		StatusDrawPic (30,4,NOKEYPIC);
+		StatusDrawPic(30,4,NOKEYPIC);
 
 	if (gamestate.keys & 2)
-		StatusDrawPic (30,20,SILVERKEYPIC);
+		StatusDrawPic(30,20,SILVERKEYPIC);
 	else
-		StatusDrawPic (30,20,NOKEYPIC);
+		StatusDrawPic(30,20,NOKEYPIC);
 }
 
 
@@ -518,15 +518,15 @@ void DrawKeys (void)
 ==================
 */
 
-void GiveWeapon (int weapon)
+void GiveWeapon(int weapon)
 {
-	GiveAmmo (6);
+	GiveAmmo(6);
 
 	if (gamestate.bestweapon<weapon)
 		gamestate.bestweapon = gamestate.weapon
 		= gamestate.chosenweapon = weapon;
 
-	DrawWeapon ();
+	DrawWeapon();
 }
 
 
@@ -540,9 +540,9 @@ void GiveWeapon (int weapon)
 ===============
 */
 
-void	DrawAmmo (void)
+void DrawAmmo()
 {
-	LatchNumber (27,16,2,gamestate.ammo);
+	LatchNumber(27,16,2,gamestate.ammo);
 }
 
 
@@ -554,7 +554,7 @@ void	DrawAmmo (void)
 ===============
 */
 
-void	GiveAmmo (int ammo)
+void GiveAmmo(int ammo)
 {
 	if (!gamestate.ammo)				// knife was out
 	{
@@ -567,7 +567,7 @@ void	GiveAmmo (int ammo)
 	gamestate.ammo += ammo;
 	if (gamestate.ammo > 99)
 		gamestate.ammo = 99;
-	DrawAmmo ();
+	DrawAmmo();
 }
 
 //===========================================================================
@@ -580,10 +580,10 @@ void	GiveAmmo (int ammo)
 ==================
 */
 
-void GiveKey (int key)
+void GiveKey(int key)
 {
 	gamestate.keys |= (1<<key);
-	DrawKeys ();
+	DrawKeys();
 }
 
 

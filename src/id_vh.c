@@ -77,19 +77,6 @@ void VWB_DrawPic(int x, int y, int chunknum)
 }
 
 /*
-=====================
-=
-= LatchDrawPic
-=
-=====================
-*/
-
-void LatchDrawPic(unsigned x, unsigned y, unsigned picnum)
-{
-	VWB_DrawPic(x*8, y+160, picnum);
-}
-
-/*
 ===================
 =
 = LoadLatchMem
