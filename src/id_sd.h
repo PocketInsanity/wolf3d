@@ -1,23 +1,14 @@
-//
-//	ID Engine
-//	ID_SD.h - Sound Manager Header
-//	Version for Wolfenstein
-//	By Jason Blochowiak
-//
-
-#ifndef	__ID_SD__
-#define	__ID_SD__
-
-void	alOut(byte n,byte b);
+#ifndef	__ID_SD_H__
+#define	__ID_SD_H__
 
 #define	TickBase	70		// 70Hz per tick - used as a base for timer 0
 
 typedef	enum	{
 					sdm_Off,
-					sdm_PC, sdm_AdLib
+					sdm_PC,sdm_AdLib,
 				}	SDMode;
 typedef	enum	{
-					smm_Off, smm_AdLib
+					smm_Off,smm_AdLib
 				}	SMMode;
 typedef	enum	{
 					sds_Off,sds_PC,sds_SoundSource,sds_SoundBlaster
@@ -222,5 +213,6 @@ extern	void	SD_SetDigiDevice(SDSMode),
 				SD_StopDigitized(void),
 				SD_Poll(void);
 
+#elif
+#error "fix me TODO"
 #endif
-

@@ -625,18 +625,6 @@ void CP_ReadThis(void)
 ////////////////////////////////////////////////////////////////////
 void BossKey(void)
 {
-	SD_MusicOff();
-	_AX = 3;
-	geninterrupt(0x10);
-	printf("C>");
-	while (!Keyboard[sc_Escape])
-	IN_ClearKeysDown();
-
-	SD_MusicOn();
-	VL_SetVGAPlaneMode ();
-	VL_TestPaletteSet ();
-	VL_SetPalette (&gamepal);
-	LoadLatchMem();
 }
 #endif
 #endif
