@@ -124,7 +124,7 @@ void PicturePause (void)
 
 	/* TODO: save picture to file */
 	
-	VL_SetPalette (&gamepal);
+	VL_SetPalette(gamepal);
 
 	VW_WaitVBL(70);
 	VW_WaitVBL(70);

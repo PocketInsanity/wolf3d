@@ -37,7 +37,7 @@ void VWB_Plot(int x, int y, int color);
 void VWB_Hlin(int x1, int x2, int y, int color);
 void VWB_Vlin(int y1, int y2, int x, int color);
 
-extern byte gamepal;
+extern byte gamepal[];
 extern boolean screenfaded;
 
 #define VW_Startup		VL_Startup
@@ -47,7 +47,7 @@ extern boolean screenfaded;
 #define VW_Hlin(x,z,y,c)	VL_Hlin(x,y,(z)-(x)+1,c)
 #define VW_Vlin(y,z,x,c)	VL_Vlin(x,y,(z)-(y)+1,c)
 #define VW_WaitVBL		VL_WaitVBL
-#define VW_FadeIn()		VL_FadeIn(0,255,&gamepal,30);
+#define VW_FadeIn()		VL_FadeIn(0,255,gamepal,30);
 #define VW_FadeOut()		VL_FadeOut(0,255,0,0,0,30);
 void	VW_MeasurePropString(char *string, word *width, word *height);
 

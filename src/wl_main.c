@@ -684,7 +684,7 @@ void SetupWalls (void)
 
 void SignonScreen()
 {
-	VL_SetPalette(&gamepal);
+	VL_SetPalette(gamepal);
 	VL_MemToScreen(introscn, 320, 200, 0, 0);
 	VW_UpdateScreen();
 }

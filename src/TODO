@@ -85,6 +85,7 @@ for every byte when transferring to the pixmap, palette fades require a
 screen update
 * mitshm
 * make sure none of the code tries to handle gfx/sound data directly
+* GL_shared_texture_palette
 
 Specific:
 * memory/sound intro screen goes

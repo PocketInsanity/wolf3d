@@ -999,7 +999,6 @@ void CA_CacheScreen(int chunk)
 
 //
 // allocate final space, decompress it, and free bigbuffer
-// Sprites need to have shifts made and various other junk
 //
 	MM_GetPtr((void *)&dest, expanded);
 	CAL_HuffExpand(source, dest, expanded, grhuffman);
