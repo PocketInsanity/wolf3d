@@ -43,8 +43,7 @@ int InitResources(char *name)
 	
 	for (i = 0; i < typecount; i++) {
 		int type;
-		int off, bak, bak2, data, count, x, c, z;
-		int d1, d2, d3, d4;
+		int off, bak, bak2, data, count, x;
 		
 		type = (fgetc(fp) << 24) | (fgetc(fp) << 16) | (fgetc(fp) << 8) | (fgetc(fp) << 0);
 		
@@ -103,8 +102,8 @@ void *LoadAResource2(Word RezNum, LongWord Type)
 		c = c->next;		
 	}
 	
-	fprintf(stderr, "ERROR: %d/%d was not found!\n", Type, RezNum);
-	AllocSomeMem(666666666);
+	fprintf(stderr, "ERROR: %ld/%d was not found!\n", Type, RezNum);
+	AllocSomeMem(666666666); /* TODO: hack! */
 	exit(EXIT_FAILURE);
 }
 

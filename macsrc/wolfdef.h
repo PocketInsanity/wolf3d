@@ -73,11 +73,18 @@ typedef unsigned short ufixed_t;	/* 8.8 unsigned fixed point number */
 #define	ANGLE90		0x4000		/* Use a 0x10000 angle range */
 #define	ANGLE180	0x8000		/* Use a 0x10000 angle range */
 
+#if 0
 #define	SCREENWIDTH	320		/* Size of the offscreen buffer */
 #define SCREENHEIGHT 200	/* Height of the offscreen buffer */
 #define VIEWHEIGHT 160		/* Height of the viewing area */
-#define ScaleX(x) x		/* Scale factor for 320 mode points projected to SCREEN */
-#define ScaleY(y) y
+#endif
+
+#define SCREENWIDTH	VidWidth
+#define SCREENHEIGHT	VidHeight
+#define VIEWHEIGHT	ViewHeight
+extern int VidWidth, VidHeight, ViewHeight;
+Word ScaleX(Word x);	/* Scale factor for 320 mode points projected to SCREEN */
+Word ScaleY(Word y);
 
 #define	CENTERY	(VIEWHEIGHT/2)	/* Center of the viewing area */
 #define	CENTERX	(SCREENWIDTH/2)	/* Center of the viewing area */

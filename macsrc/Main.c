@@ -50,15 +50,16 @@ void RunAutoMap(void)
 	} else {
 		vy = 0;
 	}
-	oldjoy = joystick1;
 	do {
 		ClearTheScreen(BLACK);
 		DrawAutomap(vx,vy);
 		do {
+			oldjoy = joystick1;
 			ReadSystemJoystick();
 		} while (joystick1==oldjoy);
 		oldjoy &= joystick1;
 		newjoy = joystick1 ^ oldjoy;
+
 		if (newjoy & (JOYPAD_START|JOYPAD_SELECT|JOYPAD_A|JOYPAD_B|JOYPAD_X|JOYPAD_Y)) {
 			playstate = EX_STILLPLAYING;
 		} 
@@ -77,9 +78,10 @@ void RunAutoMap(void)
 	} while (playstate==EX_AUTOMAP);
 
 	playstate = EX_STILLPLAYING;
-/* let the player scroll around until the start button is pressed again */
+
 	KillSmallFont();			/* Release the tiny font */
 	RedrawStatusBar();
+
 	ReadSystemJoystick();
 	mousex = 0;
 	mousey = 0;
@@ -108,7 +110,7 @@ void StartGame(void)
 
 **********************************/
 
-Boolean TitleScreen (void)
+Boolean TitleScreen()
 {
 	Word RetVal;		/* Value to return */
 	LongWord PackLen;
@@ -129,9 +131,12 @@ Boolean TitleScreen (void)
 	StartSong(SongListPtr[0]);
 	FadeTo(rTitlePal);	/* Fade in the picture */
 	BlastScreen();
+	
 	RetVal = WaitTicksEvent(0);		/* Wait for event */
+	
 	playstate = EX_COMPLETED;
-	return TRUE;				/* Return True if canceled */
+
+	return TRUE;	
 }
 
 /**********************************
@@ -169,6 +174,7 @@ DoGame:
 				StartGame();		/* Play the game */
 			}
 		}
+		/* TODO: demos or whatever here */
 	}
 	
 	return 0;

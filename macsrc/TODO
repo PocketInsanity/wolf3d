@@ -1,9 +1,11 @@
 * remove NOVGA when other ports are added. NOVGA is a hack for using
 ElectricFence (since svgalib doesn't work too well with it)
-* finish defining all the keys 
+* fix return value of DoEvents
 * when you die, where do all the sprites go?
 * drawing seems like its imprecise, stationary sprites move back and forth,
-and walls 'swim' when you move around
+and walls 'swim' when you move around, or sprites pop into different sizes
+when are far enough and get closer/farther away
 * Word is 16bit damnit, wonder why in the MAC version its 32bits?!
-* Automap movement is too fast
 * How about adding red/white shifts (from PC wolf3d)? 
+* it crashes somewhere, no reason why...
+* Pause key

@@ -253,6 +253,8 @@ Word ChooseGameDiff(void)
 /* 0 = easy, 1 = normal, 2 = hard, 3 = death incarnate */
 	difficulty = 1;
 	SetAPalette(rGamePal);
+	
+	return 1;
 }
 
 void FinishLoadGame(void)

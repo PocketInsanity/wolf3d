@@ -439,12 +439,12 @@ skipbrief:
 		} else if (playstate != EX_WARPED) {
 			nextmap = MapListPtr->InfoArray[gamestate.mapon].NextLevel; /* Normal warp? */
 		}			/* If warped, then nextmap is preset */
-		if (nextmap == 0xffff) {	/* Last level? */
-			VictoryScale();				/* You win!! */
-			ReleaseMap();		/* Unload the map */
-			Intermission();				/* Display the wrapup... */
+		if (nextmap == 0xffff) {		/* Last level? */
+			VictoryScale();			/* You win!! */
+			ReleaseMap();			/* Unload the map */
+			Intermission();			/* Display the wrapup... */
 			ShareWareEnd();			/* End the game for the shareware version */
-/*			VictoryIntermission();		/* Wrapup for victory! */
+			/* VictoryIntermission(); */	/* Wrapup for victory! */
 			return;
 		}
 		ReleaseMap();				/* Unload the game map */

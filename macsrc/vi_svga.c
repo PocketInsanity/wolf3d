@@ -95,7 +95,10 @@ void BlastScreen2(Rect *BlastRect)
 	BlastScreen();
 }
 
-static int w, h, v;
+int VidWidth, VidHeight, ViewHeight;
+#define w VidWidth
+#define h VidHeight
+#define v ViewHeight
 
 void BlastScreen()
 {
@@ -117,14 +120,46 @@ Word VidVs[] = {160,320,320,400};
 Word VidPics[] = {rFaceShapes,rFace512,rFace640,rFace640};
 Word VidSize = -1;
 
+Word ScaleX(Word x) 
+{
+	switch(VidSize) {
+		case 1:
+			return x*8/5;
+		case 2:
+		case 3:
+			return x*2;
+	}
+	return x;
+}
+
+Word ScaleY(Word y)
+{
+	switch(VidSize) {
+		case 1:
+			y = (y*8/5)+64;
+			if (y == 217)
+				y++;
+			return y;
+		case 2:
+			return y*2;
+		case 3:
+			return y*2+80;
+	}
+	return y;
+}
+
 Word NewGameWindow(Word NewVidSize)
 {
 	LongWord *LongPtr;
 	Byte *DestPtr;
 	int i;
 	
+	printf("Called: %d\n", NewVidSize);
+	
 	if (NewVidSize == VidSize)
 		return VidSize;
+	
+	printf("Setting Size: %d (from %d)\n", NewVidSize, VidSize);
 		
 	if (NewVidSize < 4) {
 		w = VidXs[NewVidSize];
@@ -153,6 +188,9 @@ Word NewGameWindow(Word NewVidSize)
 	
 	LongPtr = (LongWord *) LoadAResource(VidPics[NewVidSize]);
 	
+	if (GameShapes)
+		FreeSomeMem(GameShapes);
+		
 	GameShapes = (Byte **) AllocSomeMem(lMSB(LongPtr[0]));
 	DLZSS((Byte *)GameShapes,(Byte *) &LongPtr[1],lMSB(LongPtr[0]));
 	ReleaseAResource(rFaceShapes);
@@ -290,22 +328,97 @@ void ReleaseScalers()
 {
 }
 
-void FlushKeys(void)
+/* Keyboard Hack */
+static int RSJ;
+static int keys[128];
+
+void FlushKeys()
 {
-	/* TODO: read all keys in keyboard buffer */
+	while (keyboard_update()) ;
+	
+	memset(keys, 0, sizeof(keys));
 }
 
-static int RSJ;
+#define SC(x) SCANCODE_##x
 
-static int keys[128];
+struct {
+	int code[13];
+	int flag;
+} CheatCodes[] = {
+{ { SC(X), SC(U), SC(S), SC(C), SC(N), SC(I), SC(E), SC(L), SC(P), SC(P), SC(A) }, 0 }, /* "XUSCNIELPPA" */
+{ { SC(I), SC(D), SC(D), SC(Q), SC(D) }, 0 }, /* "IDDQD" */
+{ { SC(B), SC(U), SC(R), SC(G), SC(E), SC(R) }, 0 }, /* "BURGER" */
+{ { SC(W), SC(O), SC(W), SC(Z), SC(E), SC(R), SC(S) }, 0 }, /* "WOWZERS" */
+{ { SC(L), SC(E), SC(D), SC(O), SC(U), SC(X) }, 0 }, /* "LEDOUX" */
+{ { SC(S), SC(E), SC(G), SC(E), SC(R) }, 0 }, /* "SEGER" */
+{ { SC(M), SC(C), SC(C), SC(A), SC(L), SC(L) }, 0 }, /* "MCCALL" */
+{ { SC(A), SC(P), SC(P), SC(L), SC(E), SC(I), SC(I), SC(G), SC(S) } }, 0 /* "APPLEIIGS" */
+};
+const int CheatCount = sizeof(CheatCodes) / sizeof(CheatCodes[0]);
+int CheatIndex;
 
 void keyboard_handler(int key, int press)
 {
-	if (key == SCANCODE_Q) 
-		Quit("blah");
+	int i;
+	
+	if (key == SCANCODE_ESCAPE) 
+		Quit(0);
+
 	if (RSJ) {
 		keys[key] = press;
 		
+		if (press == 0) {
+			for (i = 0; i < CheatCount; i++) {
+				if (CheatCodes[i].code[CheatIndex] == key) {
+					CheatIndex++;
+					if (CheatCodes[i].code[CheatIndex] == 0) {
+						PlaySound(SND_BONUS);
+						switch (i) {
+						case 0:
+						case 4:
+							GiveKey(0);
+							GiveKey(1);
+							gamestate.godmode = TRUE;
+							break;
+						case 1:
+							gamestate.godmode^=TRUE;
+							break;
+						case 2:
+							gamestate.machinegun = TRUE;
+							gamestate.chaingun = TRUE;
+							gamestate.flamethrower = TRUE;
+							gamestate.missile = TRUE;
+							GiveAmmo(gamestate.maxammo);
+							GiveGas(99);
+							GiveMissile(99);
+							break;
+						case 3:
+							gamestate.maxammo = 999;
+							GiveAmmo(999);
+							break;
+						case 5:
+							GiveKey(0);
+							GiveKey(1);
+							break;
+						case 6:
+							playstate=EX_WARPED;
+							nextmap = gamestate.mapon+1;
+							if (MapListPtr->MaxMap<=nextmap) 
+								nextmap = 0;
+							break;
+						case 7:
+							ShowPush ^= TRUE;
+							break;
+						}
+						CheatIndex = 0;
+					}
+					break;
+				} 
+			}	
+			if (i == CheatCount) 
+				CheatIndex = 0;
+		}
+				
 		joystick1 = 0;
 		
 		if (press == 0) {
@@ -345,6 +458,23 @@ void keyboard_handler(int key, int press)
 			}
 		}
 		
+		if (keys[SCANCODE_CURSORUPLEFT])
+			joystick1 |= (JOYPAD_UP|JOYPAD_LFT);
+		if (keys[SCANCODE_CURSORUP])
+			joystick1 |= JOYPAD_UP;
+		if (keys[SCANCODE_CURSORUPRIGHT])
+			joystick1 |= (JOYPAD_UP|JOYPAD_RGT);
+		if (keys[SCANCODE_CURSORRIGHT])
+			joystick1 |= JOYPAD_RGT;
+		if (keys[SCANCODE_CURSORDOWNRIGHT])
+			joystick1 |= (JOYPAD_DN|JOYPAD_RGT);
+		if (keys[SCANCODE_CURSORDOWN])
+			joystick1 |= JOYPAD_DN;
+		if (keys[SCANCODE_CURSORDOWNLEFT])
+			joystick1 |= (JOYPAD_DN|JOYPAD_LFT);
+		if (keys[SCANCODE_CURSORLEFT])
+			joystick1 |= JOYPAD_LFT;	
+		
 		if (keys[SCANCODE_CURSORBLOCKLEFT]) 
 			joystick1 |= JOYPAD_LFT;
 		if (keys[SCANCODE_CURSORBLOCKRIGHT])
@@ -353,10 +483,28 @@ void keyboard_handler(int key, int press)
 			joystick1 |= JOYPAD_UP;
 		if (keys[SCANCODE_CURSORBLOCKDOWN])
 			joystick1 |= JOYPAD_DN;
+		
+		if (keys[SCANCODE_KEYPADENTER])
+			joystick1 |= JOYPAD_A;	
+		if (keys[SCANCODE_ENTER])
+			joystick1 |= JOYPAD_A;
 		if (keys[SCANCODE_SPACE])
 			joystick1 |= JOYPAD_A;
+		
+		if (keys[SCANCODE_LEFTALT]) 
+			joystick1 |= JOYPAD_TL;
+		if (keys[SCANCODE_RIGHTALT])
+			joystick1 |= JOYPAD_TR;
+			
 		if (keys[SCANCODE_LEFTCONTROL])
 			joystick1 |= JOYPAD_B;
+		if (keys[SCANCODE_RIGHTCONTROL])
+			joystick1 |= JOYPAD_B;
+		
+		if (keys[SCANCODE_LEFTSHIFT])
+			joystick1 |= (JOYPAD_X|JOYPAD_Y);
+		if (keys[SCANCODE_RIGHTSHIFT])
+			joystick1 |= (JOYPAD_X|JOYPAD_Y);	
 	}
 							
 }
