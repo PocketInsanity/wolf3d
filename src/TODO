@@ -39,6 +39,7 @@ savegames until they are fixed to not use pointers
 * menu code is a mess, always does things differently than the rest of the
 code, it really needs to be cleaned up
 * id_ca.c cache code: fix/readd/rewrite the "garbage collection" system?
+* rewrite id_ca.c: uniform memory handling system
 * clean up header files, especially wl_def.h, where some declarations aren't 
 in the right place
 * every structure that is read/written must be PACKED, with datatypes
@@ -69,9 +70,6 @@ function with same parameters, only difference is the name)
 * look for places where gfx needs to be redrawn, like back to game etc 
 * fizzlefade is hackish, stipple buf would work ok in opengl, maybe only
 update once per frame or such...
-and where is that stray pixel coming from (during fizzlefade with largest
-window size, for example) in svgalib -- is that another bug with my geforce?
-no idea how to do fizzlefade in TrueColor X
 * check filehandling (ex, file missing, bad file type, and such)
 PlayDemoFromFile specifically
 * make sure all infinite loops are found (looping around Keyboard)
@@ -81,8 +79,7 @@ same with the spear of destiny animation part of ending
 * move all references to gfxbuf to vi_* only (gl will need this anyway,
 since it would replace id_vh, (parts of) wl_draw, wl_scale)
 by putting in code from id_vh (either by using Plot or just copying it in)
-we can stop the large conversion before each UpdateScreen
-but palette fades will still need it!
+we can mostly stop the large conversion before each UpdateScreen
 * the higher depths are a hack since a palette lookup has to be done
 for every byte when transferring to the pixmap, palette fades require a
 screen update

@@ -10,8 +10,8 @@
 =============================================================================
 */
 
-#define MOVESCALE		150l
-#define BACKMOVESCALE		100l
+#define MOVESCALE		150
+#define BACKMOVESCALE		100
 #define ANGLESCALE		20
 
 /*
@@ -43,17 +43,16 @@ objtype		*LastAttacker;
 */
 
 
-void	T_Player (objtype *ob);
-void	T_Attack (objtype *ob);
+void T_Player(objtype *ob);
+void T_Attack(objtype *ob);
 
 statetype s_player = {false,0,0,T_Player,NULL,NULL};
 statetype s_attack = {false,0,0,T_Attack,NULL,NULL};
 
 struct atkinf
 {
-	char	tics,attack,frame;		// attack is 1 for gun, 2 for knife
+	char tics, attack, frame; 	// attack is 1 for gun, 2 for knife
 } static attackinfo[4][14] =
-
 {
 { {6,0,1},{6,2,2},{6,0,3},{6,-1,4} },
 { {6,0,1},{6,1,2},{6,0,3},{6,-1,4} },
@@ -217,25 +216,22 @@ void StatusDrawPic(unsigned x, unsigned y, unsigned picnum)
 ==================
 */
 
-void DrawFace (void)
+void DrawFace()
 {
-	if (gamestate.health)
-	{
+	if (gamestate.health) {
 		#ifdef SPEAR
 		if (godmode)
-			StatusDrawPic (17,4,GODMODEFACE1PIC+gamestate.faceframe);
+			StatusDrawPic(17,4,GODMODEFACE1PIC+gamestate.faceframe);
 		else
 		#endif
 		StatusDrawPic (17,4,FACE1APIC+3*((100-gamestate.health)/16)+gamestate.faceframe);
-	}
-	else
-	{
+	} else {
 #ifndef SPEAR
-	 if (LastAttacker->obclass == needleobj)
-	   StatusDrawPic (17,4,MUTANTBJPIC);
-	 else
+		if (LastAttacker->obclass == needleobj)
+			StatusDrawPic(17,4,MUTANTBJPIC);
+		else
 #endif
-	   StatusDrawPic (17,4,FACE8APIC);
+		StatusDrawPic (17,4,FACE8APIC);
 	}
 }
 
@@ -334,7 +330,7 @@ void	DrawHealth (void)
 ===============
 */
 
-void TakeDamage (int points,objtype *attacker)
+void TakeDamage(int points, objtype *attacker)
 {
 	LastAttacker = attacker;
 

@@ -546,13 +546,6 @@ void CacheLayoutGraphics (void)
 				numpages++;
 			if (ch == 'E')		// end of file, so load graphics and return
 			{
-				/*
-				CA_MarkGrChunk(H_TOPWINDOWPIC);
-				CA_MarkGrChunk(H_LEFTWINDOWPIC);
-				CA_MarkGrChunk(H_RIGHTWINDOWPIC);
-				CA_MarkGrChunk(H_BOTTOMINFOPIC);
-				CA_CacheMarks ();
-				*/
 				CA_CacheGrChunk(H_TOPWINDOWPIC);
 				CA_CacheGrChunk(H_LEFTWINDOWPIC);
 				CA_CacheGrChunk(H_RIGHTWINDOWPIC);
@@ -564,13 +557,11 @@ void CacheLayoutGraphics (void)
 			if (ch == 'G')		// draw graphic command, so mark graphics
 			{
 				ParsePicCommand ();
-				/* CA_MarkGrChunk (picnum); */
 				CA_CacheGrChunk(picnum);
 			}
 			if (ch == 'T')		// timed draw graphic command, so mark graphics
 			{
 				ParseTimedCommand ();
-				/* CA_MarkGrChunk (picnum); */
 				CA_CacheGrChunk(picnum);
 			}
 		}
@@ -599,7 +590,6 @@ void ShowArticle(char *article)
 	text = article;
 	oldfontnumber = fontnumber;
 	fontnumber = 0;
-	/* CA_MarkGrChunk(STARTFONT); */
 	CA_CacheGrChunk(STARTFONT);
 	VW_Bar (0,0,320,200,BACKCOLOR);
 	CacheLayoutGraphics ();

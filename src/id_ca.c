@@ -30,9 +30,6 @@ maptype		*mapheaderseg[NUMMAPS];
 byte		*audiosegs[NUMSNDCHUNKS];
 byte		*grsegs[NUMCHUNKS];
 
-static byte 	grneeded[NUMCHUNKS];
-static byte	ca_levelbit, ca_levelnum;
-
 char extension[5],
      gheadname[10] = "vgahead.",
      gfilename[10] = "vgagraph.",
@@ -62,6 +59,7 @@ static long GRFILEPOS(int c)
 
 	offset = c*3;
 
+/* TODO: unaligned access */
 	value = *(long *)(((byte *)grstarts)+offset);
 
 	value &= 0x00ffffffl;
@@ -82,7 +80,6 @@ static long GRFILEPOS(int c)
 
 static void CA_CannotOpen(char *string)
 {
-	/* TODO Ow, string must be a small one else boom */
 	char str[30];
 
 	strcpy(str, "Can't open ");
@@ -218,7 +215,6 @@ boolean CA_LoadFile(char *filename, memptr *ptr)
 ======================
 =
 = CAL_HuffExpand
-=
 = Length is the length of the EXPANDED data
 =
 ======================
@@ -258,7 +254,6 @@ void CAL_HuffExpand(byte *source, byte *dest, long length, huffnode *htable)
 ======================
 =
 = CAL_CarmackExpand
-=
 = Length is the length of the EXPANDED data
 =
 ======================
@@ -572,8 +567,6 @@ void CA_Startup()
 	CAL_SetupAudioFile();
 
 	mapon = -1;
-	ca_levelbit = 1;
-	ca_levelnum = 0;
 }
 
 //==========================================================================
@@ -774,8 +767,6 @@ void CA_CacheGrChunk(int chunk)
 	if ( (grhandle == 0) || (grhandle == -1) ) 
 		return;
 		
-	grneeded[chunk] |= ca_levelbit;	/* make sure it doesn't get removed */
-	
 	if (grsegs[chunk]) {
 		return;
 	}
@@ -811,7 +802,6 @@ void CA_UnCacheGrChunk(int chunk)
 	}
 	
 	MM_FreePtr((void *)&grsegs[chunk]);
-	grneeded[chunk] &= ~ca_levelbit;
 	
 	grsegs[chunk] = 0;
 }
@@ -926,249 +916,23 @@ void CA_CacheMap(int mapnum)
 	}
 }
 
-//===========================================================================
-
-/*
-======================
-=
-= CA_UpLevel
-=
-= Goes up a bit level in the needed lists and clears it out.
-= Everything is made purgable
-=
-======================
-*/
+/* ======================================================================== */
 
 void CA_UpLevel()
 {
-/*
-	int	i;
-
-	if (ca_levelnum==7)
-		Quit ("CA_UpLevel: Up past level 7!");
-
-	for (i=0;i<NUMCHUNKS;i++)
-		if (grsegs[i])
-			MM_SetPurge ((memptr)&grsegs[i],3);
-	ca_levelbit<<=1;
-	ca_levelnum++;
-*/
 }
 
-//===========================================================================
-
-/*
-======================
-=
-= CA_DownLevel
-=
-= Goes down a bit level in the needed lists and recaches
-= everything from the lower level
-=
-======================
-*/
-
-void CA_DownLevel(d)
+void CA_DownLevel()
 {
-/*
-	if (!ca_levelnum)
-		Quit ("CA_DownLevel: Down past level 0!");
-	ca_levelbit>>=1;
-	ca_levelnum--;
-	CA_CacheMarks();
-*/
 }
-
-//===========================================================================
-
-/*
-======================
-=
-= CA_ClearMarks
-=
-= Clears out all the marks at the current level
-=
-======================
-*/
-#if 0
-void CA_ClearMarks()
-{
-	int i;
-
-	for (i=0;i<NUMCHUNKS;i++)
-		grneeded[i]&=~ca_levelbit;
-}
-#endif
-
-//===========================================================================
-
-/*
-======================
-=
-= CA_ClearAllMarks
-=
-= Clears out all the marks on all the levels
-=
-======================
-*/
-#if 0
-void CA_ClearAllMarks()
-{
-	memset (grneeded,0,sizeof(grneeded));
-	ca_levelbit = 1;
-	ca_levelnum = 0;
-}
-#endif
-
-//===========================================================================
-
-#if 0
-/*
-======================
-=
-= CA_CacheMarks
-=
-======================
-*/
-#define MAXEMPTYREAD	1024
-
-void CA_CacheMarks()
-{
-	int 	i,next,numcache;
-	long	pos,endpos,nextpos,nextendpos,compressed;
-	long	bufferstart,bufferend;	// file position of general buffer
-	byte *source;
-	memptr	bigbufferseg;
-
-	numcache = 0;
-//
-// go through and make everything not needed purgable
-//
-	for (i=0;i<NUMCHUNKS;i++)
-		if (grneeded[i]&ca_levelbit)
-		{
-			if (grsegs[i])					// its allready in memory, make
-				MM_SetPurge(&grsegs[i],0);	// sure it stays there!
-			else
-				numcache++;
-		}
-		else
-		{
-			if (grsegs[i])					// not needed, so make it purgeable
-				MM_SetPurge(&grsegs[i],3);
-		}
-
-	if (!numcache)			// nothing to cache!
-		return;
-
-
-//
-// go through and load in anything still needed
-//
-	bufferstart = bufferend = 0;		// nothing good in buffer now
-
-	for (i=0;i<NUMCHUNKS;i++)
-		if ( (grneeded[i]&ca_levelbit) && !grsegs[i])
-		{
-			pos = GRFILEPOS(i);
-			if (pos<0)
-				continue;
-
-			next = i +1;
-			while (GRFILEPOS(next) == -1)		// skip past any sparse tiles
-				next++;
-
-			compressed = GRFILEPOS(next)-pos;
-			endpos = pos+compressed;
-
-			if (compressed<=BUFFERSIZE)
-			{
-				if (bufferstart<=pos
-				&& bufferend>= endpos)
-				{
-				// data is allready in buffer
-					source = (byte *)bufferseg+(pos-bufferstart);
-				}
-				else
-				{
-				// load buffer with a new block from disk
-				// try to get as many of the needed blocks in as possible
-					while ( next < NUMCHUNKS )
-					{
-						while (next < NUMCHUNKS &&
-						!(grneeded[next]&ca_levelbit && !grsegs[next]))
-							next++;
-						if (next == NUMCHUNKS)
-							continue;
-
-						nextpos = GRFILEPOS(next);
-						while (GRFILEPOS(++next) == -1)	// skip past any sparse tiles
-							;
-						nextendpos = GRFILEPOS(next);
-						if (nextpos - endpos <= MAXEMPTYREAD
-						&& nextendpos-pos <= BUFFERSIZE)
-							endpos = nextendpos;
-						else
-							next = NUMCHUNKS;			// read pos to posend
-					}
-
-					lseek(grhandle,pos,SEEK_SET);
-					CA_FarRead(grhandle,bufferseg,endpos-pos);
-					bufferstart = pos;
-					bufferend = endpos;
-					source = bufferseg;
-				}
-			}
-			else
-			{
-			// big chunk, allocate temporary buffer
-				MM_GetPtr(&bigbufferseg,compressed);
-				MM_SetLock (&bigbufferseg,true);
-				lseek(grhandle,pos,SEEK_SET);
-				CA_FarRead(grhandle,bigbufferseg,compressed);
-				source = bigbufferseg;
-			}
-
-			CAL_ExpandGrChunk (i,source);
-
-			if (compressed>BUFFERSIZE)
-				MM_FreePtr(&bigbufferseg);
-
-		}
-}
-#endif
-
-/*
-===================
-=
-= MM_Startup
-=
-===================
-*/
 
 void MM_Startup()
 {
 }
 
-/*
-====================
-=
-= MM_Shutdown
-=
-====================
-*/
-
 void MM_Shutdown()
 {
 }
-
-/*
-====================
-=
-= MM_GetPtr
-=
-====================
-*/
 
 void MM_GetPtr(memptr *baseptr, unsigned long size)
 {
@@ -1176,59 +940,19 @@ void MM_GetPtr(memptr *baseptr, unsigned long size)
 	*baseptr = malloc(size);
 }
 
-/*
-====================
-=
-= MM_FreePtr
-=
-====================
-*/
-
 void MM_FreePtr(memptr *baseptr)
 {
 	/* TODO: add some sort of linked list for purging, etc */
 	free(*baseptr);
 }
 
-//==========================================================================
-
-/*
-=====================
-=
-= MM_SetPurge
-=
-= Sets the purge level for a block (locked blocks cannot be made purgable)
-=
-=====================
-*/
-
 void MM_SetPurge(memptr *baseptr, int purge)
 {
 }
 
-/*
-=====================
-=
-= MM_SetLock
-=
-= Locks / unlocks the block
-=
-=====================
-*/
-
 void MM_SetLock(memptr *baseptr, boolean locked)
 {
 }
-
-/*
-=====================
-=
-= MM_SortMem
-=
-= Throws out all purgable stuff
-=
-=====================
-*/
 
 void MM_SortMem()
 {
@@ -1240,15 +964,7 @@ static int PageFile = -1;
 word ChunksInFile;
 word PMSpriteStart, PMSoundStart;
 
-word PMNumBlocks;
-long PMFrameCount;
 PageListStruct *PMPages, *PMSegPages;
-
-/////////////////////////////////////////////////////////////////////////////
-//
-//	File management code
-//
-/////////////////////////////////////////////////////////////////////////////
 
 //
 //	PML_ReadFromFile() - Reads some data in from the page file
@@ -1261,7 +977,7 @@ static void PML_ReadFromFile(byte *buf, long offset, word length)
 		Quit("PML_ReadFromFile: Zero offset");
 	if (lseek(PageFile, offset, SEEK_SET) != offset)
 		Quit("PML_ReadFromFile: Seek failed");
-	if (!CA_FarRead(PageFile,buf,length))
+	if (!CA_FarRead(PageFile ,buf, length))
 		Quit("PML_ReadFromFile: Read failed");
 }
 
@@ -1286,19 +1002,18 @@ static void PML_OpenPageFile()
 		Quit("PML_OpenPageFile: Unable to open page file");
 
 	// Read in header variables
-	read(PageFile,&ChunksInFile,sizeof(ChunksInFile));
-	read(PageFile,&PMSpriteStart,sizeof(PMSpriteStart));
-	read(PageFile,&PMSoundStart,sizeof(PMSoundStart));
+	read(PageFile, &ChunksInFile, sizeof(ChunksInFile));
+	read(PageFile, &PMSpriteStart, sizeof(PMSpriteStart));
+	read(PageFile, &PMSoundStart, sizeof(PMSoundStart));
 
 	// Allocate and clear the page list
-	PMNumBlocks = ChunksInFile;
-	MM_GetPtr((memptr)&PMPages,sizeof(PageListStruct) * PMNumBlocks);
-	MM_SetLock((memptr)&PMPages,true);
-	memset(PMPages,0,sizeof(PageListStruct) * PMNumBlocks);
+	MM_GetPtr((memptr)&PMPages, sizeof(PageListStruct) * ChunksInFile);
+	MM_SetLock((memptr)&PMPages, true);
+	memset(PMPages, 0, sizeof(PageListStruct) * ChunksInFile);
 
 	// Read in the chunk offsets
 	size = sizeof(longword) * ChunksInFile;
-	MM_GetPtr(&buf,size);
+	MM_GetPtr(&buf, size);
 	if (!CA_FarRead(PageFile,(byte *)buf,size))
 		Quit("PML_OpenPageFile: Offset read failed");
 	offsetptr = (longword *)buf;
@@ -1312,7 +1027,7 @@ static void PML_OpenPageFile()
 	if (!CA_FarRead(PageFile,(byte *)buf,size))
 		Quit("PML_OpenPageFile: Length read failed");
 	lengthptr = (word *)buf;
-	for (i = 0,page = PMPages;i < ChunksInFile;i++,page++)
+	for (i = 0, page = PMPages; i < ChunksInFile; i++, page++)
 		page->length = *lengthptr++;
 	MM_FreePtr(&buf);
 }
@@ -1331,25 +1046,6 @@ static void PML_ClosePageFile()
 	}
 }
 
-/////////////////////////////////////////////////////////////////////////////
-//
-//	Allocation, etc., code
-//
-/////////////////////////////////////////////////////////////////////////////
-
-//
-//	PM_GetPageAddress() - Returns the address of a given page
-//		Returns NULL if block is not loaded
-//
-memptr PM_GetPageAddress(int pagenum)
-{
-	PageListStruct *page;
-
-	page = &PMPages[pagenum];
-	
-	return page->addr;
-}
-
 //
 //	PM_GetPage() - Returns the address of the page, loading it if necessary
 //
@@ -1362,11 +1058,9 @@ memptr PM_GetPage(int pagenum)
 
 	page = &PMPages[pagenum];
 	if (page->addr == NULL) {
-		page->lastHit = 0;
 		MM_GetPtr((memptr)&page->addr, PMPageSize);
 		PML_ReadFromFile(page->addr, page->offset, page->length);
 	}
-	page->lastHit++;
 	return page->addr;
 }
 
@@ -1375,47 +1069,22 @@ memptr PM_GetPage(int pagenum)
 //		Calls the update function after each load, indicating the current
 //		page, and the total pages that need to be loaded (for thermometer).
 //
-void PM_Preload(boolean (*update)(word current,word total))
+void PM_Preload(boolean (*update)(word current, word total))
 {
 	update(1, 1);
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-//	General code
-//
-/////////////////////////////////////////////////////////////////////////////
-
-//
-//	PM_NextFrame() - Increments the frame counter
-//
-void PM_NextFrame()
-{
-	int	i;
-
-	// Frame count overrun - kill the LRU hit entries & reset frame count
-	if (++PMFrameCount >= MAXLONG - 4)
-	{
-		for (i = 0; i < PMNumBlocks; i++)
-			PMPages[i].lastHit = 0;
-		PMFrameCount = 0;
-	}
-
 }
 
 //
 //	PM_Reset() - Sets up caching structures
 //
-void PM_Reset()
+static void PM_Reset()
 {
 	int i;
 	PageListStruct *page;
 
 	// Initialize page list
-	for (i = 0, page = PMPages; i < PMNumBlocks; i++, page++)
-	{
+	for (i = 0, page = PMPages; i < ChunksInFile; i++, page++)
 		page->addr = NULL;
-	}
 }
 
 //

@@ -6,8 +6,6 @@
 #define NUMMAPS		60
 #define MAPPLANES	2
 
-//===========================================================================
-
 typedef	struct
 {
 	long planestart[3];
@@ -16,7 +14,7 @@ typedef	struct
 	char name[16];
 } PACKED maptype;
 
-//===========================================================================
+/* ======================================================================== */
 
 extern	int			mapon;
 
@@ -33,7 +31,7 @@ extern	char		extension[5],
 			aheadname[10],
 			afilename[10];
 
-//===========================================================================
+/* ======================================================================== */
 
 boolean CA_FarRead(int handle, byte *dest, long length);
 boolean CA_FarWrite(int handle, byte *source, long length);
@@ -55,14 +53,6 @@ void CA_UnCacheGrChunk(int chunk);
 
 void CA_UpLevel();
 void CA_DownLevel();
-/*
-void CA_ClearMarks();
-void CA_ClearAllMarks();
-
-#define CA_MarkGrChunk(chunk)	grneeded[chunk]|=ca_levelbit
-
-void CA_CacheMarks();
-*/
 
 void CA_CacheScreen(int chunk);
 
@@ -84,23 +74,19 @@ typedef	struct {
 	longword offset;		// Offset of chunk into file
 	word length;		// Length of the chunk
 	memptr addr;
-	longword lastHit;	// Last frame number of hit
 } PageListStruct;
 
-extern	word ChunksInFile, PMSpriteStart, PMSoundStart;
+extern word ChunksInFile, PMSpriteStart, PMSoundStart;
 
-extern	PageListStruct *PMPages;
+extern PageListStruct *PMPages;
 
 #define	PM_GetSoundPage(v)	PM_GetPage(PMSoundStart + (v))
 #define	PM_GetSpritePage(v)	PM_GetPage(PMSpriteStart + (v))
 
-void	PM_Startup(void),
-	PM_Shutdown(void),
-	PM_Reset(void),
-	PM_Preload(boolean (*update)(word current,word total)),
-	PM_NextFrame(void),
-	PM_SetMainPurge(int level);
+void PM_Startup();
+void PM_Shutdown();
+void PM_Preload(boolean (*update)(word current,word total));
 	
-memptr	PM_GetPageAddress(int pagenum), PM_GetPage(int pagenum);
+memptr PM_GetPage(int pagenum);
 
 #endif

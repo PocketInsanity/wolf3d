@@ -37,12 +37,10 @@ typedef bool boolean;
 #define PACKED __attribute__((packed))
 #define LONGLONG long long
 
-#define O_BINARY 0
-
 #ifdef __cplusplus
 typedef bool boolean;
 #else
-typedef       enum {false,true} boolean;
+typedef enum { false, true } boolean;
 #endif
 
 #endif
@@ -57,6 +55,10 @@ typedef       enum {false,true} boolean;
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <math.h>
+
+#ifndef O_BINARY
+#define O_BINARY 0
+#endif
 
 #include "misc.h"
 #include "version.h"
@@ -87,9 +89,9 @@ typedef       enum {false,true} boolean;
 
 /* ---------------- */
 
-typedef	unsigned	char		byte;
-typedef	unsigned	short int	word;
-typedef	unsigned	long		longword;
+typedef unsigned char byte;
+typedef unsigned short int word;
+typedef unsigned long longword;
 typedef long fixed;
 
 typedef void * memptr;
@@ -118,13 +120,13 @@ void Quit(char *error);
 #undef PI
 #define PI      3.141592657
 
-#define	MAXTICS				10
-#define DEMOTICS			4
+#define	MAXTICS		10
+#define DEMOTICS	4
 
-extern	unsigned	mapwidth,mapheight,tics;
+extern unsigned mapwidth, mapheight, tics;
 
-extern	byte		fontcolor,backcolor;
+extern byte fontcolor, backcolor;
 
-#define SETFONTCOLOR(f,b) fontcolor=f;backcolor=b;
+#define SETFONTCOLOR(f, b) { fontcolor = f; backcolor = b; }
 
 #endif
