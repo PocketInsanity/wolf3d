@@ -15,9 +15,10 @@ byte *gfxbuf = NULL;
 ==========================
 */
 
+void DisplayTextSplash(byte *text);
+
 void Quit(char *error)
 {
-	/* TODO: blah blah blah */
 	memptr screen = NULL;
 
 	if (!error || !*error) {
@@ -33,6 +34,8 @@ void Quit(char *error)
 	
 	if (screen) {
 		printf("TODO: spiffy ansi screen goes here..\n");
+		/* doesn't look too good on console at the moment ...*/
+		//DisplayTextSplash(screen);
 	}
 	
 	if (error && *error) {

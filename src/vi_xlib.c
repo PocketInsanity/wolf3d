@@ -55,9 +55,10 @@ int main(int argc, char *argv[])
 ==========================
 */
 
+void DisplayTextSplash(byte *text);
+
 void Quit(char *error)
 {
-	/* TODO: blah blah blah */
 	memptr screen = NULL;
 
 	if (!error || !*error) {
@@ -72,7 +73,8 @@ void Quit(char *error)
 	ShutdownId();
 	
 	if (screen) {
-		printf("TODO: spiffy ansi screen goes here..\n");
+		//printf("TODO: spiffy ansi screen goes here..\n");
+		DisplayTextSplash(screen);
 	}
 	
 	if (error && *error) {

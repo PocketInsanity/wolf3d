@@ -943,8 +943,9 @@ static void AsmRefresh()
 		    if (tilehit & 0x40) {
 			/* vertpushwall */
 			long ytemp = yintercept + (pwallpos * ystep) / 64;
-			ytemp &= ~0x4000000; /* TODO: why? */
-			//fprintf(stderr, "VertPushWall@%d: 0x%X vs 0x%X\n", angle, yintercept, ytemp);
+			
+			fprintf(stderr, "VertPushWall@%d: %d = %d + (%d * %d) / 64\n", angle, ytemp, yintercept, pwallpos, ystep);
+			ytemp &= ~0x4000000; /* TODO: why? */			
 			if (TILE(ytemp) != TILE(yintercept)) 
 				goto passvert;
 			yintercept = ytemp;
@@ -985,6 +986,8 @@ static void AsmRefresh()
 		    /* horizdoor */
 		    if (tilehit & 0x40) {
 		    	long xtemp = xintercept + (pwallpos * xstep) / 64;
+		    	
+			fprintf(stderr, "HorizPushWall@%d: %d = %d + (%d * %d) / 64\n", angle, xtemp, xintercept, pwallpos, xstep);
 		    	xtemp &= ~0x4000000;
 			/* horizpushwall */
 			if (TILE(xtemp) != TILE(xintercept))

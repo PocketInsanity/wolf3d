@@ -20,7 +20,7 @@ typedef struct
 =============================================================================
 */
 
-static byte *tinf;
+static mapfiletype *tinf;
 int mapon;
 
 word		*mapsegs[MAPPLANES];
@@ -467,9 +467,9 @@ static void CAL_SetupMapFile()
 		CA_CannotOpen(fname);
 
 	length = filelength(handle);
-	MM_GetPtr ((memptr)&tinf,length);
+	MM_GetPtr((memptr)&tinf, length);
 	
-	CA_FarRead(handle, tinf, length);
+	CA_FarRead(handle, (byte *)tinf, length);
 	
 	close(handle);
 
@@ -487,7 +487,7 @@ static void CAL_SetupMapFile()
 //
 	for (i=0;i<NUMMAPS;i++)
 	{
-		pos = ((mapfiletype *)tinf)->headeroffsets[i];
+		pos = tinf->headeroffsets[i];
 		if (pos < 0)	/* $FFFFFFFF start is a sparse map */
 			continue;
 
@@ -907,7 +907,7 @@ void CA_CacheMap(int mapnum)
 		source++;
 		MM_GetPtr(&buffer2seg, expanded);
 		CAL_CarmackExpand(source, (word *)buffer2seg,expanded);
-		CA_RLEWexpand(((word *)buffer2seg)+1,*dest,size,((mapfiletype *)tinf)->RLEWtag);
+		CA_RLEWexpand(((word *)buffer2seg)+1,*dest,size, tinf->RLEWtag);
 		MM_FreePtr(&buffer2seg);
 
 		MM_FreePtr(&bigbufferseg);
