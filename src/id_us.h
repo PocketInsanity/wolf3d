@@ -30,15 +30,15 @@ void US_Startup(),
 				US_InitRndT(boolean randomize),
 				US_DrawWindow(word x,word y,word w,word h),
 				US_ClearWindow(void),
-				US_PrintCentered(char *s),
-				US_CPrint(char *s),
-				US_CPrintLine(char *s),
-				US_Print(char *s),
+				US_PrintCentered(const char *s),
+				US_CPrint(const char *s),
+				US_CPrintLine(const char *s),
+				US_Print(const char *s),
 				US_PrintUnsigned(longword n);
-boolean	US_LineInput(int x,int y,char *buf,char *def,boolean escok,
+boolean	US_LineInput(int x,int y,char *buf,const char *def,boolean escok,
 				int maxchars,int maxwidth);
 int				US_RndT();
 
-void	USL_PrintInCenter(char *s,Rect r);
+void	USL_PrintInCenter(const char *s,Rect r);
 
 #endif

@@ -14,7 +14,7 @@ byte *gfxbuf = NULL;
 ==========================
 */
 
-void Quit(char *error)
+void Quit(const char *error)
 {
 	memptr screen = NULL;
 

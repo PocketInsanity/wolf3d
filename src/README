@@ -1,3 +1,8 @@
+Wolfenstein 3D for Linux - http://www.icculus.org/wolf3d/
+------------------------
+
+This is an in-progress port of the id Software MS-DOS game, Wolfenstein 3D,
+to the GNU/Linux operating system.
 
 Save game and configuration file formats are not yet "solid" (files created
 with an older version may not work with a new binary), but they probably
@@ -22,6 +27,6 @@ Thanks:
 * Chuck Mason
 * And everyone who has emailed me about this code! Thanks!
 
------
+-- 
 Steven Fuller
 relnev@icculus.org

@@ -17,7 +17,7 @@ boolean		spearflag;
 
 /* ELEVATOR BACK MAPS - REMEMBER (-1)!! */
 #ifndef SPEAR
-static int ElevatorBackTo[]={ 1, 1, 7, 3, 5, 3};
+static const int ElevatorBackTo[]={ 1, 1, 7, 3, 5, 3};
 #endif
 
 //===========================================================================
@@ -841,7 +841,7 @@ void PlayDemo(int demonumber)
 	ClearMemory();
 }
 
-int PlayDemoFromFile(char *demoname)
+int PlayDemoFromFile(const char *demoname)
 {
 	int length;
 

@@ -25,7 +25,7 @@ void DisplayTextSplash(byte *text);
 ==========================
 */
 
-void Quit(char *error)
+void Quit(const char *error)
 {
 	memptr screen = NULL;
 

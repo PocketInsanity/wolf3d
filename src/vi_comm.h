@@ -161,7 +161,7 @@ extern void IN_Startup(), IN_Shutdown(), IN_ClearKeysDown(),
 		IN_Ack();
 		
 extern boolean IN_UserInput(longword delay);
-extern char *IN_GetScanName(ScanCode);
+extern const char *IN_GetScanName(ScanCode);
 
 byte IN_MouseButtons();
 byte IN_JoyButtons();

@@ -269,9 +269,9 @@ void PG13()
 
 //==========================================================================
 
-void Write(int x,int y,char *string)
+void Write(int x,int y,const char *string)
 {
- int alpha[]={L_NUM0PIC,L_NUM1PIC,L_NUM2PIC,L_NUM3PIC,L_NUM4PIC,L_NUM5PIC,
+const int alpha[]={L_NUM0PIC,L_NUM1PIC,L_NUM2PIC,L_NUM3PIC,L_NUM4PIC,L_NUM5PIC,
 	L_NUM6PIC,L_NUM7PIC,L_NUM8PIC,L_NUM9PIC,L_COLONPIC,0,0,0,0,0,0,L_APIC,L_BPIC,
 	L_CPIC,L_DPIC,L_EPIC,L_FPIC,L_GPIC,L_HPIC,L_IPIC,L_JPIC,L_KPIC,
 	L_LPIC,L_MPIC,L_NPIC,L_OPIC,L_PPIC,L_QPIC,L_RPIC,L_SPIC,L_TPIC,
@@ -320,7 +320,7 @@ void Write(int x,int y,char *string)
 	   break;
 
 	 default:
-	   VWB_DrawPic(nx,ny,alpha[(int)ch]);
+	   VWB_DrawPic(nx,ny,alpha[(unsigned char)ch]);
 	}
 	nx+=16;
    }
@@ -333,7 +333,7 @@ void Write(int x,int y,char *string)
 void BJ_Breathe()
 {
 	static int which=0,max=10;
-	int pics[2]={L_GUYPIC,L_GUY2PIC};
+	const int pics[2]={L_GUYPIC,L_GUY2PIC};
 
 	if (get_TimeCount() > max)
 	{
@@ -380,7 +380,7 @@ void LevelCompleted()
 
 	char tempstr[10];
 	long bonus,timeleft=0;
-	times parTimes[]=
+	const times parTimes[]=
 	{
 #ifndef SPEAR
 	 //

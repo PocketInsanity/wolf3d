@@ -46,14 +46,14 @@ TEXT FORMATTING COMMANDS
 =============================================================================
 */
 
-int		pagenum, numpages;
+static int pagenum, numpages;
 
-unsigned	leftmargin[TEXTROWS], rightmargin[TEXTROWS];
-char		*text;
-unsigned	rowon;
+static unsigned leftmargin[TEXTROWS], rightmargin[TEXTROWS];
+static const char *text;
+static unsigned rowon;
 
-int		picx, picy, picnum, picdelay;
-boolean		layoutdone;
+static int picx, picy, picnum, picdelay;
+static boolean layoutdone;
 
 /* ======================================================================== */
 
@@ -526,7 +526,7 @@ void BackPage()
 */
 void CacheLayoutGraphics()
 {
-	char	*bombpoint, *textstart;
+	const char	*bombpoint, *textstart;
 	char	ch;
 
 	textstart = text;
@@ -577,7 +577,7 @@ void CacheLayoutGraphics()
 =====================
 */
 
-void ShowArticle(char *article)
+void ShowArticle(const char *article)
 {
 	unsigned oldfontnumber;
 	boolean newpage, firstpage;

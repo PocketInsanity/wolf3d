@@ -331,7 +331,7 @@ configend:
 	return 0;
 }
 
-int SaveTheGame(char *fn, char *tag, int dx, int dy)
+int SaveTheGame(const char *fn, const char *tag, int dx, int dy)
 {
 	objtype *ob;
 	int fd, i, x, y;
@@ -508,7 +508,7 @@ int SaveTheGame(char *fn, char *tag, int dx, int dy)
 	return 0;
 }
 
-int ReadSaveTag(char *fn, char *tag)
+int ReadSaveTag(const char *fn, const char *tag)
 {
 	char buf[8];
 	int fd;
@@ -556,7 +556,7 @@ rstfail:
 	return -1;
 }
 
-int LoadTheGame(char *fn, int dx, int dy)
+int LoadTheGame(const char *fn, int dx, int dy)
 {
 	char buf[8];
 	int fd, i, x, y, id;
@@ -805,7 +805,7 @@ loadfail:
 =================
 */
 
-int MS_CheckParm(char *check)
+int MS_CheckParm(const char *check)
 {
 	int i;
 	char *parm;

@@ -61,7 +61,7 @@ void US_Shutdown()
 //		supported.
 //
 ///////////////////////////////////////////////////////////////////////////
-void US_Print(char *str)
+void US_Print(const char *str)
 {
 	char c, *se, *s, *sz = strdup(str);
 	word w, h;
@@ -115,7 +115,7 @@ void US_PrintUnsigned(longword n)
 //	USL_PrintInCenter() - Prints a string in the center of the given rect
 //
 ///////////////////////////////////////////////////////////////////////////
-void USL_PrintInCenter(char *s, Rect r)
+void USL_PrintInCenter(const char *s, Rect r)
 {
 	word w, h, rw, rh;
 
@@ -133,7 +133,7 @@ void USL_PrintInCenter(char *s, Rect r)
 //	US_PrintCentered() - Prints a string centered in the current window.
 //
 ///////////////////////////////////////////////////////////////////////////
-void US_PrintCentered(char *s)
+void US_PrintCentered(const char *s)
 {
 	Rect r;
 
@@ -151,7 +151,7 @@ void US_PrintCentered(char *s)
 //		advances to the next line. Newlines are not supported.
 //
 ///////////////////////////////////////////////////////////////////////////
-void US_CPrintLine(char *s)
+void US_CPrintLine(const char *s)
 {
 	word w, h;
 
@@ -171,7 +171,7 @@ void US_CPrintLine(char *s)
 //		supported.
 //
 ///////////////////////////////////////////////////////////////////////////
-void US_CPrint(char *str)
+void US_CPrint(const char *str)
 {
 	/* Functions like to pass a string constant */
 	
@@ -251,7 +251,7 @@ void US_DrawWindow(word x,word y,word w,word h)
 //	USL_XORICursor() - XORs the I-bar text cursor. Used by US_LineInput()
 //
 ///////////////////////////////////////////////////////////////////////////
-static void USL_XORICursor(int x, int y, char *s, word cursor)
+static void USL_XORICursor(int x, int y, const char *s, word cursor)
 {
 	static boolean status;
 	char buf[MaxString];
@@ -285,7 +285,7 @@ static void USL_XORICursor(int x, int y, char *s, word cursor)
 //		returned
 //
 ///////////////////////////////////////////////////////////////////////////
-boolean US_LineInput(int x,int y,char *buf,char *def,boolean escok,
+boolean US_LineInput(int x,int y,char *buf,const char *def,boolean escok,
 				int maxchars,int maxwidth)
 {
 	boolean	redraw, cursorvis, cursormoved, done, result = true;

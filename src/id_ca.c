@@ -14,7 +14,8 @@ typedef struct
 =============================================================================
 */
 
-word RLEWtag;
+static word RLEWtag;
+
 int mapon;
 
 word	*mapsegs[MAPPLANES];
@@ -49,7 +50,7 @@ static int audiohandle = -1;	/* handle to AUDIOT */
 =============================================================================
 */
 
-static void CA_CannotOpen(char *string)
+static void CA_CannotOpen(const char *string)
 {
 	char str[30];
 
@@ -69,7 +70,7 @@ static void CA_CannotOpen(char *string)
 ==========================
 */
 
-boolean CA_WriteFile(char *filename, void *ptr, long length)
+boolean CA_WriteFile(const char *filename, const void *ptr, long length)
 {
 	ssize_t l;
 	int handle;
@@ -79,7 +80,7 @@ boolean CA_WriteFile(char *filename, void *ptr, long length)
 	if (handle == -1)
 		return false;
 
-	l = WriteBytes(handle, (byte *)ptr, length);
+	l = WriteBytes(handle, (const byte *)ptr, length);
 	if (l == -1) {
 		perror("CA_FarWrite");
 		return false;
@@ -106,7 +107,7 @@ boolean CA_WriteFile(char *filename, void *ptr, long length)
 ==========================
 */
 
-boolean CA_LoadFile(char *filename, memptr *ptr)
+boolean CA_LoadFile(const char *filename, memptr *ptr)
 {
 	int handle;
 	ssize_t l;
@@ -154,15 +155,16 @@ boolean CA_LoadFile(char *filename, memptr *ptr)
 */
 
 /* From Ryan C. Gordon -- ryan_gordon@hotmail.com */
-void CAL_HuffExpand(byte *source, byte *dest, long length, huffnode *htable)
+void CAL_HuffExpand(const byte *source, byte *dest, long length, 
+	const huffnode *htable)
 {
-	huffnode *headptr;          
-	huffnode *nodeon;           
+	const huffnode *headptr;          
+	const huffnode *nodeon;           
 	byte      mask = 0x01;    
 	word      path;             
 	byte     *endoff = dest + length;    
 
-	nodeon = headptr = htable + 254;  
+	nodeon = headptr = htable + 254;
 
 	do {
 		if (*source & mask)
@@ -198,11 +200,12 @@ void CAL_HuffExpand(byte *source, byte *dest, long length, huffnode *htable)
 #define NEARTAG	0xa7
 #define FARTAG	0xa8
 
-void CAL_CarmackExpand(byte *source, word *dest, word length)
+void CAL_CarmackExpand(const byte *source, word *dest, word length)
 {
 	unsigned int offset;
 	word *copyptr, *outptr;	
-	byte chhigh, chlow, *inptr;
+	byte chhigh, chlow;
+	const byte *inptr;
 	
 	length /= 2;
 
@@ -262,7 +265,7 @@ void CAL_CarmackExpand(byte *source, word *dest, word length)
 ======================
 */
 
-void CA_RLEWexpand(word *source, word *dest, long length, word rlewtag)
+void CA_RLEWexpand(const word *source, word *dest, long length, word rlewtag)
 {
 	word value, count, i;
 	word *end = dest + length / 2;
@@ -271,10 +274,10 @@ void CA_RLEWexpand(word *source, word *dest, long length, word rlewtag)
 	do {
 		value = *source++;
 
-		if (value != rlewtag)
+		if (value != rlewtag) {
 			/* uncompressed */
 			*dest++ = value;
-		else {
+		} else {
 			/* compressed string */
 			count = *source++;
 			
@@ -580,7 +583,7 @@ void CA_LoadAllSounds()
 ======================
 */
 
-static void CAL_ExpandGrChunk(int chunk, byte *source)
+static void CAL_ExpandGrChunk(int chunk, const byte *source)
 {
 	int tilecount = 0, i;
 	long expanded;

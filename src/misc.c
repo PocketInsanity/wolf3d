@@ -160,7 +160,7 @@ static void put_dos2ansi(byte attrib)
 		printf ("%c[%d;25;%dm%c[%dm", 27, intens, fore, 27, back);
 }
 
-void DisplayTextSplash(byte *text, int l)
+void DisplayTextSplash(const byte *text, int l)
 {
 	int i, x;
 	
@@ -207,7 +207,7 @@ uint32_t SwapInt32L(uint32_t i)
 
 /* ** */
 
-int OpenWrite(char *fn)
+int OpenWrite(const char *fn)
 {
 	int fp;
 	
@@ -215,7 +215,7 @@ int OpenWrite(char *fn)
 	return fp;
 }
 
-int OpenWriteAppend(char *fn)
+int OpenWriteAppend(const char *fn)
 {
 	int fp;
 	
@@ -257,13 +257,13 @@ int WriteInt32(int fp, int32_t d)
 	return write(fp, &b, 4) / 4;
 }
 
-int WriteBytes(int fp, byte *d, int len)
+int WriteBytes(int fp, const byte *d, int len)
 {
 	return write(fp, d, len);
 }
 
 
-int OpenRead(char *fn)
+int OpenRead(const char *fn)
 {
 	int fp;
 	

@@ -27,10 +27,8 @@ extern char extension[5];
 
 /* ======================================================================== */
 
-boolean CA_LoadFile(char *filename, memptr *ptr);
-boolean CA_WriteFile(char *filename, void *ptr, long length);
-
-void CA_RLEWexpand(word *source, word *dest, long length, word rlewtag);
+boolean CA_LoadFile(const char *filename, memptr *ptr);
+boolean CA_WriteFile(const char *filename, const void *ptr, long length);
 
 void CA_Startup();
 void CA_Shutdown();

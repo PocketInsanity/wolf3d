@@ -499,9 +499,9 @@ int main(int argc, char *argv[])
 ==========================
 */
 
-void DisplayTextSplash(byte *text, int l);
+void DisplayTextSplash(const byte *text, int l);
 
-void Quit(char *error)
+void Quit(const char *error)
 {
 	memptr screen = NULL;
 	int l = 0;

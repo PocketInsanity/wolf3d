@@ -493,7 +493,6 @@ typedef enum {
 	nodir
 } dirtype;
 
-
 #define NUMENEMIES		22
 typedef enum {
 	en_guard,
@@ -519,15 +518,6 @@ typedef enum {
 	en_will,
 	en_death
 } enemy_t;
-
-typedef struct statestruct
-{
-	boolean	rotate;
-	int shapenum; /* a shapenum of -1 means get from ob->temp1 */
-	int tictime;
-	void (*think)(), (*action)();
-	int next; /* stateenum */
-} statetype;
 
 //---------------------
 //
@@ -595,6 +585,15 @@ typedef struct objstruct
 	struct		objstruct *next,*prev;
 } objtype;
 
+typedef struct statestruct
+{
+	boolean	rotate;
+	int shapenum; /* a shapenum of -1 means get from ob->temp1 */
+	int tictime;
+	void (*think)(objtype *ob);
+	void (*action)(objtype *ob);
+	int next; /* stateenum */
+} statetype;
 
 #define NUMBUTTONS	8
 enum {
@@ -700,9 +699,9 @@ void NewGame(int difficulty,int episode);
 void NewViewSize(int width);
 void ShowViewSize(int width);
 
-int LoadTheGame(char *fn, int x, int y);
-int SaveTheGame(char *fn, char *tag, int x, int y);
-int ReadSaveTag(char *fn, char *tag);
+int LoadTheGame(const char *fn, int x, int y);
+int SaveTheGame(const char *fn, const char *tag, int x, int y);
+int ReadSaveTag(const char *fn, const char *tag);
 
 void ShutdownId();
 int WriteConfig();
@@ -735,7 +734,7 @@ void 	DrawPlayScreen (void);
 void 	GameLoop (void);
 void ClearMemory (void);
 void PlayDemo(int demonumber);
-int PlayDemoFromFile(char *demoname);
+int PlayDemoFromFile(const char *demoname);
 void RecordDemo();
 void DrawHighScores();
 void DrawPlayBorder();

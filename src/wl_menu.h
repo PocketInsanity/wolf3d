@@ -126,8 +126,8 @@ void TicDelay(int count);
 void CacheLump(int lumpstart,int lumpend);
 void UnCacheLump(int lumpstart,int lumpend);
 void StartCPMusic(int song);
-int  Confirm(char *string);
-void Message(char *string);
+int  Confirm(const char *string);
+void Message(const char *string);
 void CheckPause(void);
 void ShootSnd(void);
 void FreeMusic(void);
@@ -220,7 +220,7 @@ typedef struct {
 
 extern LRstruct LevelRatios[];
 
-void Write(int x,int y,char *string);
+void Write(int x,int y,const char *string);
 int GetYorN(int x,int y,int pic);
 
 #endif

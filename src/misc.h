@@ -4,8 +4,8 @@
 extern int _argc;
 extern char **_argv;
 
-void SavePCX256ToFile(unsigned char *buf, int width, int height, unsigned char *pal, char *name);
-void SavePCXRGBToFile(unsigned char *buf, int width, int height, char *name);
+void SavePCX256ToFile(const unsigned char *buf, int width, int height, const unsigned char *pal, const char *name);
+void SavePCXRGBToFile(const unsigned char *buf, int width, int height, const char *name);
 
 void set_TimeCount(unsigned long t);
 unsigned long get_TimeCount();
@@ -23,8 +23,8 @@ char *ultoa(unsigned long value, char *string, int radix);
 uint16_t SwapInt16L(uint16_t i);
 uint32_t SwapInt32L(uint32_t i);
 
-extern int OpenWrite(char *fn);
-extern int OpenWriteAppend(char *fn);
+extern int OpenWrite(const char *fn);
+extern int OpenWriteAppend(const char *fn);
 extern void CloseWrite(int fp);
 
 extern int WriteSeek(int fp, int offset, int whence);
@@ -33,9 +33,9 @@ extern int WritePos(int fp);
 extern int WriteInt8(int fp, int8_t d);
 extern int WriteInt16(int fp, int16_t d);
 extern int WriteInt32(int fp, int32_t d);
-extern int WriteBytes(int fp, byte *d, int len);
+extern int WriteBytes(int fp, const byte *d, int len);
 
-extern int OpenRead(char *fn);
+extern int OpenRead(const char *fn);
 extern void CloseRead(int fp);
 
 extern int ReadSeek(int fp, int offset, int whence);

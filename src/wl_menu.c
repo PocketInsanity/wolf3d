@@ -17,7 +17,7 @@ void CP_ReadThis();
 #define STARTITEM	newgame
 #endif
 
-static char endStrings[9][80]=
+static const char endStrings[9][80]=
 {
 	ENDSTR1,
 	ENDSTR2,
@@ -146,8 +146,8 @@ CusMenu[]=
 };
 
 
-static int color_hlite[] = { DEACTIVE, HIGHLIGHT, READHCOLOR, 0x67 };
-static int color_norml[] = { DEACTIVE, TEXTCOLOR, READCOLOR, 0x6b };
+static const int color_hlite[] = { DEACTIVE, HIGHLIGHT, READHCOLOR, 0x67 };
+static const int color_norml[] = { DEACTIVE, TEXTCOLOR, READCOLOR, 0x6b };
 
 #ifndef SPEAR
 static int EpisodeSelect[6] = { 1 };
@@ -192,7 +192,7 @@ static struct {
 { sc_None,	"?"	}
 };
 
-char *IN_GetScanName(ScanCode scan)
+const char *IN_GetScanName(ScanCode scan)
 {
 	int i;
 	
@@ -204,7 +204,7 @@ char *IN_GetScanName(ScanCode scan)
 
 #else
 
-static char
+static const char
 					*ScanNames[] =		// Scan code names with single chars
 					{
 	"?","?","1","2","3","4","5","6","7","8","9","0","-","+","?","?",
@@ -231,7 +231,7 @@ static char
 	"Down","Left","Right",""
 					};
 
-char *IN_GetScanName(ScanCode scan)
+const char *IN_GetScanName(ScanCode scan)
 {
 	char **p;
 	ScanCode *s;
@@ -240,7 +240,7 @@ char *IN_GetScanName(ScanCode scan)
 		if (*s == scan)
 			return *p;
 
-	return ScanNames[(int)scan];
+	return ScanNames[(unsigned char)scan];
 }
 #endif
 
@@ -3064,7 +3064,7 @@ void ReadAnyControl(ControlInfo *ci)
 // DRAW DIALOG AND CONFIRM YES OR NO TO QUESTION
 //
 ////////////////////////////////////////////////////////////////////
-int Confirm(char *string)
+int Confirm(const char *string)
 {
 	int xit=0,x,y,tick=0,whichsnd[2]={ESCPRESSEDSND,SHOOTSND};
 
@@ -3120,7 +3120,7 @@ int Confirm(char *string)
 // PRINT A MESSAGE IN A WINDOW
 //
 ////////////////////////////////////////////////////////////////////
-void Message(char *string)
+void Message(const char *string)
 {
 	word h=0, mw=0;
 
