@@ -53,7 +53,7 @@ int                     minheightdiv;
 
 void            Quit (char *error);
 
-boolean         startgame,loadedgame,virtualreality;
+boolean         startgame,loadedgame;
 int             mouseadjustment;
 
 char	configname[13]="config.";
@@ -150,8 +150,6 @@ void ReadConfig(void)
 
 		if (SoundBlasterPresent)
 			sds = sds_SoundBlaster;
-		else if (SoundSourcePresent)
-			sds = sds_SoundSource;
 		else
 			sds = sds_Off;
 
@@ -162,8 +160,9 @@ void ReadConfig(void)
 		joypadenabled = false;
 		joystickport = 0;
 
+		/* max viewsize is 20 */
 		viewsize = 15;
-		mouseadjustment=5;
+		mouseadjustment = 5;
 	}
 
 	SD_SetMusicMode (sm);
@@ -644,16 +643,10 @@ void SetupWalls (void)
 ==========================
 */
 
-void SignonScreen (void)                        // VGA version
+void SignonScreen()
 {
-	unsigned        segstart,seglength;
-
-	VL_SetPalette (&gamepal);
-
-	if (!virtualreality)
-	{
-		VL_MemToScreen (&introscn,320,200,0,0);
-	}
+	VL_SetPalette(&gamepal);
+	VL_MemToScreen(&introscn, 320, 200, 0, 0);
 }
 
 
@@ -1040,14 +1033,9 @@ void DoJukebox(void)
 ==========================
 */
 
-void InitGame (void)
+void InitGame(void)
 {
-	int                     i,x,y;
-
-	if (MS_CheckParm ("virtual"))
-		virtualreality = true;
-	else
-		virtualreality = false;
+	int i,x,y;
 
 	MM_Startup (); 
 	VW_Startup ();
@@ -1083,8 +1071,7 @@ void InitGame (void)
 //
 // draw intro screen stuff
 //
-	if (!virtualreality)
-		IntroScreen ();
+	IntroScreen ();
 
 //
 // load in and lock down some basic chunks
@@ -1104,13 +1091,7 @@ void InitGame (void)
 // initialize variables
 //
 	InitRedShifts ();
-	if (!virtualreality)
-		FinishSignon();
-
-	if (virtualreality)
-	{
-		NoWait = true;
-	}
+	FinishSignon();
 }
 
 //===========================================================================

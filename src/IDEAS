@@ -1,1 +1,5 @@
 * One binary, any game type. Store certain things in a new file?
+* A key to change viewsize at runtime (max == 20, min == 5 or so...)
+* Game able to cope at any virtual resolution in software mode. OpenGL
+  handles this transparently
+* Audio support using OpenAL

@@ -1306,7 +1306,6 @@ long funnyticount;
 void PlayLoop (void)
 {
 	int		give;
-	int	helmetangle;
 
 	playstate = lasttimecount = 0;
 	set_TimeCount(0);
@@ -1323,15 +1322,6 @@ void PlayLoop (void)
 
 	do
 	{
-		if (virtualreality)
-		{
-			helmetangle = 0; /* TODO: virtualreality can be removed */
-			player->angle += helmetangle;
-			if (player->angle >= ANGLES)
-				player->angle -= ANGLES;
-		}
-
-
 		PollControls();
 
 //
@@ -1392,15 +1382,7 @@ void PlayLoop (void)
 			}
 		}
 
-
-		if (virtualreality)
-		{
-			player->angle -= helmetangle;
-			if (player->angle < 0)
-				player->angle += ANGLES;
-		}
-
-	}while (!playstate && !startgame);
+	} while (!playstate && !startgame);
 
 	if (playstate != ex_died)
 		FinishPaletteShifts ();
