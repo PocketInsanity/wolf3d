@@ -1550,8 +1550,8 @@ void CopyProtection(void)
 				US_LineInput(PrintX,PrintY,inputbuffer,nil,true,20,100);
 
 				match = 0;
-				for (i=0;i<_fstrlen(bossstrs[whichboss]);i++)
-					if (!_fstrnicmp(inputbuffer,bossstrs[whichboss]+i,strlen(inputbuffer)) &&
+				for (i=0;i<strlen(bossstrs[whichboss]);i++)
+					if (!strnicmp(inputbuffer,bossstrs[whichboss]+i,strlen(inputbuffer)) &&
 						strlen(inputbuffer)>3)
 						match = 1;
 
@@ -1569,9 +1569,9 @@ void CopyProtection(void)
 				PrintY += 25;
 				US_CPrint(STR_MAN1);
 				US_CPrint(STR_MAN2);
-				_fstrcpy(message,STR_MAN3" \"");
-				_fstrcat(message,WordStr[whichword]);
-				_fstrcat(message,"\" "STR_MAN4);
+				strcpy(message,STR_MAN3" \"");
+				strcat(message,WordStr[whichword]);
+				strcat(message,"\" "STR_MAN4);
 				US_CPrint(message);
 				VW_UpdateScreen();
 				VW_FadeIn();
@@ -1584,7 +1584,7 @@ void CopyProtection(void)
 				US_LineInput(PrintX,PrintY,inputbuffer,nil,true,6,100);
 
 				strlwr(inputbuffer);
-				match = 1-(_fstrcmp(inputbuffer,WordCorrect[whichword])!=0);
+				match = 1-(strcmp(inputbuffer,WordCorrect[whichword])!=0);
 				match += BackDoor(inputbuffer);
 				break;
 
@@ -1611,8 +1611,8 @@ void CopyProtection(void)
 
 				strlwr(inputbuffer);
 				match = 0;
-				for (i=0;i<_fstrlen(MemberCorrect[whichmem]);i++)
-					if (!_fstrnicmp(inputbuffer,MemberCorrect[whichmem]+i,strlen(inputbuffer)) &&
+				for (i=0;i<strlen(MemberCorrect[whichmem]);i++)
+					if (!strnicmp(inputbuffer,MemberCorrect[whichmem]+i,strlen(inputbuffer)) &&
 						strlen(inputbuffer)>2)
 							match = 1;
 				match += BackDoor(inputbuffer);
@@ -1641,7 +1641,7 @@ void CopyProtection(void)
 				US_LineInput(PrintX,PrintY,inputbuffer,nil,true,6,100);
 
 				strlwr(inputbuffer);
-				match = 1-(_fstrcmp(inputbuffer,MiscCorrect[whichone])!=0);
+				match = 1-(strcmp(inputbuffer,MiscCorrect[whichone])!=0);
 				match += BackDoor(inputbuffer);
 				break;
 			}
@@ -1693,10 +1693,7 @@ void CopyProtection(void)
 	ClearMemory();
 	ShutdownId();
 
-	_fstrcpy(message,DosMessages[US_RndT()%9]);
-
-	_AX = 3;
-	geninterrupt(0x10);
+	strcpy(message,DosMessages[US_RndT()%9]);
 
 	printf("%s\n",message);
 	exit(1);

@@ -511,12 +511,10 @@ void US_ControlPanel(byte scancode)
 	//
 	if (startgame || loadedgame)
 	{
-		#pragma warn -sus
 		MainMenu[viewscores].routine = NULL;
 		#ifndef JAPAN
-		_fstrcpy(MainMenu[viewscores].string,STR_EG);
+		strcpy(MainMenu[viewscores].string,STR_EG);
 		#endif
-		#pragma warn +sus
 	}
 
 	// RETURN/START GAME EXECUTION
@@ -558,9 +556,9 @@ void DrawMainMenu(void)
 		#ifndef JAPAN
 
 		#ifdef SPANISH
-		_fstrcpy(&MainMenu[backtodemo].string,STR_GAME);
+		strcpy(&MainMenu[backtodemo].string,STR_GAME);
 		#else
-		_fstrcpy(&MainMenu[backtodemo].string[8],STR_GAME);
+		strcpy(&MainMenu[backtodemo].string[8],STR_GAME);
 		#endif
 
 		#else
@@ -577,9 +575,9 @@ void DrawMainMenu(void)
 	{
 		#ifndef JAPAN
 		#ifdef SPANISH
-		_fstrcpy(&MainMenu[backtodemo].string,STR_BD);
+		strcpy(&MainMenu[backtodemo].string,STR_BD);
 		#else
-		_fstrcpy(&MainMenu[backtodemo].string[8],STR_DEMO);
+		strcpy(&MainMenu[backtodemo].string[8],STR_DEMO);
 		#endif
 		#else
 		CA_CacheGrChunk(C_MRETDEMOPIC);
@@ -852,13 +850,11 @@ int CP_EndGame(void)
 	pickquick = gamestate.lives = 0;
 	playstate = ex_died;
 
-	#pragma warn -sus
 	MainMenu[savegame].active = 0;
 	MainMenu[viewscores].routine=CP_ViewScores;
 	#ifndef JAPAN
-	_fstrcpy(MainMenu[viewscores].string,STR_VS);
+	strcpy(MainMenu[viewscores].string,STR_VS);
 	#endif
-	#pragma warn +sus
 
 	return 1;
 }
@@ -1646,9 +1642,7 @@ int CalibrateJoystick(void)
 	#define CALW	158
 	#define CALH	140
 
-	unsigned xmin,ymin,xmax,ymax,jb;
-
-
+	word xmin,ymin,xmax,ymax,jb;
 
 	#ifdef JAPAN
 	VWB_DrawPic(CALX,CALY,C_JOY0PIC);
@@ -1683,7 +1677,7 @@ int CalibrateJoystick(void)
 	} while(!(jb&1));
 
 	SD_PlaySound(SHOOTSND);
-	IN_GetJoyAbs(joystickport,&xmin,&ymin);
+	IN_GetJoyAbs(joystickport, &xmin, &ymin);
 
 
 	#ifdef JAPAN
@@ -2931,6 +2925,7 @@ void DrawOutline(int x,int y,int w,int h,int color1,int color2)
 ////////////////////////////////////////////////////////////////////
 void SetupControlPanel(void)
 {
+#if 0 /* DOS VERSION */
 	struct ffblk f;
 	char name[13];
 	int which,i;
@@ -2975,6 +2970,45 @@ void SetupControlPanel(void)
 				strcpy(&SaveGameNames[which][0],temp);
 			}
 		} while(!findnext(&f));
+#else 
+	glob_t globbuf;
+	char name[13];
+	int which, i, x;
+	
+	CA_CacheGrChunk(STARTFONT+1);
+#ifndef SPEAR
+	CacheLump(CONTROLS_LUMP_START, CONTROLS_LUMP_END);
+#else
+	CacheLump(BACKDROP_LUMP_START, BACKDROP_LUMP_END);
+#endif
+
+	SETFONTCOLOR(TEXTCOLOR, BKGDCOLOR);
+	fontnumber = 1;
+	WindowH = 200;
+	
+	if (!ingame)
+		CA_LoadAllSounds();
+	else
+		MainMenu[savegame].active = 1;
+	
+	if (glob(SaveName, 0, NULL, &globbuf))
+		return;
+	
+	for (x = 0; x < globbuf.gl_pathc; x++) {
+		which = globbuf.gl_pathv[x][7] - '0';
+		if (which < 10)	{
+			int handle;
+			char temp[32];
+			
+			SaveGamesAvail[which] = 1;
+			handle = open(globbuf.gl_pathv[x], O_RDONLY);
+			read(handle, temp, 32);
+			close(handle);
+			strcpy(SaveGameNames[which], temp);
+		}
+	}
+	globfree(&globbuf);
+#endif
 }
 
 
@@ -3546,7 +3580,7 @@ void Message(char *string)
 	fontnumber=1;
 	font=grsegs[STARTFONT+fontnumber];
 	h=font->height;
-	for (i=0;i<_fstrlen(string);i++)
+	for (i=0;i<strlen(string);i++)
 		if (string[i]=='\n')
 		{
 			if (w>mw)
@@ -3690,6 +3724,7 @@ void ShootSnd(void)
 ///////////////////////////////////////////////////////////////////////////
 void CheckForEpisodes(void)
 {
+#if 0 /* DOS VERSION */
 	struct ffblk f;
 
 //
@@ -3782,5 +3817,89 @@ void CheckForEpisodes(void)
 	strcat(configname,extension);
 	strcat(SaveName,extension);
 	strcat(PageFileName,extension);
+
+#else
+
+	glob_t globbuf;
+//
+// JAPANESE VERSION
+//
+#ifdef JAPAN
+#ifdef JAPDEMO
+	if (glob("*.wj1", 0, NULL, &globbuf) == 0) {
+		strcpy(extension, "wj1");
+#else /* JAPDEMO */
+	if (glob("*.wj6", 0, NULL, &globbuf) == 0) {
+		strcpy(extension, "wj6");
+#endif /* JAPDEMO */
+		strcat(configname,extension);
+		strcat(SaveName,extension);
+		strcat(PageFileName,extension);
+		EpisodeSelect[1] =
+		EpisodeSelect[2] =
+		EpisodeSelect[3] =
+		EpisodeSelect[4] =
+		EpisodeSelect[5] = 1;
+	}
+	else
+		Quit("NO JAPANESE WOLFENSTEIN 3-D DATA FILES to be found!");
+#else /* JAPAN */
+
+//
+// ENGLISH
+//
+#ifndef UPLOAD
+#ifndef SPEAR
+	if (glob("*.wl6", 0, NULL, &globbuf) == 0) {
+		strcpy(extension,"wl6");
+		NewEmenu[2].active =
+		NewEmenu[4].active =
+		NewEmenu[6].active =
+		NewEmenu[8].active =
+		NewEmenu[10].active =
+		EpisodeSelect[1] =
+		EpisodeSelect[2] =
+		EpisodeSelect[3] =
+		EpisodeSelect[4] =
+		EpisodeSelect[5] = 1;
+	} else if (glob("*.wl3", 0, NULL, &globbuf) == 0) {
+		strcpy(extension,"wl3");
+		NewEmenu[2].active =
+		NewEmenu[4].active =
+		EpisodeSelect[1] =
+		EpisodeSelect[2] = 1;
+	}
+	else
+#endif /* SPEAR */
+#endif /* UPLOAD */
+
+#ifdef SPEAR
+#ifndef SPEARDEMO
+	if (glob("*.sod", 0, NULL, &globbuf) == 0) {
+		strcpy(extension, "sod");
+	} else
+		Quit("NO SPEAR OF DESTINY DATA FILES TO BE FOUND!");
+#else /* SPEARDEMO */
+	if (glob("*.sdm", 0, NULL, &globbuf) == 0) {
+		strcpy(extension, "sdm");
+	}
+	else
+		Quit("NO SPEAR OF DESTINY DEMO DATA FILES TO BE FOUND!");
+#endif /* SPEARDEMO */
+
+#else /* SPEAR */
+	if (glob("*.wl1", 0, NULL, &globbuf) == 0) {
+		strcpy(extension,"wl1");
+	}
+	else
+		Quit("NO WOLFENSTEIN 3-D DATA FILES to be found!");
+#endif /* SPEAR */
+#endif /* JAPAN */
+
+	strcat(configname,extension);
+	strcat(SaveName,extension);
+	strcat(PageFileName,extension);
+
+#endif
 
 }

@@ -11,6 +11,7 @@
 #include <sys/stat.h>
 #include <values.h>
 #include <sys/types.h>
+#include <glob.h>
 
 #include "misc.h"
 
