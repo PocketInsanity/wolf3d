@@ -398,7 +398,26 @@ void IN_GetMouseDelta(int *dx, int *dy)
 
 byte IN_MouseButtons()
 {
-	return SDL_GetMouseState(NULL, NULL);
+	Uint8 state;
+	byte retr;
+	
+	state = SDL_GetMouseState(NULL, NULL);
+	
+	retr = 0;
+	
+	if (state & SDL_BUTTON(SDL_BUTTON_LEFT)) {
+		retr |= 1;
+	}
+	
+	if (state & SDL_BUTTON(SDL_BUTTON_RIGHT)) {
+		retr |= 2;
+	}
+	
+	if (state & SDL_BUTTON(SDL_BUTTON_MIDDLE)) {
+		retr |= 4;
+	}
+	
+	return retr;
 }
 
 /*
