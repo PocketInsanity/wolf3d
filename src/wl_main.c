@@ -48,8 +48,6 @@ int             centerx;
 int             shootdelta;                     // pixels away from centerx a target can be
 fixed           scale,maxslope;
 long            heightnumerator;
-int                     minheightdiv;
-
 
 void            Quit (char *error);
 
@@ -584,7 +582,6 @@ void CalcProjection (long focal)
 // the heightbuffer.  The pixel height is height>>2
 //
 	heightnumerator = (TILEGLOBAL*scale)>>6;
-	minheightdiv = heightnumerator/0x7fff +1;
 
 //
 // calculate the angle offset from view angle of each pixel's ray

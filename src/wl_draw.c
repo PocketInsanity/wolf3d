@@ -268,9 +268,7 @@ int CalcHeight (void)
 ===================
 */
 
-long		postsource;
 unsigned	postx;
-unsigned	postwidth;
 
 void ScalePost (byte *wall, int texture)		// VGA version
 {

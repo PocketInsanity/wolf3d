@@ -553,16 +553,14 @@ typedef enum {
 	en_death
 } enemy_t;
 
-
 typedef struct statestruct
 {
 	boolean	rotate;
-	int		shapenum; /* a shapenum of -1 means get from ob->temp1 */
-	int		tictime;
-	void	(*think) (),(*action) ();
+	int shapenum; /* a shapenum of -1 means get from ob->temp1 */
+	int tictime;
+	void (*think)(), (*action)();
 	struct statestruct *next;
 } PACKED statetype;
-
 
 //---------------------
 //
@@ -603,7 +601,7 @@ typedef struct doorstruct
 typedef struct objstruct
 {
 	activetype	active;
-	int			ticcount;
+	int		ticcount;
 	classtype	obclass;
 	statetype	*state;
 
@@ -621,7 +619,7 @@ typedef struct objstruct
 	fixed		transx, transy;		/* in global coord */
 
 	int 		angle;
-	int			hitpoints;
+	int		hitpoints;
 	long		speed;
 
 	int		temp1,temp2,temp3;
@@ -652,7 +650,7 @@ typedef enum	{
 } weapontype;
 
 
-/* typedef */ enum {
+enum {
 	gd_baby,
 	gd_easy,
 	gd_medium,
@@ -735,7 +733,6 @@ extern fixed sintable[], *costable;
 // derived constants
 //
 extern	fixed maxslope;
-extern	int		minheightdiv;
 
 extern	char	configname[13];
 
@@ -872,10 +869,9 @@ void StartBonusFlash (void);
 void IntroScreen (void);
 void PreloadGraphics(void);
 void LevelCompleted (void);
-void	CheckHighScore (long score,word other);
+void CheckHighScore (long score,word other);
 void Victory (void);
 void ClearSplitVWB (void);
-
 
 /*
 =============================================================================
@@ -887,7 +883,6 @@ void ClearSplitVWB (void);
 
 int DebugKeys (void);
 void PicturePause (void);
-
 
 /*
 =============================================================================
@@ -905,13 +900,12 @@ extern	unsigned	wallheight[MAXVIEWWIDTH];
 
 extern	fixed	tileglobal;
 extern	fixed	focallength;
-extern	fixed	mindist;
 
 //
 // derived constants
 //
 extern	fixed 	scale;
-extern	long	heightnumerator,mindist;
+extern	long	heightnumerator;
 
 //
 // refresh variables
@@ -920,10 +914,7 @@ extern	fixed	viewx,viewy;			// the focal point
 extern	int		viewangle;
 extern	fixed	viewsin,viewcos;
 
-extern	long		postsource;
 extern	unsigned	postx;
-extern	unsigned	postwidth;
-
 
 extern	int		horizwall[],vertwall[];
 
@@ -950,12 +941,9 @@ void	ThreeDRefresh (void);
 #define SPDPATROL	512
 #define SPDDOG		1500
 
-
 extern	dirtype opposite[9];
 extern	dirtype diagonal[9][9];
 
-
-void	InitHitRect (objtype *ob, unsigned radius);
 void	SpawnNewObj (unsigned tilex, unsigned tiley, statetype *state);
 void	NewState (objtype *ob, statetype *state);
 

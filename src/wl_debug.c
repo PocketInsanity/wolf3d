@@ -229,8 +229,7 @@ static	char	buf[10];
 			// draw the wall
 			//
 				postx = 128;
-				postwidth = 1;
-				for (x=0;x<64;x++,postx++,postsource+=64)
+				for (x=0;x<64;x++,postx++)
 				{
 					wallheight[postx] = 256;
 					ScalePost((byte *)addr, x);
@@ -439,7 +438,6 @@ int DebugKeys (void)
 		DebugMemory();
 		return 1;
 	}
-#ifdef SPEAR
 	else if (Keyboard[sc_N])			// N = no clip
 	{
 		noclip^=1;
@@ -452,7 +450,6 @@ int DebugKeys (void)
 		IN_Ack ();
 		return 1;
 	}
-#endif
 #if 0
 	else if (Keyboard[sc_O])			// O = overhead
 	{
@@ -503,6 +500,7 @@ int DebugKeys (void)
 	{
 		CenterWindow(26,3);
 		PrintY+=6;
+	/* TODO: wouldn't work on sod demo etc */
 #ifndef SPEAR
 		US_Print("  Warp to which level(1-10):");
 #else
@@ -523,15 +521,6 @@ int DebugKeys (void)
 				playstate = ex_warped;
 			}
 		}
-		return 1;
-	}
-	else if (Keyboard[sc_X])			// X = item cheat
-	{
-		CenterWindow (12,3);
-		US_PrintCentered ("Extra stuff!");
-		VW_UpdateScreen();
-		// DEBUG: put stuff here
-		IN_Ack ();
 		return 1;
 	}
 

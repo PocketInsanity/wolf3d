@@ -5,7 +5,9 @@
 /* WL6 = 1 */
 /* SDM = 2 */
 /* SOD = 3 */
+#ifndef WMODE
 #define WMODE 1
+#endif
 
 #if WMODE == 0
 /* #define SPEAR */
