@@ -161,4 +161,25 @@ Boolean SetupScalers(void)
 void ReleaseScalers()
 {
 }
-        
+
+void FlushKeys(void)
+{
+	/* TODO: read all keys in keyboard buffer */
+}
+
+void ReadSystemJoystick(void)
+{
+	/* TODO: do key stuff here */
+}
+
+/* 
+Handle events, and return:
+last keypress (if any)
+mouse button events == 1
+zero means none of the above
+*/
+
+int DoEvents()
+{
+	return 0;
+}

@@ -1,0 +1,1 @@
+* WaitTick only called in nonplay modes and ReadSystemJoystick in playmode

@@ -22,17 +22,82 @@ unsigned long lMSB(unsigned long x)
 	
 	return x1 | x2 | x3 | x4;
 }
+
+Byte *SmallFontPtr;
 	
 void MakeSmallFont(void)
 {
+	Word i,j,Width,Height;
+	Byte *DestPtr,*ArtStart;
+	Byte *TempPtr;
+	
+	SmallFontPtr = AllocSomeMem(16*16*65);
+	if (!SmallFontPtr) {
+		return;
+	}
+	
+	memset(SmallFontPtr,0,16*16*65);
+	
+	i = 0;
+	DestPtr = SmallFontPtr;
+	do {
+		ArtStart = &ArtData[i][0];
+		
+		if (!ArtStart) {
+			DestPtr+=(16*16);
+		} else {
+			Height = 0;
+			do {
+				Width = 16;
+				j = Height*8;
+				do {
+					DestPtr[0] = ArtStart[j];
+					++DestPtr;
+					j+=(WALLHEIGHT*8);
+				} while (--Width);
+			} while (++Height<16);
+		}
+	} while (++i<64);
+	
+	TempPtr = LoadAResource(MyBJFace);
+	memcpy(DestPtr,TempPtr,16*16);
+	ReleaseAResource(MyBJFace);
 }
 
 void KillSmallFont(void)
 {
+	if (SmallFontPtr) {
+		FreeSomeMem(SmallFontPtr);
+		SmallFontPtr = 0;
+	}
 }
 
 void DrawSmall(Word x,Word y,Word tile)
 {
+	Byte *Screenad;
+	Byte *ArtStart;
+	Word Width,Height;
+	
+	if (!SmallFontPtr) {
+		return;
+	}
+	
+	x *= 16;
+	y *= 16;
+	
+	Screenad = &VideoPointer[YTable[y]+x];
+	ArtStart = &SmallFontPtr[tile*(16*16)];
+	Height = 0;
+	
+	do {
+		Width = 16;
+		do {
+			Screenad[0] = ArtStart[0];
+			++Screenad;
+			++ArtStart;
+		} while (--Width);
+		Screenad+=VideoWidth-16;
+	} while (++Height<16);	
 }
 
 void ShowGetPsyched(void)
@@ -48,7 +113,7 @@ void ShowGetPsyched(void)
 	PackLength = lMSB(PackPtr[0]);
 	ShapePtr = AllocSomeMem(PackLength);
 	DLZSS(ShapePtr,(Byte *) &PackPtr[1],PackLength);
-	X = 100; /* TODO */
+	X = 10; /* TODO */
 	Y = 100;
 	DrawShape(X,Y,ShapePtr);
 	FreeSomeMem(ShapePtr);
@@ -68,16 +133,6 @@ void EndGetPsyched(void)
 	SetAPalette(rBlackPal);
 }
 
-void FlushKeys(void)
-{
-	/* TODO: read all keys in keyboard buffer */
-}
-
-void ReadSystemJoystick(void)
-{
-	/* TODO: do key stuff here */
-}
-
 void ShareWareEnd(void)
 {
         SetAPalette(rGamePal);
@@ -87,7 +142,8 @@ void ShareWareEnd(void)
 
 Word WaitEvent(void)
 {
-	WaitTicks(240);
+	while (DoEvents() == 0) ;
+	
 	return 0;
 }
 
@@ -119,7 +175,7 @@ LongWord ReadTick()
 void WaitTick()
 {
 	do {
-		/* TODO: get events */
+		DoEvents();
 	} while (ReadTick() == LastTick);
 	LastTick = ReadTick();
 }
@@ -129,7 +185,7 @@ void WaitTicks(Word Count)
 	LongWord TickMark;
 	
 	do {
-		/* TODO: get events */
+		DoEvents();
 		TickMark = ReadTick();
 	} while ((TickMark-LastTick)<=Count);
 	LastTick = TickMark;
@@ -139,18 +195,23 @@ Word WaitTicksEvent(Word Time)
 {
 	LongWord TickMark;
 	LongWord NewMark;
+	Word RetVal;
 	
 	TickMark = ReadTick();
 	for (;;) {
-		/* TODO: get events */
+		RetVal = DoEvents();
+		if (RetVal)
+			break;
+		
 		NewMark = ReadTick();
-		//if (Time) {
+		if (Time) {
 			if ((NewMark-TickMark)>=Time) {
+				RetVal = 0;
 				break;
 			}
-		//}
+		}
 	}	
-	return 0;
+	return RetVal;
 }
 
 void FreeSong()
@@ -189,6 +250,8 @@ void BailOut()
 
 Word ChooseGameDiff(void)
 {
+/* 0 = easy, 1 = normal, 2 = hard, 3 = death incarnate */
+	difficulty = 1;
 	SetAPalette(rGamePal);
 }
 

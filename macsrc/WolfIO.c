@@ -38,7 +38,7 @@ void SetNumber(LongWord number,Word x,Word y,Word digits)
 
 /**********************************
 
-	Read from the Mac's keyboard/mouse system
+	Read the keyboard/mouse
 	
 **********************************/
 
