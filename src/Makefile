@@ -19,6 +19,8 @@ NASM = nasm
 
 all:	wolf3d
 
+$(OBJS): version.h id_heads.h
+
 .asm.o:
 	$(NASM) -f elf -o $@ $<
 

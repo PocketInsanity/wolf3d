@@ -45,6 +45,18 @@ long filelength(int handle)
 	return buf.st_size;
 }
 
+char *strlwr(char *s)
+{
+	char *p = s;
+	
+	while (*p) {
+		*p = tolower(*p);
+		p++;
+	}
+	
+	return s;
+}
+	
 char *itoa(short int value, char *string, int radix)
 {
 	/* wolf3d only uses radix 10 */

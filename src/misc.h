@@ -9,6 +9,10 @@ unsigned long get_TimeCount();
 
 long filelength(int handle);
 
+#define stricmp strcasecmp
+#define strnicmp strncasecmp
+char *strlwr(char *s);
+
 char *itoa(short int value, char *string, int radix);
 char *ltoa(long value, char *string, int radix);
 char *ultoa(unsigned long value, char *string, int radix);
