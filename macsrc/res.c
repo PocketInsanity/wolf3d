@@ -158,8 +158,10 @@ void *LoadAResource2(Word RezNum, LongWord Type)
 			} else {
 				/* DEBUG: we want a fresh copy... */
 				printf("DEBUG: Item %ld/%d already loaded!\n", Type, RezNum);
+			/*	
 				free(c->buf);
 				c->buf = malloc(c->size);
+			*/				
 				memcpy(c->buf, c->dat, c->size);
 			}
 			
@@ -187,8 +189,10 @@ void *FindResource(Word RezNum, LongWord Type)
 			} else {
 				/* DEBUG: we want a fresh copy... */
 				printf("DEBUG: Item %ld/%d already loaded!\n", Type, RezNum);
+			/*	
 				free(c->buf);
 				c->buf = malloc(c->size);
+			*/
 				memcpy(c->buf, c->dat, c->size);
 			}
 			
