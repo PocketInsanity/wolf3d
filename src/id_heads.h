@@ -24,7 +24,13 @@ typedef enum { false, true } boolean;
 #ifndef SPEAR
 
 #ifndef UPLOAD
-#include "gfxv_wl6.h"
+
+#ifdef WOLF92
+#  include "gfxv_wl6_92.h"
+#else
+#  include "gfxv_wl6.h"
+#endif
+  
 #else
 #include "gfxv_wl1.h"
 #endif

@@ -42,6 +42,7 @@ P R - rewrite RLEWexpand to not use words
 B M - openal support
 B I - when window loses focus, it should clear the keys
 B M - [X11] use the data in the visual/image for formatting colors
+P M - see if ROTT's raycaster (interpolate between rays) gives speed increase
 
 Complete:
 P I - fix or remove fizzle fade

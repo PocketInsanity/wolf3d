@@ -6,9 +6,13 @@
 /* WL6 = 1 */
 /* SDM = 2 */
 /* SOD = 3 */
+/* WL3 not supported */
 #ifndef WMODE
 #define WMODE 0
 #endif
+
+/* define WOLF92 if you have full version of Wolfenstein 3D dated 1992 */
+/* #define WOLF92 */
 
 /* --- End of User-Modifiable Variables --- */
 
