@@ -42,7 +42,6 @@ extern char signon;
 #endif /* JAPDEMO */
 
 #include "audiowl6.h"
-#include "mapswl6.h"
 
 #else /* JAPAN */
 
@@ -51,11 +50,9 @@ extern char signon;
 #ifndef UPLOAD
 #include "gfxv_wl6.h"
 #include "audiowl6.h"
-#include "mapswl6.h"
 #else
 #include "gfxv_wl1.h"
 #include "audiowl1.h"
-#include "mapswl1.h"
 #endif
 
 #else /* SPEAR */
@@ -63,11 +60,9 @@ extern char signon;
 #ifndef SPEARDEMO
 #include "gfxv_sod.h"
 #include "audiosod.h"
-#include "mapssod.h"
 #else /* SPEARDEMO */
 #include "gfxv_sdm.h"
 #include "audiosdm.h"
-#include "mapssdm.h"
 #endif /* SPEARDEMO */
 
 #endif /* SPEAR */

@@ -5,3 +5,4 @@
 * Audio support using OpenAL
 * Add support for the Mac version, if possible
 * Network support!
+* Fully compile with no warnings/errors using -Wall -ansi -pedantic
