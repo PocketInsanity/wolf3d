@@ -63,8 +63,8 @@ void EndSpear(void)
 	US_CPrint (STR_ENDGAME2);
 	VW_UpdateScreen ();
 	IN_StartAck ();
-	TimeCount = 0;
-	while (!IN_CheckAck () && TimeCount < 700);
+	set_TimeCount(0);
+	while ( !IN_CheckAck () && (get_TimeCount() < 700) );
 
 	PrintX = 0;
 	PrintY = 180;
@@ -73,8 +73,8 @@ void EndSpear(void)
 	US_CPrint (STR_ENDGAME4);
 	VW_UpdateScreen ();
 	IN_StartAck ();
-	TimeCount = 0;
-	while (!IN_CheckAck () && TimeCount < 700);
+	set_TimeCount(0);
+	while ( !IN_CheckAck () && (get_TimeCount() < 700) );
 
 	VW_FadeOut ();
 
@@ -391,13 +391,12 @@ void BJ_Breathe(void)
 	static int which=0,max=10;
 	int pics[2]={L_GUYPIC,L_GUY2PIC};
 
-
-	if (TimeCount>max)
+	if (get_TimeCount() > max)
 	{
 		which^=1;
 		VWB_DrawPic(0,16,pics[which]);
 		VW_UpdateScreen();
-		TimeCount=0;
+		set_TimeCount(0);
 		max=35;
 	}
 }
@@ -892,7 +891,7 @@ void LevelCompleted (void)
 	DrawScore();
 	VW_UpdateScreen();
 
-	TimeCount=0;
+	set_TimeCount(0);
 	IN_StartAck();
 	while(!IN_CheckAck())
 	  BJ_Breathe();

@@ -428,9 +428,8 @@ void PollControls (void)
 //
 	if (demoplayback)
 	{
-		while (TimeCount<lasttimecount+DEMOTICS)
-		;
-		TimeCount = lasttimecount + DEMOTICS;
+		while ( get_TimeCount() < (lasttimecount+DEMOTICS) ) ;
+		set_TimeCount(lasttimecount + DEMOTICS);
 		lasttimecount += DEMOTICS;
 		tics = DEMOTICS;
 	}
@@ -439,9 +438,8 @@ void PollControls (void)
 //
 // take DEMOTICS or more tics, and modify Timecount to reflect time taken
 //
-		while (TimeCount<lasttimecount+DEMOTICS)
-		;
-		TimeCount = lasttimecount + DEMOTICS;
+		while ( get_TimeCount() < (lasttimecount+DEMOTICS) ) ;
+		set_TimeCount(lasttimecount + DEMOTICS);
 		lasttimecount += DEMOTICS;
 		tics = DEMOTICS;
 	}
@@ -560,9 +558,8 @@ void PollControls (void)
 #define MAXX	320
 #define MAXY	160
 
-void	CenterWindow(word w,word h)
+void CenterWindow(word w,word h)
 {
-	FixOfs ();
 	US_DrawWindow(((MAXX / 8) - w) / 2,((MAXY / 8) - h) / 2,w,h);
 }
 
@@ -767,7 +764,7 @@ void CheckKeys (void)
 		}
 		if (loadedgame)
 			playstate = ex_abort;
-		lasttimecount = TimeCount;
+		lasttimecount = get_TimeCount();
 		return;
 	}
 
@@ -780,7 +777,7 @@ void CheckKeys (void)
 		fontnumber=0;
 		SETFONTCOLOR(0,15);
 		DebugKeys();
-		lasttimecount = TimeCount;
+		lasttimecount = get_TimeCount();
 		return;
 	}
 
@@ -1317,7 +1314,9 @@ void PlayLoop (void)
 	int		give;
 	int	helmetangle;
 
-	playstate = TimeCount = lasttimecount = 0;
+	playstate = lasttimecount = 0;
+	set_TimeCount(0);
+	
 	frameon = 0;
 	anglefrac = 0;
 	facecount = 0;
@@ -1369,7 +1368,7 @@ void PlayLoop (void)
 		}
 		#endif
 
-		gamestate.TimeCount+=tics;
+		gamestate.TimeCount += tics;
 
 		SD_Poll ();
 		UpdateSoundLoc();	// JAB
@@ -1385,7 +1384,7 @@ void PlayLoop (void)
 		if (singlestep)
 		{
 			VW_WaitVBL(14);
-			lasttimecount = TimeCount;
+			lasttimecount = get_TimeCount();
 		}
 		if (extravbls)
 			VW_WaitVBL(extravbls);

@@ -545,14 +545,14 @@ boolean IN_UserInput(longword delay)
 {
 	longword	lasttime;
 
-	lasttime = TimeCount;
+	lasttime = get_TimeCount();
 	IN_StartAck ();
 	do
 	{
 		if (IN_CheckAck())
 			return true;
-	} while (TimeCount - lasttime < delay);
-	return(false);
+	} while ( (get_TimeCount() - lasttime) < delay );
+	return false;
 }
 
 //===========================================================================

@@ -163,9 +163,8 @@ void	TimedPicCommand (void)
 //
 // wait for time
 //
-	TimeCount = 0;
-	while (TimeCount < picdelay)
-	;
+	set_TimeCount(0);
+	while (get_TimeCount() < picdelay) ;
 
 //
 // draw pic

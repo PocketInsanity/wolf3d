@@ -700,7 +700,7 @@ int CP_CheckQuick(unsigned scancode)
 
 				if (loadedgame)
 					playstate = ex_abort;
-				lasttimecount = TimeCount;
+				lasttimecount = get_TimeCount();
 
 
 
@@ -771,7 +771,7 @@ int CP_CheckQuick(unsigned scancode)
 				if (loadedgame)
 					playstate = ex_abort;
 
-				lasttimecount = TimeCount;
+				lasttimecount = get_TimeCount();
 
 				#ifndef SPEAR
 				UNCACHEGRCHUNK(C_CURSOR1PIC);
@@ -2148,7 +2148,9 @@ void EnterCtrlData(int index,CustomCtrls *cust,void (*DrawRtn)(int),void (*Print
   if ((ci.button0|ci.button1|ci.button2|ci.button3)||
 	  ((type==KEYBOARDBTNS||type==KEYBOARDMOVE) && LastScan==sc_Enter))
   {
-   tick=TimeCount=picked=0;
+   tick = picked = 0;
+   set_TimeCount(0);
+   
    SETFONTCOLOR(0,TEXTCOLOR);
 
    do
@@ -2162,7 +2164,7 @@ void EnterCtrlData(int index,CustomCtrls *cust,void (*DrawRtn)(int),void (*Print
 	//
 	// FLASH CURSOR
 	//
-	if (TimeCount>10)
+	if (get_TimeCount() >10)
 	{
 	 switch(tick)
 	 {
@@ -2175,7 +2177,7 @@ void EnterCtrlData(int index,CustomCtrls *cust,void (*DrawRtn)(int),void (*Print
 	SD_PlaySound(HITWALLSND);
 	 }
 	 tick^=1;
-	 TimeCount=0;
+	 set_TimeCount(0);
 	 VW_UpdateScreen();
 	}
 
@@ -3053,7 +3055,7 @@ int HandleMenu(CP_iteminfo *item_i,CP_itemtype *items,void (*routine)(int w))
 	shape=C_CURSOR1PIC;
 	timer=8;
 	exit=0;
-	TimeCount=0;
+	set_TimeCount(0);
 	IN_ClearKeysDown();
 
 
@@ -3062,9 +3064,9 @@ int HandleMenu(CP_iteminfo *item_i,CP_itemtype *items,void (*routine)(int w))
 		//
 		// CHANGE GUN SHAPE
 		//
-		if (TimeCount>timer)
+		if (get_TimeCount() > timer)
 		{
-			TimeCount=0;
+			set_TimeCount(0);
 			if (shape==C_CURSOR1PIC)
 			{
 				shape=C_CURSOR2PIC;
@@ -3288,8 +3290,8 @@ void DrawHalfStep(int x,int y)
 	VWB_DrawPic(x,y,C_CURSOR1PIC);
 	VW_UpdateScreen();
 	SD_PlaySound(MOVEGUN1SND);
-	TimeCount=0;
-	while(TimeCount<8);
+	set_TimeCount(0);
+	while(get_TimeCount() < 8);
 }
 
 
@@ -3325,12 +3327,10 @@ void TicDelay(int count)
 {
 	ControlInfo ci;
 
-
-	TimeCount=0;
-	do
-	{
+	set_TimeCount(0);
+	do {
 		ReadAnyControl(&ci);
-	} while(TimeCount<count && ci.dir!=dir_None);
+	} while( (get_TimeCount() < count) && (ci.dir!=dir_None) );
 }
 
 
@@ -3439,11 +3439,11 @@ int Confirm(char *string)
 	//
 	x=PrintX;
 	y=PrintY;
-	TimeCount=0;
+	set_TimeCount(0);
 
 	do
 	{
-		if (TimeCount>=10)
+		if (get_TimeCount() >= 10)
 		{
 			switch(tick)
 			{
@@ -3457,7 +3457,7 @@ int Confirm(char *string)
 			}
 			VW_UpdateScreen();
 			tick^=1;
-			TimeCount=0;
+			set_TimeCount(0);
 		}
 
 		#ifndef SPEAR

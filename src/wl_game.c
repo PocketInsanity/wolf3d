@@ -1149,7 +1149,7 @@ void Died (void)
 
 	VW_Bar (0,0,viewwidth,viewheight,4);
 	IN_ClearKeysDown ();
-	FizzleFade(bufferofs,displayofs+screenofs,viewwidth,viewheight,70,false);
+	FizzleFade(gfxbuf, viewwidth,viewheight,70,false);
 	IN_UserInput(100);
 	SD_WaitSoundDone ();
 

@@ -3776,7 +3776,7 @@ void	A_StartDeathCam (objtype *ob)
 
 	gamestate.victoryflag = true;
 	VW_Bar (0,0,320,200-STATUSLINES,127);
-	FizzleFade(bufferofs,displayofs,320,200-STATUSLINES,70,false);
+	FizzleFade(gfxbuf, 320, 200-STATUSLINES,70,false);
 
 	CA_UpLevel ();
 	CacheLump(LEVELEND_LUMP_START,LEVELEND_LUMP_END);

@@ -222,8 +222,7 @@ void LoadLatchMem(void)
 ===================
 */
 
-boolean FizzleFade (unsigned source, unsigned dest,
-	unsigned width,unsigned height, unsigned frames, boolean abortable)
+boolean FizzleFade(byte *source, unsigned width,unsigned height, unsigned frames, boolean abortable)
 {
 	int			pixperframe;
 	unsigned	drawofs,pagedelta;
@@ -231,14 +230,15 @@ boolean FizzleFade (unsigned source, unsigned dest,
 	unsigned	x,y,p,frame;
 	long		rndval;
 
-	pagedelta = dest-source;
 	rndval = 1;
 	y = 0;
 	pixperframe = 64000/frames;
 
 	IN_StartAck ();
 
-	TimeCount=frame=0;
+	frame=0;
+	set_TimeCount(0);
+	
 	do {
 		if (abortable && IN_CheckAck ())
 			return true;
@@ -292,7 +292,6 @@ noxor:
 
 		}
 		frame++;
-		while (TimeCount<frame)	
-		;
+		while (get_TimeCount() < frame)	;
 	} while (1);
 }
