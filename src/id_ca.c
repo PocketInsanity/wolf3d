@@ -33,7 +33,7 @@ typedef struct
 byte 			*tinf;
 int			mapon;
 
-unsigned		*mapsegs[MAPPLANES];
+word		*mapsegs[MAPPLANES];
 maptype			*mapheaderseg[NUMMAPS];
 byte			*audiosegs[NUMSNDCHUNKS];
 void			*grsegs[NUMCHUNKS];

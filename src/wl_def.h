@@ -653,7 +653,7 @@ typedef enum	{
 } weapontype;
 
 
-typedef enum	{
+/* typedef */ enum {
 	gd_baby,
 	gd_easy,
 	gd_medium,
@@ -1008,7 +1008,7 @@ typedef struct
 {
 	unsigned	codeofs[65];
 	unsigned	width[65];
-	byte		code[];
+	byte		*code;
 }	t_compscale;
 
 typedef struct

@@ -1,7 +1,6 @@
-// WL_ACT1.C
+/* wl_act1.c */
 
-#include "WL_DEF.H"
-#pragma hdrstop
+#include "wl_def.h"
 
 /*
 =============================================================================
@@ -275,7 +274,7 @@ int			doornum;
 unsigned	doorposition[MAXDOORS];		// leading edge of door 0=closed
 										// 0xffff = fully open
 
-byte		far areaconnect[NUMAREAS][NUMAREAS];
+byte		areaconnect[NUMAREAS][NUMAREAS];
 
 boolean		areabyplayer[NUMAREAS];
 
@@ -350,7 +349,7 @@ void InitDoorList (void)
 void SpawnDoor (int tilex, int tiley, boolean vertical, int lock)
 {
 	int	areanumber;
-	unsigned	far *map;
+	word *map;
 
 	if (doornum==64)
 		Quit ("64+ doors on level!");
@@ -369,7 +368,7 @@ void SpawnDoor (int tilex, int tiley, boolean vertical, int lock)
 // for door sides
 //
 	tilemap[tilex][tiley] = doornum | 0x80;
-	map = mapsegs[0] + farmapylookup[tiley]+tilex;
+	map = (word *)(mapsegs[0] + farmapylookup[tiley]+tilex);
 	if (vertical)
 	{
 		*map = *(map-1);                        // set area number
@@ -554,7 +553,7 @@ void DoorOpen (int door)
 void DoorOpening (int door)
 {
 	int		area1,area2;
-	unsigned	far	*map;
+	word *map;
 	long	position;
 
 	position = doorposition[door];
@@ -563,8 +562,8 @@ void DoorOpening (int door)
 	//
 	// door is just starting to open, so connect the areas
 	//
-		map = mapsegs[0] + farmapylookup[doorobjlist[door].tiley]
-			+doorobjlist[door].tilex;
+		map = (word *)(mapsegs[0] + farmapylookup[doorobjlist[door].tiley]
+			+doorobjlist[door].tilex);
 
 		if (doorobjlist[door].vertical)
 		{
@@ -617,7 +616,7 @@ void DoorOpening (int door)
 void DoorClosing (int door)
 {
 	int		area1,area2,move;
-	unsigned	far	*map;
+	word *map;
 	long	position;
 	int		tilex,tiley;
 
@@ -646,8 +645,8 @@ void DoorClosing (int door)
 
 		doorobjlist[door].action = dr_closed;
 
-		map = mapsegs[0] + farmapylookup[doorobjlist[door].tiley]
-			+doorobjlist[door].tilex;
+		map = (word *)(mapsegs[0] + farmapylookup[doorobjlist[door].tiley]
+			+doorobjlist[door].tilex);
 
 		if (doorobjlist[door].vertical)
 		{

@@ -23,7 +23,7 @@ typedef	struct
 extern	byte 			*tinf;
 extern	int			mapon;
 
-extern	unsigned		*mapsegs[MAPPLANES];
+extern	word *mapsegs[MAPPLANES];
 extern	maptype			*mapheaderseg[NUMMAPS];
 extern	byte			*audiosegs[NUMSNDCHUNKS];
 extern	void			*grsegs[NUMCHUNKS];

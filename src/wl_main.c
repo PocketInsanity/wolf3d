@@ -61,6 +61,7 @@ int             mouseadjustment;
 
 char	configname[13]="config.";
 
+unsigned xoffset, yoffset;
 
 int _argc;
 char **argv;
@@ -690,7 +691,6 @@ void SignonScreen (void)                        // VGA version
 
 	if (!virtualreality)
 	{
-		VL_MungePic (&introscn,320,200);
 		VL_MemToScreen (&introscn,320,200,0,0);
 	}
 }
@@ -1211,7 +1211,10 @@ boolean SetViewSize (unsigned width, unsigned height)
 	centerx = viewwidth/2-1;
 	shootdelta = viewwidth/10;
 	screenofs = ((200-STATUSLINES-viewheight)/2*SCREENWIDTH+(320-viewwidth)/8);
-
+	
+	yoffset =  (200-STATUSLINES-viewheight)/2
+	xoffset = (320-viewwidth)/2;
+	
 //
 // calculate trace angles and projection constants
 //
