@@ -978,8 +978,8 @@ void Died()
 			if (player->angle < 0)
 				player->angle += ANGLES;
 
-			ThreeDRefresh ();
-			CalcTics ();
+			ThreeDRefresh();
+			CalcTics();
 		} while (curangle != iangle);
 	}
 

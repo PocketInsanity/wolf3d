@@ -69,18 +69,14 @@ SD_StartMusic(chunk);
 * would be nice if Quit() used vsnprintf, etc
 * actor walking through door is drawn in front of door: near end of E1M1 for
 example
-* clean up vi_xlib.c: fix vid mode changing, fix dga for non8bit modes and
-the nonpalette setting stuff... lots of if statements
-also, it should be able to compile without extensions
+* SDL version will have all the features for now, xlib will just be a
+320x200 window
 * getenv so that you can point an env. var to the proper dir
-* refresh rate under svgalib is horrible. the screen keeps getting updated
-midframe.  it's due to the way CalcTics works
 * rewrite hw (sound, input) code, remove stuff like SD_SetSoundMode
-* proper left/right sound
-* adlib sounds seem like they play at twice the freq
 * fix config file and savegames
 * use static and const where appropriate
 * convert uses of open() to fopen(), etc maybe
+move fileio code to a seperate file
 * menu code is a mess, always does things differently than the rest of the
 code, it really needs to be cleaned up
 * id_ca.c cache code: fix/readd/rewrite the "garbage collection" system?
@@ -92,6 +88,8 @@ specifially set to correct size
 * or have PACKED versions of read/write structures, and transfer
 to/from just for reading, so only non-packed structures are used during
 actual gameplay/etc. 
+this isn't as much of a big deal since compensating for endianness will
+require major changes also
 * is that memory intro screen needed anymore? probably not, although it
 would be nice to show what version is loaded, but doom just printed text
 and the intro screen which came with wolf3d has copyrighted/trademarked images
@@ -106,16 +104,13 @@ metaname like sc_Left etc or something
 * add a ViewMap? (could be done similar to mac version)
 * find and remove any function stubs (functions which just call another
 function with same parameters, only difference is the name)
-* fix wl_debug.c, lots of junk code..
 * change the current parameter handling code to something like getopt
 * remove check for debugmode?
-* look for places where gfx needs to be redrawn, like back to game etc 
 * fizzlefade is hackish, stipple buf would work ok in opengl, maybe only
 update once per frame or such...
 no idea how to do fizzlefade in TrueColor X
 * check filehandling (ex, file missing, bad file type, and such)
 PlayDemoFromFile specifically
-* make sure all infinite loops are found (looping around Keyboard)
 * deathcam went by too fast, and right before the fizzlefade was being done
 on the border
 same with the spear of destiny animation part of ending

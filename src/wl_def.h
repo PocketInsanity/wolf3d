@@ -769,7 +769,6 @@ extern	byte		spotvis[MAPSIZE][MAPSIZE];
 extern	objtype		*actorat[MAPSIZE][MAPSIZE];
 
 extern	boolean		singlestep,godmode,noclip;
-extern	int			extravbls;
 
 //
 // control info

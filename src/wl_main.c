@@ -97,21 +97,22 @@ fixed FixedByFrac(fixed a, fixed b)
 
 void CalcTics()
 {
-	long newtime;
+	int newtime;
+	int ticcount;
 	
-	/* calculate tics since last refresh for adaptive timing */
-	if (lasttimecount > get_TimeCount())
-		set_TimeCount(lasttimecount); /* if paused for a long time */
-		
+	if (demoplayback || demorecord)
+		ticcount = DEMOTICS - 1; /* [70/4] 17.5 Hz */
+	else
+		ticcount = 0 + 1; /* 35 Hz */
+	
 	do {
 		newtime = get_TimeCount();
 		tics = newtime - lasttimecount;
-	} while (!tics); /* make sure at least one tic passes */
+	} while (tics <= ticcount);
 	
 	lasttimecount = newtime;
 	
 	if (tics > MAXTICS) {
-		set_TimeCount(get_TimeCount() - (tics - MAXTICS));
 		tics = MAXTICS;
 	}
 }
@@ -1039,7 +1040,7 @@ void InitGame()
 	SD_Startup();
 	US_Startup();
 	
-	SignonScreen();
+//	SignonScreen();
 	
 //
 // build some tables
@@ -1080,7 +1081,7 @@ void InitGame()
 		DoJukebox();
 #endif
 
-	FinishSignon();
+//	FinishSignon();
 }
 
 //===========================================================================
@@ -1100,7 +1101,7 @@ boolean SetViewSize(unsigned width, unsigned height)
 	centerx = viewwidth/2-1;
 	shootdelta = viewwidth/10;
 	
-	yoffset =  (200-STATUSLINES-viewheight)/2;
+	yoffset = (200-STATUSLINES-viewheight)/2;
 	xoffset = (320-viewwidth)/2;
 	
 //
@@ -1220,18 +1221,17 @@ void DemoLoop()
 //
 // high scores
 //
-			DrawHighScores ();
-			VW_UpdateScreen ();
-			VW_FadeIn ();
+			DrawHighScores();
+			VW_UpdateScreen();
+			VW_FadeIn();
 
 			if (IN_UserInput(TickBase*10))
 				break;
 //
 // demo
 //
-
 			#ifndef SPEARDEMO
-			PlayDemo (LastDemo++%4);
+			PlayDemo(LastDemo++%4);
 			#else
 			PlayDemo(0);
 			#endif
@@ -1241,16 +1241,16 @@ void DemoLoop()
 			StartCPMusic(INTROSONG);
 		}
 
-		VW_FadeOut ();
+		VW_FadeOut();
 
 		if (IN_KeyDown(sc_Tab) && MS_CheckParm("debugmode"))
 			RecordDemo ();
 		else
-			US_ControlPanel (0);
+			US_ControlPanel(0);
 
 		if (startgame || loadedgame)
 		{
-			GameLoop ();
+			GameLoop();
 			VW_FadeOut();
 			StartCPMusic(INTROSONG);
 		}
@@ -1264,7 +1264,7 @@ void DemoLoop()
 /*
 ==========================
 =
-= main
+= WolfMain
 =
 ==========================
 */
@@ -1274,6 +1274,11 @@ int WolfMain(int argc, char *argv[])
 	_argc = argc;
 	_argv = argv;
 
+	if (MS_CheckParm("version")) {
+		printf("Game: %s\n", GAMENAME);
+		Quit(NULL);
+	}
+		
 	printf("Now Loading %s\n", GAMENAME);
 		
 	CheckForEpisodes();

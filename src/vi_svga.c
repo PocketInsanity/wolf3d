@@ -46,9 +46,13 @@ void Quit(char *error)
 void VL_WaitVBL(int vbls)
 {
 	int i;
-	
+
 	for (i = 0; i < vbls; i++)
 		vga_waitretrace();
+
+//	long last = get_TimeCount() + vbls;
+//	while (last > get_TimeCount()) ;
+                
 }
 
 void VW_UpdateScreen()
@@ -65,7 +69,7 @@ void VW_UpdateScreen()
 =======================
 */
 
-void VL_Startup (void)
+void VL_Startup()
 {
 	if (gfxbuf == NULL) 
 		gfxbuf = malloc(320 * 200 * 1);
@@ -87,7 +91,7 @@ void VL_Startup (void)
 =======================
 */
 
-void VL_Shutdown (void)
+void VL_Shutdown()
 {
 	if (gfxbuf != NULL) {
 		free(gfxbuf);
@@ -112,17 +116,6 @@ void VL_ClearVideo(byte color)
 {
 	memset(gfxbuf, color, 64000);
 }
-
-/*
-=============================================================================
-
-						PALETTE OPS
-
-		To avoid snow, do a WaitVBL BEFORE calling these
-
-=============================================================================
-*/
-
 
 /*
 =================

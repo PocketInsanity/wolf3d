@@ -198,21 +198,6 @@ int DebugKeys()
 		ShapeTest();
 		return 1;
 	}
-	else if (IN_KeyDown(sc_V))			// V = extra VBLs
-	{
-		CenterWindow(30,3);
-		PrintY+=6;
-		US_Print("  Add how many extra VBLs(0-8):");
-		VW_UpdateScreen();
-		esc = !US_LineInput (px,py,str,NULL,true,2,0);
-		if (!esc)
-		{
-			level = atoi (str);
-			if (level>=0 && level<=8)
-				extravbls = level;
-		}
-		return 1;
-	}
 	else if (IN_KeyDown(sc_W))			// W = warp to level
 	{
 		CenterWindow(26,3);

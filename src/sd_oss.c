@@ -229,7 +229,6 @@ void *SoundThread(void *data)
 			write(audiofd, sndbuf, sizeof(sndbuf));
 		}		
 	}
-	
 	return NULL;
 }
 
@@ -330,12 +329,15 @@ void SD_Startup()
 	NewMusic = -1;
 	AdlibPlaying = -1;
 	sqActive = false;
+	
+	SD_Started = true;
+	
 	if (pthread_create(&hSoundThread, NULL, SoundThread, NULL) != 0) {
+		SD_Started = false;
+		
 		perror("pthread_create");
 		return;
 	}
-		
-	SD_Started = true;
 }
 
 void SD_Shutdown()

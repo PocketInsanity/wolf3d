@@ -244,16 +244,12 @@ void DrawFace()
 ===============
 */
 
-#define FACETICS	70
+int facecount;
 
-int	facecount;
-
-void UpdateFace (void)
+void UpdateFace()
 {
-
-	/* TODO: GETGATLINGSND is an adlib sound... :( */ 
-	//if (SD_SoundPlaying() == GETGATLINGSND)
-	//  return;
+	if (SD_SoundPlaying() == GETGATLINGSND)
+		return;
 
 	facecount += tics;
 	if (facecount > US_RndT())
@@ -263,7 +259,7 @@ void UpdateFace (void)
 			gamestate.faceframe = 1;
 
 		facecount = 0;
-		DrawFace ();
+		DrawFace();
 	}
 }
 
@@ -279,27 +275,26 @@ void UpdateFace (void)
 ===============
 */
 
-void	LatchNumber (int x, int y, int width, long number)
+void LatchNumber(int x, int y, int width, long number)
 {
-	unsigned	length,c;
-	char	str[20];
+	int length, c;
 
-	ltoa (number,str,10);
+	ltoa(number,str,10);
 
-	length = strlen (str);
+	length = strlen(str);
 
-	while (length<width)
+	while(length < width)
 	{
-		StatusDrawPic (x,y,N_BLANKPIC);
+		StatusDrawPic(x,y,N_BLANKPIC);
 		x++;
 		width--;
 	}
 
-	c= length <= width ? 0 : length-width;
+	c = length <= width ? 0 : length-width;
 
-	while (c<length)
+	while(c<length)
 	{
-		StatusDrawPic (x,y,str[c]-'0'+ N_0PIC);
+		StatusDrawPic(x,y,str[c]-'0'+ N_0PIC);
 		x++;
 		c++;
 	}

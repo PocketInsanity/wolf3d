@@ -69,21 +69,21 @@ typedef enum { false, true } boolean;
 
 #ifndef UPLOAD
 #include "gfxv_wl6.h"
-#include "audiowl6.h"
 #else
 #include "gfxv_wl1.h"
-#include "audiowl1.h"
 #endif
+
+#include "audiowl6.h"
 
 #else /* SPEAR */
 
 #ifndef SPEARDEMO
 #include "gfxv_sod.h"
-#include "audiosod.h"
 #else /* SPEARDEMO */
 #include "gfxv_sdm.h"
-#include "audiosdm.h"
 #endif /* SPEARDEMO */
+
+#include "audiosod.h"
 
 #endif /* SPEAR */
 
@@ -125,7 +125,7 @@ void Quit(char *error);
 #define	MAXTICS		10
 #define DEMOTICS	4
 
-extern unsigned tics;
+extern int tics;
 
 #define mapwidth	64
 #define mapheight	64

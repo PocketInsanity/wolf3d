@@ -6,9 +6,9 @@
 * Network support!
 * Fully compile with no warnings/errors using -Wall -ansi -pedantic and with
   other compilers (would need to turn off warnings about unused parameters)
-* Port to: Linux/SVGAlib, Linux/X (Windowed and DGA), Linux/OpenGL?, 
-  DOS/Allegro?, Win32/GDI?, Win32/DX?, Win32/D3D?, Win32/OpenGL, BeOS?,
-  MacOS?, QNX?
+* Port to: Linux/SVGAlib, Unix/X (Windowed and DGA), Unix/OpenGL?,
+  Linux/SDL, DOS/Allegro?, Win32/GDI?, Win32/DX?, Win32/D3D?, Win32/OpenGL, 
+  BeOS?, MacOS?, QNX?
 * Ease in using demos. Playing demos from files, recording to files, batch
   playing, and so on.
 * Make Wolf3D the game it was originally planned to be...  More strategy...

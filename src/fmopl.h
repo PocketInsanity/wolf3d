@@ -91,7 +91,6 @@ typedef struct fm_opl_f {
 	INT32 vibIncr;
 	/* wave selector enable flag */
 	UINT8 wavesel;
-	/* external event callback handler */
 } FM_OPL;
 
 /* ---------- Generic interface section ---------- */

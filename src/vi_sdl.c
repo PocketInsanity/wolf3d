@@ -52,11 +52,13 @@ void Quit(char *error)
 
 void VL_WaitVBL(int vbls)
 {
+	long last = get_TimeCount() + vbls;
+	while (last > get_TimeCount()) ;
 }
 
 void VW_UpdateScreen()
 {
-	VL_WaitVBL(1); 
+	//VL_WaitVBL(1); 
 	memcpy(surface->pixels, gfxbuf, 64000);
 	SDL_UpdateRect(surface,0,0,0,0);
 }
@@ -69,7 +71,7 @@ void VW_UpdateScreen()
 =======================
 */
 
-void VL_Startup (void)
+void VL_Startup()
 {
 	if (gfxbuf == NULL) 
 		gfxbuf = malloc(320 * 200 * 1);
@@ -78,12 +80,20 @@ void VL_Startup (void)
 		Quit("Couldn't init SDL");
 	}
 
-	surface = SDL_SetVideoMode (320,200,8, SDL_SWSURFACE|SDL_HWPALETTE);
+	if (MS_CheckParm("fullscreen"))
+		surface = SDL_SetVideoMode (320,200,8, SDL_SWSURFACE|SDL_HWPALETTE| SDL_FULLSCREEN);
+	else
+		surface = SDL_SetVideoMode (320,200,8, SDL_SWSURFACE|SDL_HWPALETTE);
+		
 	if (surface == NULL)
 	{
 		SDL_Quit();
 		Quit ("Couldn't set 320x200 mode");
 	}
+	
+	SDL_WM_SetCaption(GAMENAME, GAMENAME);
+
+	SDL_ShowCursor(0);	
 }
 
 /*
@@ -94,7 +104,7 @@ void VL_Startup (void)
 =======================
 */
 
-void VL_Shutdown (void)
+void VL_Shutdown()
 {
 	if (gfxbuf != NULL) {
 		free(gfxbuf);

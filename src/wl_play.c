@@ -20,13 +20,12 @@ objtype 	objlist[MAXACTORS],*new,*obj,*player,*lastobj,
 unsigned	farmapylookup[MAPSIZE];
 
 boolean		singlestep,godmode,noclip;
-int			extravbls;
 
 byte		tilemap[MAPSIZE][MAPSIZE];	// wall values only
 byte		spotvis[MAPSIZE][MAPSIZE];
 objtype		*actorat[MAPSIZE][MAPSIZE];
 
-unsigned tics;
+int tics;
 
 //
 // control info
@@ -59,7 +58,6 @@ boolean		buttonstate[NUMBUTTONS];
 
 
 static void RemoveObj(objtype *gone);
-static void PollControls();
 void StopMusic();
 void StartMusic();
 void PlayLoop();
@@ -409,35 +407,7 @@ void PollControls()
 	int	max, min, i;
 	byte	buttonbits;
 
-//
-// get timing info for last frame
-//
-	if (demoplayback) {
-	#if 0
-		if (1 /* (TEMP) TODO: TimeDemo */) {
-			set_TimeCount(lasttimecount + DEMOTICS);
-			lasttimecount += DEMOTICS;
-			tics = DEMOTICS;
-		} else 
-	#endif	
-		{
-			while ( get_TimeCount() < (lasttimecount+DEMOTICS) ) ;
-			set_TimeCount(lasttimecount + DEMOTICS);
-			lasttimecount += DEMOTICS;
-			tics = DEMOTICS;
-		}
-	} else if (demorecord) {
-				// demo recording and playback needs
-				// to be constant
-//
-// take DEMOTICS or more tics, and modify Timecount to reflect time taken
-//
-		while (get_TimeCount() < (lasttimecount+DEMOTICS)) ;
-		set_TimeCount(lasttimecount + DEMOTICS);
-		lasttimecount += DEMOTICS;
-		tics = DEMOTICS;
-	} else
-		CalcTics();
+
 
 	controlx = 0;
 	controly = 0;
@@ -531,7 +501,7 @@ void PollControls()
 		*demoptr++ = controly;
 
 		if (demoptr >= lastdemoptr)
-			Quit ("Demo buffer overflowed!");
+			Quit("Demo buffer overflowed!");
 
 		controlx *= (int)tics;
 		controly *= (int)tics;
@@ -1265,20 +1235,25 @@ long funnyticount;
 void PlayLoop()
 {
 	playstate = lasttimecount = 0;
-	set_TimeCount(0);
 	
 	frameon = 0;
 	anglefrac = 0;
 	facecount = 0;
 	funnyticount = 0;
 	memset (buttonstate,0,sizeof(buttonstate));
-	ClearPaletteShifts ();
-
+	ClearPaletteShifts();
+	
 	if (demoplayback)
-		IN_StartAck ();
+		IN_StartAck();
 
+	set_TimeCount(0);
+	
 	do
 	{
+		/* get timing info for last frame */
+		CalcTics();
+		
+		/* handle input */
 		PollControls();
 
 //
@@ -1326,8 +1301,6 @@ void PlayLoop()
 			VW_WaitVBL(14);
 			lasttimecount = get_TimeCount();
 		}
-		if (extravbls)
-			VW_WaitVBL(extravbls);
 
 		if (demoplayback)
 		{
