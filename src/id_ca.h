@@ -55,10 +55,10 @@ boolean CA_ReadFile (char *filename, memptr *ptr);
 boolean CA_LoadFile (char *filename, memptr *ptr);
 boolean CA_WriteFile (char *filename, void *ptr, long length);
 
-long CA_RLEWCompress (unsigned huge *source, long length, unsigned huge *dest,
+long CA_RLEWCompress (unsigned *source, long length, unsigned *dest,
   unsigned rlewtag);
 
-void CA_RLEWexpand (unsigned huge *source, unsigned huge *dest,long length,
+void CA_RLEWexpand (unsigned *source, unsigned *dest,long length,
   unsigned rlewtag);
 
 void CA_Startup (void);

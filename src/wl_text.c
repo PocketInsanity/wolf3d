@@ -767,11 +767,11 @@ void HelpScreens (void)
 #ifdef ARTSEXTERN
 	artnum = helpextern;
 	CA_CacheGrChunk (artnum);
-	text = (char _seg *)grsegs[artnum];
+	text = (char *)grsegs[artnum];
 	MM_SetLock (&grsegs[artnum], true);
 #else
 	CA_LoadFile (helpfilename,&layout);
-	text = (char _seg *)layout;
+	text = (char *)layout;
 	MM_SetLock (&layout, true);
 #endif
 
@@ -828,12 +828,12 @@ void EndText (void)
 #ifdef ARTSEXTERN
 	artnum = endextern+gamestate.episode;
 	CA_CacheGrChunk (artnum);
-	text = (char _seg *)grsegs[artnum];
+	text = (char *)grsegs[artnum];
 	MM_SetLock (&grsegs[artnum], true);
 #else
 	endfilename[6] = '1'+gamestate.episode;
 	CA_LoadFile (endfilename,&layout);
-	text = (char _seg *)layout;
+	text = (char *)layout;
 	MM_SetLock (&layout, true);
 #endif
 

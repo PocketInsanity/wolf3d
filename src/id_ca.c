@@ -369,7 +369,7 @@ void CAL_OptimizeNodes (huffnode *table)
 ======================
 */
 
-void CAL_HuffExpand (byte huge *source, byte huge *dest,
+void CAL_HuffExpand (byte *source, byte *dest,
   long length,huffnode *hufftable, boolean screenhack)
 {
 //  unsigned bit,byte,node,code;
@@ -628,12 +628,12 @@ void CAL_CarmackExpand (unsigned far *source, unsigned far *dest, unsigned lengt
 ======================
 */
 
-long CA_RLEWCompress (unsigned huge *source, long length, unsigned huge *dest,
+long CA_RLEWCompress (unsigned *source, long length, unsigned *dest,
   unsigned rlewtag)
 {
   long complength;
   unsigned value,count,i;
-  unsigned huge *start,huge *end;
+  unsigned *start, *end;
 
   start = dest;
 
@@ -685,11 +685,11 @@ long CA_RLEWCompress (unsigned huge *source, long length, unsigned huge *dest,
 ======================
 */
 
-void CA_RLEWexpand (unsigned huge *source, unsigned huge *dest,long length,
+void CA_RLEWexpand (unsigned *source, unsigned *dest,long length,
   unsigned rlewtag)
 {
 //  unsigned value,count,i;
-  unsigned huge *end;
+  unsigned *end;
   unsigned sourceseg,sourceoff,destseg,destoff,endseg,endoff;
 
 
@@ -867,7 +867,7 @@ void CAL_SetupGrFile (void)
 	CAL_GetGrChunkLength(STRUCTPIC);		// position file pointer
 	MM_GetPtr(&compseg,chunkcomplen);
 	CA_FarRead (grhandle,compseg,chunkcomplen);
-	CAL_HuffExpand (compseg, (byte huge *)pictable,NUMPICS*sizeof(pictabletype),grhuffman,false);
+	CAL_HuffExpand (compseg, (byte *)pictable,NUMPICS*sizeof(pictabletype),grhuffman,false);
 	MM_FreePtr(&compseg);
 }
 

@@ -67,7 +67,7 @@ extern	void interrupt	SDL_t0ExtremeAsmService(void),
 	SDSMode		DigiMode;
 	longword	TimeCount;
 	word		HackCount;
-	word		*SoundTable;	// Really * _seg *SoundTable, but that don't work
+	word		*SoundTable;	
 	boolean		ssIsTandy;
 	word		ssPort = 2;
 	int			DigiMap[LASTSOUND];
@@ -97,7 +97,7 @@ static	void			(*SoundUserHook)(void);
 		word			TimerRate;
 
 		word			NumDigi,DigiLeft,DigiPage;
-		word			_seg *DigiList;
+		word			*DigiList;
 		word			DigiLastStart,DigiLastEnd;
 		boolean			DigiPlaying;
 static	boolean			DigiMissed,DigiLastSegment;
@@ -108,7 +108,7 @@ static	word			DigiNextLen;
 static	boolean					sbNoCheck,sbNoProCheck;
 static	volatile boolean		sbSamplePlaying;
 static	byte					sbOldIntMask = -1;
-static	volatile byte			huge *sbNextSegPtr;
+static	volatile byte			*sbNextSegPtr;
 static	byte					sbDMA = 1,
 								sbDMAa1 = 0x83,sbDMAa2 = 2,sbDMAa3 = 3,
 								sba1Vals[] = {0x87,0x83,0,0x82},
@@ -117,7 +117,7 @@ static	byte					sbDMA = 1,
 static	int						sbLocation = -1,sbInterrupt = 7,sbIntVec = 0xf,
 								sbIntVectors[] = {-1,-1,0xa,0xb,-1,0xd,-1,0xf,-1,-1,-1};
 static	volatile longword		sbNextSegLen;
-static	volatile SampledSound	huge *sbSamples;
+static	volatile SampledSound *sbSamples;
 static	void interrupt			(*sbOldIntHand)(void);
 static	byte					sbpOldFMMix,sbpOldVOCMix;
 
@@ -126,17 +126,17 @@ static	byte					sbpOldFMMix,sbpOldVOCMix;
 		boolean				ssActive;
 		word				ssControl,ssStatus,ssData;
 		byte				ssOn,ssOff;
-		volatile byte		far *ssSample;
+		volatile byte		*ssSample;
 		volatile longword	ssLengthLeft;
 
 //	PC Sound variables
-		volatile byte	pcLastSample,far *pcSound;
+		volatile byte	pcLastSample, *pcSound;
 		longword		pcLengthLeft;
 		word			pcSoundLookup[255];
 
 //	AdLib variables
 		boolean			alNoCheck;
-		byte			far *alSound;
+		byte			*alSound;
 		word			alBlock;
 		longword		alLengthLeft;
 		longword		alTimeCount;
@@ -155,7 +155,7 @@ static	word			alFXReg;
 static	ActiveTrack		*tracks[sqMaxTracks],
 						mytracks[sqMaxTracks];
 static	word			sqMode,sqFadeStep;
-		word			far *sqHack,far *sqHackPtr,sqHackLen,sqHackSeqLen;
+		word			*sqHack, *sqHackPtr,sqHackLen,sqHackSeqLen;
 		long			sqHackTime;
 
 //	Internal routines
@@ -279,7 +279,7 @@ asm	popf
 //
 ///////////////////////////////////////////////////////////////////////////
 static longword
-SDL_SBPlaySeg(volatile byte huge *data,longword length)
+SDL_SBPlaySeg(volatile byte *data,longword length)
 {
 	unsigned		datapage;
 	longword		dataofs,uselen;
@@ -361,7 +361,7 @@ SDL_SBService(void)
 //		DMA to play the sound
 //
 ///////////////////////////////////////////////////////////////////////////
-static void SDL_SBPlaySample(byte huge *data,longword len)
+static void SDL_SBPlaySample(byte *data,longword len)
 {
 	longword	used;
 
@@ -670,13 +670,13 @@ done:;
 //	SDL_SSPlaySample() - Plays the specified sample on the Sound Source
 //
 ///////////////////////////////////////////////////////////////////////////
-static void SDL_SSPlaySample(byte huge *data,longword len)
+static void SDL_SSPlaySample(byte *data,longword len)
 {
 asm	pushf
 asm	cli
 
 	ssLengthLeft = len;
-	ssSample = (volatile byte far *)data;
+	ssSample = (volatile byte *)data;
 
 asm	popf
 }
@@ -793,7 +793,7 @@ SDL_DetectSoundSource(void)
 //	SDL_PCPlaySample() - Plays the specified sample on the PC speaker
 //
 ///////////////////////////////////////////////////////////////////////////
-static void SDL_PCPlaySample(byte huge *data,longword len)
+static void SDL_PCPlaySample(byte  *data,longword len)
 {
 asm	pushf
 asm	cli
@@ -801,7 +801,7 @@ asm	cli
 	SDL_IndicatePC(true);
 
 	pcLengthLeft = len;
-	pcSound = (volatile byte far *)data;
+	pcSound = (volatile byte *)data;
 
 asm	popf
 }
@@ -832,7 +832,7 @@ asm	popf
 //	SDL_PCPlaySound() - Plays the specified sound on the PC speaker
 //
 ///////////////////////////////////////////////////////////////////////////
-static void SDL_PCPlaySound(PCSound far *sound)
+static void SDL_PCPlaySound(PCSound *sound)
 {
 asm	pushf
 asm	cli
@@ -1186,15 +1186,15 @@ void
 SDL_SetupDigi(void)
 {
 	memptr	list;
-	word	far *p,
+	word	*p,
 			pg;
 	int		i;
 
 	PM_UnlockMainMem();
 	MM_GetPtr(&list,PMPageSize);
 	PM_CheckMainMem();
-	p = (word far *)MK_FP(PM_GetPage(ChunksInFile - 1),0);
-	_fmemcpy((void far *)list,(void far *)p,PMPageSize);
+	p = (word *)MK_FP(PM_GetPage(ChunksInFile - 1),0);
+	_fmemcpy((void *)list,(void *)p,PMPageSize);
 	pg = PMSoundStart;
 	for (i = 0;i < PMPageSize / (sizeof(word) * 2);i++,p += 2)
 	{
@@ -1204,7 +1204,7 @@ SDL_SetupDigi(void)
 	}
 	PM_UnlockMainMem();
 	MM_GetPtr((memptr *)&DigiList,i * sizeof(word) * 2);
-	_fmemcpy((void far *)DigiList,(void far *)list,i * sizeof(word) * 2);
+	_fmemcpy((void *)DigiList,(void *)list,i * sizeof(word) * 2);
 	MM_FreePtr(&list);
 	NumDigi = i;
 
@@ -1288,7 +1288,7 @@ asm	in	al,dx
 //
 ///////////////////////////////////////////////////////////////////////////
 static void
-SDL_SetInstrument(int track,int which,Instrument far *inst,boolean percussive)
+SDL_SetInstrument(int track,int which,Instrument *inst,boolean percussive)
 {
 	byte		c,m;
 
@@ -1344,7 +1344,7 @@ asm	popf
 }
 
 static void
-SDL_AlSetFXInst(Instrument far *inst)
+SDL_AlSetFXInst(Instrument *inst)
 {
 	byte		c,m;
 
@@ -1371,10 +1371,10 @@ SDL_AlSetFXInst(Instrument far *inst)
 //	SDL_ALPlaySound() - Plays the specified sound on the AdLib card
 //
 ///////////////////////////////////////////////////////////////////////////
-static void SDL_ALPlaySound(AdLibSound far *sound)
+static void SDL_ALPlaySound(AdLibSound *sound)
 {
-	Instrument	far *inst;
-	byte		huge *data;
+	Instrument *inst;
+	byte	*data;
 
 	SDL_ALStopSound();
 
@@ -1385,7 +1385,7 @@ asm	cli
 	data = sound->data;
 	data++;
 	data--;
-	alSound = (byte far *)data;
+	alSound = (byte *)data;
 	alBlock = ((sound->block & 7) << 2) | 0x20;
 	inst = &sound->inst;
 
@@ -1457,7 +1457,7 @@ SDL_ALService(void)
 	alTimeCount++;
 	if (!sqHackLen)
 	{
-		sqHackPtr = (word far *)sqHack;
+		sqHackPtr = (word *)sqHack;
 		sqHackLen = sqHackSeqLen;
 		alTimeCount = sqHackTime = 0;
 	}
@@ -2059,7 +2059,7 @@ boolean
 SD_PlaySound(soundnames sound)
 {
 	boolean		ispos;
-	SoundCommon	far *s;
+	SoundCommon	*s;
 	int	lp,rp;
 
 	lp = LeftPosition;
@@ -2124,10 +2124,10 @@ SD_PlaySound(soundnames sound)
 	switch (SoundMode)
 	{
 	case sdm_PC:
-		SDL_PCPlaySound((void far *)s);
+		SDL_PCPlaySound((void *)s);
 		break;
 	case sdm_AdLib:
-		SDL_ALPlaySound((void far *)s);
+		SDL_ALPlaySound((void *)s);
 		break;
 	}
 
@@ -2242,7 +2242,7 @@ SD_MusicOff(void)
 //
 ///////////////////////////////////////////////////////////////////////////
 void
-SD_StartMusic(MusicGroup far *music)
+SD_StartMusic(MusicGroup *music)
 {
 	SD_MusicOff();
 asm	pushf

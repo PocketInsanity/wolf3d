@@ -17,8 +17,7 @@
 //	DEBUG - there are more globals
 //
 
-#include "ID_HEADS.H"
-#pragma	hdrstop
+#include "id_heads.h"
 
 #define	KeyInt		9	// The keyboard ISR number
 
@@ -68,7 +67,7 @@ boolean			JoyPadPresent;
 		longword	MouseDownCount;
 
 		Demo		DemoMode = demo_Off;
-		byte _seg	*DemoBuffer;
+		byte 		*DemoBuffer;
 		word		DemoOffset,DemoSize;
 
 /*
@@ -78,7 +77,7 @@ boolean			JoyPadPresent;
 
 =============================================================================
 */
-static	byte        far ASCIINames[] =		// Unshifted ASCII for scan codes
+static byte ASCIINames[] =		// Unshifted ASCII for scan codes
 					{
 //	 0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F
 	0  ,27 ,'1','2','3','4','5','6','7','8','9','0','-','=',8  ,9  ,	// 0
@@ -90,7 +89,7 @@ static	byte        far ASCIINames[] =		// Unshifted ASCII for scan codes
 	0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,	// 6
 	0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0		// 7
 					},
-					far ShiftNames[] =		// Shifted ASCII for scan codes
+					 ShiftNames[] =		// Shifted ASCII for scan codes
 					{
 //	 0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F
 	0  ,27 ,'!','@','#','$','%','^','&','*','(',')','_','+',8  ,9  ,	// 0
@@ -102,7 +101,7 @@ static	byte        far ASCIINames[] =		// Unshifted ASCII for scan codes
 	0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,	// 6
 	0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0   	// 7
 					},
-					far SpecialNames[] =	// ASCII for 0xe0 prefixed codes
+					 SpecialNames[] =	// ASCII for 0xe0 prefixed codes
 					{
 //	 0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F
 	0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,	// 0
@@ -468,7 +467,7 @@ INL_StartMouse(void)
 	return(false);
 #endif
  union REGS regs;
- unsigned char far *vector;
+ unsigned char *vector;
 
 
  if ((vector=MK_FP(peek(0,0x33*4+2),peek(0,0x33*4)))==NULL)
