@@ -1,3 +1,22 @@
+/*
+Copyright (C) 1992-1994 Id Software, Inc.
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+
+See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+*/
+
 #ifndef __WOLFDEF__
 #define __WOLFDEF__
 
@@ -111,16 +130,16 @@ Word ScaleY(Word y);
 
 #define JOYPAD_B	0x8000
 #define JOYPAD_Y	0x4000
-#define JOYPAD_SELECT 0x2000
-#define JOYPAD_START 0x1000
-#define JOYPAD_UP	0x800
-#define JOYPAD_DN	0x400
-#define JOYPAD_LFT	0x200
-#define JOYPAD_RGT	0x100
-#define JOYPAD_A	0x80
-#define JOYPAD_X	0x40
-#define JOYPAD_TL	0x20
-#define JOYPAD_TR	0x10
+#define JOYPAD_SELECT	0x2000
+#define JOYPAD_START	0x1000
+#define JOYPAD_UP	0x0800
+#define JOYPAD_DN	0x0400
+#define JOYPAD_LFT	0x0200
+#define JOYPAD_RGT	0x0100
+#define JOYPAD_A	0x0080
+#define JOYPAD_X	0x0040
+#define JOYPAD_TL	0x0020
+#define JOYPAD_TR	0x0010
 
 /**********************************
 

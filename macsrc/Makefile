@@ -3,18 +3,19 @@ CC = gcc
 #CFLAGS = -Wall -O6 -fomit-frame-pointer -ffast-math -funroll-loops -mpentiumpro -mcpu=pentiumpro -march=pentiumpro 
 #CFLAGS = -g -Wall -O6 -fomit-frame-pointer -ffast-math -funroll-loops -mpentiumpro -mcpu=pentiumpro -march=pentiumpro 
 #CFLAGS = -g -Wall
-#CFLAGS = -g -DNOVGA
+#CFLAGS = -g -Wall -ansi -pedantic
 CFLAGS = -g
 #CFLAGS = -Os -g
 #CFLAGS = -g -Wall -I/home/relnev/cvs/oal/include
 
 OBJS =  Data.o Doors.o EnMove.o EnThink.o Intro.o Level.o \
-	Missiles.o Music.o PlMove.o PlStuff.o PlThink.o PushWall.o \
+	Missiles.o Sounds.o PlMove.o PlStuff.o PlThink.o PushWall.o \
 	RefBsp.o RefSprite.o Refresh.o Refresh2.o Sight.o Main.o \
 	StateDef.o WolfMain.o WolfIO.o InterMis.o Burger.o stub.o res.o
 SOBJS = $(OBJS) vi_svga.o
 XOBJS = $(OBJS) vi_xlib.o
-GOBJS = $(OBJS)
+GOBJS = $(OBJS) vi_gtk.o
+GLOBJS = $(OBJS) vi_glx.o
 
 LFLAGS = -lm 
 #LFLAGS = -lm -L/home/relnev/cvs/oal/linux/src -lopenal -lpthread -ldl
@@ -24,21 +25,25 @@ LFLAGS = -lm
 SLFLAGS = $(LFLAGS) -lvga
 #XLFLAGS = $(LFLAGS) -L/usr/X11R6/lib -lX11 -lXext -lXxf86vm -lXxf86dga
 XLFLAGS = $(LFLAGS) -L/usr/X11R6/lib -lX11
-GLFLAGS = $(LFLAGS) -L/usr/X11R6/lib -lX11 -lXext -lGL
+GLFLAGS = $(LFLAGS) `gtk-config --libs` # -L/usr/X11R6/lib -lX11 -lXi -lXext -lgdk -lgtk 
+GLLFLAGS = $(LFLAGS) -L/usr/X11R6/lib -lX11 -lXext -lGL
 
 NASM = nasm
 
 .SUFFIXES: .asm
 
-#all:	swolf3d xwolf3d gwolf3d
-all:	swolf3d xwolf3d
+all:	swolf3d xwolf3d gwolf3d glwolf3d
 
 $(SOBJS): Sounds.h  Sprites.h  States.h  Wolf.h  burger.h  wolfdef.h
 $(XOBJS): Sounds.h  Sprites.h  States.h  Wolf.h  burger.h  wolfdef.h
 $(GOBJS): Sounds.h  Sprites.h  States.h  Wolf.h  burger.h  wolfdef.h
+$(GLOBJS): Sounds.h  Sprites.h  States.h  Wolf.h  burger.h  wolfdef.h
 
 .asm.o:
 	$(NASM) -f elf -o $@ $<
+
+vi_gtk.o: vi_gtk.c
+	gcc -c vi_gtk.c $(CFLAGS) `gtk-config --cflags`
 
 swolf3d: $(SOBJS)
 	gcc -o swolf3d $(SOBJS) $(SLFLAGS) 
@@ -49,11 +54,14 @@ xwolf3d: $(XOBJS)
 gwolf3d: $(GOBJS)
 	gcc -o gwolf3d $(GOBJS) $(GLFLAGS)
 
+glwolf3d: $(GLOBJS)
+	gcc -o glwolf3d $(GLOBJS) $(GLLFLAGS)
+
 clean:
-	rm -rf swolf3d xwolf3d gwolf3d *.o
+	rm -rf swolf3d xwolf3d gwolf3d glwolf3d *.o
 
 distclean: clean
-	rm -rf *~ DEADJOE
+	rm -rf core *~ DEADJOE
 
 forced: distclean all
 	rm -rf *.o
