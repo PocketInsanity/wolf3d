@@ -251,9 +251,9 @@ void ScalePost(byte *wall, int texture)
 ====================
 */
 
-void HitHorizDoor (void)
+void HitHorizDoor()
 {
-	unsigned	texture,doorpage,doornum;
+	unsigned texture, doorpage = 0, doornum;
 	byte *wall;
 
 	doornum = tilehit&0x7f;
@@ -293,9 +293,9 @@ void HitHorizDoor (void)
 ====================
 */
 
-void HitVertDoor (void)
+void HitVertDoor()
 {
-	unsigned	texture,doorpage,doornum;
+	unsigned texture, doorpage = 0, doornum;
 	byte *wall;
 
 	doornum = tilehit&0x7f;

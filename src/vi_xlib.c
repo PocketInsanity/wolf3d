@@ -1019,7 +1019,7 @@ void IN_ClearKeysDown(void)
 ///////////////////////////////////////////////////////////////////////////
 void IN_ReadControl(int player,ControlInfo *info)
 {
-			boolean		realdelta;
+			boolean		realdelta = false;
 			word		buttons;
 			int			dx,dy;
 			Motion		mx,my;

@@ -299,7 +299,7 @@ boolean US_LineInput(int x,int y,char *buf,char *def,boolean escok,
 {
 	boolean		redraw,
 				cursorvis,cursormoved,
-				done,result;
+				done,result = true;
 	ScanCode	sc;
 	char		c,
 				s[MaxString],olds[MaxString];

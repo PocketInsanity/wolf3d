@@ -787,20 +787,20 @@ void CA_UnCacheAudioChunk(int chunk)
 ======================
 */
 
-void CA_LoadAllSounds (void)
+void CA_LoadAllSounds()
 {
-	unsigned	start,i;
+	unsigned start, i;
 
 	switch (oldsoundmode)
 	{
-	case sdm_Off:
-		goto cachein;
 	case sdm_PC:
 		start = STARTPCSOUNDS;
 		break;
 	case sdm_AdLib:
 		start = STARTADLIBSOUNDS;
 		break;
+	default:
+		goto cachein;
 	}
 
 	for (i=0;i<NUMSOUNDS;i++,start++)
@@ -812,14 +812,14 @@ cachein:
 
 	switch (SoundMode)
 	{
-	case sdm_Off:
-		return;
 	case sdm_PC:
 		start = STARTPCSOUNDS;
 		break;
 	case sdm_AdLib:
 		start = STARTADLIBSOUNDS;
 		break;
+	default:
+		return;
 	}
 
 	for (i=0;i<NUMSOUNDS;i++,start++)

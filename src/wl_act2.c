@@ -341,7 +341,7 @@ void T_Projectile (objtype *ob)
 			damage = (US_RndT() >>3);
 			break;
 		default:
-			break;
+			return;
 		}
 
 		TakeDamage (damage,ob);
@@ -832,7 +832,7 @@ statetype s_gretelshoot8 	= {false,SPR_GRETEL_SHOOT1,10,NULL,NULL,&s_gretelchase
 
 void SpawnStand (enemy_t which, int tilex, int tiley, int dir)
 {
-	word *map,tile;
+	word *map, tile = 0;
 
 	switch (which)
 	{
