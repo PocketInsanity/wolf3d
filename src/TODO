@@ -28,8 +28,6 @@ works alright at some res, but breaks on most others currently
 * would be nice if Quit() used vsnprintf, etc
 * actor walking through door is drawn in front of door: near end of E1M1 for
 example
-* SDL version will have all the features for now, xlib will just be a
-320x200 window
 * getenv so that you can point an env. var to the proper dir
 * rewrite hw (sound, input) code, remove stuff like SD_SetSoundMode
 * fix config file and savegames
@@ -42,13 +40,6 @@ code, it really needs to be cleaned up
 * rewrite id_ca.c: uniform memory handling system
 * clean up header files, especially wl_def.h, where some declarations aren't 
 in the right place
-* every structure that is read/written must be PACKED, with datatypes
-specifially set to correct size
-* or have PACKED versions of read/write structures, and transfer
-to/from just for reading, so only non-packed structures are used during
-actual gameplay/etc. 
-this isn't as much of a big deal since compensating for endianness will
-require major changes also
 * is that memory intro screen needed anymore? probably not, although it
 would be nice to show what version is loaded, but doom just printed text
 and the intro screen which came with wolf3d has copyrighted/trademarked images
@@ -84,7 +75,4 @@ at a time
 * systems with no sound should still have working WaitSoundDone.. it's 
 possible to calculate the sound lengths in terms of 70Hz (adlib sound len / 2, 
 pcm sound len / 100).
-
-Things to try:
-* Create a native palette format instead of doing conversions each frame
 ------------------------------------------------------------------------------

@@ -755,22 +755,16 @@ static void ScaleLineTrans(unsigned int height, byte *source, int x)
 
 static unsigned char *spritegfx[SPR_TOTAL];
 
-typedef struct
-{
-	word leftpix, rightpix;
-	word dataofs[64];
-        /* table data after dataofs[rightpix-leftpix+1] */
-} PACKED t_compshape;
-
 static void DeCompileSprite(int shapenum)
 {
-	t_compshape *ptr;
+	unsigned char *ptr;
 	unsigned char *buf;
-	int srcx;
-	unsigned short int *cmdptr;
-	short int *linecmds;
+	unsigned char *cmdptr;
 	unsigned char *pixels;
+	short int yoff; /* int16_t */
 	int y, y0, y1;
+	int x, left, right;
+	int cmd;
 	
 	MM_GetPtr((void *)&buf, 64 * 64);
 	
@@ -778,23 +772,37 @@ static void DeCompileSprite(int shapenum)
 	
 	ptr = PM_GetSpritePage(shapenum);
 
-	cmdptr = &ptr->dataofs[0];
-	for (srcx = ptr->leftpix; srcx <= ptr->rightpix; srcx++) {
-		linecmds = (short *)((unsigned char *)ptr + *cmdptr++);
-		
-		while (linecmds[0]) {
-			y0 = linecmds[2] / 2;
-			y1 = linecmds[0] / 2;
-			pixels = (unsigned char *)ptr + y0 + linecmds[1];
+	/* left = ptr[0] | (ptr[1] << 8); */
+	left = ptr[0];
+	/* right = ptr[2] | (ptr[3] << 8); */
+	right = ptr[2];
+	
+	cmdptr = &ptr[4];
+	
+	for (x = left; x <= right; x++) {
+		cmd = cmdptr[0] | (cmdptr[1] << 8);
+		cmdptr += 2;
+					
+		/* while (ptr[cmd+0] | (ptr[cmd+1] << 8)) { */
+		while (ptr[cmd+0]) {
+			/* y1 = (ptr[cmd+0] | (ptr[cmd+1] << 8)) / 2; */
+			y1 = ptr[cmd+0] / 2;
+			yoff = ptr[cmd+2] | (ptr[cmd+3] << 8);
+			/* y0 = (ptr[cmd+4] | (ptr[cmd+5] << 8)) / 2; */
+			y0 = ptr[cmd+4] / 2;
+			
+			pixels = &ptr[y0 + yoff];
 			
 			for (y = y0; y < y1; y++) {
-				//*(buf + slinex + (y*64)) = *pixels;
-				*(buf + (srcx*64) + y) = *pixels;
+				/* *(buf + x + (y*64)) = *pixels; */
+				*(buf + (x*64) + y) = *pixels;
 				pixels++;
 			}
-			linecmds += 3;
+			
+			cmd += 6;
 		}
 	}
+	
 	spritegfx[shapenum] = buf;
 }
 
