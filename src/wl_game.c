@@ -10,8 +10,6 @@
 =============================================================================
 */
 
-extern unsigned xoffset, yoffset;
-
 boolean		ingame,fizzlein;
 gametype	gamestate;
 

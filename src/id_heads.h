@@ -75,7 +75,8 @@ typedef	struct {
 #include "id_vh.h"
 #include "id_us.h"
 
-extern byte introscn[];
+extern const byte introscn[];
+extern const byte gamepal[];
 
 int MS_CheckParm(char *string);
 int WolfMain(int argc, char *argv[]);

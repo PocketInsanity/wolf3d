@@ -705,6 +705,8 @@ extern	int			dirangle[9];
 
 extern	boolean         startgame,loadedgame;
 extern	int		mouseadjustment;
+extern unsigned xoffset, yoffset;
+
 //
 // math tables
 //

@@ -75,6 +75,7 @@ screen update
 * GL_shared_texture_palette for opengl
 * if window looses focus, should it clear the keys ?
 * add DGA, clean up vi_xlib.c, fix vid mode changing
+* fix broken opengl
 
 Specific:
 * memory/sound intro screen goes

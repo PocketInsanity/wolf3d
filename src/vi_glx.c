@@ -30,7 +30,7 @@ int attrib[] = {
 	GLX_GREEN_SIZE,         5,
 	GLX_BLUE_SIZE,          5,
 	GLX_DEPTH_SIZE,         16,
-	GLX_DOUBLEBUFFER,
+//	GLX_DOUBLEBUFFER,
         None
 };
 
@@ -154,6 +154,8 @@ void VL_WaitVBL(int vbls)
 
 void VW_UpdateScreen()
 {
+//	glXSwapBuffers(dpy, win);
+//	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 /*
@@ -173,7 +175,10 @@ void VL_Startup()
 				   
 	XMapWindow(dpy, win);
 	
+	glColor4f(0.0f, 0.0f, 0.0f, 0.0f);
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	
+	glEnable(GL_TEXTURE_2D);
 	
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();

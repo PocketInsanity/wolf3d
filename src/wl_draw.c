@@ -39,8 +39,6 @@ int		xtilestep,ytilestep;
 long	xintercept,yintercept;
 long	xstep,ystep;
 
-extern unsigned xoffset, yoffset;
-
 void AsmRefresh (void);
 void xBuildCompScale(int height, byte *source, int x);
 

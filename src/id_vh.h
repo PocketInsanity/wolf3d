@@ -31,7 +31,6 @@ void VW_UpdateScreen (void);
 void VWB_DrawTile8(int x, int y, int tile);
 void VWB_DrawPic(int x, int y, int chunknum);
 
-extern byte gamepal[];
 extern boolean screenfaded;
 
 #define VW_Startup		VL_Startup
