@@ -724,6 +724,7 @@ void CP_NewGame()
 	UnCacheLump (OPTIONS_LUMP_START,OPTIONS_LUMP_END);
 #endif
 
+	episode = 0;
 
 #ifndef SPEAR
 firstpart:
@@ -776,8 +777,6 @@ firstpart:
 	MenuFadeOut();
 
 #else
-	episode = 0;
-
 	//
 	// ALREADY IN A GAME?
 	//
