@@ -1,9 +1,6 @@
 #ifndef	__ID_US_H__
 #define	__ID_US_H__
 
-#define	MaxX	320
-#define	MaxY	200
-
 #define	MaxHighName	57
 #define	MaxScores	7
 typedef	struct {
