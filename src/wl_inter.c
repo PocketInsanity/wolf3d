@@ -56,9 +56,10 @@ void EndSpear()
 	WindowW = 320;
 	PrintX = 0;
 	PrintY = 180;
-	US_CPrint (STR_ENDGAME1"\n");
-	US_CPrint (STR_ENDGAME2);
-	VW_UpdateScreen ();
+	US_CPrint(STR_ENDGAME1"\n");
+	US_CPrint(STR_ENDGAME2);
+	VW_UpdateScreen();
+	
 	IN_StartAck ();
 	set_TimeCount(0);
 	while ( !IN_CheckAck () && (get_TimeCount() < 700) );
@@ -66,9 +67,10 @@ void EndSpear()
 	PrintX = 0;
 	PrintY = 180;
 	VW_Bar(0,180,320,20,0);
-	US_CPrint (STR_ENDGAME3"\n");
-	US_CPrint (STR_ENDGAME4);
-	VW_UpdateScreen ();
+	US_CPrint(STR_ENDGAME3"\n");
+	US_CPrint(STR_ENDGAME4);
+	VW_UpdateScreen();
+	
 	IN_StartAck ();
 	set_TimeCount(0);
 	while ( !IN_CheckAck () && (get_TimeCount() < 700) );
@@ -493,7 +495,7 @@ void LevelCompleted()
 	};
 
 	CacheLump(LEVELEND_LUMP_START,LEVELEND_LUMP_END);
-	ClearSplitVWB ();			// set up for double buffering in split screen
+	ClearSplitVWB();			// set up for double buffering in split screen
 	VW_Bar (0,0,320,200-STATUSLINES,127);
 	StartCPMusic(ENDLEVEL_MUS);
 
@@ -814,14 +816,14 @@ void LevelCompleted()
 #ifdef SPEARDEMO
 	if (gamestate.mapon == 1)
 	{
-		SD_PlaySound (BONUS1UPSND);
+		SD_PlaySound(BONUS1UPSND);
 
-		CA_CacheGrChunk (STARTFONT+1);
-		Message ("This concludes your demo\n"
+		CA_CacheGrChunk(STARTFONT+1);
+		Message("This concludes your demo\n"
 				 "of Spear of Destiny! Now,\n"
 				 "go to your local software\n"
 				 "store and buy it!");
-		CA_UnCacheGrChunk (STARTFONT+1);
+		CA_UnCacheGrChunk(STARTFONT+1);
 
 		IN_ClearKeysDown();
 		IN_Ack();
@@ -933,14 +935,14 @@ void DrawHighScores()
 
 	fontnumber = 0;
 #else
-	CacheLump (BACKDROP_LUMP_START,BACKDROP_LUMP_END);
+	CacheLump(BACKDROP_LUMP_START,BACKDROP_LUMP_END);
 	ClearMScreen();
 	DrawStripes(10);
-	UnCacheLump (BACKDROP_LUMP_START,BACKDROP_LUMP_END);
+	UnCacheLump(BACKDROP_LUMP_START,BACKDROP_LUMP_END);
 
-	CacheLump (HIGHSCORES_LUMP_START,HIGHSCORES_LUMP_END);
-	CA_CacheGrChunk (STARTFONT+1);
-	VWB_DrawPic (0,0,HIGHSCORESPIC);
+	CacheLump(HIGHSCORES_LUMP_START,HIGHSCORES_LUMP_END);
+	CA_CacheGrChunk(STARTFONT+1);
+	VWB_DrawPic(0,0,HIGHSCORESPIC);
 
 	fontnumber = 1;
 #endif
@@ -979,14 +981,12 @@ void DrawHighScores()
 		PrintX = 194 - w;
 #endif
 
-#ifndef UPLOAD
-#ifndef SPEAR
+#if !defined(UPLOAD) || !defined(SPEAR)
 		PrintX -= 6;
 		itoa(s->episode+1,buffer1,10);
 		US_Print("E");
 		US_Print(buffer1);
 		US_Print("/L");
-#endif
 #endif
 
 #ifdef SPEAR
@@ -1015,13 +1015,10 @@ void DrawHighScores()
 	VW_UpdateScreen();
 
 #ifdef SPEAR
-	UnCacheLump (HIGHSCORES_LUMP_START,HIGHSCORES_LUMP_END);
+	UnCacheLump(HIGHSCORES_LUMP_START, HIGHSCORES_LUMP_END);
 	fontnumber = 0;
 #endif
 }
-
-//===========================================================================
-
 
 /*
 =======================
@@ -1031,27 +1028,22 @@ void DrawHighScores()
 =======================
 */
 
-void	CheckHighScore (long score,word other)
+void CheckHighScore(long score, word other)
 {
-	word		i,j;
-	int			n;
-	HighScore	myscore;
+	word i, j;
+	int n;
+	HighScore myscore;
 
-	strcpy(myscore.name,"");
+	strcpy(myscore.name, "");
 	myscore.score = score;
 	myscore.episode = gamestate.episode;
 	myscore.completed = other;
 
-	for (i = 0,n = -1;i < MaxScores;i++)
+	for (i = 0, n = -1; i < MaxScores;i++)
 	{
-		if
-		(
-			(myscore.score > Scores[i].score)
-		||	(
-				(myscore.score == Scores[i].score)
-			&& 	(myscore.completed > Scores[i].completed)
-			)
-		)
+		if ((myscore.score > Scores[i].score) ||
+		   ((myscore.score == Scores[i].score) &&
+		    (myscore.completed > Scores[i].completed)))
 		{
 			for (j = MaxScores;--j > i;)
 				Scores[j] = Scores[j - 1];
@@ -1062,13 +1054,13 @@ void	CheckHighScore (long score,word other)
 	}
 
 #ifdef SPEAR
-	StartCPMusic (XAWARD_MUS);
+	StartCPMusic(XAWARD_MUS);
 #else
-	StartCPMusic (ROSTER_MUS);
+	StartCPMusic(ROSTER_MUS);
 #endif
-	DrawHighScores ();
+	DrawHighScores();
 
-	VW_FadeIn ();
+	VW_FadeIn();
 
 	if (n != -1)
 	{
@@ -1085,7 +1077,7 @@ void	CheckHighScore (long score,word other)
 		PrintX = 16;
 		fontnumber = 1;
 		VW_Bar(PrintX-2,PrintY-2,145,15,0x9c);
-		VW_UpdateScreen ();
+		VW_UpdateScreen();
 		backcolor = 0x9c;
 		fontcolor = 15;
 		US_LineInput(PrintX,PrintY,Scores[n].name,NULL,true,MaxHighName,130);
@@ -1093,7 +1085,7 @@ void	CheckHighScore (long score,word other)
 	}
 	else
 	{
-		IN_ClearKeysDown ();
+		IN_ClearKeysDown();
 		IN_UserInput(500);
 	}
 

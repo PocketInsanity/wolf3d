@@ -1104,7 +1104,7 @@ void FinishPaletteShifts (void)
 =====================
 */
 
-void DoActor (objtype *ob)
+void DoActor(objtype *ob)
 {
 	void (*think)(objtype *);
 
@@ -1134,7 +1134,7 @@ void DoActor (objtype *ob)
 		if (ob->flags&FL_NEVERMARK)
 			return;
 
-		if ( (ob->flags&FL_NONMARK) && actorat[ob->tilex][ob->tiley])
+		if ((ob->flags&FL_NONMARK) && actorat[ob->tilex][ob->tiley])
 			return;
 
 		actorat[ob->tilex][ob->tiley] = ob;
@@ -1153,7 +1153,7 @@ void DoActor (objtype *ob)
 			think (ob);
 			if (!ob->state)
 			{
-				RemoveObj (ob);
+				RemoveObj(ob);
 				return;
 			}
 		}
@@ -1185,7 +1185,7 @@ think:
 		think (ob);
 		if (!ob->state)
 		{
-			RemoveObj (ob);
+			RemoveObj(ob);
 			return;
 		}
 	}
@@ -1193,7 +1193,7 @@ think:
 	if (ob->flags&FL_NEVERMARK)
 		return;
 
-	if ( (ob->flags&FL_NONMARK) && actorat[ob->tilex][ob->tiley])
+	if ((ob->flags&FL_NONMARK) && actorat[ob->tilex][ob->tiley])
 		return;
 
 	actorat[ob->tilex][ob->tiley] = ob;

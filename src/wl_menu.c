@@ -440,7 +440,7 @@ void US_ControlPanel(byte scancode)
 		
 #ifdef SPEAR
 	UnCacheLump (OPTIONS_LUMP_START,OPTIONS_LUMP_END);
-	MM_SortMem ();
+	MM_SortMem();
 #endif
 }
 
@@ -1344,7 +1344,6 @@ int CP_SaveGame(int quick)
 		if (SaveGamesAvail[which])
 		{
 			name[7]=which+'0';
-			unlink(name);
 			handle=creat(name,S_IREAD|S_IWRITE);
 
 			strcpy(input,&SaveGameNames[which][0]);
@@ -1399,16 +1398,15 @@ int CP_SaveGame(int quick)
 
 			if (US_LineInput(LSM_X+LSItems.indent+2,LSM_Y+which*13+1,input,input,true,31,LSM_W-LSItems.indent-30))
 			{
-				SaveGamesAvail[which]=1;
+				SaveGamesAvail[which] = 1;
 				strcpy(&SaveGameNames[which][0],input);
 
-				unlink(name);
-				handle=creat(name,S_IREAD|S_IWRITE);
-				nwritten = write(handle,(void *)input,32);
-				lseek(handle,32,SEEK_SET);
+				handle = creat(name, S_IREAD|S_IWRITE);
+				nwritten = write(handle, (void *)input, 32);
+				lseek(handle, 32, SEEK_SET);
 
 				DrawLSAction(1);
-				SaveTheGame(handle,LSA_X+8,LSA_Y+5);
+				SaveTheGame(handle, LSA_X+8, LSA_Y+5);
 
 				close(handle);
 
@@ -3244,7 +3242,6 @@ void StartCPMusic(int song)
 	lastmusic = song;
 
 	CA_CacheAudioChunk(STARTMUSIC + song);
-	MM_SetLock((memptr *)&(audiosegs[STARTMUSIC + song]), true);
 	SD_StartMusic((MusicGroup *)audiosegs[STARTMUSIC + song]);
 }
 
@@ -3252,8 +3249,10 @@ void FreeMusic()
 {
 	SD_MusicOff();
 	
-	if (lastmusic >= 0)
+	if (lastmusic >= 0) {
 		CA_UnCacheAudioChunk(STARTMUSIC + lastmusic);
+		lastmusic = -1;
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////

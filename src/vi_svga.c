@@ -143,6 +143,10 @@ void VL_DirectPlot(int x1, int y1, int x2, int y2)
 	*(graph_mem + x1 + y1 * 320) = *(gfxbuf + x2 + y2 * 320);
 }
 
+void VL_DirectPlotFlush()
+{
+}
+
 /*
 =============================================================================
 

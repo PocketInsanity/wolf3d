@@ -49,6 +49,7 @@ boolean FizzleFade(unsigned xx, unsigned yy, unsigned width, unsigned height, un
 	int pixperframe;
 	unsigned x, y, p, frame;
 	long rndval;
+	int retr;
 		
 	rndval = 1;
 	pixperframe = 64000/frames;
@@ -60,10 +61,13 @@ boolean FizzleFade(unsigned xx, unsigned yy, unsigned width, unsigned height, un
 	
 	if (vwidth != 320)
 		return false;
+	
+	retr = -1;
 		
 	do {
 		if (abortable && IN_CheckAck())
-			return true;
+			retr = true;
+		else
 		for (p = 0; p < pixperframe; p++) {
 			y = (rndval & 0x00FF) - 1;
 			x = (rndval & 0x00FFFF00) >> 8;
@@ -79,13 +83,22 @@ boolean FizzleFade(unsigned xx, unsigned yy, unsigned width, unsigned height, un
 
 			VL_DirectPlot(xx+x, yy+y, xx+x, yy+y);
 			
-			if (rndval == 1) /* entire sequence has been completed */
-				return false;
+			if (rndval == 1) { 
+				/* entire sequence has been completed */
+				retr = false;
+				break;
+			}
 
 		}
+		VL_DirectPlotFlush();
+		
 		frame++;
 		while (get_TimeCount() < frame);
-	} while (1);
+	} while (retr == -1);
+	
+	VL_DirectPlotFlush();
+	
+	return retr;
 }
 
 void VL_FillPalette(int red, int green, int blue)

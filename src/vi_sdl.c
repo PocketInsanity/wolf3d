@@ -143,9 +143,6 @@ void VL_SetPalette(const byte *palette)
 	SDL_SetColors(surface, colors, 0, 256);
 }
 
-
-//===========================================================================
-
 /*
 =================
 =
@@ -168,7 +165,11 @@ void VL_GetPalette(byte *palette)
 void VL_DirectPlot(int x1, int y1, int x2, int y2)
 {
 	*(((Uint8 *)surface->pixels) + x1 + y1 * vwidth) = *(gfxbuf + x2 + y2 * vwidth);
-	//SDL_UpdateRect(surface, x1,y1,x1,y1);
+}
+
+void VL_DirectPlotFlush()
+{
+	SDL_UpdateRect(surface, 0, 0, 0, 0);
 }
 
 /*

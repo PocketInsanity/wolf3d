@@ -41,12 +41,6 @@ objtype		*LastAttacker;
 */
 
 
-void T_Player(objtype *ob);
-void T_Attack(objtype *ob);
-
-statetype s_player = {false,0,0,T_Player,NULL,NULL};
-statetype s_attack = {false,0,0,T_Attack,NULL,NULL};
-
 struct atkinf
 {
 	char tics, attack, frame; 	// attack is 1 for gun, 2 for knife
@@ -61,13 +55,6 @@ struct atkinf
 void DrawWeapon (void);
 void GiveWeapon (int weapon);
 void GiveAmmo (int ammo);
-
-//===========================================================================
-
-boolean TryMove (objtype *ob);
-void T_Player (objtype *ob);
-
-void ClipMove (objtype *ob, long xmove, long ymove);
 
 /*
 =============================================================================
@@ -87,7 +74,7 @@ void ClipMove (objtype *ob, long xmove, long ymove);
 ======================
 */
 
-void CheckWeaponChange (void)
+void CheckWeaponChange()
 {
 	int i;
 
@@ -262,7 +249,6 @@ void UpdateFace()
 		DrawFace();
 	}
 }
-
 
 
 /*
@@ -734,11 +720,11 @@ void GetBonus (statobj_t *check)
 = TryMove
 =
 = returns true if move ok
-= debug: use pointers to optimize
+=
 ===================
 */
 
-boolean TryMove (objtype *ob)
+boolean TryMove(objtype *ob)
 {
 	int			xl,yl,xh,yh,x,y;
 	objtype		*check;
@@ -803,7 +789,7 @@ boolean TryMove (objtype *ob)
 ===================
 */
 
-void ClipMove (objtype *ob, long xmove, long ymove)
+void ClipMove(objtype *ob, long xmove, long ymove)
 {
 	long	basex,basey;
 
@@ -847,12 +833,11 @@ void ClipMove (objtype *ob, long xmove, long ymove)
 ===================
 */
 
-void VictoryTile (void)
+void VictoryTile()
 {
 #ifndef SPEAR
-	SpawnBJVictory ();
+	SpawnBJVictory();
 #endif
-
 	gamestate.victoryflag = true;
 }
 
@@ -870,14 +855,13 @@ void Thrust(int angle, long speed)
 	long xmove,ymove;
 	unsigned offset;
 
-
+#ifdef SPEAR
 	//
 	// ZERO FUNNY COUNTER IF MOVED!
 	//
-	#ifdef SPEAR
 	if (speed)
 		funnyticount = 0;
-	#endif
+#endif
 
 	thrustspeed += speed;
 //
@@ -919,7 +903,7 @@ void Thrust(int angle, long speed)
 ===============
 */
 
-void Cmd_Fire (void)
+void Cmd_Fire()
 {
 	buttonheld[bt_attack] = true;
 
@@ -946,8 +930,8 @@ void Cmd_Fire (void)
 
 void Cmd_Use()
 {
-	int			checkx,checky,doornum,dir;
-	boolean		elevatorok;
+	int checkx, checky, doornum, dir;
+	boolean elevatorok;
 
 //
 // find which cardinal direction the player is facing
@@ -1003,16 +987,16 @@ void Cmd_Use()
 			playstate = ex_secretlevel;
 		else
 			playstate = ex_completed;
-		SD_PlaySound (LEVELDONESND);
+		SD_PlaySound(LEVELDONESND);
 		SD_WaitSoundDone();
 	}
 	else if (!buttonheld[bt_use] && doornum & 0x80)
 	{
 		buttonheld[bt_use] = true;
-		OperateDoor (doornum & ~0x80);
+		OperateDoor(doornum & ~0x80);
 	}
 	else
-		SD_PlaySound (DONOTHINGSND);
+		SD_PlaySound(DONOTHINGSND);
 
 }
 
@@ -1191,9 +1175,9 @@ void GunAttack(objtype *ob)
 ===============
 */
 
-void VictorySpin (void)
+void VictorySpin()
 {
-	long	desty;
+	long desty;
 
 	if (player->angle > 270)
 	{
@@ -1231,13 +1215,13 @@ void VictorySpin (void)
 
 void T_Attack(objtype *ob)
 {
-	struct	atkinf	*cur;
+	struct atkinf *cur;
 
-	UpdateFace ();
+	UpdateFace();
 
 	if (gamestate.victoryflag)		// watching the BJ actor
 	{
-		VictorySpin ();
+		VictorySpin();
 		return;
 	}
 
@@ -1317,10 +1301,6 @@ void T_Attack(objtype *ob)
 
 }
 
-
-
-//===========================================================================
-
 /*
 ===============
 =
@@ -1329,32 +1309,29 @@ void T_Attack(objtype *ob)
 ===============
 */
 
-void	T_Player (objtype *ob)
+void T_Player(objtype *ob)
 {
 	if (gamestate.victoryflag)		// watching the BJ actor
 	{
-		VictorySpin ();
+		VictorySpin();
 		return;
 	}
 
-	UpdateFace ();
-	CheckWeaponChange ();
+	UpdateFace();
+	CheckWeaponChange();
 
-	if ( buttonstate[bt_use] )
-		Cmd_Use ();
+	if (buttonstate[bt_use])
+		Cmd_Use();
 
-	if ( buttonstate[bt_attack] && !buttonheld[bt_attack])
-		Cmd_Fire ();
+	if (buttonstate[bt_attack] && !buttonheld[bt_attack])
+		Cmd_Fire();
 
-	ControlMovement (ob);
+	ControlMovement(ob);
 	if (gamestate.victoryflag)		// watching the BJ actor
 		return;
-
 
 	plux = player->x >> UNSIGNEDSHIFT;			// scale to fit in unsigned
 	pluy = player->y >> UNSIGNEDSHIFT;
 	player->tilex = player->x >> TILESHIFT;		// scale to tile values
 	player->tiley = player->y >> TILESHIFT;
 }
-
-

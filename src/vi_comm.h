@@ -25,7 +25,7 @@ void VL_MemToScreen(const byte *source, int width, int height, int x, int y);
 void VL_DeModeXize(byte *buf, int width, int height);
 
 void VL_DirectPlot(int x1, int y1, int x2, int y2);
-
+void VL_DirectPlotFlush();
 
 #define	MaxPlayers	4
 #define	MaxJoys		2

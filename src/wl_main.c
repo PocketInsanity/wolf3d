@@ -282,9 +282,9 @@ void DiskFlopAnim(int x, int y)
 
 long DoChecksum(byte *source, unsigned size, long checksum)
 {
-	unsigned i;
+	int i;
 
-	for (i=0;i<size-1;i++)
+	for (i = 0; i < size-1; i++)
 		checksum += source[i]^source[i+1];
 
 	return checksum;
@@ -427,9 +427,9 @@ boolean LoadTheGame(int file,int x,int y)
 		if (nullobj.active == ac_badobject)
 			break;
 		
-		GetNewActor ();
+		GetNewActor();
 	 // don't copy over the links
-		memcpy(new,&nullobj,sizeof(nullobj)-4);
+		memcpy(new, &nullobj, sizeof(nullobj)-4);
 	}
 
 
