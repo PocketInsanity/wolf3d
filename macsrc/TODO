@@ -13,19 +13,26 @@ Psyched bar
 pause key
 About Box
 Detect Shareware version, End Game box (Sharware/Retail)
+remove PACKED
 add better error checking for invalid file in res.c
 select resolution to use
+options dialog: resolution, speed (fps)
 make sure all needed keys work
 mouse support
+options dialog: mouse enabled
 sound (/dev/dsp?)
 music (what format?, mp3 - there's smpeg?)
+options dialog: sound enabled, music enabled
 options file
 input config
 .wolf3d/{macfull,macshare} ?
 command line options
 verify other todo lists are also complete
+make sure all desired options have been added
 check bigendianesss
+try to speed drawing up
 play through testing
+update copyrights where needed
 Documentation
 --------- release one anytime after this point ---------
 SDL support (for full screen), optional

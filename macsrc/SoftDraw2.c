@@ -217,7 +217,15 @@ void IO_DrawStatusBar(void)
 
 void IO_DisplayViewBuffer (void)
 {
-	BlastScreen();
+	Rect r;
+	/* BlastScreen(); */
+	
+	r.left = 0;
+	r.top = 0;
+	r.right = ScaleX(320);
+	r.bottom = ScaleY(160);
+	BlastScreen2(&r);
+	
 /* if this is the first frame rendered, upload everything and fade in */
     if (firstframe) { 
 		FadeTo(rGamePal);

@@ -109,3 +109,6 @@ Some functions were moved to different files to account for functions which
 did not exist on some platforms, different rendering systems, etc.
 Changes from the orignal source:
 ...
+
+GtkImageDB (gtkimagedb.c and gtkimagedb.h) is based on gtk+ 1.2.10's
+GtkImage code.

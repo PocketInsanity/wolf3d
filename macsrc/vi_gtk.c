@@ -20,30 +20,33 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <ctype.h>
 
 #include <gtk/gtk.h>
 #include <gdk/gdkkeysyms.h>
+#include "gtkimagedb.h"
 
 #include "wolfdef.h"
 
 Byte *gfxbuf;
 
-GtkWidget *win;
-GtkWidget *main_vbox;
-GtkWidget *menubar;
-GtkItemFactory *item_factory;
-GtkAccelGroup *accel_group;
+static GtkWidget *win;
+static GtkWidget *main_vbox;
+static GtkWidget *menubar;
+static GtkItemFactory *item_factory;
+static GtkAccelGroup *accel_group;
 
-GtkWidget *event_box;
-GdkVisual *visual;
-GdkImage *image;
-GtkImage *image_area;
+static GtkWidget *event_box;
+static GdkVisual *visual;
+static GdkImage *image[2];
+static GtkImageDB *image_area;
+static gint current;
 
-GdkColormap *cmap;
-GdkColor game_colors[256], default_colors[256];
+static GdkColormap *cmap;
+static GdkColor game_colors[256], default_colors[256];
 
-int image_focus = 1;
+static int image_focus = 1;
 
 void Quit();
 
@@ -208,9 +211,10 @@ int main(int argc, char *argv[])
 	gtk_widget_show(menubar);
 
 
-/* Create image and image area */	
-	image = gdk_image_new(GDK_IMAGE_FASTEST, visual, 320, 200);
-	image_area = (GtkImage *)gtk_image_new(image, NULL);
+/* Create (temp) image and image area */	
+	image[0] = gdk_image_new(GDK_IMAGE_FASTEST, visual, 320, 200);
+	image[1] = gdk_image_new(GDK_IMAGE_FASTEST, visual, 320, 200);
+	image_area = (GtkImageDB *)gtk_imagedb_new(image[0], image[1], NULL);
 	
 	gtk_signal_connect(GTK_OBJECT(image_area), "draw", GTK_SIGNAL_FUNC(draw), NULL);
 	gtk_signal_connect(GTK_OBJECT(image_area), "draw_default", GTK_SIGNAL_FUNC(draw_default), NULL);
@@ -239,7 +243,7 @@ int main(int argc, char *argv[])
 /* Game-related initialization */	
 	InitData();
 	
-	GameViewSize = 0;	
+	GameViewSize = 3;
 	NewGameWindow(GameViewSize); 
 
 	ClearTheScreen(BLACK);
@@ -259,8 +263,10 @@ void Quit(char *str)
 		free(gfxbuf);
 #endif
 	
-	if (image)
-		gdk_image_destroy(image);
+	if (image[0])
+		gdk_image_destroy(image[0]);
+	if (image[1])
+		gdk_image_destroy(image[1]);
 		
 	if (str && *str) {
 		fprintf(stderr, "%s\n", str);
@@ -287,16 +293,33 @@ int VidWidth, VidHeight, ViewHeight;
 #define h VidHeight
 #define v ViewHeight	
 
+void BlastScreen()
+{
+#ifdef SLOWDRAW
+
+	memcpy(image->mem, gfxbuf, w * h);
+	
+	gtk_widget_draw(GTK_WIDGET(image_area), NULL); 	
+#else
+	return;
+	
+	current = gtk_imagedb_swap(image_area);
+	gtk_imagedb_draw(image_area, NULL);
+	
+	gfxbuf = image[current]->mem;
+	VideoPointer = gfxbuf;
+#endif		
+}
+
 void BlastScreen2(Rect *BlastRect)
 {
+#ifdef SLOWDRAW
 	GdkRectangle r;
 
 	r.x = BlastRect->left;
 	r.y = BlastRect->top;
 	r.width = BlastRect->right - BlastRect->left;
 	r.height = BlastRect->bottom - BlastRect->top;
-
-#ifdef SLOWDRAW	
 
 #if 1
 	memcpy(image->mem, gfxbuf, w * h);
@@ -316,18 +339,21 @@ void BlastScreen2(Rect *BlastRect)
 	*/
 #endif
 	
-#endif
-	
 	gtk_widget_draw(GTK_WIDGET(image_area), &r);
-}
+#else
+	GdkRectangle r;
 
-void BlastScreen()
-{
-#ifdef SLOWDRAW
-	memcpy(image->mem, gfxbuf, w * h);
-#endif
+	r.x = BlastRect->left;
+	r.y = BlastRect->top;
+	r.width = BlastRect->right - BlastRect->left;
+	r.height = BlastRect->bottom - BlastRect->top;
+
+	current = gtk_imagedb_swap(image_area);
+	gtk_imagedb_draw(image_area, &r);
 	
-	gtk_widget_draw(GTK_WIDGET(image_area), NULL); 	
+	gfxbuf = image[current]->mem;
+	VideoPointer = gfxbuf;
+#endif		
 }
 
 Word VidXs[] = {320,512,640,640};       /* Screen sizes to play with */
@@ -358,12 +384,14 @@ Word NewGameWindow(Word NewVidSize)
 		exit(EXIT_FAILURE);
 	}
 	
-	if (image) {
-		gdk_image_destroy(image);
-	}
+	if (image[0])
+		gdk_image_destroy(image[0]);
+	if (image[1])
+		gdk_image_destroy(image[1]);
 
-	image = gdk_image_new(GDK_IMAGE_FASTEST, visual, w, h);
-	gtk_image_set(image_area, image, NULL);
+	image[0] = gdk_image_new(GDK_IMAGE_FASTEST, visual, w, h);
+	image[1] = gdk_image_new(GDK_IMAGE_FASTEST, visual, w, h);
+	gtk_imagedb_set(image_area, image[0], image[1], NULL);
 	
 /* Main window will autoshrink */
 	gtk_widget_set_usize(GTK_WIDGET(image_area), w, h);
@@ -372,12 +400,14 @@ Word NewGameWindow(Word NewVidSize)
 	if (gfxbuf)
 		free(gfxbuf);
 	gfxbuf = malloc(w * h);
-#else		
-	gfxbuf = image->mem;
-#endif
+#else
+	current = 0;
 	
+	gfxbuf = (Byte *)image[current]->mem;
+#endif	
 	VideoPointer = gfxbuf;
 	VideoWidth = w;
+	
 	InitYTable();
 	SetAPalette(rBlackPal);
 	ClearTheScreen(BLACK);

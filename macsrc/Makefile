@@ -16,7 +16,7 @@ SOFTOBJS = RefSprite.o SoftDraw.o SoftDraw2.o
 OGLOBJS	 = GLDraw.o
 SOBJS	 = $(OBJS) $(SOFTOBJS) vi_svga.o
 XOBJS	 = $(OBJS) $(SOFTOBJS) vi_xlib.o
-GOBJS	 = $(OBJS) $(SOFTOBJS) vi_gtk.o
+GOBJS	 = $(OBJS) $(SOFTOBJS) vi_gtk.o gtkimagedb.o
 GLOBJS	 = $(OBJS) $(OGLOBJS)  vi_glx.o
 DOBJS	 = $(OBJS) $(SOFTOBJS) vi_sdl.o
 
@@ -48,6 +48,9 @@ $(DOBJS):  Sounds.h  Sprites.h  States.h  Wolf.h  burger.h  wolfdef.h
 
 vi_gtk.o: vi_gtk.c
 	$(CC) -c vi_gtk.c $(CFLAGS) `gtk-config --cflags`
+
+gtkimagedb.o: gtkimagedb.c gtkimagedb.h
+	$(CC) -c gtkimagedb.c $(CFLAGS) `gtk-config --cflags`
 
 swolf3d: $(SOBJS)
 	$(CC) -o swolf3d $(SOBJS) $(SLFLAGS) 

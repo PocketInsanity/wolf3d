@@ -223,6 +223,7 @@ void IO_ClearViewBuffer(void)
 	} while (--Count);
 }
 
+#if 0
 void ScaledDraw(Byte *gfx, Word scale, Byte *vid, LongWord TheFrac, Word TheInt, Word Width, LongWord Delta)
 {	
 	LongWord OldDelta;
@@ -268,6 +269,60 @@ void IO_ScaleWallColumn(Word x, Word scale, Word tile, Word column)
 		
 		ScaledDraw(&ArtStart[y>>24],VIEWHEIGHT,&VideoPointer[x],
 		TheFrac,TheInt,VideoWidth,y<<8);
+	}
+}
+#endif
+
+void ScaledDrawOld(Byte *gfx, Word scale, Byte *vid, LongWord TheFrac, Word TheInt, Word Width, LongWord Delta)
+{	
+	LongWord OldDelta;
+	while (scale--) {
+		*vid = *gfx;
+		vid += Width;
+		OldDelta = Delta;
+		Delta += TheFrac;
+		gfx += TheInt;
+		if (OldDelta > Delta)
+			gfx += 1;			
+	}
+}
+
+static void ScaledDraw(Byte *gfx, Word scale, Byte *vid, LongWord TheFrac, Word Width, LongWord Delta)
+{	
+	while (scale--) {
+		*vid = gfx[TheFrac >> 24];
+		vid += Width;		
+		TheFrac += Delta;
+	}
+}
+
+static void IO_ScaleWallColumn(Word x, Word scale, Word tile, Word column)
+{
+	LongWord TheFrac;
+	LongWord y;
+	
+	Byte *ArtStart;
+	
+	if (scale) {
+		scale *= 2;
+		TheFrac = 0x80000000UL / scale;
+
+		ArtStart = &ArtData[tile][column<<7];
+	
+		if (scale < VIEWHEIGHT) {
+			y = (VIEWHEIGHT - scale) / 2;
+			
+			ScaledDraw(ArtStart,scale,&VideoPointer[(y*VideoWidth)+x],
+			0, VideoWidth, TheFrac);
+			
+			return;
+			
+		}
+		y = (scale-VIEWHEIGHT)/2;
+		y *= TheFrac;
+		
+		ScaledDraw(ArtStart,VIEWHEIGHT,&VideoPointer[x],
+		y,VideoWidth,TheFrac);
 	}
 }
 
@@ -321,7 +376,7 @@ void IO_ScaleMaskedColumn(Word x,Word scale, unsigned short *CharPtr,Word column
 				}
 				RunCount = Y2-Y1;
 				if (RunCount) 
-					ScaledDraw(&CharPtr2[Index],RunCount,
+					ScaledDrawOld(&CharPtr2[Index],RunCount,
 					&Screenad[Y1*VideoWidth],TFrac,TInt,VideoWidth, Delta);
 			}
 		}

@@ -100,7 +100,7 @@ static struct timeval t0;
 LongWord ReadTick()
 {
 	struct timeval t1;
-	long secs, usecs;
+	int secs, usecs;
 	
 	if (t0.tv_sec == 0) {
 		gettimeofday(&t0, NULL);

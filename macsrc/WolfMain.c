@@ -357,25 +357,28 @@ Again:
 
 void PlayLoop(void)
 {
-	LongWord Timer;
+	LongWord Timer, Delay;
 
 	InitGameCounter();
 	InitRendCounter();
 	
 	LastTicCount = ReadTick();	
 	do {
-		Timer = ReadTick();		/* How much time has elapsed */
+		if (!SlowDown)
+			Delay = 4; /* 15 Hz */
+		else
+			Delay = 2; /* 30 Hz */
+
+		do {
+			Timer = ReadTick();
+		} while ((Timer-LastTicCount) < Delay);
+                                                
 		TicCount = (Timer-LastTicCount);
-		gamestate.playtime += TicCount;	/* Add the physical time to the elapsed time */
-		
+/*		
+		printf("Timer: %d, Tic = %d\n", Timer, TicCount);
+*/			
+		gamestate.playtime += TicCount;
 		LastTicCount=Timer;
-		
-		if (!SlowDown) {
-			TicCount = 4;		/* Adjust from 4 */
-		}
-		if (TicCount>=5) {
-			TicCount = 4;
-		}
 		
 		IO_CheckInput();	/* Read the controls from the system */
 		
