@@ -649,7 +649,7 @@ void ShowArticle(char *article)
 			break;
 		}
 
-		if (IN_KeyDown(sc_Tab) && IN_KeyDown(sc_P) && MS_CheckParm("goobers"))
+		if (IN_KeyDown(sc_Tab) && IN_KeyDown(sc_P) && MS_CheckParm("debugmode"))
 			PicturePause();
 
 	} while (LastScan != sc_Escape);

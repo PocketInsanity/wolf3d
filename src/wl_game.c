@@ -20,7 +20,7 @@ boolean		spearflag;
 //
 // ELEVATOR BACK MAPS - REMEMBER (-1)!!
 //
-int ElevatorBackTo[]={1,1,7,3,5,3};
+static int ElevatorBackTo[]={ 1, 1, 7, 3, 5, 3};
 
 //===========================================================================
 
@@ -1066,45 +1066,45 @@ void GameLoop()
 	boolean	died;
 
 restartgame:
-	ClearMemory ();
+	ClearMemory();
 	SETFONTCOLOR(0,15);
-	DrawPlayScreen ();
+	DrawPlayScreen();
 	died = false;
 
 	do
 	{
 		if (!loadedgame)
-		  gamestate.score = gamestate.oldscore;
+			gamestate.score = gamestate.oldscore;
 		DrawScore();
 
 		startgame = false;
 		if (loadedgame)
 			loadedgame = false;
 		else
-			SetupGameLevel ();
+			SetupGameLevel();
 
 #ifdef SPEAR
 		if (gamestate.mapon == 20)	// give them the key allways
 		{
 			gamestate.keys |= 1;
-			DrawKeys ();
+			DrawKeys();
 		}
 #endif
 
 		ingame = true;
-		StartMusic ();
+		StartMusic();
 		if (!died)
-			PreloadGraphics ();
+			PreloadGraphics();
 		else
 			died = false;
 
 		fizzlein = true;
-		DrawLevel ();
+		DrawLevel();
 
 #ifdef SPEAR
 startplayloop:
 #endif
-		PlayLoop ();
+		PlayLoop();
 
 #ifdef SPEAR
 		if (spearflag)
@@ -1137,7 +1137,7 @@ startplayloop:
 		}
 #endif
 
-		StopMusic ();
+		StopMusic();
 		ingame = false;
 
 		if (demorecord && playstate != ex_warped)
@@ -1224,17 +1224,17 @@ startplayloop:
 			break;
 
 		case ex_died:
-			Died ();
+			Died();
 			died = true;			// don't "get psyched!"
 
 			if (gamestate.lives > -1)
-				break;				// more lives left
+				break;			// more lives left
 
-			VW_FadeOut ();
+			VW_FadeOut();
 
-			ClearMemory ();
+			ClearMemory();
 
-			CheckHighScore (gamestate.score,gamestate.mapon+1);
+			CheckHighScore(gamestate.score,gamestate.mapon+1);
 
 			strcpy(MainMenu[viewscores].string,STR_VS);
 			MainMenu[viewscores].routine = (void *)CP_ViewScores;
@@ -1244,17 +1244,17 @@ startplayloop:
 		case ex_victorious:
 
 #ifndef SPEAR
-			VW_FadeOut ();
+			VW_FadeOut();
 #else
-			VL_FadeOut (0,255,0,17,17,300);
+			VL_FadeOut(0,255,0,17,17,300);
 #endif
-			ClearMemory ();
+			ClearMemory();
 
-			Victory ();
+			Victory();
 
-			ClearMemory ();
+			ClearMemory();
 
-			CheckHighScore (gamestate.score,gamestate.mapon+1);
+			CheckHighScore(gamestate.score,gamestate.mapon+1);
 
 			strcpy(MainMenu[viewscores].string,STR_VS);
 			MainMenu[viewscores].routine = (void *)CP_ViewScores;
@@ -1262,11 +1262,10 @@ startplayloop:
 			return;
 
 		default:
-			ClearMemory ();
+			ClearMemory();
 			break;
 		}
 
 	} while (1);
 
 }
-

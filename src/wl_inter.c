@@ -224,7 +224,7 @@ void Victory (void)
 	IN_Ack();
 
 	#ifndef SPEAR
-	if (IN_KeyDown(sc_P) && MS_CheckParm("goobers"))
+	if (IN_KeyDown(sc_P) && MS_CheckParm("debugmode"))
 		PicturePause();
 	#endif
 
@@ -833,7 +833,7 @@ void LevelCompleted()
 #endif
 
 	#ifndef SPEAR
-	if (IN_KeyDown(sc_P) && MS_CheckParm("goobers"))
+	if (IN_KeyDown(sc_P) && MS_CheckParm("debugmode"))
 		PicturePause();
 	#endif
 

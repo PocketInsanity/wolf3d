@@ -9,6 +9,7 @@ SD_StartMusic((MusicGroup *)audiosegs[STARTMUSIC + chunk]);
 SD_StartMusic(chunk);
 
 General:
+* convert uses of open() to fopen()
 * half of these things belong in IDEAS; they are not bugs, just random
 musings
 * inconsistancy:
@@ -16,7 +17,7 @@ id_ca.c has code for setting the data filenames' extension
 so does wl_menu.c
 * menu code is a mess, always does things differently than the rest of the
 code, it really needs to be cleaned up
-* id_ca.c cache code: fix/rewrite the "garbage collection" system?
+* id_ca.c cache code: fix/readd/rewrite the "garbage collection" system?
 * clean up header files, especially wl_def.h, where some declarations aren't 
 in the right place
 * every structure that is read/written must be PACKED, with datatypes
@@ -33,10 +34,11 @@ work the same, let the input handler do it all instead
 i think its safe for now to go with the scancodes as being the "universal"
 key type, and for everything not scancode-based, have a function to
 translate
+* wl_menu uses specific scancodes for names, config file will have to use
+metaname like sc_Left etc or something
 * remove GOODTIMES?
 * Remove the SOD manual check?
 * perhaps rename UPLOAD
-* TOO MANY #IFDEFs
 * verify if the sounds and graphics are correctly numbered, once again...
 * add a ViewMap? (could be done similar to mac version)
 * find and remove any function stubs (functions which just call another
@@ -44,17 +46,13 @@ function with same parameters, only difference is the name)
 * fix wl_debug.c, lots of junk code..
 * change the current parameter handling code to something like getopt
 * rename goobers to debugmode, then remove debugmode for things...
-* for some reason, it feels sluggish, maybe its from having mikmod playing
-at the same time... especially when you pick up items.. probably due to
-calling wait vbl when doing palette stuffs
+* retrace problems (esp. with svgalib).
 * look for places where gfx needs to be redrawn, like back to game etc 
-* wl_menu uses specific scancodes for names, config file will have to use
-metaname like sc_Left etc or something
 * fizzlefade is hackish, stipple buf would work ok in opengl, maybe only
 update once per frame or such...
 and where is that stray pixel coming from (when using end game with largest
 window size) in svgalib -- is that another bug with my geforce?
-no idea how to do fizzlefade in 16bit X
+no idea how to do fizzlefade in TrueColor X
 * check filehandling (ex, file missing, bad file type, and such)
 PlayDemoFromFile specifically
 * make sure all infinite loops are found (looping around Keyboard)
@@ -78,17 +76,16 @@ also, it should be able to compile without extensions
 * fix up windows port
 * create 'sound channels' with priority.. ie a door can only make one sound
 at a time
-* beos is c++ but wolf3d will need many cleanups for c++ either that or use 
-extern "C" { ... } in the header files
 * change wl_scale to use mac wolf3d's version of scaling
 wall drawing is done, just needed to fix sprite code
-* check in wolftools and add mac wolftools (currently the res dumping stuff)
 * cat file.c | perl -e 'while($in = <STDIN>)
 {$in =~ s/\/\/(.*)$/\/\* \1\ *\//gm;print $in;}'
 or
 cat foo.txt |sed -e "s/\/\/\(.*\)$/\/\*\1\*\//g"
+* systems with no sound should still have working WaitSoundDone.. it's 
+possible to calculate the sound lengths in terms of 70Hz (adlib sound len / 2, 
+pcm sound len / 100).
 
 Things to try:
-* Any speed gain with comparing values in screen before writing?
 * Convert to a 320x200xWhatever screen first then draw all at once
 * Create a native palette format instead of doing conversions each frame

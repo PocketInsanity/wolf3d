@@ -11,10 +11,10 @@
 */
 
 
-dirtype opposite[9] =
+static dirtype opposite[9] =
 	{west,southwest,south,southeast,east,northeast,north,northwest,nodir};
 
-dirtype diagonal[9][9] =
+static dirtype diagonal[9][9] =
 {
 /* east */	{nodir,nodir,northeast,nodir,nodir,nodir,southeast,nodir,nodir},
 			{nodir,nodir,nodir,nodir,nodir,nodir,nodir,nodir,nodir},
@@ -337,7 +337,7 @@ boolean TryWalk (objtype *ob)
 ==================================
 */
 
-void SelectDodgeDir (objtype *ob)
+void SelectDodgeDir(objtype *ob)
 {
 	int 		deltax,deltay,i;
 	unsigned	absdx,absdy;

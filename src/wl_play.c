@@ -10,7 +10,7 @@
 =============================================================================
 */
 
-boolean		madenoise;					// true when shooting or screaming
+boolean		madenoise;		// true when shooting or screaming
 
 exit_t		playstate;
 
@@ -63,13 +63,11 @@ boolean		buttonstate[NUMBUTTONS];
 //===========================================================================
 
 
-void	CenterWindow(word w,word h);
-void 	InitObjList (void);
-void 	RemoveObj (objtype *gone);
-void 	PollControls (void);
-void 	StopMusic(void);
-void 	StartMusic(void);
-void	PlayLoop (void);
+static void RemoveObj(objtype *gone);
+static void PollControls();
+void StopMusic();
+void StartMusic();
+void PlayLoop();
 
 /*
 =============================================================================
@@ -78,9 +76,6 @@ void	PlayLoop (void);
 
 =============================================================================
 */
-
-
-objtype dummyobj;
 
 //
 // LIST OF SONGS FOR EACH VERSION
@@ -226,10 +221,6 @@ int songs[]=
 
 #define BASEMOVE		35
 #define RUNMOVE			70
-#define BASETURN		35
-#define RUNTURN			70
-
-#define JOYSCALE		2
 
 /*
 ===================
@@ -239,9 +230,9 @@ int songs[]=
 ===================
 */
 
-void PollKeyboardButtons (void)
+void PollKeyboardButtons()
 {
-	int		i;
+	int i;
 
 	for (i=0;i<NUMBUTTONS;i++)
 		if (IN_KeyDown(buttonscan[i]))
@@ -257,11 +248,11 @@ void PollKeyboardButtons (void)
 ===================
 */
 
-void PollMouseButtons (void)
+void PollMouseButtons()
 {
 	int	buttons;
 
-	buttons = IN_MouseButtons ();
+	buttons = IN_MouseButtons();
 
 	if (buttons&1)
 		buttonstate[buttonmouse[0]] = true;
@@ -281,11 +272,11 @@ void PollMouseButtons (void)
 ===================
 */
 
-void PollJoystickButtons (void)
+void PollJoystickButtons()
 {
 	int	buttons;
 
-	buttons = IN_JoyButtons ();
+	buttons = IN_JoyButtons();
 
 	if (joystickport && !joypadenabled)
 	{
@@ -354,7 +345,7 @@ void PollKeyboardMove()
 ===================
 */
 
-void PollMouseMove (void)
+void PollMouseMove()
 {
 	int	mousexmove = 0, mouseymove = 0;
 
@@ -372,7 +363,7 @@ void PollMouseMove (void)
 ===================
 */
 
-void PollJoystickMove (void)
+void PollJoystickMove()
 {
 	int joyx, joyy;
 
@@ -584,7 +575,7 @@ void CenterWindow(word w,word h)
 =====================
 */
 
-void CheckKeys (void)
+void CheckKeys()
 {
 	byte	scan;
 
@@ -611,7 +602,7 @@ void CheckKeys (void)
 
 		IN_Ack();
 		godmode ^= 1;
-		DrawAllPlayBorderSides ();
+		DrawAllPlayBorderSides();
 		IN_ClearKeysDown();
 		return;
 	}
@@ -655,7 +646,7 @@ void CheckKeys (void)
 	//
 	if (IN_KeyDown(sc_BackSpace) && IN_KeyDown(sc_LShift) &&
 		IN_KeyDown(sc_Alt) && MS_CheckParm("debugmode")) {
-	 ClearMemory ();
+	 ClearMemory();
 	 CA_CacheGrChunk (STARTFONT+1);
 	 ClearSplitVWB ();
 
@@ -872,7 +863,7 @@ void GetNewActor (void)
 =========================
 */
 
-void RemoveObj(objtype *gone)
+static void RemoveObj(objtype *gone)
 {
 	if (gone == player)
 		Quit ("RemoveObj: Tried to remove the player!");
@@ -917,7 +908,7 @@ void RemoveObj(objtype *gone)
 =================
 */
 
-void StopMusic(void)
+void StopMusic()
 {
 	int	i;
 
@@ -984,7 +975,7 @@ boolean	palshifted;
 =====================
 */
 
-void InitRedShifts (void)
+void InitRedShifts()
 {
 	byte *workptr;
 	const byte *baseptr;
@@ -1037,7 +1028,7 @@ void InitRedShifts (void)
 =====================
 */
 
-void ClearPaletteShifts (void)
+void ClearPaletteShifts()
 {
 	bonuscount = damagecount = 0;
 }
@@ -1051,7 +1042,7 @@ void ClearPaletteShifts (void)
 =====================
 */
 
-void StartBonusFlash (void)
+void StartBonusFlash()
 {
 	bonuscount = NUMWHITESHIFTS*WHITETICS;		// white shift palette
 }
@@ -1065,7 +1056,7 @@ void StartBonusFlash (void)
 =====================
 */
 
-void StartDamageFlash (int damage)
+void StartDamageFlash(int damage)
 {
 	damagecount += damage;
 }
@@ -1079,9 +1070,9 @@ void StartDamageFlash (int damage)
 =====================
 */
 
-void UpdatePaletteShifts (void)
+void UpdatePaletteShifts()
 {
-	int	red,white;
+	int red, white;
 
 	if (bonuscount)
 	{

@@ -1508,7 +1508,7 @@ int CalibrateJoystick(void)
 		if (IN_KeyDown(sc_Escape))
 			return 0;
 		
-		if (IN_KeyDown(sc_Tab) && IN_KeyDown(sc_P) && MS_CheckParm("goobers"))
+		if (IN_KeyDown(sc_Tab) && IN_KeyDown(sc_P) && MS_CheckParm("debugmode"))
 			PicturePause();
 
 	} while(!(jb&1));
@@ -1537,7 +1537,7 @@ int CalibrateJoystick(void)
 		IN_CheckAck(); /* force update */
 		if (IN_KeyDown(sc_Escape))
 			return 0;
-		if (IN_KeyDown(sc_Tab) && IN_KeyDown(sc_P) && MS_CheckParm("goobers"))
+		if (IN_KeyDown(sc_Tab) && IN_KeyDown(sc_P) && MS_CheckParm("debugmode"))
 			PicturePause();
 	} while(!(jb&2));
 
@@ -2859,11 +2859,7 @@ int HandleMenu(CP_iteminfo *item_i,CP_itemtype *items,void (*routine)(int w))
 			//
 			// CHECK FOR SCREEN CAPTURE
 			//
-			#ifndef SPEAR
-			if (IN_KeyDown(sc_Tab) && IN_KeyDown(sc_P) && MS_CheckParm("goobers"))
-			#else
 			if (IN_KeyDown(sc_Tab) && IN_KeyDown(sc_P) && MS_CheckParm("debugmode"))
-			#endif
 				PicturePause();
 
 
@@ -3220,7 +3216,7 @@ int Confirm(char *string)
 			set_TimeCount(0);
 		}
 
-		if (IN_KeyDown(sc_Tab) && IN_KeyDown(sc_P) && MS_CheckParm("goobers"))
+		if (IN_KeyDown(sc_Tab) && IN_KeyDown(sc_P) && MS_CheckParm("debugmode"))
 			PicturePause();
 
 	} while(!IN_KeyDown(sc_Y) && !IN_KeyDown(sc_N) && !IN_KeyDown(sc_Escape));

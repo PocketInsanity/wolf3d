@@ -883,14 +883,22 @@ int XKeysymToScancode(unsigned int keysym)
 			return sc_A;
 		case XK_b:
 			return sc_B;
+		case XK_c:
+			return sc_C;
+		case XK_h:
+			return sc_H;
 		case XK_i:
 			return sc_I;
 		case XK_l:
 			return sc_L;
 		case XK_m:
 			return sc_M;
+		case XK_n:
+			return sc_N;
 		case XK_t:
 			return sc_T;
+		case XK_y:
+			return sc_Y;
 		case XK_Left:
 		case XK_KP_Left:
 			return sc_LeftArrow;
@@ -919,10 +927,10 @@ int XKeysymToScancode(unsigned int keysym)
 		case XK_KP_Enter:
 		case XK_Return:
 			return sc_Enter;
-		case XK_y:
-			return sc_Y;
-		case XK_n:
-			return sc_N;
+		case XK_Tab:
+			return sc_Tab;
+		case XK_BackSpace:
+			return sc_BackSpace;
 		case XK_Pause:
 			return 0xE1;
 		default:

@@ -823,8 +823,6 @@ void 	FinishPaletteShifts (void);
 void	CenterWindow(word w,word h);
 void 	InitActorList (void);
 void 	GetNewActor (void);
-void 	RemoveObj (objtype *gone);
-void 	PollControls (void);
 void 	StopMusic(void);
 void 	StartMusic(void);
 void	PlayLoop (void);

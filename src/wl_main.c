@@ -119,6 +119,8 @@ void CalcTics()
 	}
 }
 
+/* ======================================================================== */
+
 /*
 ====================
 =
@@ -133,7 +135,6 @@ void ReadConfig()
 	SMMode sm;
 	SDSMode sds;
 
-#if 0 /* TODO */
 	int file;
 	
 	if ((file = open(configname, O_BINARY | O_RDONLY)) != -1)
@@ -179,13 +180,16 @@ void ReadConfig()
 
 		MainMenu[6].active=1;
 		MainItems.curpos=0;
-	}
+	}	
 	else
-#endif
 	{
 	//
 	// no config file, so select by hardware
 	//
+		/* max viewsize is 20 */
+		viewsize = 15;
+	}
+	
 		if (SoundBlasterPresent || AdLibPresent)
 		{
 			sd = sdm_AdLib;
@@ -209,15 +213,11 @@ void ReadConfig()
 		joypadenabled = false;
 		joystickport = 0;
 
-		/* max viewsize is 20 */
-		viewsize = 15;
 		mouseadjustment = 5;
-	}
 
-	SD_SetMusicMode (sm);
-	SD_SetSoundMode (sd);
-	SD_SetDigiDevice (sds);
-
+	SD_SetMusicMode(sm);
+	SD_SetSoundMode(sd);
+	SD_SetDigiDevice(sds);
 }
 
 
@@ -261,9 +261,6 @@ void WriteConfig()
 	}
 }
 
-
-//===========================================================================
-
 /*
 =====================
 =
@@ -289,8 +286,6 @@ void NewGame(int difficulty, int episode)
 
 	startgame = true;
 }
-
-/* ======================================================================== */
 
 void DiskFlopAnim(int x, int y)
 {
@@ -398,8 +393,6 @@ boolean SaveTheGame(int file,int x,int y)
 
 	return true;
 }
-
-//===========================================================================
 
 /*
 ==================
@@ -534,7 +527,7 @@ void ShutdownId()
 }
 
 
-//===========================================================================
+/* ======================================================================== */
 
 /*
 ==================

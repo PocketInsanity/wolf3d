@@ -402,7 +402,7 @@ static int CalcRotate(objtype *ob)
 =====================
 */
 
-#define MAXVISABLE	50
+#define MAXVISABLE	64
 
 typedef struct {
 	int viewx;
@@ -501,10 +501,10 @@ static void DrawScaleds()
 	if (!numvisable)
 		return;									// no visable objects
 
-	for (i = 0; i<numvisable; i++)
+	for (i = 0; i < numvisable; i++)
 	{
 		least = 32000;
-		for (visstep=&vislist[0] ; visstep<visptr ; visstep++)
+		for (visstep = &vislist[0]; visstep < visptr; visstep++)
 		{
 			height = visstep->viewheight;
 			if (height < least)
@@ -516,7 +516,7 @@ static void DrawScaleds()
 		//
 		// draw farthest
 		//
-		ScaleShape(farthest->viewx,farthest->shapenum,farthest->viewheight);
+		ScaleShape(farthest->viewx, farthest->shapenum, farthest->viewheight);
 
 		farthest->viewheight = 32000;
 	}

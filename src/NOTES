@@ -33,5 +33,7 @@ Wolfenstein 3D was originally planned to be a much more complex game. ...
 ... lots of unused code ... possibly from previous projects and incarnations
 of wolf3d.
 
-Version 1.4 of Wolfenstein 3D (full) had a Read Me! option. The text still 
-exists in the data files, but all the graphics are incorrect.
+Version 1.4 of Wolfenstein 3D (full) did not had a Read Me! option, but the 
+text still exists in the data files, but all the graphics are incorrect
+(wrong graphic numbers, etc).
+

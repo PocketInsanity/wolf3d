@@ -153,8 +153,8 @@ int DebugKeys()
 		CenterWindow (12,3);
 		US_PrintCentered ("Free items!");
 		VW_UpdateScreen();
-		GivePoints (100000);
-		HealSelf (99);
+		GivePoints(100000);
+		HealSelf(99);
 		if (gamestate.bestweapon<wp_chaingun)
 			GiveWeapon (gamestate.bestweapon+1);
 		gamestate.ammo += 50;

@@ -334,7 +334,7 @@ void	DrawHealth (void)
 ===============
 */
 
-void	TakeDamage (int points,objtype *attacker)
+void TakeDamage (int points,objtype *attacker)
 {
 	LastAttacker = attacker;
 
@@ -353,12 +353,12 @@ void	TakeDamage (int points,objtype *attacker)
 		killerobj = attacker;
 	}
 
-	StartDamageFlash (points);
+	StartDamageFlash(points);
 
 	gotgatgun=0;
 
-	DrawHealth ();
-	DrawFace ();
+	DrawHealth();
+	DrawFace();
 
 	//
 	// MAKE BJ'S EYES BUG IF MAJOR DAMAGE!
@@ -382,15 +382,15 @@ void	TakeDamage (int points,objtype *attacker)
 ===============
 */
 
-void	HealSelf (int points)
+void HealSelf(int points)
 {
 	gamestate.health += points;
 	if (gamestate.health>100)
 		gamestate.health = 100;
 
-	DrawHealth ();
+	DrawHealth();
 	gotgatgun = 0;	// JR
-	DrawFace ();
+	DrawFace();
 }
 
 

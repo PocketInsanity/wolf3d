@@ -1,20 +1,25 @@
 CC = gcc
 
-#CFLAGS = -Wall -O6 -fomit-frame-pointer -ffast-math -funroll-loops -mpentiumpro -mcpu=pentiumpro -march=pentiumpro -D_REENTRANT
-CFLAGS = -g -Wall -D_REENTRANT
+#CFLAGS = -Wall -O6 -fomit-frame-pointer -ffast-math -funroll-loops -mpentiumpro -mcpu=pentiumpro -march=pentiumpro
+CFLAGS = -g -Wall
 #CFLAGS = -Os -Wall
-#CFLAGS = -Os -Wall -fomit-frame-pointer -ffast-math -mpentiumpro -mcpu=pentiumpro -march=pentiumpro 
+#CFLAGS = -Os -Wall -fomit-frame-pointer -ffast-math -mpentiumpro -mcpu=pentiumpro -march=pentiumpro
 
 OBJS = objs.o misc.o id_ca.o id_vh.o id_us.o \
 	wl_act1.o wl_act2.o wl_agent.o wl_game.o \
 	wl_inter.o wl_menu.o wl_play.o wl_state.o wl_text.o wl_main.o \
-	wl_debug.o gfxsave.o sd_oss.o fmopl.o # sd_null.o
+	wl_debug.o gfxsave.o
 ROBJS = wl_draw.o wl_scale.o
 SOBJS = $(OBJS) $(ROBJS) vi_svga.o
 XOBJS = $(OBJS) $(ROBJS) vi_xlib.o
 
-#LFLAGS = -lm 
-LFLAGS = -lm -lpthread
+LFLAGS = -lm
+
+#OBJS += sd_null.o
+OBJS += sd_oss.o fmopl.o
+CFLAGS += -D_REENTRANT
+LFLAGS += -lpthread
+
 
 SLFLAGS = $(LFLAGS) -lvga
 XLFLAGS = $(LFLAGS) -L/usr/X11R6/lib -lX11 -lXext -lXxf86vm -lXxf86dga
