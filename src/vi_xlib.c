@@ -14,6 +14,8 @@
 #include <X11/keysymdef.h>
 #include <X11/Xatom.h>
 #include <X11/extensions/XShm.h>
+#include <X11/extensions/xf86vmode.h>
+#include <X11/extensions/xf86dga.h>
 
 byte *gfxbuf = NULL;
 byte *disbuf = NULL;
@@ -28,12 +30,27 @@ Colormap cmap;
 Atom wmDeleteWindow;
 
 XShmSegmentInfo shminfo;
-
+XF86VidModeModeInfo vidmode;
+XF86VidModeModeInfo **vmmi;
 XColor clr[256];
 
 int indexmode;
 int shmmode;
+int fullscreen;
 unsigned char mypal[768];
+
+int main(int argc, char *argv[])
+{
+	return WolfMain(argc, argv);
+}
+
+/*
+=======================
+=
+= VL_Startup
+=
+=======================
+*/
 
 void GetVisual()
 {
@@ -141,10 +158,27 @@ void GetVisual()
 	Quit("No usable visual found!");		
 }
 
-int main(int argc, char *argv[])
+int BPP(int d)
 {
-	/* TODO: move these to proper functions */
+	switch(d) {
+		case 8:
+			return 1;
+		case 15:
+		case 16:
+			return 2;
+		case 24: /* TODO: ??? the nvidia xserver really gave me AGBR? */
+			/* need to check what the image says */
+			return 4;
+		case 32:
+			return 4;
+		default:
+			Quit("Sorry, BPP doesn't like that...");
+			return 0; /* heh */
+	}
+}
 	
+void VL_Startup()
+{
 	XSetWindowAttributes attr;
 	XSizeHints sizehints;	
 	XGCValues gcvalues;
@@ -155,7 +189,7 @@ int main(int argc, char *argv[])
 	char data[8] = { 0x01 };
 	
 	char *disp;
-	int attrmask;
+	int attrmask, eventn, errorn, i, vmc;
 	
 	disp = getenv("DISPLAY");
 	dpy = XOpenDisplay(disp);
@@ -180,6 +214,29 @@ int main(int argc, char *argv[])
 		Quit("Unable to create window!");
 	}
 	
+	fullscreen = 0;
+	if (MS_CheckParm("fullscreen") && XF86VidModeQueryExtension(dpy, &eventn, &errorn)) {
+		
+		
+		XF86VidModeGetAllModeLines(dpy, screen, &vmc, (XF86VidModeModeInfo ***)&vmmi);
+		
+		printf("VidMode: eventn = %d, error = %d, vmc = %d\n", eventn, errorn, vmc);
+		
+		for (i = 0; i < vmc; i++) {
+			if ( (vmmi[i]->hdisplay == 320) && (vmmi[i]->vdisplay == 200) ) {
+				//XF86VidModeGetModeLine(dpy, screen, &errorn, (XF86VidModeModeLine *)&vidmode); /* TODO: 3rd parm? */
+				//memcpy(&vidmode, vmmi[0], sizeof(XF86VidModeModeInfo)); /* TODO: bah, why doesn't above work? */
+				//printf("%d, %d, %d\n", vidmode.hdisplay, vidmode.vdisplay, errorn);
+				if (XF86VidModeSwitchToMode(dpy, screen, vmmi[i]) == True)  {
+					XF86VidModeLockModeSwitch(dpy, screen, True);
+					printf("Using VidMode!\n");
+					fullscreen = 1;
+					break;
+				}
+			}
+		}		
+	}
+	
 	gcvalues.foreground = BlackPixel(dpy, screen);
 	gcvalues.background = WhitePixel(dpy, screen);
 	gc = XCreateGC(dpy, win, GCForeground | GCBackground, &gcvalues);
@@ -192,7 +249,7 @@ int main(int argc, char *argv[])
 	sizehints.base_height = 200;
 	sizehints.flags = PMinSize | PMaxSize | PBaseSize;
 	
-	XSetWMProperties(dpy, win, NULL, NULL, argv, argc, &sizehints, None, None); 
+	XSetWMProperties(dpy, win, NULL, NULL, _argv, _argc, &sizehints, None, None); 
 	
 	XStoreName(dpy, win, GAMENAME);
 	XSetIconName(dpy, win, GAMENAME);
@@ -203,10 +260,100 @@ int main(int argc, char *argv[])
 	bitmap = XCreateBitmapFromData(dpy, win, data, 8, 8);
 	cursor = XCreatePixmapCursor(dpy, bitmap, bitmap, &fg, &bg, 0, 0);
 	XDefineCursor(dpy, win, cursor);
+		
+	shmmode = 0;
 	
+	if (XShmQueryExtension(dpy) == True) {
+		img = XShmCreateImage(dpy, vi->visual, vi->depth, ZPixmap, 
+				      NULL, &shminfo, 320, 200);
+		printf("Shm: bpl = %d, h = %d, bp = %d\n", img->bytes_per_line, img->height, img->bitmap_pad);
+		if ( img->bytes_per_line != (320 * BPP(vi->depth)) ) {
+			printf("Currently cannot handle irregular shm sizes...\n");
+		} else {
+			shminfo.shmid = shmget(IPC_PRIVATE, img->bytes_per_line * img->height, IPC_CREAT | 0777);
+			shminfo.shmaddr = img->data = shmat(shminfo.shmid, 0, 0);	
+			shminfo.readOnly = False;
+			disbuf = (byte *)img->data;
+			
+			if (indexmode)
+				gfxbuf = disbuf;
+			else
+				gfxbuf = malloc(320 * 200 * 1);
+				
+			if (XShmAttach(dpy, &shminfo) == True) {
+				printf("Using XShm Extension...\n");
+				shmmode = 1;
+			} else {
+				printf("Error with XShm...\n");
+			}
+		}
+	}
+				
+	if (img == NULL) {
+		printf("Falling back on XImage...\n");
+		
+		if (gfxbuf == NULL) 
+			gfxbuf = malloc(320 * 200 * 1);
+		if (indexmode) 
+			disbuf = gfxbuf;
+		else 
+			disbuf = malloc(320 * 200 * BPP(vi->depth));
+		
+		img = XCreateImage(dpy, vi->visual, vi->depth, ZPixmap, 0, (char *)disbuf, 320, 200,
+			   8, 320 * BPP(vi->depth));
+	
+		if (img == NULL) {
+			Quit("XCreateImage returned NULL");
+		}
+	}				   
+	XMapWindow(dpy, win);
+
+	if (fullscreen) {
+		XMoveWindow(dpy, win, 0, 0);
+		XRaiseWindow(dpy, win);
+		XWarpPointer(dpy, None, win, 0, 0, 0, 0, 0, 0);
+		XF86VidModeSetViewPort(dpy, screen, 0, 0);
+	}
+				
 	XFlush(dpy);
+}
+
+/*
+=======================
+=
+= VL_Shutdown
+=
+=======================
+*/
+
+void VL_Shutdown()
+{
+	if (fullscreen) {
+		XF86VidModeLockModeSwitch(dpy, screen, False);
+		//printf("%d, %d\n", vidmode.hdisplay, vidmode.vdisplay);
+		//XF86VidModeSwitchToMode(dpy, screen, &vidmode);
+		XF86VidModeSwitchToMode(dpy, screen, vmmi[0]);
+	}
 	
-	return WolfMain(argc, argv);
+	if ( !shmmode && (gfxbuf != NULL) ) {
+		free(gfxbuf);
+		gfxbuf = NULL;
+	}
+	
+	if ( shmmode && !indexmode && (gfxbuf != NULL) ) {
+		free(gfxbuf);
+		gfxbuf = NULL;
+	}
+	
+	if (shmmode) {
+		XShmDetach(dpy, &shminfo);
+		XDestroyImage(img);
+		shmdt(shminfo.shmaddr);
+		shmctl(shminfo.shmid, IPC_RMID, 0);
+	} else if ( (indexmode == 0) && (disbuf != NULL) ) {
+		free(disbuf);
+		disbuf = NULL;
+	}
 }
 
 void VL_WaitVBL(int vbls)
@@ -259,135 +406,6 @@ void VW_UpdateScreen()
 		XShmPutImage(dpy, win, gc, img, 0, 0, 0, 0, 320, 200, False);
 	else
 		XPutImage(dpy, win, gc, img, 0, 0, 0, 0, 320, 200);
-}
-
-/*
-=======================
-=
-= VL_Startup
-=
-=======================
-*/
-
-
-int BPP(int d)
-{
-	switch(d) {
-		case 8:
-			return 1;
-		case 15:
-		case 16:
-			return 2;
-		case 24: /* TODO: ??? the nvidia xserver really gave me AGBR? */
-			/* need to check what the image says */
-			return 4;
-		case 32:
-			return 4;
-		default:
-			Quit("Sorry, BPP doesn't like that...");
-			return 0; /* heh */
-	}
-}
-	
-void VL_Startup()
-{
-	shmmode = 0;
-	
-	if (XShmQueryExtension(dpy) == True) {
-		img = XShmCreateImage(dpy, vi->visual, vi->depth, ZPixmap, 
-				      NULL, &shminfo, 320, 200);
-		printf("Shm: bpl = %d, h = %d, bp = %d\n", img->bytes_per_line, img->height, img->bitmap_pad);
-		if ( img->bytes_per_line != (320 * BPP(vi->depth)) ) {
-			printf("Currently cannot handle irregular shm sizes...\n");
-		} else {
-			shminfo.shmid = shmget(IPC_PRIVATE, img->bytes_per_line * img->height, IPC_CREAT | 0777);
-			shminfo.shmaddr = img->data = shmat(shminfo.shmid, 0, 0);	
-			shminfo.readOnly = False;
-			disbuf = (byte *)img->data;
-			
-			if (indexmode)
-				gfxbuf = disbuf;
-			else
-				gfxbuf = malloc(320 * 200 * 1);
-				
-			if (XShmAttach(dpy, &shminfo) == True) {
-				printf("Using XShm Extension...\n");
-				shmmode = 1;
-			} else {
-				printf("Error with XShm...\n");
-			}
-		}
-	}
-			
-				
-	if (img == NULL) {
-		printf("Falling back on XImage...\n");
-		
-		if (gfxbuf == NULL) 
-			gfxbuf = malloc(320 * 200 * 1);
-		if (indexmode) 
-			disbuf = gfxbuf;
-		else 
-			disbuf = malloc(320 * 200 * BPP(vi->depth));
-		
-		img = XCreateImage(dpy, vi->visual, vi->depth, ZPixmap, 0, (char *)disbuf, 320, 200,
-			   8, 320 * BPP(vi->depth));
-	
-		if (img == NULL) {
-			Quit("XCreateImage returned NULL");
-		}
-	}				   
-	XMapWindow(dpy, win);
-	
-	XFlush(dpy);
-}
-
-/*
-=======================
-=
-= VL_Shutdown
-=
-=======================
-*/
-
-void VL_Shutdown (void)
-{
-	if ( !shmmode && (gfxbuf != NULL) ) {
-		free(gfxbuf);
-		gfxbuf = NULL;
-	}
-	
-	if ( shmmode && !indexmode && (gfxbuf != NULL) ) {
-		free(gfxbuf);
-		gfxbuf = NULL;
-	}
-	
-	if (shmmode) {
-		XShmDetach(dpy, &shminfo);
-		XDestroyImage(img);
-		shmdt(shminfo.shmaddr);
-		shmctl(shminfo.shmid, IPC_RMID, 0);
-	} else if ( (indexmode == 0) && (disbuf != NULL) ) {
-		free(disbuf);
-		disbuf = NULL;
-	}
-}
-
-//===========================================================================
-
-/*
-=================
-=
-= VL_ClearVideo
-=
-= Fill the entire video buffer with a given color
-=
-=================
-*/
-
-void VL_ClearVideo(byte color)
-{
-	memset(gfxbuf, color, 64000);
 }
 
 /*
@@ -494,6 +512,21 @@ void VL_GetPalette(byte *palette)
 
 =============================================================================
 */
+
+/*
+=================
+=
+= VL_ClearVideo
+=
+= Fill the entire video buffer with a given color
+=
+=================
+*/
+
+void VL_ClearVideo(byte color)
+{
+	memset(gfxbuf, color, 64000);
+}
 
 /*
 =================
@@ -722,8 +755,6 @@ static	Direction	DirTable[] =		// Quick lookup for total direction
 						dir_SouthWest,	dir_South,	dir_SouthEast
 					};
 
-//	Internal routines
-
 int XKeysymToScancode(unsigned int keysym)
 {
 	switch (keysym) {
@@ -766,7 +797,6 @@ int XKeysymToScancode(unsigned int keysym)
 			return sc_None;
 	}
 }
-
 			
 void keyboard_handler(int code, int press)
 {

@@ -19,7 +19,7 @@ GOBJS = $(OBJS) vi_ogl.o vi_glx.o
 LFLAGS = -lm -L/home/relnev/cvs/oal/linux/src -lopenal -lpthread -ldl
 
 SLFLAGS = $(LFLAGS) -lvga
-XLFLAGS = $(LFLAGS) -L/usr/X11R6/lib -lX11 -lXext
+XLFLAGS = $(LFLAGS) -L/usr/X11R6/lib -lX11 -lXext -lXxf86vm -lXxf86dga
 GLFLAGS = $(LFLAGS) -L/usr/X11R6/lib -lX11 -lXext -lGL
 
 NASM = nasm

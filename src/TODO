@@ -24,12 +24,10 @@ work the same, let the input handler do it all instead
 i think its safe for now to go with the scancodes as being the "universal"
 key type, and for everything not scancode-based, have a function to
 translate
-* when viewsize is around 20, sprites end up being drawn over the border.
-maybe there are clipping bugs that will cause it to fill over the top, left, 
-and right (happens at any view basically, except this version of source does
-not leave any artifacts after a few screen redraws)
-* remove GOODTIMES (the piracy message is somewhat worthless)
-* then consider removing the SOD manual check
+* maybe there are sprite drawing/clipping bugs that will cause it to draw
+outside the viewarea, leaving artifacts
+* remove GOODTIMES?
+* Consider removing the SOD manual check
 * perhaps rename UPLOAD
 * TOO MANY #IFDEFs
 * and upload builds with lots of wl6 code anyway (sound references were just
@@ -38,15 +36,14 @@ ifndefed out)
 * add a ViewMap?
 * remove the #else at the end of each header since nothing is being doubly
 included now (if ever)
-* especially with the video functions, there are functions/defines which
-just call a different function (most are left from the update block code)
-rename/remove them
+* find and remove any function stubs (functions which just call another
+function with same parameters, only difference is the name)
 * fix wl_debug.c, lots of junk code..
 * change the current parameter handling code to something like getopt
 * rename goobers to debugmode, then remove debugmode for things...
 * for some reason, it feels sluggish, maybe its from having mikmod playing
-at the same time... especially when you pick up items
-or the pallete ops calling waitvbl
+at the same time... especially when you pick up items.. probably due to
+calling wait vbl when doing palette stuffs
 * look for places where gfx needs to be redrawn, like back to game etc 
 * wl_menu uses specific scancodes for names, config file will have to use
 metaname like sc_Left etc or something
@@ -54,6 +51,7 @@ metaname like sc_Left etc or something
 update once per frame or such.. hm
 and where is that stray pixel coming from (when using end game with largest
 window size) in svgalib
+no idea how to do fizzlefade in 16bit.
 * change id_sd to sd_oss, sd_win, sd_dos, sd_oal, etc
 idea is that different <outputs> can share some drivers, unlike video
 although glx and x11 share a lot of code (i guess since gl will be a great
@@ -65,20 +63,18 @@ PlayDemoFromFile specifically
 on the border
 same with the spear of destiny animation part of ending
 * move all references to gfxbuf to vi_* only (gl will need this anyway,
-since it deprecates: id_vh, wl_draw, wl_scale)
+since it deprecates: id_vh, (parts of) wl_draw, wl_scale)
 by putting in code from id_vh (either by using Plot or just copying it in)
 we can stop the large conversion before each UpdateScreen
-but palette fades will still need it!
-* pause key
+but palette fades will still need it! damnit
 * what are special keys... ?
-* no fizzlefade in 15-24bit
-also, the higher bitrates are a hack since a palette lookup has to be done
+* the higher bitrates are a hack since a palette lookup has to be done
 for every byte when transferring to the pixmap, palette fades require a
 screen update
-* dga 1 and 2
 * make sure none of the code tries to handle gfx/sound data directly
 * GL_shared_texture_palette for opengl
 * if window looses focus, should it clear the keys ?
+* add DGA, clean up vi_xlib.c, fix vid mode changing
 
 Specific:
 * memory/sound intro screen goes
