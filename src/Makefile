@@ -1,13 +1,12 @@
 CC = gcc
-#CC = gcc-3.0
 #CC=/opt/intel/compiler60/ia32/bin/icc
 
 CFLAGS = -g -Wall
 #CFLAGS = -g -O2 -Wall -pedantic 
-#CFLAGS = -Wall -O6 -fomit-frame-pointer -ffast-math -funroll-loops -mpentiumpro -mcpu=pentiumpro -march=pentiumpro
+#CFLAGS = -Wall -O6 -fomit-frame-pointer -ffast-math -funroll-loops -march=pentiumpro
 #CFLAGS = -g -Wall -pedantic -std=gnu99
 #CFLAGS = -Os -Wall -pedantic
-#CFLAGS = -Os -Wall -fomit-frame-pointer -ffast-math -mpentiumpro -mcpu=pentiumpro -march=pentiumpro
+#CFLAGS = -Os -Wall -fomit-frame-pointer -ffast-math -march=pentiumpro
 #CFLAGS=-O3 -xiMK -tpp6 -c99 -wp_ipo -g
 OBJS = objs.o misc.o id_ca.o id_vh.o id_us.o \
 	wl_act1.o wl_act2.o wl_act3.o wl_agent.o wl_game.o \
@@ -18,19 +17,24 @@ SOBJS = $(OBJS) $(ROBJS) vi_svga.o
 XOBJS = $(OBJS) $(ROBJS) vi_xlib.o
 DOBJS = $(OBJS) $(ROBJS) vi_sdl.o
 
-#LFLAGS = -lm -wp_ipo
-LFLAGS = -lm
+#LDLIBS = -lm -wp_ipo
+LDLIBS = -lm
 
+# no sound
 OBJS += sd_null.o
+# sound using OSS
 #OBJS += sd_oss.o fmopl.o
 #CFLAGS += -D_REENTRANT
-#LFLAGS += -lpthread
+#LDLIBS += -lpthread
+# sound using SDL_mixer
+#OBJS += sd_mixer.o fmopl.o
+#LDLIBS += -lSDL_mixer
 
 CFLAGS += $(shell sdl-config --cflags)
 
-SLFLAGS = $(LFLAGS) -lvga
-XLFLAGS = $(LFLAGS) -L/usr/X11R6/lib -lX11 -lXext
-DLFLAGS = $(LFLAGS) $(shell sdl-config --libs)
+SLDLIBS = $(LDLIBS) -lvga
+XLDLIBS = $(LDLIBS) -L/usr/X11R6/lib -lX11 -lXext
+DLDLIBS = $(LDLIBS) $(shell sdl-config --libs)
 
 NASM = nasm
 
@@ -47,13 +51,13 @@ $(DOBJS): version.h id_heads.h wl_def.h
 	$(NASM) -f elf -o $@ $<
 
 swolf3d: $(SOBJS)
-	$(CC) -o swolf3d $(SOBJS) $(SLFLAGS) 
+	$(CC) -o swolf3d $(SOBJS) $(SLDLIBS) 
 
 xwolf3d: $(XOBJS)
-	$(CC) -o xwolf3d $(XOBJS) $(XLFLAGS)
+	$(CC) -o xwolf3d $(XOBJS) $(XLDLIBS)
 
 sdlwolf3d: $(DOBJS)
-	$(CC) -o sdlwolf3d $(DOBJS) $(DLFLAGS)
+	$(CC) -o sdlwolf3d $(DOBJS) $(DLDLIBS)
 
 clean:
 	rm -rf swolf3d xwolf3d sdlwolf3d *.o *.il
