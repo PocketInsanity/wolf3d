@@ -33,6 +33,11 @@ int main(int argc, char *argv[])
 	XVisualInfo vitemp;
 	XSizeHints sizehints;	
 	XGCValues gcvalues;
+	Pixmap bitmap;
+	Cursor cursor;
+	XColor bg = { 0 };
+	XColor fg = { 0 };
+	char data[8] = { 0x01 };
 	
 	char *disp;
 	int attrmask, numVisuals, i;
@@ -69,8 +74,6 @@ int main(int argc, char *argv[])
 		clr[i].pixel = i;
 		clr[i].flags = DoRed|DoGreen|DoBlue;
 	}
-	//XQueryColors(dpy, DefaultColormap(dpy, screen), clr, 256);
-	//XStoreColors(dpy, cmap, clr, 256);
 	                      	
 	attr.colormap = cmap;		   
 	attr.event_mask = KeyPressMask | KeyReleaseMask | ExposureMask;
@@ -81,7 +84,6 @@ int main(int argc, char *argv[])
 	if (win == None) {
 		Quit("Unable to create window!");
 	}
-	
 	
 	gcvalues.foreground = BlackPixel(dpy, screen);
 	gcvalues.background = WhitePixel(dpy, screen);
@@ -97,13 +99,16 @@ int main(int argc, char *argv[])
 	
 	XSetWMProperties(dpy, win, NULL, NULL, argv, argc, &sizehints, None, None); 
 	
-	/* TODO: have some global identifier for each game type */
 	XStoreName(dpy, win, GAMENAME);
 	XSetIconName(dpy, win, GAMENAME);
 	
 	wmDeleteWindow = XInternAtom(dpy, "WM_DELETE_WINDOW", False);
 	XSetWMProtocols(dpy, win, &wmDeleteWindow, 1);
 
+	bitmap = XCreateBitmapFromData(dpy, win, data, 8, 8);
+	cursor = XCreatePixmapCursor(dpy, bitmap, bitmap, &fg, &bg, 0, 0);
+	XDefineCursor(dpy, win, cursor);
+	
 	XFlush(dpy);
 	
 	return WolfMain(argc, argv);

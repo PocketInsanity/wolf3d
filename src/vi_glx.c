@@ -40,12 +40,15 @@ int main(int argc, char *argv[])
 	/* TODO: move this to the proper functions */
 	
 	XSetWindowAttributes attr;
-	XVisualInfo vitemp;
 	XSizeHints sizehints;	
-	XGCValues gcvalues;
-	
+	Pixmap bitmap;
+	Cursor cursor;
+	XColor bg = { 0 };
+	XColor fg = { 0 };
+	char data[8] = { 0x01 };
+		
 	char *disp, *ext;
-	int attrmask, numVisuals, i;
+	int attrmask, i;
 	int major, minor;
 		
 	disp = getenv("DISPLAY");
@@ -120,13 +123,16 @@ int main(int argc, char *argv[])
 	
 	XSetWMProperties(dpy, win, NULL, NULL, argv, argc, &sizehints, None, None); 
 	
-	/* TODO: have some global identifier for each game type */
 	XStoreName(dpy, win, GAMENAME);
 	XSetIconName(dpy, win, GAMENAME);
 	
 	wmDeleteWindow = XInternAtom(dpy, "WM_DELETE_WINDOW", False);
 	XSetWMProtocols(dpy, win, &wmDeleteWindow, 1);
 
+	bitmap = XCreateBitmapFromData(dpy, win, data, 8, 8);
+	cursor = XCreatePixmapCursor(dpy, bitmap, bitmap, &fg, &bg, 0, 0);
+	XDefineCursor(dpy, win, cursor);
+	
 	XFlush(dpy);
 	
 	glXMakeCurrent(dpy, win, ctx);
