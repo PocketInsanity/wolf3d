@@ -1,9 +1,12 @@
 TODO:
 * Pause key
+  - With windowed systems, put paused in the title bar?
+  + Being in a text menu could be the "pause"
+    - This would be fine for svgalib
 * SVGAlib Hack:
   - If user requests a gamemode which SVGAlib says it does not support, fail
   - Check to make sure linear addressing is supported
-  + If SVGAlib does not support 512x384x256, allow the user to pan around 
+  - If SVGAlib does not support 512x384x256, allow the user to pan around 
     with the keypad arrow keys if only mode supported 320x200x256 (center if
     640x400 or 480 is supported?)
   - Have a "force no 512 mode" for those who do not want mode changing.
@@ -11,10 +14,8 @@ TODO:
 * Finish OpenGL
   + Status bars, Introscreens [DrawShape]
     - Not exactly sure how I will implement this yet.
-  - Correct viewing frustum
   - Allow window resizing
-  - Could use the LastTexture to have less glBegin/Ends (would need to know
-    where to stop though (try IO_DisplayViewBuffer).
+  - Could use the LastTexture to have less glBegin/Ends.
   - When all drawing is implemented, remove any unnecessary state/matrix
     changes.
 * Save/Load Games
@@ -24,11 +25,12 @@ TODO:
     since this source does not have any code for determining sound position).
   - Check 'csnd' for a sample, then 'snd ' if not found.
   + Music is planned.
-    - Midi support would be not hard, all that would be needed is something
-      that can get the note ons and then play the notes at the right time.
-      (the songs seem to only use note ons and the instruments correspond to
-      sample numbers, not midi instruments.  If the final result does not
-      sound "desirable," go with Plan B)
+    - Output using timidity with sounds did not end up sounding good.
+      Probably the INST resources are used for ASDR/looping/etc...
+  - csnd: sox -t raw -r 11025 -c 1 -w -s a.dat -r 11025 -c 1 -w -s -t wav a.wav
+  - snd: sox -t raw -r 11025 -c 1 -w -u a.dat -r 11025 -c 1 -w -s -t wav a.wav
+  - csnd might be -b -s (odd)
+  - 11025 will probably be the best rate
 * Interface
   + Menus and dialog boxes
     + Command line (temporary workaround for no menus).
@@ -36,8 +38,12 @@ TODO:
       - Difficulty
     - Text only menus (similar to what snes9x has).
 * Different depths/visuals for software clients.
+  + Different functions to draw with different bpps.
+    - 15 bpp uses same draw routes as 16 but different palette one
+    - not sure how to do palette fades
 * Get it to compile/work with g++ if it is not too much trouble.
 * SDL version (software)
+* Mouse
 
 BUGS:
 * Software Drawing seems like its imprecise, stationary sprites move back and 

@@ -414,7 +414,7 @@ void keyboard_handler(int key, int press)
 			joystick1 |= JOYPAD_A;
 		
 		if (keys[SCANCODE_LEFTALT]) 
-			joystick1 |= JOYPAD_TL;
+			joystick1 |= JOYPAD_TR;
 		if (keys[SCANCODE_RIGHTALT])
 			joystick1 |= JOYPAD_TR;
 			
@@ -427,6 +427,21 @@ void keyboard_handler(int key, int press)
 			joystick1 |= (JOYPAD_X|JOYPAD_Y);
 		if (keys[SCANCODE_RIGHTSHIFT])
 			joystick1 |= (JOYPAD_X|JOYPAD_Y);	
+	}
+	
+	if ((joystick1 & (JOYPAD_LFT|JOYPAD_RGT)) == (JOYPAD_LFT|JOYPAD_RGT))
+		joystick1 &= ~(JOYPAD_LFT|JOYPAD_RGT);
+	if ((joystick1 & (JOYPAD_UP|JOYPAD_DN)) == (JOYPAD_UP|JOYPAD_DN))
+		joystick1 &= ~(JOYPAD_UP|JOYPAD_DN);
+		
+	if (joystick1 & JOYPAD_TR) {
+		if (joystick1 & JOYPAD_LFT) {
+			joystick1 = (joystick1 & ~(JOYPAD_TR|JOYPAD_LFT)) | JOYPAD_TL;
+		} else if (joystick1 & JOYPAD_RGT) {
+			joystick1 = joystick1 & ~JOYPAD_RGT;
+		} else {
+			joystick1 &= ~JOYPAD_TR;
+		}
 	}
 							
 }

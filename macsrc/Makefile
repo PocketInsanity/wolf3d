@@ -3,11 +3,8 @@ CC = gcc
 
 CFLAGS = -Wall -O6 -fomit-frame-pointer -ffast-math -funroll-loops -mpentiumpro -mcpu=pentiumpro -march=pentiumpro 
 #CFLAGS = -g -Wall -O6 -fomit-frame-pointer -ffast-math -funroll-loops -mpentiumpro -mcpu=pentiumpro -march=pentiumpro 
-#CFLAGS = -g -Wall
-#CFLAGS = -g -Wall -ansi -pedantic
-#CFLAGS = -g
+CFLAGS = -g -Wall -ansi -pedantic
 #CFLAGS = -Os -g
-#CFLAGS = -g -Wall -I/home/relnev/cvs/oal/include
 
 OBJS 	 = Data.o Doors.o EnMove.o EnThink.o Intro.o Level.o \
 	   Missiles.o Sounds.o PlMove.o PlStuff.o PlThink.o PushWall.o \
@@ -21,7 +18,6 @@ GOBJS	 = $(SOFTOBJS) $(OBJS) vi_gtk.o
 GLOBJS	 = $(OGLOBJS)  $(OBJS) vi_glx.o
 
 LFLAGS = -lm 
-#LFLAGS = -lm -L/home/relnev/cvs/oal/linux/src -lopenal -lpthread -ldl
 #LFLAGS = -lm /home/relnev/ElectricFence-2.1/libefence.a
 #LFLAGS = -lm /home/relnev/ElectricFence-2.2.2/libefence.a -lpthread
 

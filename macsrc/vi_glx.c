@@ -40,9 +40,6 @@ XVisualInfo *vi;
 GLXContext ctx;
 Atom wmDeleteWindow;
 
-XColor clr[256];
-
-Byte *gfxbuf;
 Byte Pal[768];
 
 int attrib[] = {
@@ -137,10 +134,11 @@ int main(int argc, char *argv[])
 	cmap = XCreateColormap(dpy, root, vi->visual, AllocNone);
 	
 	attr.colormap = cmap;
-	attr.event_mask = KeyPressMask | KeyReleaseMask | ExposureMask;
+	attr.event_mask = KeyPressMask | KeyReleaseMask | ExposureMask |
+	                  StructureNotifyMask;
 	mask = CWColormap | CWEventMask;
 	
-	win = XCreateWindow(dpy, root, 0, 0, 320, 200, 0, CopyFromParent,
+	win = XCreateWindow(dpy, root, 0, 0, 640, 480, 0, CopyFromParent,
 			    InputOutput, vi->visual, mask, &attr);
 	
 	if (win == None) {
@@ -244,14 +242,10 @@ Word NewGameWindow(Word NewVidSize)
 	LongWord *LongPtr;
 	Byte *DestPtr;
 	int i;
-	
-	printf("Called: %d\n", NewVidSize);
-	
+		
 	if (NewVidSize == VidSize)
 		return VidSize;
 	
-	printf("Setting Size: %d (from %d)\n", NewVidSize, VidSize);
-		
 	if (NewVidSize < 4) {
 		w = VidXs[NewVidSize];
 		h = VidYs[NewVidSize];
@@ -260,19 +254,14 @@ Word NewGameWindow(Word NewVidSize)
 		fprintf(stderr, "Invalid Vid size: %d\n", NewVidSize);
 		exit(EXIT_FAILURE);
 	}
-	
-	sizehints.min_width = sizehints.max_width = sizehints.base_width = w;
-	sizehints.min_height = sizehints.max_height = sizehints.base_height = h;
-	sizehints.flags = PMinSize | PMaxSize | PBaseSize;
+
+	sizehints.min_width =  w;
+	sizehints.min_height = h;
+	sizehints.flags = PMinSize;
 	XSetWMNormalHints(dpy, win, &sizehints);
 	XResizeWindow(dpy, win, w, h);
 	XSync(dpy, False);
-	glViewport(0, 0, w, h);
 	
-	gfxbuf = (Byte *)malloc(w * h);
-		
-	VideoPointer = gfxbuf;
-	VideoWidth = w;
 	InitYTable();
 	SetAPalette(rBlackPal);
 	ClearTheScreen(BLACK);
@@ -563,7 +552,7 @@ void keyboard_handler(KeySym keycode, int press)
 			joystick1 |= JOYPAD_A;
 		
 		if (keys[SC_LEFTALT]) 
-			joystick1 |= JOYPAD_TL;
+			joystick1 |= JOYPAD_TR;
 		if (keys[SC_RIGHTALT])
 			joystick1 |= JOYPAD_TR;
 			
@@ -577,7 +566,22 @@ void keyboard_handler(KeySym keycode, int press)
 		if (keys[SC_RIGHTSHIFT])
 			joystick1 |= (JOYPAD_X|JOYPAD_Y);
 	}
-							
+	
+	if ((joystick1 & (JOYPAD_LFT|JOYPAD_RGT)) == (JOYPAD_LFT|JOYPAD_RGT))
+		joystick1 &= ~(JOYPAD_LFT|JOYPAD_RGT);
+	if ((joystick1 & (JOYPAD_UP|JOYPAD_DN)) == (JOYPAD_UP|JOYPAD_DN))
+		joystick1 &= ~(JOYPAD_UP|JOYPAD_DN);
+	
+	if (joystick1 & JOYPAD_TR) {
+		if (joystick1 & JOYPAD_LFT) {
+			joystick1 = (joystick1 & ~(JOYPAD_TR|JOYPAD_LFT)) | JOYPAD_TL;
+		} else if (joystick1 & JOYPAD_RGT) {
+			joystick1 = joystick1 & ~JOYPAD_RGT;
+		} else {
+			joystick1 &= ~JOYPAD_TR;
+		}
+	}
+	
 }
 
 int HandleEvents()
@@ -591,14 +595,17 @@ int HandleEvents()
 			switch(event.type) {
 				case KeyPress:
 					keyboard_handler(XKeycodeToKeysym(dpy, event.xkey.keycode, 0), 1);
-					/* ret = 1; */
+					ret = 1;
 					break; 
 				case KeyRelease:
 					keyboard_handler(XKeycodeToKeysym(dpy, event.xkey.keycode, 0), 0);
-					ret = 1;
+					ret = 0;
 					break;
 				case Expose:
 					BlastScreen();
+					break;
+				case ConfigureNotify:
+					glViewport(0, 0, event.xconfigure.width, event.xconfigure.height);
 					break;
 				case ClientMessage:
 					if (event.xclient.data.l[0] == wmDeleteWindow)

@@ -20,11 +20,31 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include <GL/gl.h>
 #include <GL/glext.h>
 
 #include "wolfdef.h"
+
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
+int UseSharedTexturePalette = 0;
+
+void xgluPerspective(GLdouble fovx, GLdouble aspect, GLdouble zNear, GLdouble zFar)
+{
+	GLdouble xmin, xmax, ymin, ymax;
+	
+	xmax = zNear * tan(fovx * M_PI / 360.0);
+	xmin = -xmax;
+	
+	ymin = xmin / aspect;
+	ymax = xmax / aspect;
+	
+	glFrustum(xmin, xmax, ymin, ymax, zNear, zFar);
+}
 
 void DisplayScreen(Word res)
 {
@@ -44,7 +64,7 @@ void SetAPalettePtr(unsigned char *PalPtr)
 
 void ClearTheScreen(Word c)
 {
-	glClearColor((double)Pal[c*3+0]/256.0, (double)Pal[c*3+1]/256.0, (double)Pal[c*3+2]/256.0, 0.0);
+	glClearColor((double)Pal[c*3+0]/255.0, (double)Pal[c*3+1]/255.0, (double)Pal[c*3+2]/255.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 }
 
@@ -285,18 +305,19 @@ void IO_ClearViewBuffer()
 {
 	LastTexture = 0;
 	glBindTexture(GL_TEXTURE_2D, 0);
-	
-	/* glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); */
-	glClear(GL_DEPTH_BUFFER_BIT);
-	
-	glDisable(GL_DEPTH_TEST);
-	
+
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 		
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
 	glLoadIdentity();
+	
+#if 0	
+	/* glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); */
+	glClear(GL_DEPTH_BUFFER_BIT);
+	
+	glDisable(GL_DEPTH_TEST);
 	
 	glColor3ub(Pal[0x2F*3+0], Pal[0x2F*3+1], Pal[0x2F*3+2]);
 	glRectf(-1, 0, 1, 1);
@@ -307,7 +328,23 @@ void IO_ClearViewBuffer()
 	glColor3f(1.0, 1.0, 1.0);
 
 	glEnable(GL_DEPTH_TEST);
+#else	
+	glEnable(GL_DEPTH_TEST);
 	
+	glDepthRange(1.0, 1.0);
+	glDepthFunc(GL_ALWAYS);
+	
+	glColor3ub(Pal[0x2F*3+0], Pal[0x2F*3+1], Pal[0x2F*3+2]);
+	glRectf(-1, 0, 1, 1);
+	
+	glColor3ub(Pal[0x2A*3+0], Pal[0x2A*3+1], Pal[0x2A*3+2]);
+	glRectf(1, -1, -1, 0);
+		
+	glColor3f(1.0, 1.0, 1.0);
+	
+	glDepthRange(0.0, 1.0);
+	glDepthFunc(GL_LESS);
+#endif
 	glPopMatrix();	
 }
 
@@ -319,6 +356,8 @@ void InitRenderView()
 {
 	Byte *pal;
 	int i;
+	
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
 	LastTexture = 0;
 	glEnable(GL_TEXTURE_2D);	
@@ -417,18 +456,17 @@ void InitRenderView()
 	ReleaseAResource(rGamePal);
 
 	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LEQUAL);
+	glDepthFunc(GL_LESS);
 	
 	glEnable(GL_ALPHA_TEST);
 	glAlphaFunc(GL_GREATER, 0.5);
-	/* glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); */
 	
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	
-	glFrustum(-0.20, 0.20, -0.288675, 0.288675, 0.2, 182.0);
+	xgluPerspective(90.0, 400.0/640.0, 0.20, 182.0);
 /*	
 	glFrontFace(GL_CCW);
 	glCullFace(GL_BACK);
@@ -470,9 +508,8 @@ void IO_AttackShape(Word shape)
 
 void StartRenderView()
 {	
-
-/*	glViewport(0, VidHeight - ViewHeight, VidWidth, VidHeight); */
-
+	glViewport(0, VidHeight - ViewHeight, VidWidth, ViewHeight); 
+	
 	glMatrixMode(GL_MODELVIEW);
 	/* glLoadIdentity(); */
 	
