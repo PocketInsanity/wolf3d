@@ -1,8 +1,6 @@
-// WL_DEBUG.C
+/* wl_debug.c */
 
-#include "WL_DEF.H"
-#pragma hdrstop
-#include <BIOS.H>
+#include "wl_def.h"
 
 /*
 =============================================================================
@@ -154,50 +152,23 @@ void PicturePause (void)
 	}
 
 	VW_ColorBorder (1);
-	VW_SetScreen (0,0);
 //
 // vga stuff...
 //
 
 	ClearMemory ();
 	CA_SetAllPurge();
-	MM_GetPtr (&buffer,64000);
-	for (p=0;p<4;p++)
-	{
-	   src = MK_FP(0xa000,displayofs);
-	   dest = (byte *)buffer+p;
-	   VGAREADMAP(p);
-	   for (x=0;x<16000;x++,dest+=4)
-		   *dest = *src++;
-	}
 
-
-#if 0
-	for (p=0;p<4;p++)
-	{
-		src = MK_FP(0xa000,0);
-		dest = (byte *)buffer+51200+p;
-		VGAREADMAP(p);
-		for (x=0;x<3200;x++,dest+=4)
-			*dest = *src++;
-	}
-#endif
-
-	asm	mov	ax,0x13
-	asm	int	0x10
-
-	dest = MK_FP(0xa000,0);
-	_fmemcpy (dest,buffer,64000);
-
+	/* TODO: save picture to file */
+	
 	VL_SetPalette (&gamepal);
 
 
 	IN_Shutdown ();
 
 	VW_WaitVBL(70);
-	bioskey(0);
 	VW_WaitVBL(70);
-	Quit (NULL);
+	Quit(NULL);
 }
 
 

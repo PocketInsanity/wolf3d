@@ -5,11 +5,6 @@
 unsigned	bufferofs;
 unsigned	displayofs;
 
-unsigned	screenseg=SCREENSEG;		// set to 0xa000 for asm convenience
-
-unsigned	linewidth;
-unsigned	ylookup[MAXSCANLINES];
-
 boolean		screenfaded;
 
 byte		palette1[256][3], palette2[256][3];
