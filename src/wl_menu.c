@@ -169,44 +169,6 @@ static char SaveGameNames[10][32],SaveName[13]="savegam?.";
 //
 ////////////////////////////////////////////////////////////////////
 
-#if 0
-static struct {
-	int sc;
-	char *str;
-} ScanNames[] = {
-{ sc_1,		"1"	},
-{ sc_2,		"2"	},
-{ sc_3,		"3"	},
-{ sc_4,		"4"	},
-{ sc_5,		"5"	},
-{ sc_6,		"6"	},
-{ sc_7,		"7"	},
-{ sc_8,		"8"	},
-{ sc_9,		"9"	},
-
-{ sc_Escape,	"Esc"	},
-
-{ sc_LeftArrow,	"Left"	},
-{ sc_RightArrow,"Right" },
-{ sc_UpArrow,	"Up"	},
-{ sc_DownArrow,	"Down"	},
-
-{ sc_Bad,	"?" 	},
-{ sc_None,	"?"	}
-};
-
-const char *IN_GetScanName(ScanCode scan)
-{
-	int i;
-	
-	for (i = 0; i < (sizeof(ScanNames)/sizeof(ScanNames[0])); i++)
-		if (ScanNames[i].sc == scan)
-			return ScanNames[i].str;
-	return "?";
-}
-
-#else
-
 static const char
 					*ScanNames[] =		// Scan code names with single chars
 					{
@@ -245,9 +207,8 @@ const char *IN_GetScanName(ScanCode scan)
 		if (*s == scan)
 			return *p;
 
-	return ScanNames[(unsigned char)scan];
+	return ScanNames[scan];
 }
-#endif
 
 ////////////////////////////////////////////////////////////////////
 //
