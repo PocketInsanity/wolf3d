@@ -65,38 +65,38 @@ CP_itemtype
 MainMenu[]=
 {
 #ifdef JAPAN
-	{1,"",CP_NewGame},
-	{1,"",CP_Sound},
-	{1,"",CP_Control},
-	{1,"",CP_LoadGame},
-	{0,"",CP_SaveGame},
-	{1,"",CP_ChangeView},
-	{2,"",CP_ReadThis},
-	{1,"",CP_ViewScores},
+	{1,"",(void *)CP_NewGame},
+	{1,"",(void *)CP_Sound},
+	{1,"",(void *)CP_Control},
+	{1,"",(void *)CP_LoadGame},
+	{0,"",(void *)CP_SaveGame},
+	{1,"",(void *)CP_ChangeView},
+	{2,"",(void *)CP_ReadThis},
+	{1,"",(void *)CP_ViewScores},
 	{1,"",0},
 	{1,"",0}
 #else
 
-	{1,STR_NG,CP_NewGame},
-	{1,STR_SD,CP_Sound},
-	{1,STR_CL,CP_Control},
-	{1,STR_LG,CP_LoadGame},
-	{0,STR_SG,CP_SaveGame},
-	{1,STR_CV,CP_ChangeView},
+	{1,STR_NG,(void *)CP_NewGame},
+	{1,STR_SD,(void *)CP_Sound},
+	{1,STR_CL,(void *)CP_Control},
+	{1,STR_LG,(void *)CP_LoadGame},
+	{0,STR_SG,(void *)CP_SaveGame},
+	{1,STR_CV,(void *)CP_ChangeView},
 
 #ifndef GOODTIMES
 #ifndef SPEAR
 
 	#ifdef SPANISH
-	{2,"Ve esto!",CP_ReadThis},
+	{2,"Ve esto!",(void *)CP_ReadThis},
 	#else
-	{2,"Read This!",CP_ReadThis},
+	{2,"Read This!",(void *)CP_ReadThis},
 	#endif
 
 #endif
 #endif
 
-	{1,STR_VS,CP_ViewScores},
+	{1,STR_VS,(void *)CP_ViewScores},
 	{1,STR_BD,0},
 	{1,STR_QT,0}
 #endif
@@ -140,15 +140,15 @@ CtlMenu[]=
 	{0,"",0},
 	{0,"",0},
 	{0,"",0},
-	{0,"",MouseSensitivity},
-	{1,"",CustomControls}
+	{0,"",(void *)MouseSensitivity},
+	{1,"",(void *)CustomControls}
 #else
 	{0,STR_MOUSEEN,0},
 	{0,STR_JOYEN,0},
 	{0,STR_PORT2,0},
 	{0,STR_GAMEPAD,0},
-	{0,STR_SENS,MouseSensitivity},
-	{1,STR_CUSTOM,CustomControls}
+	{0,STR_SENS,(void *)MouseSensitivity},
+	{1,STR_CUSTOM,(void *)CustomControls}
 #endif
 },
 
@@ -845,7 +845,7 @@ int CP_EndGame(void)
 	playstate = ex_died;
 
 	MainMenu[savegame].active = 0;
-	MainMenu[viewscores].routine=CP_ViewScores;
+	MainMenu[viewscores].routine= (void *)CP_ViewScores;
 	#ifndef JAPAN
 	strcpy(MainMenu[viewscores].string,STR_VS);
 	#endif

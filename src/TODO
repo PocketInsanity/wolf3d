@@ -1,5 +1,5 @@
 * inconsistancy:
-id_ca.c has code for setting the extension to load files
+id_ca.c has code for setting the data filenames' extension
 so does wl_menu.c
 * menu code is a mess, always does things differently than the rest of the
 code, it really needs to be cleaned up
@@ -15,6 +15,7 @@ to/from just for reading, so only not-packed structures are used during
 actual gameplay/etc. 
 * is that memory intro screen needed anymore? probably not, although it
 would be nice to show what version is loaded, but doom just printed text
+and the intro screen which came with wolf3d has copyrighted images
 * then, what about PG13? OH NO!!!!
 * fix the input code, everything is spread out... ideally everything should
 work the same, let the input handler do it all instead
@@ -22,6 +23,9 @@ work the same, let the input handler do it all instead
 maybe there are clipping bugs that will cause it to fill over the top, left, 
 and right
 * if japan versions are not to be found, remove the code 
+actually, if you look in wl_menu.c, the japan menus are empty, which means
+no text, and it would have to be that there was no offically released
+japanese version (unless the text was removed, but then why?)
 * remove DEMOEXTERN, and add ability to play demos from commandline 
 * remove SPANISH code (and spanish.h)? honestly i would rather have a german
 version than a spanish version
@@ -50,3 +54,4 @@ data in vga memory. so figure it out, fix it, and remove
 just call a different function (most are left from the update block code)
 remove them
 * implement fizzlefade, and get that last pixel!
+* remove the time verification code (in wl_inter.c)

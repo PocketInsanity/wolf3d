@@ -963,29 +963,21 @@ boolean PreloadUpdate(unsigned current, unsigned total)
 {
 	unsigned w = WindowW - 10;
 
-
 	VWB_Bar(WindowX + 5,WindowY + WindowH - 3,w,2,BLACK);
 	w = ((long)w * current) / total;
-	if (w)
-	{
-	 VWB_Bar(WindowX + 5,WindowY + WindowH - 3,w,2,0x37); 
-	 VWB_Bar(WindowX + 5,WindowY + WindowH - 3,w-1,1,0x32);
-
+	if (w) {
+		VWB_Bar(WindowX + 5,WindowY + WindowH - 3,w,2,0x37); 
+		VWB_Bar(WindowX + 5,WindowY + WindowH - 3,w-1,1,0x32);
 	}
 	VW_UpdateScreen();
-//	if (LastScan == sc_Escape)
-//	{
-//		IN_ClearKeysDown();
-//		return(true);
-//	}
-//	else
-		return(false);
+
+	return false;
 }
 
 void PreloadGraphics(void)
 {
-	DrawLevel ();
-	ClearSplitVWB ();			// set up for double buffering in split screen
+	DrawLevel();
+	ClearSplitVWB();
 
 	VWB_Bar (0,0,320,200-STATUSLINES,127);
 
@@ -998,7 +990,7 @@ void PreloadGraphics(void)
 	VW_UpdateScreen();
 	VW_FadeIn ();
 
-	PM_Preload (PreloadUpdate);
+	PM_Preload((void *)PreloadUpdate);
 	IN_UserInput (70);
 	VW_FadeOut ();
 

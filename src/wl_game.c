@@ -1375,7 +1375,7 @@ startplayloop:
 			#ifndef JAPAN
 			strcpy(MainMenu[viewscores].string,STR_VS);
 			#endif
-			MainMenu[viewscores].routine = CP_ViewScores;
+			MainMenu[viewscores].routine = (void *)CP_ViewScores;
 
 			return;
 
@@ -1397,7 +1397,7 @@ startplayloop:
 			#ifndef JAPAN
 			strcpy(MainMenu[viewscores].string,STR_VS);
 			#endif
-			MainMenu[viewscores].routine = CP_ViewScores;
+			MainMenu[viewscores].routine = (void *)CP_ViewScores;
 
 			return;
 
