@@ -1,6 +1,6 @@
 /* id_vl.c */
 
-#include "id_heads.h"
+#include "wl_def.h"
 
 #include <sys/ipc.h>
 #include <sys/shm.h>
@@ -42,6 +42,41 @@ unsigned char mypal[768];
 int main(int argc, char *argv[])
 {
 	return WolfMain(argc, argv);
+}
+
+/*
+==========================
+=
+= Quit
+=
+==========================
+*/
+
+void Quit(char *error)
+{
+	/* TODO: blah blah blah */
+	memptr screen = NULL;
+
+	if (!error || !*error) {
+		CA_CacheGrChunk(ORDERSCREEN);
+		screen = grsegs[ORDERSCREEN];
+		WriteConfig();
+	} else if (error) {
+		CA_CacheGrChunk(ERRORSCREEN);
+		screen = grsegs[ERRORSCREEN];
+	}
+	
+	ShutdownId();
+	
+	if (screen) {
+		printf("TODO: spiffy ansi screen goes here..\n");
+	}
+	
+	if (error && *error) {
+		fprintf(stderr, "Quit: %s", error);
+		exit(EXIT_FAILURE);
+ 	}
+	exit(EXIT_SUCCESS);
 }
 
 /*
@@ -470,6 +505,7 @@ void VL_SetPalette(const byte *palette)
 		}
 		XStoreColors(dpy, cmap, clr, 256);
 	} else {
+		/* TODO: memcpy? */
 		for (i = 0; i < 256; i++) {
 			mypal[i*3+0] = palette[i*3+0];
 			mypal[i*3+1] = palette[i*3+1];
@@ -606,7 +642,7 @@ void VL_Bar(int x, int y, int width, int height, int color)
 =================
 */
 
-void VL_MemToScreen(byte *source, int width, int height, int x, int y)
+void VL_MemToScreen(const byte *source, int width, int height, int x, int y)
 {
 	byte *ptr = gfxbuf + 320 * y + x;
 	while(height--) {

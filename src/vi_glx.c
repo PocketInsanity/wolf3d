@@ -1,6 +1,6 @@
 /* id_vl.c */
 
-#include "id_heads.h"
+#include "wl_def.h"
 
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
@@ -33,6 +33,41 @@ int attrib[] = {
 	GLX_DOUBLEBUFFER,
         None
 };
+
+/*
+==========================
+=
+= Quit
+=
+==========================
+*/
+
+void Quit(char *error)
+{
+	/* TODO: blah blah blah */
+	memptr screen = NULL;
+
+	if (!error || !*error) {
+		CA_CacheGrChunk(ORDERSCREEN);
+		screen = grsegs[ORDERSCREEN];
+		WriteConfig();
+	} else if (error) {
+		CA_CacheGrChunk(ERRORSCREEN);
+		screen = grsegs[ERRORSCREEN];
+	}
+	
+	ShutdownId();
+	
+	if (screen) {
+		printf("TODO: spiffy ansi screen goes here..\n");
+	}
+	
+	if (error && *error) {
+		fprintf(stderr, "Quit: %s", error);
+		exit(EXIT_FAILURE);
+ 	}
+	exit(EXIT_SUCCESS);
+}
 
 int main(int argc, char *argv[])
 {
@@ -368,7 +403,7 @@ void VL_Bar(int x, int y, int width, int height, int color)
 =================
 */
 
-void VL_MemToScreen(byte *source, int width, int height, int x, int y)
+void VL_MemToScreen(const byte *source, int width, int height, int x, int y)
 {
 	byte *ptr = gfxbuf + 320 * y + x;
 	while(height--) {

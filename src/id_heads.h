@@ -1,7 +1,44 @@
 #ifndef __ID_HEADS_H__
 #define __ID_HEADS_H__
 
+#ifdef _WIN32
+
+/* TODO: rename dosism, because like djgpp has glob() */
+#define DOSISM /* for junk which isn't abstracted (namely stuff in wl_menu.c with glob/findfirst and misc.c) */
+#undef HAVE_FFBLK /* TODO: what to do with hacks like this */
+
+#define WIN32_LEAN_AND_MEAN
+
+#include <windows.h>
+#include <io.h>
+#include <dos.h>
+
+#define boolean BOOLEAN
+#define false FALSE
+#define true TRUE
+
+#define PACKED
+#pragma pack(1) /* TODO: this unfortunately packs every struct... */
+
+#define ssize_t SSIZE_T
+
+
+#else 
+
+#undef DOSISM
 #include <unistd.h>
+#include <sys/time.h>
+#include <values.h>
+#include <glob.h>
+
+#define PACKED __attribute__((packed))
+#define LONGLONG long long
+
+#define O_BINARY 0
+typedef	enum {false,true} boolean;
+
+#endif
+
 #include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -9,22 +46,16 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <sys/time.h>
+
 #include <sys/stat.h>
-#include <values.h>
+
 #include <sys/types.h>
-#include <glob.h>
+
 #include <math.h>
 
 #include "misc.h"
 
 #include "version.h"
-
-#define PACKED __attribute__((packed))
-
-#ifndef O_BINARY
-#define O_BINARY 0
-#endif
 
 /* ------------------------------------------------------------------------ */
 
@@ -52,7 +83,7 @@
 
 /* ---------------- */
 
-typedef	enum	{false,true}	boolean;
+
 typedef	unsigned	char		byte;
 typedef	unsigned	short int	word;
 typedef	unsigned	long		longword;
@@ -79,7 +110,6 @@ extern const byte introscn[];
 extern const byte gamepal[];
 
 int MS_CheckParm(char *string);
-int WolfMain(int argc, char *argv[]);
 void Quit(char *error);
 
 #undef PI

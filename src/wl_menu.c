@@ -2603,7 +2603,8 @@ void DrawOutline(int x,int y,int w,int h,int color1,int color2)
 ////////////////////////////////////////////////////////////////////
 void SetupControlPanel(void)
 {
-#if 0 /* DOS VERSION */
+#ifdef DOSISM /* DOS VERSION */
+#ifdef HAVE_FFBLK
 	struct ffblk f;
 	int which;
 
@@ -2629,8 +2630,8 @@ void SetupControlPanel(void)
 	//
 	// SEE WHICH SAVE GAME FILES ARE AVAILABLE & READ STRING IN
 	//
-	strcpy(name,SaveName);
-	if (!findfirst(name,&f,0))
+	
+	if (!findfirst(SaveNaame,&f,0))
 		do
 		{
 			which=f.ff_name[7]-'0';
@@ -2647,6 +2648,53 @@ void SetupControlPanel(void)
 			}
 		} while(!findnext(&f));
 #else 
+	struct _finddata_t f;
+	int which;
+	long hand;
+
+	//
+	// CACHE GRAPHICS & SOUNDS
+	//
+	CA_CacheGrChunk(STARTFONT+1);
+#ifndef SPEAR
+	CacheLump(CONTROLS_LUMP_START,CONTROLS_LUMP_END);
+#else
+	CacheLump(BACKDROP_LUMP_START,BACKDROP_LUMP_END);
+#endif
+
+	SETFONTCOLOR(TEXTCOLOR,BKGDCOLOR);
+	fontnumber=1;
+	WindowH=200;
+
+	if (!ingame)
+		CA_LoadAllSounds();
+	else
+		MainMenu[savegame].active=1;
+
+	//
+	// SEE WHICH SAVE GAME FILES ARE AVAILABLE & READ STRING IN
+	//
+	
+	if ((hand = _findfirst(SaveName, &f)) != -1)
+		do
+		{
+			which=f.name[7]-'0';
+			if (which<10)
+			{
+				int handle;
+				char temp[32];
+
+				SaveGamesAvail[which]=1;
+				handle=open(f.name,O_BINARY);
+				read(handle,temp,32);
+				close(handle);
+				strcpy(&SaveGameNames[which][0],temp);
+			}
+		} while(_findnext(hand, &f) != -1);
+#endif
+
+#else
+
 	glob_t globbuf;
 	int which, x;
 	
@@ -3180,7 +3228,7 @@ void Message(char *string)
 
 	CA_CacheGrChunk (STARTFONT+1);
 	fontnumber=1;
-	font=grsegs[STARTFONT+fontnumber];
+	font= (fontstruct *)grsegs[STARTFONT+fontnumber];
 	h=font->height;
 	for (i=0;i<strlen(string);i++)
 		if (string[i]=='\n')
@@ -3320,9 +3368,10 @@ void ShootSnd(void)
 // CHECK FOR EPISODES
 //
 ///////////////////////////////////////////////////////////////////////////
-void CheckForEpisodes(void)
+void CheckForEpisodes()
 {
-#if 0 /* DOS VERSION */
+#ifdef DOSISM /* DOS VERSION */
+#ifdef HAVE_FFBLK
 	struct ffblk f;
 //
 // ENGLISH
@@ -3385,6 +3434,70 @@ void CheckForEpisodes(void)
 	strcat(configname,extension);
 	strcat(SaveName,extension);
 	strcat(PageFileName,extension);
+
+#else
+
+	struct _finddata_t f;
+
+//
+// ENGLISH
+//
+#ifndef UPLOAD
+#ifndef SPEAR
+	if (_findfirst("*.WL6", &f) != -1)
+	{
+		strcpy(extension,"WL6");
+		NewEmenu[2].active =
+		NewEmenu[4].active =
+		NewEmenu[6].active =
+		NewEmenu[8].active =
+		NewEmenu[10].active =
+		EpisodeSelect[1] =
+		EpisodeSelect[2] =
+		EpisodeSelect[3] =
+		EpisodeSelect[4] =
+		EpisodeSelect[5] = 1;
+	} else if (_findfirst("*.WL3",&f) != -1) {
+		strcpy(extension,"WL3");
+		NewEmenu[2].active =
+		NewEmenu[4].active =
+		EpisodeSelect[1] =
+		EpisodeSelect[2] = 1;
+	}
+	else
+#endif /* SPEAR */
+#endif /* UPLOAD */
+
+#ifdef SPEAR
+#ifndef SPEARDEMO
+	if (_findfirst("*.SOD",&f) != -1)
+	{
+		strcpy(extension,"SOD");
+	}
+	else
+		Quit("NO SPEAR OF DESTINY DATA FILES TO BE FOUND!");
+#else /* SPEARDEMO */
+	if (_findfirst("*.SDM",&f) != -1)
+	{
+		strcpy(extension,"SDM");
+	}
+	else
+		Quit("NO SPEAR OF DESTINY DEMO DATA FILES TO BE FOUND!");
+#endif /* SPEARDEMO */
+
+#else /* SPEAR */
+	if (_findfirst("*.WL1",&f) != -1)
+	{
+		strcpy(extension,"WL1");
+	}
+	else
+		Quit("NO WOLFENSTEIN 3-D DATA FILES to be found!");
+#endif /* SPEAR */
+
+	strcat(configname,extension);
+	strcat(SaveName,extension);
+	strcat(PageFileName,extension);
+#endif
 
 #else
 	glob_t globbuf;

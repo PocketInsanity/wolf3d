@@ -36,7 +36,6 @@ static	boolean					sbNoCheck,sbNoProCheck;
 static	byte					sbOldIntMask = -1;
 static	byte			*sbNextSegPtr;
 static	longword		sbNextSegLen;
-static	SampledSound *sbSamples;
 
 //	SoundSource variables
 		boolean				ssNoCheck;
@@ -166,7 +165,7 @@ void SD_PositionSound(int leftvol,int rightvol)
 //	SD_PlaySound() - plays the specified sound on the appropriate hardware
 //
 ///////////////////////////////////////////////////////////////////////////
-boolean SD_PlaySound(soundnames sound)
+void SD_PlaySound(soundnames sound)
 {
 	boolean		ispos;
 	int	lp,rp;
@@ -179,7 +178,6 @@ boolean SD_PlaySound(soundnames sound)
 	ispos = nextsoundpos;
 	nextsoundpos = false;
 
-	return false;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -317,8 +315,9 @@ byte lefttable[ATABLEMAX][ATABLEMAX * 2] = {
 { 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8}
 };
 
-void SetSoundLoc(fixed gx,fixed gy)
+void SetSoundLoc(fixed gx, fixed gy)
 {
+#if 0
 	fixed	xt,yt;
 	int		x,y;
 
@@ -352,6 +351,7 @@ void SetSoundLoc(fixed gx,fixed gy)
 		x = ATABLEMAX - 1;
 	leftchannel  =  lefttable[x][y + ATABLEMAX];
 	rightchannel = righttable[x][y + ATABLEMAX];
+#endif
 }
 
 /*
@@ -368,14 +368,14 @@ void PlaySoundLocGlobal(word s,fixed gx,fixed gy)
 {
 	SetSoundLoc(gx,gy);
 	SD_PositionSound(leftchannel,rightchannel);
-	if (SD_PlaySound(s))
-	{
-		globalsoundx = gx;
-		globalsoundy = gy;
-	}
+
+	SD_PlaySound(s);
+	
+	globalsoundx = gx;
+	globalsoundy = gy;
 }
 
-void UpdateSoundLoc()
+void UpdateSoundLoc(fixed x, fixed y, int angle)
 {
 	if (SoundPositioned)
 	{

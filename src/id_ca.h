@@ -26,7 +26,7 @@ extern	int			mapon;
 extern	word *mapsegs[MAPPLANES];
 extern	maptype			*mapheaderseg[NUMMAPS];
 extern	byte			*audiosegs[NUMSNDCHUNKS];
-extern	void			*grsegs[NUMCHUNKS];
+extern	byte			*grsegs[NUMCHUNKS];
 
 extern	byte		grneeded[NUMCHUNKS];
 extern	byte		ca_levelbit,ca_levelnum;

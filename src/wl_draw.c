@@ -847,7 +847,7 @@ void AsmRefresh (void)
 	    ytile += ytilestep;
 	    xintercept += xstep;
 	    goto horizcheck;
-    nextpix:
+    nextpix: ;
     }
 }
 

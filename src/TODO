@@ -17,6 +17,7 @@ actual gameplay/etc.
 * is that memory intro screen needed anymore? probably not, although it
 would be nice to show what version is loaded, but doom just printed text
 and the intro screen which came with wolf3d has copyrighted images
+maybe make a new intro screen...
 * then, what about PG13? OH NO!!!! -- people would probably want the first
 two screens for nostalga
 * fix the input code, everything is spread out... ideally everything should
@@ -33,7 +34,7 @@ outside the viewarea, leaving artifacts
 * and upload builds with lots of wl6 code anyway (sound references were just
 ifndefed out)
 * verify if the sounds and graphics are correctly numbered, once again...
-* add a ViewMap?
+* add a ViewMap? 
 * remove the #else at the end of each header since nothing is being doubly
 included now (if ever)
 * find and remove any function stubs (functions which just call another
@@ -51,7 +52,7 @@ metaname like sc_Left etc or something
 update once per frame or such.. hm
 and where is that stray pixel coming from (when using end game with largest
 window size) in svgalib
-no idea how to do fizzlefade in 16bit.
+no idea how to do fizzlefade in 16bit X
 * change id_sd to sd_oss, sd_win, sd_dos, sd_oal, etc
 idea is that different <outputs> can share some drivers, unlike video
 although glx and x11 share a lot of code (i guess since gl will be a great
@@ -68,7 +69,7 @@ by putting in code from id_vh (either by using Plot or just copying it in)
 we can stop the large conversion before each UpdateScreen
 but palette fades will still need it! damnit
 * what are special keys... ?
-* the higher bitrates are a hack since a palette lookup has to be done
+* the higher depths are a hack since a palette lookup has to be done
 for every byte when transferring to the pixmap, palette fades require a
 screen update
 * make sure none of the code tries to handle gfx/sound data directly
@@ -80,9 +81,4 @@ of the game (namely stuff used for hit testing when firing weapon) in the
 draw loop.. start by cp wl_draw.c vi_ogl.c and just take out the actual
 drawing bits and replace with opengl.
 * change visable -> visible
-
-Specific:
-* memory/sound intro screen goes
-  - Trademarked images, only came with wolf3d 1.4's (I believe)
-* copy protection goes
-  - Who needs a manual to look at the source?
+* fix up windows port

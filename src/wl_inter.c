@@ -1277,8 +1277,7 @@ void CopyProtection(void)
 		whichone,whichpicked[4]={0,0,0,0},quiztype,whichmem,
 		memberpicked[5]={0,0,0,0,0},wordpicked[5]={0,0,0,0,0},whichword;
 
-	char	inputbuffer[20],
-			message[80];
+	char message[30], inputbuffer[20];
 
 	enum
 	{
@@ -1485,13 +1484,7 @@ void CopyProtection(void)
 		}
 	}
 
-	ClearMemory();
-	ShutdownId();
-
-	strcpy(message,DosMessages[US_RndT()%9]);
-
-	printf("%s\n",message);
-	exit(1);
+	Quit(DosMessages[US_RndT()%9]);
 }
 
 #endif // SPEARDEMO

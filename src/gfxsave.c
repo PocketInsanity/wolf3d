@@ -1,7 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-
-#define PACKED __attribute__((packed))
+#include "wl_def.h"
 
 typedef struct pcx_header_type
 {

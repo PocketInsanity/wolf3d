@@ -10,6 +10,8 @@ void SavePCXRGBToFile(unsigned char *buf, int width, int height, char *name);
 void set_TimeCount(unsigned long t);
 unsigned long get_TimeCount();
 
+#ifndef DOSISM
+
 long filelength(int handle);
 
 #define stricmp strcasecmp
@@ -19,6 +21,8 @@ char *strlwr(char *s);
 char *itoa(short int value, char *string, int radix);
 char *ltoa(long value, char *string, int radix);
 char *ultoa(unsigned long value, char *string, int radix);
+
+#endif /* DOSISM */
 
 #else 
 #error "fix me TODO"

@@ -22,7 +22,7 @@ void VL_Hlin(unsigned x, unsigned y, unsigned width, unsigned color);
 void VL_Vlin(int x, int y, int height, int color);
 void VL_Bar(int x, int y, int width, int height, int color);
 
-void VL_MemToScreen(byte *source, int width, int height, int x, int y);
+void VL_MemToScreen(const byte *source, int width, int height, int x, int y);
 
 void VL_DeModeXize(byte *buf, int width, int height);
 

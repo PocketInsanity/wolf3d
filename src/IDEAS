@@ -2,14 +2,14 @@
   dataset?
 * A key to change viewsize while playing (note: max == 20, min == 5 or so...)
 * Game able to cope at any virtual resolution in software mode. OpenGL
-  handles this transparently
+  handles this transparently (after setting correct glViewport)
 * Audio support using OpenAL (somewhat decently supported at the moment)
 * Add support for the Mac version, if possible
 * Network support!
 * Fully compile with no warnings/errors using -Wall -ansi -pedantic and with
   other compilers (would need to turn off warnings about unused parameters)
 * Port to: Linux/SVGAlib, Linux/X (Windowed and DGA), Linux/OpenGL, 
-  DOS/Allegro, Win32/GDI, Win32/DX, Win32/D3D, Win32/OpenGL, BeOS?, MacOS?
+  DOS/Allegro, Win32/GDI?, Win32/DX, Win32/D3D, Win32/OpenGL, BeOS?, MacOS?
 * Ease in using demos. Playing demos from files, recording to files, batch
   playing, and so on.
 * Make Wolf3D the game it was originally planned to be...  More strategy...
@@ -17,9 +17,12 @@
   regardless of future plans [IDEAS]) and no TODO/FIXME/XXXs in the source 
   code
 * Have some sort of way of playing both digital and adlib sounds on all
-  platforms
+  platforms (if possible)
 * Test with other available mods (that were compatible with the original
   game)
 * Unified input handling
 * Configuration files and save games which work regardless of operating
   system/processor/binary build
+* Suite of utilities to edit the game data.
+* Building on previous idea, have some way to break out of requiring the
+  game to be recompiled for each game dataset

@@ -726,7 +726,9 @@ boolean 	LoadTheGame(int file,int x,int y);
 boolean		SaveTheGame(int file,int x,int y);
 void 		ShowViewSize (int width);
 void		ShutdownId (void);
+void WriteConfig(void);
 
+int WolfMain(int argc, char *argv[]);
 
 /*
 =============================================================================

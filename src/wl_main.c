@@ -85,9 +85,9 @@ char **_argv;
 
 fixed FixedByFrac(fixed a, fixed b)
 {
-	long long ra = a;
-	long long rb = b;
-	long long r;
+	LONGLONG ra = a;
+	LONGLONG rb = b;
+	LONGLONG r;
 	
 	r = ra * rb;
 	r >>= 16;
@@ -138,7 +138,7 @@ void ReadConfig(void)
 	SMMode          sm;
 	SDSMode         sds;
 
-
+#if 0 /* TODO */
 	if ( (file = open(configname,O_BINARY | O_RDONLY)) != -1)
 	{
 	//
@@ -184,6 +184,7 @@ void ReadConfig(void)
 		MainItems.curpos=0;
 	}
 	else
+#endif
 	{
 	//
 	// no config file, so select by hardware
@@ -521,15 +522,15 @@ boolean LoadTheGame(int file,int x,int y)
 ==========================
 */
 
-void ShutdownId (void)
+void ShutdownId()
 {
-	US_Shutdown ();
-	SD_Shutdown ();
-	PM_Shutdown ();
-	IN_Shutdown ();
-	VW_Shutdown ();
-	CA_Shutdown ();
-	MM_Shutdown ();
+	US_Shutdown();
+	SD_Shutdown();
+	IN_Shutdown();
+	VW_Shutdown();
+	CA_Shutdown();
+	PM_Shutdown();
+	MM_Shutdown();
 }
 
 
@@ -604,8 +605,6 @@ void BuildTables (void)
 =
 ====================
 */
-
-#include <sys/mman.h>
 
 void CalcProjection (long focal)
 {
@@ -1153,14 +1152,14 @@ boolean SetViewSize(unsigned width, unsigned height)
 
 void ShowViewSize (int width)
 {
-	int     oldwidth,oldheight;
+	int oldwidth,oldheight;
 
 	oldwidth = viewwidth;
 	oldheight = viewheight;
 
 	viewwidth = width*16;
 	viewheight = width*16*HEIGHTRATIO;
-	DrawPlayBorder ();
+	DrawPlayBorder();
 
 	viewheight = oldheight;
 	viewwidth = oldwidth;
@@ -1179,45 +1178,6 @@ void NewViewSize(int width)
 
 
 //===========================================================================
-
-/*
-==========================
-=
-= Quit
-=
-==========================
-*/
-
-void Quit(char *error)
-{
-	memptr screen = NULL;
-
-	if (!error || !*error) {
-		CA_CacheGrChunk(ORDERSCREEN);
-		screen = grsegs[ORDERSCREEN];
-		WriteConfig();
-	} else if (error) {
-		CA_CacheGrChunk(ERRORSCREEN);
-		screen = grsegs[ERRORSCREEN];
-	}
-	
-	ShutdownId();
-	
-	if (screen) {
-		printf("TODO: spiffy ansi screen goes here..\n");
-	}
-	
-	if (error && *error) {
-		fprintf(stderr, "Quit: %s\n", error);
-		exit(EXIT_FAILURE);
- 	}
-		
-	exit(EXIT_SUCCESS);
-}
-
-//===========================================================================
-
-
 
 /*
 =====================

@@ -36,7 +36,7 @@ int			mapon;
 word		*mapsegs[MAPPLANES];
 maptype			*mapheaderseg[NUMMAPS];
 byte			*audiosegs[NUMSNDCHUNKS];
-void			*grsegs[NUMCHUNKS];
+byte			*grsegs[NUMCHUNKS];
 
 byte			grneeded[NUMCHUNKS];
 byte		ca_levelbit,ca_levelnum;

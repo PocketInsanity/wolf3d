@@ -1,11 +1,112 @@
-/* id_vl.c */
-
 #include "wl_def.h"
 
-#include <vga.h>
-#include <vgakeyboard.h>
+#include <windows.h>
+#include <ddraw.h>
+#include <dinput.h>
+#include <direct.h>
 
 byte *gfxbuf = NULL;
+
+HWND win;
+IDirectInput *lpDI;
+IDirectInputDevice *lpDIKeyboard;
+
+int hCrt;
+FILE *hf;
+
+IDirectDraw *lpDD;
+IDirectDrawSurface *lpDDSPrimary;
+IDirectDrawSurface *lpDDSBuffer;
+IDirectDrawClipper *lpDDC;
+
+LPDDSCAPS lpDDSCaps;
+DDSURFACEDESC  ddsd;
+
+byte mypal[768];
+
+void WolfDirectDrawPaint();
+HRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam);
+void CheckEvents();
+
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int iCmdShow)
+{
+	static char szAppName[] = "Wolf3D";
+	HWND hwnd;
+
+	WNDCLASSEX wndclass;
+
+	wndclass.cbSize = sizeof(wndclass);
+	wndclass.style = CS_HREDRAW | CS_VREDRAW;
+	wndclass.lpfnWndProc = WndProc;
+	wndclass.cbClsExtra = 0;
+	wndclass.cbWndExtra = 0;
+	wndclass.hInstance = hInstance;
+	wndclass.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+	wndclass.hCursor = LoadCursor(NULL, IDC_ARROW);
+	wndclass.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
+	wndclass.lpszMenuName = NULL;
+	wndclass.lpszClassName = szAppName;
+	wndclass.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
+
+	RegisterClassEx(&wndclass);
+
+	hwnd = CreateWindow(szAppName, GAMENAME, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 320, 200, NULL, NULL, hInstance, NULL);
+
+	ShowWindow(hwnd, iCmdShow);
+
+	UpdateWindow(hwnd);	
+
+		if (DirectDrawCreate(NULL, &lpDD, NULL) != DD_OK) {
+			MessageBox(hwnd, "ugh", "ugh", MB_OK);
+			return 0;
+		}
+		if (IDirectDraw_SetCooperativeLevel(lpDD, hwnd, DDSCL_NORMAL) != DD_OK) {
+			MessageBox(hwnd, "hi", "hi", MB_OK);
+		}
+//		if (IDirectDraw_SetDisplayMode(lpDD, 320, 200, 8) != DD_OK) {
+//			MessageBox(hwnd, "hi2", "hi", MB_OK);
+//		}
+		ddsd.dwSize = sizeof(ddsd); 
+		ddsd.dwFlags = DDSD_CAPS;
+		ddsd.ddsCaps.dwCaps = DDSCAPS_PRIMARYSURFACE;
+		if (IDirectDraw_CreateSurface(lpDD, &ddsd, &lpDDSPrimary, NULL) != DD_OK) {
+			MessageBox(hwnd, "hi3", "hi", MB_OK);
+		}
+		if (IDirectDraw_CreateClipper(lpDD, 0, &lpDDC, NULL) != DD_OK) {
+			MessageBox(hwnd, "hi4", "hi", MB_OK);
+		}
+		if (IDirectDrawClipper_SetHWnd(lpDDC, 0, hwnd) != DD_OK) {
+			MessageBox(hwnd, "hi5", "hi", MB_OK);
+		}
+		if (IDirectDrawSurface_SetClipper(lpDDSPrimary, lpDDC) != DD_OK) {
+			MessageBox(hwnd, "hi6", "hi", MB_OK);
+		}
+		ddsd.dwFlags = DDSD_CAPS|DDSD_WIDTH|DDSD_HEIGHT;
+		ddsd.ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN | DDSCAPS_SYSTEMMEMORY;
+		ddsd.dwWidth = 320;
+		ddsd.dwHeight = 200;
+		if (IDirectDraw_CreateSurface(lpDD, &ddsd, &lpDDSBuffer, NULL) != DD_OK) {
+			MessageBox(hwnd, "hi7", "hi", MB_OK);
+		}
+
+		if(DirectInputCreate(hInstance, DIRECTINPUT_VERSION, &lpDI, NULL) != DI_OK) {
+			MessageBox(hwnd, "hi8", "hi", MB_OK);
+		}
+		
+		if (IDirectInput_CreateDevice(lpDI, &GUID_SysKeyboard, &lpDIKeyboard, NULL) != DD_OK) {
+			MessageBox(hwnd, "hi9", "hi", MB_OK);
+		}
+
+		IDirectInputDevice_SetDataFormat(lpDIKeyboard, &c_dfDIKeyboard);
+
+		if (IDirectInputDevice_SetCooperativeLevel(lpDIKeyboard, hwnd, DISCL_NONEXCLUSIVE | DISCL_FOREGROUND) != DD_OK) {
+			MessageBox(hwnd, "hi10", "hi", MB_OK);
+		}
+
+		win = hwnd;
+
+		return WolfMain(0, NULL); /* TODO ... need to do something for silly windows */
+}
 
 /*
 ==========================
@@ -36,21 +137,189 @@ void Quit(char *error)
 	}
 	
 	if (error && *error) {
-		fprintf(stderr, "Quit: %s", error);
-		exit(EXIT_FAILURE);
+		MessageBox(win, error, "Error!", MB_ICONEXCLAMATION | MB_OK);
  	}
-	exit(EXIT_SUCCESS);
+		
+	SendMessage(win, WM_CLOSE, 0, 0);
+
+	for (;;) CheckEvents(); /* We sent our death wish, now we wait */
+}
+
+
+void WolfDirectDrawPaint()
+{
+	int x;
+	unsigned short int *ptr;
+	HWND hwnd;
+
+	if (!lpDD)
+		return;
+
+	if (!gfxbuf)
+		return;
+
+	if (IDirectDrawSurface_Lock(lpDDSBuffer, NULL,&ddsd,DDLOCK_SURFACEMEMORYPTR,NULL) != DD_OK) {
+		MessageBox(win, "eh?", "hrm", MB_OK);
+		return;
+	}
+
+	IDirectDrawClipper_GetHWnd(lpDDC, &hwnd);
+
+	ptr = ddsd.lpSurface;
+	for (x = 0; x < 64000; x++) {
+		*ptr = (mypal[gfxbuf[x]*3+0]>>3) << 13 |
+		       (mypal[gfxbuf[x]*3+1]>>3) << 8  |
+		       (mypal[gfxbuf[x]*3+2]>>3) << 2;
+		ptr++;
+	}
+
+//memcpy(ddsd.lpSurface, gfxbuf, 64000);
+	
+	IDirectDrawSurface_Unlock(lpDDSBuffer, ddsd.lpSurface);
+	
+	if (IDirectDrawSurface_IsLost(lpDDSPrimary)) {
+		printf("eh2?\n");
+		exit(1);
+	}
+/*	
+	{
+		RECT srcrect={0,0,320, 200};
+		RECT dstrect;
+		GetWindowRect(hwnd,&dstrect);
+		dstrect.top+=42;
+		dstrect.bottom-=4;
+		dstrect.left+=4;
+		dstrect.right-=4;								
+		IDirectDrawSurface_Blt(lpDDSPrimary, &dstrect, lpDDSBuffer, &srcrect, 0, NULL);
+	}
+*/
+	{
+		/* TODO: need to get and save window border sizes (setting default size needs this too) */
+		RECT srcrect={0,0,320, 200};
+		RECT dstrect;
+		GetWindowRect(hwnd,&dstrect);								
+		IDirectDrawSurface_Blt(lpDDSPrimary, &dstrect, lpDDSBuffer, &srcrect, 0, NULL);
+	}
+}
+
+byte keys[256];
+byte oldk[256];
+
+void keyboard_handler(int, int);
+
+int DIKToScancode(int i)
+{
+	switch(i) {
+	case DIK_LEFT:
+		return sc_LeftArrow;
+	case DIK_RIGHT:
+		return sc_RightArrow;
+	case DIK_UP:
+		return sc_UpArrow;
+	case DIK_DOWN:
+		return sc_DownArrow;
+	default:
+		return i;
+	}
+}
+
+void WolfDirectInputUpdateKeys()
+{
+	int i;
+
+	if (IDirectInputDevice_GetDeviceState(lpDIKeyboard, 256, keys) != DI_OK) {
+		if (IDirectInputDevice_Acquire(lpDIKeyboard) != DI_OK)
+			return;
+		if (IDirectInputDevice_GetDeviceState(lpDIKeyboard, 256, keys) != DI_OK)
+			return;
+	}
+
+	for (i = 0; i < 256; i++) 
+		if (keys[i] != oldk[i])
+			keyboard_handler(DIKToScancode(i), keys[i] ? 1 : 0);
+	
+	memcpy(oldk, keys, sizeof(oldk));
+}
+
+void CheckEvents()
+{
+	MSG msg;
+	
+	while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+		if (msg.message == WM_QUIT)
+			break;
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
+	
+	WolfDirectInputUpdateKeys();
+	
+	if (msg.message == WM_QUIT)
+			exit(msg.wParam);
+}
+
+HRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
+{
+	PAINTSTRUCT ps;
+	HDC hdc;
+
+	switch (iMsg) {
+		case WM_CREATE: 
+#ifdef _DEBUG			
+			AllocConsole();
+			
+			hCrt = _open_osfhandle((long) GetStdHandle(STD_OUTPUT_HANDLE), _O_TEXT);
+			hf = _fdopen( hCrt, "w" );
+			*stdout = *hf;
+			setvbuf(stdout, NULL, _IONBF, 0 );
+			*stderr = *hf;
+			setvbuf(stderr, NULL, _IONBF, 0);
+#endif
+
+			/* TODO */
+			_chdir("C:\\wolfsrc\\src\\test\\");
+			/* - oh well, if path is not found, CWD will still be the same (for end user use) */
+
+			return 0;
+		case WM_COMMAND:
+			break;
+		case WM_ERASEBKGND:
+			break;
+		case WM_PAINT:
+			hdc = BeginPaint(hwnd, &ps);
+			WolfDirectDrawPaint(hwnd);
+			EndPaint(hwnd, &ps);
+			break;
+		case WM_CLOSE:
+			IDirectDrawSurface_Release(lpDDSBuffer);
+			IDirectDrawClipper_Release(lpDDC);
+			IDirectDrawSurface_Release(lpDDSPrimary);
+			IDirectDraw_Release(lpDD);
+
+#ifdef _DEBUG		
+			FreeConsole();
+			fclose(hf);
+			close(hCrt);
+#endif
+
+			DestroyWindow(hwnd);
+			return 0;
+		case WM_DESTROY:
+			PostQuitMessage(0);
+			return 0;
+	}
+
+	return DefWindowProc(hwnd, iMsg, wParam, lParam);
 }
 
 void VL_WaitVBL(int vbls)
 {
-	vga_waitretrace();
 }
 
 void VW_UpdateScreen()
 {
 	/* VL_WaitVBL(1); */
-	memcpy(graph_mem, gfxbuf, 64000);
+	WolfDirectDrawPaint();
 }
 
 /*
@@ -65,14 +334,6 @@ void VL_Startup (void)
 {
 	if (gfxbuf == NULL) 
 		gfxbuf = malloc(320 * 200 * 1);
-		
-	vga_init(); /* TODO: maybe move into main or such? */
-	
-	if (vga_hasmode(G320x200x256) == 0) 
-		Quit("vga_hasmode failed!");
-			
-	if (vga_setmode(G320x200x256) != 0)
-		Quit("vga_setmode failed!");
 }
 
 /*
@@ -89,7 +350,6 @@ void VL_Shutdown (void)
 		free(gfxbuf);
 		gfxbuf = NULL;
 	}
-	vga_setmode(TEXT);
 }
 
 //===========================================================================
@@ -131,9 +391,11 @@ void VL_ClearVideo(byte color)
 void VL_FillPalette(int red, int green, int blue)
 {
 	int i;
-	
-	for (i = 0; i < 256; i++) 
-		vga_setpalette(i, red, green, blue);	
+	for (i = 0; i < 256; i++) {
+		mypal[i*3+0] = red;
+		mypal[i*3+1] = green;
+		mypal[i*3+2] = blue;
+	}
 }
 
 //===========================================================================
@@ -148,10 +410,8 @@ void VL_FillPalette(int red, int green, int blue)
 
 void VL_SetPalette(const byte *palette)
 {
-	int i;
-	
-	for (i = 0; i < 256; i++)
-		vga_setpalette(i, palette[i*3+0], palette[i*3+1], palette[i*3+2]);
+	memcpy(mypal, palette, 768);
+	VW_UpdateScreen();
 }
 
 
@@ -167,14 +427,7 @@ void VL_SetPalette(const byte *palette)
 
 void VL_GetPalette(byte *palette)
 {
-	int i, r, g, b;
-	
-	for (i = 0; i < 256; i++) {
-		vga_getpalette(i, &r, &g, &b);
-		palette[i*3+0] = r;
-		palette[i*3+1] = g;
-		palette[i*3+2] = b;
-	}
+	memcpy(palette, mypal, 768);
 }
 
 /*
@@ -273,6 +526,7 @@ void VL_MemToScreen(const byte *source, int width, int height, int x, int y)
 	}
 }
 
+/* TODO: can this go in id_vh.c? */
 void VL_DeModeXize(byte *buf, int width, int height)
 {
 	byte *mem, *ptr, *destline;
@@ -283,6 +537,7 @@ void VL_DeModeXize(byte *buf, int width, int height)
 		return;
 	}
 	
+	/* TODO: is there a better way without mallocing extra memory? */
 	mem = malloc(width * height);
 	ptr = buf;
 	for (plane = 0; plane < 4; plane++) {
@@ -299,7 +554,7 @@ void VL_DeModeXize(byte *buf, int width, int height)
 
 void VL_DirectPlot(int x1, int y1, int x2, int y2)
 {
-	*(graph_mem + x1 + y1 * 320) = *(gfxbuf + x2 + y2 * 320);
+
 }
 
 /*
@@ -393,7 +648,7 @@ void keyboard_handler(int code, int press)
 
 	if (k == 0xe0)		// Special key prefix
 		special = true;
-	else if ( (k == SCANCODE_BREAK) || (k == SCANCODE_BREAK_ALTERNATIVE) )	// Handle Pause key
+	else if ( k == 0xE1 )	// Handle Pause key
 		Paused = true;
 	else
 	{
@@ -504,8 +759,7 @@ static word INL_GetJoyButtons(word joy)
 ///////////////////////////////////////////////////////////////////////////
 static void INL_StartKbd(void)
 {
-	keyboard_init();
-	keyboard_seteventhandler(keyboard_handler);
+
 	IN_ClearKeysDown();
 }
 
@@ -516,7 +770,7 @@ static void INL_StartKbd(void)
 ///////////////////////////////////////////////////////////////////////////
 static void INL_ShutKbd(void)
 {
-	keyboard_close();
+
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -751,7 +1005,7 @@ boolean IN_CheckAck (void)
 {
 	unsigned	i,buttons;
 	
-while (keyboard_update()) ; /* get all events */
+	CheckEvents(); /* get all events */
 
 	if (LastScan)
 		return true;
@@ -831,7 +1085,4 @@ byte IN_JoyButtons (void)
 	return 0;
 }
 
-int main(int argc, char *argv[])
-{
-	return WolfMain(argc, argv);
-}
+

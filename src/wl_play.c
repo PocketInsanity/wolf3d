@@ -996,7 +996,9 @@ boolean	palshifted;
 
 void InitRedShifts (void)
 {
-	byte *workptr, *baseptr;
+	byte *workptr;
+	const byte *baseptr;
+
 	int		i,j,delta;
 
 
