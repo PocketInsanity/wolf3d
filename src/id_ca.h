@@ -8,20 +8,20 @@
 
 typedef	struct
 {
-	long planestart[3];
-	word planelength[3];
-	word width, height;
+	int planestart[3];
+	int planelength[3];
+	int width, height;
 	char name[16];
-} PACKED maptype;
+} maptype;
 
 /* ======================================================================== */
 
-extern	int			mapon;
+extern	int	mapon;
 
-extern	word *mapsegs[MAPPLANES];
-extern	maptype			*mapheaderseg[NUMMAPS];
-extern	byte			*audiosegs[NUMSNDCHUNKS];
-extern	byte			*grsegs[NUMCHUNKS];
+extern	word	*mapsegs[MAPPLANES];
+extern	maptype	*mapheaderseg[NUMMAPS];
+extern	byte	*audiosegs[NUMSNDCHUNKS];
+extern	byte	*grsegs[NUMCHUNKS];
 
 extern char extension[5];
 
@@ -63,12 +63,12 @@ void MM_SortMem();
 #define PMPageSize	4096
 
 typedef	struct {
-	longword offset;		// Offset of chunk into file
-	word length;		// Length of the chunk
+	longword offset;	// Offset of chunk into file
+	int length;		// Length of the chunk
 	memptr addr;
 } PageListStruct;
 
-extern word ChunksInFile, PMSpriteStart, PMSoundStart;
+extern int ChunksInFile, PMSpriteStart, PMSoundStart;
 
 extern PageListStruct *PMPages;
 

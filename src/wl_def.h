@@ -419,7 +419,7 @@ typedef enum {
 typedef enum {
 	ac_badobject = -1,
 	ac_no,
-	ac_yes,
+	ac_yes
 } activetype;
 
 typedef enum {
@@ -702,8 +702,8 @@ void 		NewViewSize (int width);
 boolean 	LoadTheGame(int file,int x,int y);
 boolean		SaveTheGame(int file,int x,int y);
 void 		ShowViewSize (int width);
-void		ShutdownId (void);
-void WriteConfig(void);
+void ShutdownId();
+int WriteConfig();
 
 int WolfMain(int argc, char *argv[]);
 
@@ -738,6 +738,7 @@ void RecordDemo();
 void DrawHighScores();
 void DrawPlayBorder();
 void DrawPlayBorderSides();
+void DrawStatusBar();
 
 #define	PlaySoundLocTile(s,tx,ty)	PlaySoundLocGlobal(s,(((long)(tx) << TILESHIFT) + (1L << (TILESHIFT - 1))),(((long)ty << TILESHIFT) + (1L << (TILESHIFT - 1))))
 #define	PlaySoundLocActor(s,ob)		PlaySoundLocGlobal(s,(ob)->x,(ob)->y)

@@ -20,6 +20,7 @@ SD_StartMusic((MusicGroup *)audiosegs[STARTMUSIC + chunk]);
 =>
 SD_StartMusic(chunk);
 ------------------------------------------------------------------------------
+* use int16_t, etc (stdint)
 * serialize reads/writes
 * fix fix fix different size stuff
 works alright at some res, but breaks on most others currently

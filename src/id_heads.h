@@ -22,7 +22,7 @@ typedef bool boolean;
 #endif
 
 #define PACKED
-#pragma pack(1) /* TODO: this unfortunately packs every struct... */
+#pragma pack(1)
 
 #define ssize_t SSIZE_T
 
@@ -35,7 +35,6 @@ typedef bool boolean;
 #include <glob.h>
 
 #define PACKED __attribute__((packed))
-#define LONGLONG long long
 
 #ifdef __cplusplus
 typedef bool boolean;
@@ -54,13 +53,13 @@ typedef enum { false, true } boolean;
 #include <time.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <stdint.h>
 #include <math.h>
 
 #ifndef O_BINARY
 #define O_BINARY 0
 #endif
 
-#include "misc.h"
 #include "version.h"
 
 /* ------------------------------------------------------------------------ */
@@ -105,6 +104,8 @@ typedef	struct {
 typedef	struct {
 	Point ul, lr;
 } Rect;
+
+#include "misc.h"
 
 #include "vi_comm.h"
 #include "sd_comm.h"

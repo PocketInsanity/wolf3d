@@ -3,14 +3,8 @@
 typedef struct
 {
 	/* 0-255 is a character, > is a pointer to a node */
-	word bit0, bit1;
-} PACKED huffnode;
-
-typedef struct
-{
-	word RLEWtag;
-	long headeroffsets[100];
-} PACKED mapfiletype;
+	int bit0, bit1;
+} huffnode;
 
 /*
 =============================================================================
@@ -20,13 +14,13 @@ typedef struct
 =============================================================================
 */
 
-static mapfiletype *tinf;
+int RLEWtag;
 int mapon;
 
-word		*mapsegs[MAPPLANES];
-maptype		*mapheaderseg[NUMMAPS];
-byte		*audiosegs[NUMSNDCHUNKS];
-byte		*grsegs[NUMCHUNKS];
+word	*mapsegs[MAPPLANES];
+maptype	*mapheaderseg[NUMMAPS];
+byte	*audiosegs[NUMSNDCHUNKS];
+byte	*grsegs[NUMCHUNKS];
 
 char extension[5];
 #define gheadname "vgahead."
@@ -41,11 +35,11 @@ char extension[5];
 static long *grstarts;	/* array of offsets in vgagraph */
 static long *audiostarts; /* array of offsets in audiot */
 
-static huffnode grhuffman[255];
+static huffnode grhuffman[256];
 
-static int grhandle; /* handle to VGAGRAPH */
-static int maphandle; /* handle to GAMEMAPS */
-static int audiohandle; /* handle to AUDIOT */
+static int grhandle = -1;	/* handle to VGAGRAPH */
+static int maphandle = -1;	/* handle to GAMEMAPS */
+static int audiohandle = -1;	/* handle to AUDIOT */
 
 /*
 =============================================================================
@@ -349,7 +343,7 @@ static void CAL_SetupGrFile()
 	long chunkcomplen;
 	byte *grtemp;
 	int i;
-	
+
 //
 // load vgadict.ext (huffman dictionary for graphics files)
 //
@@ -357,11 +351,17 @@ static void CAL_SetupGrFile()
 	strcpy(fname, gdictname);
 	strcat(fname, extension);
 
-	if ((handle = open(fname, O_RDONLY | O_BINARY)) == -1)
+	handle = OpenRead(fname);
+	if (handle == -1)
 		CA_CannotOpen(fname);
 
-	read(handle, &grhuffman, sizeof(grhuffman));
-	close(handle);
+	for (i = 0; i < 256; i++) {
+		grhuffman[i].bit0 = ReadInt16(handle);
+		grhuffman[i].bit1 = ReadInt16(handle);
+	}
+	
+	CloseRead(handle);
+	
 //
 // load the data offsets from vgahead.ext
 //
@@ -371,39 +371,41 @@ static void CAL_SetupGrFile()
 	strcpy(fname, gheadname);
 	strcat(fname, extension);
 
-	if ((handle = open(fname, O_RDONLY | O_BINARY)) == -1)
+	handle = OpenRead(fname);
+	if (handle == -1)
 		CA_CannotOpen(fname);
-
-	CA_FarRead(handle, (memptr)grtemp, (NUMCHUNKS+1)*3);
+	
+	ReadBytes(handle, grtemp, (NUMCHUNKS+1)*3);
 
 	for (i = 0; i < NUMCHUNKS+1; i++)
 		grstarts[i] = (grtemp[i*3+0]<<0)|(grtemp[i*3+1]<<8)|(grtemp[i*3+2]<<16);
 
 	MM_FreePtr((memptr)&grtemp);
 	
-	close(handle);
-
+	CloseRead(handle);
+	
 //
 // Open the graphics file, leaving it open until the game is finished
 //
 	strcpy(fname, gfilename);
 	strcat(fname, extension);
 
-	grhandle = open(fname, O_RDONLY | O_BINARY);
+	grhandle = OpenRead(fname);
 	if (grhandle == -1)
 		CA_CannotOpen(fname);
-
 
 //
 // load the pic headers into pictable
 //
-	MM_GetPtr((memptr)&pictable,NUMPICS*sizeof(pictabletype));
+	MM_GetPtr((memptr)&pictable, NUMPICS*sizeof(pictabletype));
 	chunkcomplen = grstarts[STRUCTPIC+1] - grstarts[STRUCTPIC];
-	lseek(grhandle, grstarts[STRUCTPIC], SEEK_SET);
+	ReadSeek(grhandle, grstarts[STRUCTPIC], SEEK_SET);
 
 	MM_GetPtr(&compseg, chunkcomplen);
-	CA_FarRead(grhandle,compseg,chunkcomplen);
-	CAL_HuffExpand(compseg+4, (byte *)pictable, NUMPICS*sizeof(pictabletype), grhuffman);
+
+	ReadBytes(grhandle, compseg, chunkcomplen);
+	
+	CAL_HuffExpand((byte *)compseg+4, (byte *)pictable, NUMPICS*sizeof(pictabletype), grhuffman);
 	MM_FreePtr(&compseg);
 }
 
@@ -422,32 +424,24 @@ static void CAL_SetupMapFile()
 {
 	int i;
 	int handle;
-	long length,pos;
+	long pos;
 	char fname[13];
-
-//
-// load maphead.ext (offsets and tileinfo for map file)
-//
+	
 	strcpy(fname, mheadname);
 	strcat(fname, extension);
 
-	if ((handle = open(fname, O_RDONLY | O_BINARY)) == -1)
+	handle = OpenRead(fname);
+	if (handle == -1)
 		CA_CannotOpen(fname);
 
-	length = filelength(handle);
-	MM_GetPtr((memptr)&tinf, length);
-	
-	CA_FarRead(handle, (byte *)tinf, length);
-	
-	close(handle);
+	RLEWtag = ReadInt16(handle);
 
-//
-// open the data file
-//
+/* open the data file */
 	strcpy(fname, gmapsname);
-	strcat(fname,extension);
+	strcat(fname, extension);
 
-	if ((maphandle = open(fname, O_RDONLY | O_BINARY)) == -1)
+	maphandle = OpenRead(fname);
+	if (maphandle == -1)
 		CA_CannotOpen(fname);
 
 //
@@ -455,18 +449,31 @@ static void CAL_SetupMapFile()
 //
 	for (i = 0; i < NUMMAPS; i++)
 	{
-		pos = tinf->headeroffsets[i];
+		pos = ReadInt32(handle);
 		if (pos == 0) {
 			mapheaderseg[i] = NULL;
 			continue;
 		}
 			
 		MM_GetPtr((memptr)&mapheaderseg[i], sizeof(maptype));
-		MM_SetLock((memptr)&mapheaderseg[i],true);
-		lseek(maphandle, pos, SEEK_SET);
-		CA_FarRead(maphandle, (memptr)mapheaderseg[i], sizeof(maptype));
+		MM_SetLock((memptr)&mapheaderseg[i], true);
+
+		ReadSeek(maphandle, pos, SEEK_SET);
+		
+		mapheaderseg[i]->planestart[0] = ReadInt32(maphandle);
+		mapheaderseg[i]->planestart[1] = ReadInt32(maphandle);
+		mapheaderseg[i]->planestart[2] = ReadInt32(maphandle);
+		
+		mapheaderseg[i]->planelength[0] = ReadInt16(maphandle);
+		mapheaderseg[i]->planelength[1] = ReadInt16(maphandle);
+		mapheaderseg[i]->planelength[2] = ReadInt16(maphandle);
+		mapheaderseg[i]->width = ReadInt16(maphandle);
+		mapheaderseg[i]->height = ReadInt16(maphandle);
+		ReadBytes(maphandle, (byte *)mapheaderseg[i]->name, 16);
+		
 	}
 
+	CloseRead(handle);
 //
 // allocate space for 2 64*64 planes
 //
@@ -492,27 +499,31 @@ static void CAL_SetupAudioFile()
 	int handle;
 	long length;
 	char fname[13];
+	int i;
+	
+	strcpy(fname, aheadname);
+	strcat(fname, extension);
 
-/* load maphead.ext (offsets and tileinfo for map file) */
-
-	strcpy(fname,aheadname);
-	strcat(fname,extension);
-
-	if ((handle = open(fname, O_RDONLY | O_BINARY)) == -1)
+	handle = OpenRead(fname);
+	if (handle == -1)
 		CA_CannotOpen(fname);
+	
+	length = ReadLength(handle);
+	
+	MM_GetPtr((memptr)&audiostarts, length);
+	
+	for (i = 0; i < (length/4); i++)
+		audiostarts[i] = ReadInt32(handle);
 
-	length = filelength(handle);
-	MM_GetPtr((memptr)&audiostarts,length);
-	CA_FarRead(handle, (byte *)audiostarts, length);
-		
-	close(handle);
+	CloseRead(handle);	
 
 /* open the data file */
 
-	strcpy(fname,afilename);
-	strcat(fname,extension);
+	strcpy(fname, afilename);
+	strcat(fname, extension);
 
-	if ((audiohandle = open(fname, O_RDONLY | O_BINARY)) == -1)
+	audiohandle = OpenRead(fname);
+	if (audiohandle == -1)
 		CA_CannotOpen(fname);
 }
 
@@ -549,9 +560,9 @@ void CA_Startup()
 
 void CA_Shutdown()
 {
-	close(maphandle);
-	close(grhandle);
-	close(audiohandle);
+	CloseRead(maphandle);
+	CloseRead(grhandle);
+	CloseRead(audiohandle);
 }
 
 //===========================================================================
@@ -568,9 +579,7 @@ void CA_CacheAudioChunk(int chunk)
 {
 	long pos, length;
 
-	if (audiosegs[chunk])
-	{
-		MM_SetPurge((memptr)&audiosegs[chunk],0);
+	if (audiosegs[chunk]) {
 		return;	
 	}
 
@@ -581,16 +590,15 @@ void CA_CacheAudioChunk(int chunk)
 	pos = audiostarts[chunk];
 	length = audiostarts[chunk+1]-pos;
 
-	lseek(audiohandle, pos, SEEK_SET);
+	ReadSeek(audiohandle, pos, SEEK_SET);
 
 	MM_GetPtr((memptr)&audiosegs[chunk], length);
 
-	CA_FarRead(audiohandle,audiosegs[chunk], length);
+	ReadBytes(audiohandle, audiosegs[chunk], length);
 }
 
 void CA_UnCacheAudioChunk(int chunk)
 {
-	/* TODO: For now the warning may be ignored since wl_menu.c causes it */
 	if (audiosegs[chunk] == 0) {
 		fprintf(stderr, "Trying to free null audio chunk %d!\n", chunk);
 		return;
@@ -605,14 +613,12 @@ void CA_UnCacheAudioChunk(int chunk)
 =
 = CA_LoadAllSounds
 =
-= Purges all sounds, then loads all new ones (mode switch)
-=
 ======================
 */
 
 void CA_LoadAllSounds()
 {
-	unsigned start, i;
+	int start, i;
 
 	for (start = STARTADLIBSOUNDS, i = 0; i < NUMSOUNDS; i++, start++)
 		CA_CacheAudioChunk(start);
@@ -690,7 +696,7 @@ void CA_CacheGrChunk(int chunk)
 	byte *source;
 
 	/* this is due to Quit() wanting to cache the error screen before this has been set up! */
-	if ( (grhandle == 0) || (grhandle == -1) ) 
+	if (grhandle == -1)
 		return;
 		
 	if (grsegs[chunk]) {
@@ -704,10 +710,10 @@ void CA_CacheGrChunk(int chunk)
 
 	compressed = grstarts[chunk+1]-pos;
 
-	lseek(grhandle,pos,SEEK_SET);
+	ReadSeek(grhandle, pos, SEEK_SET);
 
 	MM_GetPtr((memptr)&source, compressed);
-	CA_FarRead(grhandle, source, compressed);
+	ReadBytes(grhandle, source, compressed);
 
 	CAL_ExpandGrChunk(chunk, source);
 	
@@ -776,7 +782,7 @@ void CA_CacheMap(int mapnum)
 		source++;
 		MM_GetPtr(&buffer2seg, expanded);
 		CAL_CarmackExpand(source, (word *)buffer2seg,expanded);
-		CA_RLEWexpand(((word *)buffer2seg)+1,*dest,size, tinf->RLEWtag);
+		CA_RLEWexpand(((word *)buffer2seg)+1,*dest,size, RLEWtag);
 		MM_FreePtr(&buffer2seg);
 
 		MM_FreePtr(&bigbufferseg);
@@ -803,13 +809,13 @@ void MM_Shutdown()
 
 void MM_GetPtr(memptr *baseptr, unsigned long size)
 {
-	/* TODO: add some sort of linked list for purging */
+	/* add some sort of linked list for purging */
 	*baseptr = malloc(size);
 }
 
 void MM_FreePtr(memptr *baseptr)
 {
-	/* TODO: add some sort of linked list for purging, etc */
+	/* add some sort of linked list for purging, etc */
 	free(*baseptr);
 }
 
@@ -828,8 +834,7 @@ void MM_SortMem()
 static boolean PMStarted;
 
 static int PageFile = -1;
-word ChunksInFile;
-word PMSpriteStart, PMSoundStart;
+int ChunksInFile, PMSpriteStart, PMSoundStart;
 
 PageListStruct *PMPages;
 
@@ -842,9 +847,9 @@ static void PML_ReadFromFile(byte *buf, long offset, word length)
 		Quit("PML_ReadFromFile: Null pointer");
 	if (!offset)
 		Quit("PML_ReadFromFile: Zero offset");
-	if (lseek(PageFile, offset, SEEK_SET) != offset)
+	if (ReadSeek(PageFile, offset, SEEK_SET) != offset)
 		Quit("PML_ReadFromFile: Seek failed");
-	if (!CA_FarRead(PageFile ,buf, length))
+	if (ReadBytes(PageFile, buf, length) != length)
 		Quit("PML_ReadFromFile: Read failed");
 }
 
@@ -854,49 +859,34 @@ static void PML_ReadFromFile(byte *buf, long offset, word length)
 static void PML_OpenPageFile()
 {
 	int i;
-	long size;
-	void *buf;
-	longword *offsetptr;
-	word *lengthptr;
 	PageListStruct *page;
 	char fname[13];
 	
 	strcpy(fname, pfilename);
 	strcat(fname, extension);
 	
-	PageFile = open(fname, O_RDONLY | O_BINARY);
+	PageFile = OpenRead(fname);
 	if (PageFile == -1)
 		Quit("PML_OpenPageFile: Unable to open page file");
 
 	// Read in header variables
-	read(PageFile, &ChunksInFile, sizeof(ChunksInFile));
-	read(PageFile, &PMSpriteStart, sizeof(PMSpriteStart));
-	read(PageFile, &PMSoundStart, sizeof(PMSoundStart));
+	ChunksInFile = ReadInt16(PageFile);
+	PMSpriteStart = ReadInt16(PageFile);
+	PMSoundStart = ReadInt16(PageFile);
 
 	// Allocate and clear the page list
 	MM_GetPtr((memptr)&PMPages, sizeof(PageListStruct) * ChunksInFile);
 	MM_SetLock((memptr)&PMPages, true);
+	
 	memset(PMPages, 0, sizeof(PageListStruct) * ChunksInFile);
 
 	// Read in the chunk offsets
-	size = sizeof(longword) * ChunksInFile;
-	MM_GetPtr(&buf, size);
-	if (!CA_FarRead(PageFile,(byte *)buf,size))
-		Quit("PML_OpenPageFile: Offset read failed");
-	offsetptr = (longword *)buf;
-	for (i = 0,page = PMPages;i < ChunksInFile;i++,page++)
-		page->offset = *offsetptr++;
-	MM_FreePtr(&buf);
-
-	// Read in the chunk lengths
-	size = sizeof(word) * ChunksInFile;
-	MM_GetPtr(&buf,size);
-	if (!CA_FarRead(PageFile,(byte *)buf,size))
-		Quit("PML_OpenPageFile: Length read failed");
-	lengthptr = (word *)buf;
 	for (i = 0, page = PMPages; i < ChunksInFile; i++, page++)
-		page->length = *lengthptr++;
-	MM_FreePtr(&buf);
+		page->offset = ReadInt32(PageFile);
+		
+	// Read in the chunk lengths
+	for (i = 0, page = PMPages; i < ChunksInFile; i++, page++)
+		page->length = ReadInt16(PageFile);
 }
 
 //
@@ -905,7 +895,7 @@ static void PML_OpenPageFile()
 static void PML_ClosePageFile()
 {
 	if (PageFile != -1)
-		close(PageFile);
+		CloseRead(PageFile);
 		
 	if (PMPages) {
 		MM_SetLock((memptr)&PMPages,false);
@@ -938,20 +928,11 @@ memptr PM_GetPage(int pagenum)
 //
 void PM_Preload(boolean (*update)(word current, word total))
 {
-	update(1, 1);
-}
-
-//
-//	PM_Reset() - Sets up caching structures
-//
-static void PM_Reset()
-{
 	int i;
-	PageListStruct *page;
-
-	// Initialize page list
-	for (i = 0, page = PMPages; i < ChunksInFile; i++, page++)
-		page->addr = NULL;
+	
+	for (i = 0; i < 50; i++)
+		update(i, 50); /* yay */
+	update(50, 50);
 }
 
 //
@@ -963,8 +944,6 @@ void PM_Startup()
 		return;
 
 	PML_OpenPageFile();
-
-	PM_Reset();
 
 	PMStarted = true;
 }

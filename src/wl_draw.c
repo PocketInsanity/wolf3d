@@ -35,7 +35,7 @@ static unsigned postx;
 
 static void AsmRefresh();
 
-//#define NOASM
+#define NOASM
 
 #ifndef NOASM
 #define FixedByFrac(x, y) \

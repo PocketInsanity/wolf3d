@@ -90,22 +90,22 @@ CtlMenu[]=
 NewEmenu[]=
 {
 	{1,"Episode 1\n"
-	   "Escape from Wolfenstein",0},
+		"Escape from Wolfenstein",0},
 	{0,"",0},
 	{3,"Episode 2\n"
-		   "Operation: Eisenfaust",0},
+		"Operation: Eisenfaust",0},
 	{0,"",0},
 	{3,"Episode 3\n"
-		   "Die, Fuhrer, Die!",0},
+		"Die, Fuhrer, Die!",0},
 	{0,"",0},
 	{3,"Episode 4\n"
-		  "A Dark Secret",0},
+		"A Dark Secret",0},
 	{0,"",0},
 	{3,"Episode 5\n"
-		  "Trail of the Madman",0},
+		"Trail of the Madman",0},
 	{0,"",0},
 	{3,"Episode 6\n"
-		  "Confrontation",0}
+		"Confrontation",0}
 },
 #endif
 
@@ -1187,14 +1187,8 @@ int CP_LoadGame(int quick)
 			loadedgame=false;
 			close(handle);
 
-			DrawFace ();
-			DrawHealth ();
-			DrawLives ();
-			DrawLevel ();
-			DrawAmmo ();
-			DrawKeys ();
-			DrawWeapon ();
-			DrawScore ();
+			DrawStatusBar();
+			
 			return 1;
 		}
 	}

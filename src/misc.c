@@ -38,7 +38,6 @@ unsigned long get_TimeCount()
 	struct timeval t1;
 	long secs, usecs;
 	long tc;
-	//double d;
 	
 	gettimeofday(&t1, NULL);
 	secs = t1.tv_sec - t0.tv_sec;
@@ -47,12 +46,9 @@ unsigned long get_TimeCount()
 		usecs += 1000000;
 		secs--;
 	}
-	//d = (double)tc0 + (double)secs * 70.0 + (double)usecs * 70.0 / 1000000.0;
-	//d = (double)tc0 + ((double)secs * 1000000.0 + (double)usecs) / (1000000.0/70.0);
-	//tc = (long)d;
+
 	tc = tc0 + secs * 70 + usecs * 70 / 1000000;
-	
-	
+		
 	return tc;
 }
 
@@ -199,4 +195,133 @@ void DisplayTextSplash(byte *text, int l)
 		printf("%c[m", 27);
 		printf("\n");
 	}
+}
+
+/* ** */
+
+static int16_t SwapInt16L(int16_t i)
+{
+#if __BYTE_ORDER == __BIG_ENDIAN
+	return ((uint16_t)i >> 8) | ((uint16_t)i << 8);
+#else
+	return i;
+#endif
+}
+
+static int32_t SwapInt32L(int32_t i)
+{
+#if __BYTE_ORDER == __BIG_ENDIAN
+	return	((uint32_t)(i & 0xFF000000) >> 24) | 
+		((uint32_t)(i & 0x00FF0000) >>  8) |
+		((uint32_t)(i & 0x0000FF00) <<  8) | 
+		((uint32_t)(i & 0x000000FF) << 24);
+#else
+	return i;
+#endif
+}
+
+/* ** */
+
+int OpenWrite(char *fn)
+{
+	int fp;
+	
+	/* fp = creat(fn, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH); */
+	fp = open(fn, O_CREAT|O_WRONLY|O_TRUNC|O_BINARY, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH);
+	return fp;
+}
+
+void CloseWrite(int fp)
+{
+	close(fp);
+}
+
+int WriteSeek(int fp, int offset, int whence)
+{
+	return lseek(fp, offset, whence);
+}
+
+int WriteInt8(int fp, int8_t d)
+{
+	return write(fp, &d, 1);
+}
+
+int WriteInt16(int fp, int16_t d)
+{
+	int16_t b = SwapInt16L(d);
+	
+	return write(fp, &b, 2) / 2;
+}
+
+int WriteInt32(int fp, int32_t d)
+{
+	int32_t b = SwapInt32L(d);
+	
+	return write(fp, &b, 4) / 4;
+}
+
+int WriteBytes(int fp, byte *d, int len)
+{
+	return write(fp, d, len);
+}
+
+
+int OpenRead(char *fn)
+{
+	int fp;
+	
+	fp = open(fn, O_RDONLY | O_BINARY);
+	
+	return fp;
+}
+
+void CloseRead(int fp)
+{
+	close(fp);
+}
+
+int ReadSeek(int fp, int offset, int whence)
+{
+	return lseek(fp, offset, whence);
+}
+
+int ReadLength(int fp)
+{
+	return filelength(fp);
+}
+
+int8_t ReadInt8(int fp)
+{
+	int8_t d;
+	
+	read(fp, &d, 1);
+	
+	return d;
+}
+
+int16_t ReadInt16(int fp)
+{
+	int16_t d;
+	
+	read(fp, &d, 2);
+	
+	d = SwapInt16L(d);
+	
+	return d;
+}
+
+int32_t ReadInt32(int fp)
+{
+	int32_t d;
+	
+	read(fp, &d, 4);
+	
+	d = SwapInt32L(d);
+	
+	return d;
+}
+
+int ReadBytes(int fp, byte *d, int len)
+{
+	return read(fp, d, len);
 }

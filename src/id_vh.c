@@ -103,7 +103,7 @@ boolean FizzleFade(unsigned xx, unsigned yy, unsigned width, unsigned height, un
 
 void VL_FillPalette(int red, int green, int blue)
 {
-	char pal[768];
+	byte pal[768];
 	int i;
 	
 	for (i = 0; i < 256; i++) {

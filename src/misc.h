@@ -24,4 +24,25 @@ char *ultoa(unsigned long value, char *string, int radix);
 
 #endif /* DOSISM */
 
+extern int OpenWrite(char *fn);
+extern void CloseWrite(int fp);
+
+extern int WriteSeek(int fp, int offset, int whence);
+
+extern int WriteInt8(int fp, int8_t d);
+extern int WriteInt16(int fp, int16_t d);
+extern int WriteInt32(int fp, int32_t d);
+extern int WriteBytes(int fp, byte *d, int len);
+
+extern int OpenRead(char *fn);
+extern void CloseRead(int fp);
+
+extern int ReadSeek(int fp, int offset, int whence);
+extern int ReadLength(int fp);
+
+extern int8_t ReadInt8(int fp);
+extern int16_t ReadInt16(int fp);
+extern int32_t ReadInt32(int fp);
+extern int ReadBytes(int fp, byte *d, int len);
+
 #endif

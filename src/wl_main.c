@@ -60,9 +60,9 @@ char **_argv;
 
 fixed FixedByFrac(fixed a, fixed b)
 {
-	LONGLONG ra = a;
-	LONGLONG rb = b;
-	LONGLONG r;
+	int64_t ra = a;
+	int64_t rb = b;
+	int64_t r;
 	
 	r = ra * rb;
 	r >>= 16;
@@ -101,6 +101,7 @@ void CalcTics()
 
 /* ======================================================================== */
 
+#if 0
 /*
 ====================
 =
@@ -143,21 +144,6 @@ void ReadConfig()
 
 		close(file);
 
-		if (sd == sdm_AdLib && !AdLibPresent && !SoundBlasterPresent)
-		{
-			sd = sdm_PC;
-			sd = smm_Off;
-		}
-
-		if ((sds == sds_SoundBlaster && !SoundBlasterPresent) ||
-			(sds == sds_SoundSource && !SoundSourcePresent))
-			sds = sds_Off;
-
-		if (!MousePresent)
-			mouseenabled = false;
-		if (!JoysPresent[joystickport])
-			joystickenabled = false;
-
 		MainMenu[6].active=1;
 		MainItems.curpos=0;
 	}	
@@ -169,34 +155,17 @@ void ReadConfig()
 		viewsize = 15;
 	}
 	
-		if (SoundBlasterPresent || AdLibPresent)
-		{
-			sd = sdm_AdLib;
-			sm = smm_AdLib;
-		}
-		else
-		{
-			sd = sdm_PC;
-			sm = smm_Off;
-		}
+	mouseenabled = false;
 
-		if (SoundBlasterPresent)
-			sds = sds_SoundBlaster;
-		else
-			sds = sds_Off;
+	joystickenabled = false;
+	joypadenabled = false;
+	joystickport = 0;
 
-		if (MousePresent)
-			mouseenabled = true;
+	mouseadjustment = 5;
 
-		joystickenabled = false;
-		joypadenabled = false;
-		joystickport = 0;
-
-		mouseadjustment = 5;
-
-	SD_SetMusicMode(sm);
-	SD_SetSoundMode(sd);
-	SD_SetDigiDevice(sds);
+	SD_SetMusicMode(smm_AdLib);
+	SD_SetSoundMode(sdm_AdLib);
+	SD_SetDigiDevice(sds_SoundBlaster);
 }
 
 
@@ -240,31 +209,7 @@ void WriteConfig()
 	}
 }
 
-/*
-=====================
-=
-= NewGame
-=
-= Set up new game to start from the beginning
-=
-=====================
-*/
-
-void NewGame(int difficulty, int episode)
-{
-	memset(&gamestate,0,sizeof(gamestate));
-	
-	gamestate.difficulty = difficulty;
-	gamestate.weapon = gamestate.bestweapon
-		= gamestate.chosenweapon = wp_pistol;
-	gamestate.health = 100;
-	gamestate.ammo = STARTAMMO;
-	gamestate.lives = 3;
-	gamestate.nextextra = EXTRAPOINTS;
-	gamestate.episode = episode;
-
-	startgame = true;
-}
+#endif
 
 void DiskFlopAnim(int x, int y)
 {
@@ -279,7 +224,6 @@ void DiskFlopAnim(int x, int y)
 	which ^= 1;
 }
 
-
 long DoChecksum(byte *source, unsigned size, long checksum)
 {
 	int i;
@@ -290,6 +234,58 @@ long DoChecksum(byte *source, unsigned size, long checksum)
 	return checksum;
 }
 
+int WriteConfig()
+{
+	int fd;
+	
+	fd = OpenWrite(configname);
+	
+	if (fd != -1) {
+		CloseWrite(fd);
+	}
+	
+	return 0;
+}
+
+int ReadConfig()
+{
+	int fd;
+	
+	fd = OpenRead(configname);
+	
+	if (fd != -1) {
+		CloseRead(fd);
+
+#ifdef UPLOAD		
+		MainMenu[readthis].active = 1;
+		MainItems.curpos = 0;
+#endif
+	}
+	
+	mouseenabled = false;
+
+	joystickenabled = false;
+	joypadenabled = false;
+	joystickport = 0;
+
+	mouseadjustment = 5;
+
+	SD_SetMusicMode(smm_AdLib);
+	SD_SetSoundMode(sdm_AdLib);
+	SD_SetDigiDevice(sds_SoundBlaster);
+	
+	return 0;
+}
+
+int SaveGame()
+{
+	return 0;
+}
+
+int LoadGame()
+{
+	return 0;
+}
 
 /*
 ==================
@@ -299,7 +295,7 @@ long DoChecksum(byte *source, unsigned size, long checksum)
 ==================
 */
 
-boolean SaveTheGame(int file,int x,int y)
+boolean SaveTheGame(int file, int x, int y)
 {
 	long checksum;
 	objtype *ob,nullobj;
@@ -1044,6 +1040,32 @@ void ShutdownId()
 	CA_Shutdown();
 	PM_Shutdown();
 	MM_Shutdown();
+}
+
+/*
+=====================
+=
+= NewGame
+=
+= Set up new game to start from the beginning
+=
+=====================
+*/
+
+void NewGame(int difficulty, int episode)
+{
+	memset(&gamestate, 0, sizeof(gamestate));
+	
+	gamestate.difficulty = difficulty;
+	gamestate.weapon = gamestate.bestweapon
+		= gamestate.chosenweapon = wp_pistol;
+	gamestate.health = 100;
+	gamestate.ammo = STARTAMMO;
+	gamestate.lives = 3;
+	gamestate.nextextra = EXTRAPOINTS;
+	gamestate.episode = episode;
+
+	startgame = true;
 }
 
 /*

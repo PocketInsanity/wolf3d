@@ -633,6 +633,18 @@ void DrawPlayBorder()
 	}
 }
 
+void DrawStatusBar()
+{
+	DrawFace();
+	DrawHealth();
+	DrawLives();
+	DrawLevel();
+	DrawAmmo();
+	DrawKeys();
+	DrawWeapon();
+	DrawScore();
+}
+
 /*
 ===================
 =
@@ -652,14 +664,7 @@ void DrawPlayScreen()
 
 	CA_UnCacheGrChunk(STATUSBARPIC);
 
-	DrawFace();
-	DrawHealth();
-	DrawLives();
-	DrawLevel();
-	DrawAmmo();
-	DrawKeys();
-	DrawWeapon();
-	DrawScore();
+	DrawStatusBar();
 }
 
 //==========================================================================

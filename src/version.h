@@ -16,28 +16,41 @@
 /* #define SPEAR */
 /* #define SPEARDEMO */
 #define UPLOAD
-#define GAMENAME "Wolfenstein 3D Shareware"
+#define GAMENAME	"Wolfenstein 3D Shareware"
+#define GAMEEXT		"wl1"
+#define GAMETYPE	"WL1\0"
 
 #elif WMODE == 1
 /* #define SPEAR */
 /* #define SPEARDEMO */
 /* #define UPLOAD */
-#define GAMENAME "Wolfenstein 3D"
+#define GAMENAME	"Wolfenstein 3D"
+#define GAMEEXT		"wl6"
+#define GAMETYPE	"WL6\0"
 
 #elif WMODE == 2
 #define SPEAR 
 #define SPEARDEMO 
 /* #define UPLOAD */
-#define GAMENAME "Spear of Destiny Demo"
+#define GAMENAME	"Spear of Destiny Demo"
+#define GAMEEXT		"sdm"
+#define GAMETYPE	"SDM\0"
 
 #elif WMODE == 3
 #define SPEAR
 /* #define SPEARDEMO */
 /* #define UPLOAD */
-#define GAMENAME "Spear of Destiny"
+#define GAMENAME	"Spear of Destiny"
+#define GAMEEXT		"sod"
+#define GAMETYPE	"SOD\0"
 
 #else
 #error "please edit version.h and fix WMODE"
 #endif
+
+#define GAMEHDR		"WOLF3D\0\0"
+
+#define	SAVTYPE		"SAV\0"
+#define CFGTYPE		"CFG\0"
 
 #endif
