@@ -553,6 +553,53 @@ void DrawVisibleSprites()
 	}
 }
 
+#define LEFTWALL        0x01
+#define RIGHTWALL       0x02
+#define TOPWALL         0x04
+#define BOTTOMWALL      0x08
+
+void DrawCubex(byte dat, GLfloat x, GLfloat y)
+{
+        float x1 = x + 1;
+        float x2 = x - 1;
+        float z1 = -y + 1;
+        float z2 = -y - 1;
+
+        glBegin(GL_QUADS);
+
+        if (dat & BOTTOMWALL) {
+                /* glColor3f(1.0f, 0.0f, 0.0f); */
+                glTexCoord2d(1.0,0.0); glVertex3f(x1, -1.0f, z2);
+                glTexCoord2d(1.0,1.0); glVertex3f(x2, -1.0f, z2);
+                glTexCoord2d(0.0,1.0); glVertex3f(x2, 1.0f, z2);
+                glTexCoord2d(0.0,0.0); glVertex3f(x1, 1.0f, z2);
+        }
+
+        if (dat & TOPWALL) {
+                /* glColor3f(0.0f, 1.0f, 0.0f); */
+                glTexCoord2d(1.0,0.0); glVertex3f(x2, -1.0f, z1);
+                glTexCoord2d(1.0,1.0); glVertex3f(x1, -1.0f, z1);
+                glTexCoord2d(0.0,1.0); glVertex3f(x1, 1.0f, z1);
+                glTexCoord2d(0.0,0.0); glVertex3f(x2, 1.0f, z1);
+        }
+        if (dat & LEFTWALL) {
+                /* glColor3f(0.0f, 0.0f, 1.0f); */
+                glTexCoord2d(1.0,0.0); glVertex3f(x2, -1.0f, z2);
+                glTexCoord2d(1.0,1.0); glVertex3f(x2, -1.0f, z1);
+                glTexCoord2d(0.0,1.0); glVertex3f(x2, 1.0f, z1);
+                glTexCoord2d(0.0,0.0); glVertex3f(x2, 1.0f, z2);
+        }
+
+        if (dat & RIGHTWALL) {
+                /* glColor3f(1.0f, 1.0f, 0.0f); */
+                glTexCoord2d(1.0,0.0); glVertex3f(x1, -1.0f, z1);
+                glTexCoord2d(1.0,1.0); glVertex3f(x1, -1.0f, z2);
+                glTexCoord2d(0.0,1.0); glVertex3f(x1, 1.0f, z2);
+                glTexCoord2d(0.0,0.0); glVertex3f(x1, 1.0f, z1);
+        }
+
+        glEnd();
+}	
 void DrawWalls()
 {
 	int x, y;
@@ -563,6 +610,7 @@ void DrawWalls()
 			tilehit = tilemap[x][y];
 			if (tilehit < 64) {
 				glBindTexture(GL_TEXTURE_2D, waltex[0]);
+				DrawCubex(0xFF, (GLfloat)x + .5, (GLfloat)y + .5);
 			}
 		}
 	}
@@ -689,19 +737,30 @@ void ThreeDRefresh()
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	
-	DrawPlayerWeapon();	/* draw player's hands */
+	//DrawPlayerWeapon();	/* draw player's hands */
 	
 	glFrustum(-0.286751, 0.286751, -0.288675, 0.288675, 0.500000, 182.000000);
 	glMatrixMode(GL_MODELVIEW);
 	glRotatef(player->angle, 0.0f, 1.0f, 0.0f);
+	//printf("%f, %f\n", (GLfloat)player->x / 65536.0f, (GLfloat)player->y / 65536.0f);
 	glTranslatef((GLfloat)player->x / 65536.0f, 0, (GLfloat)player->y / 65536.0f);	
 	/* Render World */
+	DrawWalls();
 	
 	godmode = 1; /* (: */
 	glRotatef(360 - player->angle, 0.0f, 1.0f, 0.0f);
 	/* Render Sprites */
 	DrawVisibleSprites();	
 
+	glDisable(GL_DEPTH_TEST);
+	glMatrixMode(GL_MODELVIEW); /* temp debug */
+	glLoadIdentity();
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	
+	DrawPlayerWeapon();	/* draw player's hands */
+	glEnable(GL_DEPTH_TEST);
+	
 //
 // show screen and time last cycle
 //
@@ -715,7 +774,8 @@ void ThreeDRefresh()
 	}
 
 	VW_UpdateScreen ();
-
+	VW_WaitVBL(1);
+	
 	frameon++;
 }
 

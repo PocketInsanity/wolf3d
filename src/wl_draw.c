@@ -646,7 +646,6 @@ void ThreeDRefresh()
 	}
 
 	VW_UpdateScreen ();
-
 	frameon++;
 }
 
