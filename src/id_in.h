@@ -26,18 +26,23 @@ typedef	byte		ScanCode;
 #define	sc_DownArrow	0x50
 #define	sc_LeftArrow	0x4b
 #define	sc_RightArrow	0x4d
-*/
-#define sc_UpArrow	103
-#define sc_DownArrow	108
-#define sc_LeftArrow	105
-#define sc_RightArrow	106
-
-#define	sc_Insert		0x52
-#define	sc_Delete		0x53
 #define	sc_Home			0x47
 #define	sc_End			0x4f
 #define	sc_PgUp			0x49
 #define	sc_PgDn			0x51
+*/
+/* SVGAlib specific */
+#define sc_UpArrow	103
+#define sc_DownArrow	108
+#define sc_LeftArrow	105
+#define sc_RightArrow	106
+#define	sc_Home		102
+#define	sc_End		107
+#define	sc_PgUp		104
+#define	sc_PgDn		109
+
+#define	sc_Insert		0x52
+#define	sc_Delete		0x53
 #define	sc_F1			0x3b
 #define	sc_F2			0x3c
 #define	sc_F3			0x3d

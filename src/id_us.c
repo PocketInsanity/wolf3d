@@ -369,6 +369,8 @@ boolean US_LineInput(int x,int y,char *buf,char *def,boolean escok,
 		if (cursorvis)
 			USL_XORICursor(x,y,s,cursor);
 
+		IN_CheckAck(); /* TODO: handle events */
+		
 		sc = LastScan;
 		LastScan = sc_None;
 		c = LastASCII;

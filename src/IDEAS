@@ -1,5 +1,6 @@
-* One binary, any game type. Store certain things in a new file?
-* A key to change viewsize at runtime (max == 20, min == 5 or so...)
+* One binary, any game type. Store certain things in a new file for each
+  dataset?
+* A key to change viewsize while playing (note: max == 20, min == 5 or so...)
 * Game able to cope at any virtual resolution in software mode. OpenGL
   handles this transparently
 * Audio support using OpenAL
@@ -20,6 +21,8 @@
   regardless of future plans [IDEAS]) and no TODO/FIXME/XXXs in the source 
   code
 * Have some sort of way of playing both digital and adlib sounds on all
-  platforms...
+  platforms
 * Test with other (compatible) available mods
 * Unified input handling
+* Configuration files and save games which work regardless of operating
+  system/processor/binary build

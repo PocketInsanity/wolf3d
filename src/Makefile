@@ -25,9 +25,10 @@ wolf3d: $(OBJS)
 	gcc -o wolf3d $(OBJS) $(LFLAGS) 
 
 clean:
-	-rm -rf wolf3d *.o
+	rm -rf wolf3d *.o
 
 distclean: clean
 	rm -rf *~ DEADJOE
 
 forced: distclean wolf3d
+	rm -rf *.o
