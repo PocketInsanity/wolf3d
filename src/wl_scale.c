@@ -15,9 +15,9 @@
 /* scaling data for a given height */
 typedef struct {
     /* number of destination pixels each source pixels maps to in x and y */
-    unsigned count [65];
+    int count[65];
     /* the destination pixel for each source pixel row */
-    short desty [65];
+    int desty[65];
 } t_scaledata;
 
 static t_scaledata scaledata[MAXSCALEHEIGHT+1];
@@ -25,37 +25,40 @@ static int maxscale;
 
 static void BuildCompScale(int height)
 {
-	long		fix,step;
-	unsigned	src;
-	int		startpix,endpix,toppix;
+	long fix, step;
+	int src;
+	int startpix, endpix, toppix;
 
-
-	step = ((long)height<<16) / 64;
-	toppix = (viewheight-height)/2;
+	step = ((long)height << 16) / 64;
+	toppix = (viewheight - height) / 2;
 	fix = 0;
-
-	for (src=0;src<=64;src++)
-	{
-		startpix = fix>>16;
-		fix += step;
-		endpix = fix>>16;
-		if (endpix>startpix)
-		    scaledata [height].count[src] = endpix-startpix;
-		else
-		    scaledata [height].count[src] = 0;
-
-		startpix+=toppix;
-		endpix+=toppix;
-
-		if (startpix == endpix || endpix < 0 || startpix >= viewheight || src == 64)
-		    /* source pixel goes off screen */
-		    scaledata [height].desty[src] = -1;
-		else
-		    scaledata [height].desty[src] = startpix;
 		
-		/* Clip if needed */    
-		if ( ((signed)scaledata [height].count[src] + (signed)scaledata [height].desty[src]) > viewheight)
-			scaledata [height].count[src] = viewheight - scaledata [height].desty[src];
+/* TODO: <= 64, or < 64? */
+	for (src = 0; src < 64; src++)
+	{
+		startpix = fix >> 16;
+		fix += step;
+		endpix = fix >> 16;
+		
+		if (endpix > startpix)
+		    scaledata[height].count[src] = endpix - startpix;
+		else
+		    scaledata[height].count[src] = 0;
+
+		startpix += toppix;
+		endpix += toppix;
+
+		if ((startpix == endpix) || (endpix < 0) || (startpix >= viewheight) /*|| (src == 64)*/) {
+			/* source pixel goes off screen */
+			scaledata[height].desty[src] = -1;
+		} else if (startpix < 0) {
+			scaledata[height].desty[src] = 0;
+		} else {
+			scaledata[height].desty[src] = startpix;
+			/* Clip if needed */    
+			if ((scaledata[height].count[src] + scaledata[height].desty[src]) > viewheight)
+				scaledata[height].count[src] = viewheight - scaledata [height].desty[src];
+		}
 	}
 
 }
@@ -76,8 +79,7 @@ void SetupScaling(int maxscaleheight)
 //
 // build the compiled scalers
 //
-	for (i=1;i<=maxscaleheight;i++)
-	{
+	for (i = 1; i <= maxscaleheight; i++) {
 		BuildCompScale(i);
 	}
 
@@ -159,24 +161,26 @@ static void ScaleLine()
 	unsigned char *pixels;
 	unsigned char color;
 
-    while (linecmds[0]) {
-	y0 = linecmds[2]/2;
-	y1 = linecmds[0]/2 - 1;
-	pixels = (unsigned char *) shapeptr + y0 + linecmds[1];
+	while (linecmds[0]) {
+		y0 = linecmds[2] / 2;
+		/* y1 = linecmds[0] / 2 - 1; */
+		y1 = linecmds[0] / 2;
+		pixels = (unsigned char *)shapeptr + y0 + linecmds[1];
+if (y1 >= 65) printf("overflow! %d\n", y1);
 
-	for (y=y0; y<=y1; y++) {
-	    ys = scaledata[linescale].desty[y];
-	    color = *pixels++;
-	    if (ys >= 0) {
-		for (ny=0; ny<scaledata[linescale].count[y]; ny++) {
-		    for (n = 0, x = slinex; n < slinewidth; n++, x++) {
-			VL_Plot(x+xoffset, ys+ny+yoffset, color);
-		    }
+		/* for (y = y0; y <= y1; y++) { */
+		for (y = y0; y < y1; y++) {
+			color = *pixels++;
+			ys = scaledata[linescale].desty[y];
+			
+			if (ys >= 0) {
+				for (ny = 0; ny < scaledata[linescale].count[y]; ny++)
+					for (n = 0, x = slinex; n < slinewidth; n++, x++)
+						VL_Plot(x+xoffset, ys+ny+yoffset, color);
+			}
 		}
-	    }
+		linecmds += 3;
 	}
-	linecmds += 3;
-    }
 }
 
 /*
@@ -202,7 +206,7 @@ void ScaleShape(int xcenter, int shapenum, unsigned height)
 	word *cmdptr;
 	boolean		leftvis,rightvis;
 
-	shape = PM_GetSpritePage (shapenum);
+	shape = PM_GetSpritePage(shapenum);
 
 	scale = height>>2;		// low three bits are fractional
 	scale += 4; /* sprites look a bit better pulled up some */
@@ -221,7 +225,7 @@ void ScaleShape(int xcenter, int shapenum, unsigned height)
 	stopx = shape->leftpix;
 	cmdptr = (word *)&(shape->dataofs[31-stopx]);
 
-	while ( --srcx >=stopx && slinex>0)
+	while ( --srcx >= stopx && slinex>0)
 	{
 		linecmds = (short *)((char *) shapeptr + *cmdptr--);
 		if ( !(slinewidth = scaledata[scale].count[srcx]) )
@@ -281,7 +285,7 @@ void ScaleShape(int xcenter, int shapenum, unsigned height)
 				slinex++;
 				slinewidth--;
 			}
-			ScaleLine ();
+			ScaleLine();
 			break;			// the rest of the shape is gone
 		}
 	}

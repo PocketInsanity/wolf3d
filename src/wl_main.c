@@ -34,9 +34,8 @@
 =============================================================================
 */
 
-char            str[80],str2[20];
-int                     dirangle[9] = {0,ANGLES/8,2*ANGLES/8,3*ANGLES/8,4*ANGLES/8,
-	5*ANGLES/8,6*ANGLES/8,7*ANGLES/8,ANGLES};
+char str[80], str2[20];
+int dirangle[9] = {0,ANGLES/8,2*ANGLES/8,3*ANGLES/8,4*ANGLES/8, 5*ANGLES/8,6*ANGLES/8,7*ANGLES/8,ANGLES};
 
 //
 // proejection variables
@@ -48,8 +47,6 @@ int             centerx;
 int             shootdelta;                     // pixels away from centerx a target can be
 fixed           scale;
 long            heightnumerator;
-
-void            Quit(char *error);
 
 boolean         startgame,loadedgame;
 int             mouseadjustment;
@@ -278,7 +275,7 @@ void WriteConfig()
 =====================
 */
 
-void NewGame(int difficulty,int episode)
+void NewGame(int difficulty, int episode)
 {
 	memset(&gamestate,0,sizeof(gamestate));
 	

@@ -691,12 +691,12 @@ typedef	enum	{
 =============================================================================
 */
 
-extern	char		str[80],str2[20];
+extern	char str[80], str2[20];
 
 extern	fixed		focallength;
 extern	unsigned	viewangles;
 extern	int		    viewwidth;
-extern	int			viewheight;
+extern	int viewheight;
 extern	int			centerx;
 extern	int			shootdelta;
 

@@ -395,7 +395,7 @@ void SpawnDoor(int tilex, int tiley, boolean vertical, int lock)
 =====================
 */
 
-void OpenDoor (int door)
+void OpenDoor(int door)
 {
 	if (doorobjlist[door].action == dr_open)
 		doorobjlist[door].ticcount = 0;			// reset open time
@@ -412,7 +412,7 @@ void OpenDoor (int door)
 =====================
 */
 
-void CloseDoor (int door)
+void CloseDoor(int door)
 {
 	int	tilex,tiley,area;
 	objtype *check;
@@ -493,7 +493,7 @@ void CloseDoor (int door)
 =====================
 */
 
-void OperateDoor (int door)
+void OperateDoor(int door)
 {
 	int	lock;
 
@@ -549,7 +549,7 @@ void DoorOpen (int door)
 ===============
 */
 
-void DoorOpening (int door)
+void DoorOpening(int door)
 {
 	int		area1,area2;
 	word *map;
@@ -612,7 +612,7 @@ void DoorOpening (int door)
 ===============
 */
 
-void DoorClosing (int door)
+void DoorClosing(int door)
 {
 	int		area1,area2;
 	word *map;
@@ -668,9 +668,6 @@ void DoorClosing (int door)
 	doorposition[door] = position;
 }
 
-
-
-
 /*
 =====================
 =
@@ -681,15 +678,15 @@ void DoorClosing (int door)
 =====================
 */
 
-void MoveDoors (void)
+void MoveDoors()
 {
-	int		door;
+	int door;
 
 	if (gamestate.victoryflag)		// don't move door during victory sequence
 		return;
 
 	for (door = 0 ; door < doornum ; door++)
-		switch (doorobjlist[door].action)
+		switch(doorobjlist[door].action)
 		{
 		case dr_open:
 			DoorOpen (door);
@@ -716,10 +713,10 @@ void MoveDoors (void)
 =============================================================================
 */
 
-unsigned	pwallstate;
-unsigned	pwallpos;			// amount a pushable wall has been moved (0-63)
-unsigned	pwallx,pwally;
-int			pwalldir;
+unsigned pwallstate;
+unsigned pwallpos; // amount a pushable wall has been moved (0-63)
+unsigned pwallx, pwally;
+int pwalldir;
 
 /*
 ===============
@@ -729,12 +726,12 @@ int			pwalldir;
 ===============
 */
 
-void PushWall (int checkx, int checky, int dir)
+void PushWall(int checkx, int checky, int dir)
 {
-	int		oldtile;
+	int oldtile;
 
 	if (pwallstate)
-	  return;
+		return;
 
 
 	oldtile = tilemap[checkx][checky];
@@ -806,9 +803,9 @@ void PushWall (int checkx, int checky, int dir)
 =================
 */
 
-void MovePWalls (void)
+void MovePWalls()
 {
-	int		oldblock,oldtile;
+	int oldblock, oldtile;
 
 	if (!pwallstate)
 		return;
@@ -893,8 +890,6 @@ void MovePWalls (void)
 		}
 	}
 
-
 	pwallpos = (pwallstate/2)&63;
 
 }
-

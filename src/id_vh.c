@@ -107,7 +107,7 @@ void LoadLatchMem()
 
 	for (i = LATCHPICS_LUMP_START; i <= LATCHPICS_LUMP_END; i++) {
 		/* TODO: this just caches them for eternity */
-		CA_CacheGrChunk (i);
+		CA_CacheGrChunk(i);
 	}
 
 }
@@ -141,7 +141,7 @@ boolean FizzleFade(unsigned xx, unsigned yy, unsigned width,unsigned height, uns
 	do {
 		if (abortable && IN_CheckAck ())
 			return true;
-		for (p=0;p<pixperframe;p++) {
+		for (p = 0; p < pixperframe; p++) {
 			y = (rndval & 0x00FF) - 1;
 			x = (rndval & 0x00FFFF00) >> 8;
 			
@@ -186,7 +186,7 @@ void VL_FadeOut(int start, int end, int red, int green, int blue, int steps)
 //
 // fade through intermediate frames
 //
-	for (i=0;i<steps;i++)
+	for (i = 0; i < steps; i++)
 	{
 		origptr = &palette1[start][0];
 		newptr = &palette2[start][0];
@@ -204,7 +204,7 @@ void VL_FadeOut(int start, int end, int red, int green, int blue, int steps)
 		}
 
 		VL_WaitVBL(1);
-		VL_SetPalette (&palette2[0][0]);
+		VL_SetPalette(&palette2[0][0]);
 	}
 
 //

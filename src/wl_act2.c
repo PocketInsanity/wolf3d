@@ -23,11 +23,7 @@
 =============================================================================
 */
 
-
-dirtype dirtable[9] = {northwest,north,northeast,west,nodir,east,
-	southwest,south,southeast};
-
-int	starthitpoints[4][NUMENEMIES] =
+int starthitpoints[4][NUMENEMIES] =
 	 //
 	 // BABY MODE
 	 //
@@ -3363,9 +3359,9 @@ void T_Path (objtype *ob)
 
 		if (ob->tilex>MAPSIZE || ob->tiley>MAPSIZE)
 		{
-			sprintf (str,"T_Path hit a wall at %u,%u, dir %u"
+			sprintf(str,"T_Path hit a wall at %u,%u, dir %u"
 			,ob->tilex,ob->tiley,ob->dir);
-			Quit (str);
+			Quit(str);
 		}
 
 

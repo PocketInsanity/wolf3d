@@ -9,7 +9,7 @@ word		WindowX,WindowY,WindowW,WindowH;
 
 //	Internal variables
 
-static	boolean		US_Started;
+static	boolean	US_Started;
 
 void		(*USL_MeasureString)(char *,word *,word *) = VW_MeasurePropString,
 			(*USL_DrawString)(char *) = VW_DrawPropString;
@@ -222,11 +222,9 @@ void US_ClearWindow(void)
 //	US_DrawWindow() - Draws a frame and sets the current window parms
 //
 ///////////////////////////////////////////////////////////////////////////
-void
-US_DrawWindow(word x,word y,word w,word h)
+void US_DrawWindow(word x,word y,word w,word h)
 {
-	word	i,
-			sx,sy,sw,sh;
+	word	i,sx,sy,sw,sh;
 
 	WindowX = x * 8;
 	WindowY = y * 8;
@@ -261,10 +259,10 @@ US_DrawWindow(word x,word y,word w,word h)
 ///////////////////////////////////////////////////////////////////////////
 static void USL_XORICursor(int x, int y, char *s, word cursor)
 {
-	static	boolean	status;		// VGA doesn't XOR...
-	char	buf[MaxString];
-	int		temp;
-	word	w,h;
+	static boolean status;
+	char buf[MaxString];
+	int temp;
+	word w, h;
 
 	strcpy(buf,s);
 	buf[cursor] = '\0';
@@ -272,10 +270,9 @@ static void USL_XORICursor(int x, int y, char *s, word cursor)
 
 	px = x + w - 1;
 	py = y;
-	if (status^=1)
+	if (status ^= 1)
 		USL_DrawString("\x80");
-	else
-	{
+	else {
 		temp = fontcolor;
 		fontcolor = backcolor;
 		USL_DrawString("\x80");
@@ -297,17 +294,11 @@ static void USL_XORICursor(int x, int y, char *s, word cursor)
 boolean US_LineInput(int x,int y,char *buf,char *def,boolean escok,
 				int maxchars,int maxwidth)
 {
-	boolean		redraw,
-				cursorvis,cursormoved,
-				done,result = true;
-	ScanCode	sc;
-	char		c,
-				s[MaxString],olds[MaxString];
-	word		i,
-				cursor,
-				w,h,
-				len,temp;
-	longword	lasttime;
+	boolean	redraw, cursorvis, cursormoved, done, result = true;
+	ScanCode sc;
+	char c, s[MaxString], olds[MaxString];
+	word i, cursor, w, h, len, temp;
+	longword lasttime;
 
 	if (def)
 		strcpy(s,def);
@@ -474,7 +465,7 @@ boolean US_LineInput(int x,int y,char *buf,char *def,boolean escok,
 	return(result);
 }
 
-int rndtable[] ={
+static const int rndtable[] ={
   0,   8, 109, 220, 222, 241, 149, 107,  75, 248, 254, 140,  16,  66,
  74,  21, 211,  47,  80, 242, 154,  27, 205, 128, 161,  89,  77,  36,
  95, 110,  85,  48, 212, 140, 211, 249,  22,  79, 200,  50,  28, 188,
