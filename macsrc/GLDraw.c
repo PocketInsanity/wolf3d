@@ -1,6 +1,6 @@
 /*
+Copyright (C) 1992-1994 Id Software, Inc.
 Copyright (C) 2000 Steven Fuller <relnev@atdot.org>
-Portions Copyright (C) 1992-1994 Id Software, Inc.
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -257,7 +257,7 @@ void InitRenderView()
 	}
 	
 	ReleaseAResource(rGamePal);
-	
+
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
 	
@@ -280,6 +280,9 @@ void InitRenderView()
 
 void StartRenderView()
 {	
+
+/*	glViewport(0, VidHeight - ViewHeight, VidWidth, VidHeight); */
+
 	glMatrixMode(GL_MODELVIEW);
 	/* glLoadIdentity(); */
 	
@@ -305,6 +308,7 @@ void DrawSprite(thing_t *t)
 	glPopMatrix();
 }
 
+#if 0
 void DrawSprites(void)
 {
 	Word i;
@@ -342,9 +346,25 @@ void DrawSprites(void)
 		} while (--i);
 	}
 }
+#endif
 
-void DrawTopSprite(void)
+void DrawTopSprite()
 {
+	GLfloat z = -128.0 / (GLfloat)topspritescale;
+	
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+	
+	glBindTexture(GL_TEXTURE_2D, sprtex[topspritenum]);
+	glBegin(GL_QUADS);
+	glTexCoord2f(1.0, 0.0); glVertex3f( 0.5,  1, z);
+	glTexCoord2f(1.0, 1.0); glVertex3f( 0.5, -1, z);
+	glTexCoord2f(0.0, 1.0); glVertex3f(-0.5, -1, z);
+	glTexCoord2f(0.0, 0.0); glVertex3f(-0.5,  1, z);
+	glEnd();
+
+	glPopMatrix();
 }
 
 int WallSeen = 0;
@@ -357,6 +377,258 @@ void WallIsSeen(saveseg_t *seg)
 	areavis[seg->area] = 1;			/* for sprite drawing*/
 
 	WallSeen = 1;	
+}
+
+Word *src1,*src2,*dest;		/* Used by the sort */
+
+/**********************************
+	
+	Merges src1/size1 and src2/size2 to dest
+	Both Size1 and Size2 MUST be non-zero
+	
+**********************************/
+
+void Merge(Word Size1, Word Size2)
+{
+	Word *XDest,*XSrc1,*XSrc2;
+	
+/* merge two parts of the unsorted array to the sorted array */
+
+	XDest = dest;
+	dest = &XDest[Size1+Size2];
+	XSrc1 = src1;
+	src1 = &XSrc1[Size1];
+	XSrc2 = src2;
+	src2 = &XSrc2[Size2];
+	
+	if (XSrc1[0] < XSrc2[0]) {		/* Which sort to use? */
+mergefrom1:
+		do {
+			XDest[0] = XSrc1[0];	/* Copy one entry */
+			++XDest;
+			++XSrc1;
+			if (!--Size1) {			/* Any more? */
+				do {	/* Dump the rest */
+					XDest[0] = XSrc2[0];	/* Copy the rest of data */
+					++XDest;
+					++XSrc2;
+				} while (--Size2);
+				return;
+			}
+		} while (XSrc1[0] < XSrc2[0]);
+	}
+	do {
+		XDest[0] = XSrc2[0];
+		++XDest;
+		++XSrc2;
+		if (!--Size2) {
+			do {
+				XDest[0] = XSrc1[0];
+				++XDest;
+				++XSrc1;
+			} while (--Size1);
+			return;
+		}
+	} while (XSrc1[0] >= XSrc2[0]);
+	goto mergefrom1;
+}
+
+/**********************************
+	
+	Sorts the events from xevents[0] to xevent_p
+	firstevent will be set to the first sorted event (either xevents[0] or sortbuffer[0])
+	
+**********************************/
+
+void SortEvents(void)
+{
+	Word	count;	/* Number of members to sort */
+	Word	size;	/* Entry size to sort with */
+	Word	sort;	/* Sort count */
+	Word	remaining;	/* Temp merge count */
+	Word	*sorted,*unsorted,*temp;
+    
+	count = numvisspr;		/* How many entries are there? */
+	if (count<2) {
+		firstevent = xevents;	/* Just return the 0 or 1 entries */
+		return;				/* Leave now */
+	}
+	
+	size = 1;		/* source size		(<<1 / loop)*/
+	sort = 1;		/* iteration number (+1 / loop)*/
+	sorted = xevents;
+	unsorted = sortbuffer;
+	
+	do {
+		remaining = count>>sort;	/* How many times to try */
+		
+		/* pointers incremented by the merge */
+		src1 = sorted;		/* Sorted array */
+		src2 = &sorted[remaining<<(sort-1)];	/* Half point */
+		dest = unsorted;	/* Dest array */
+		
+		/* merge paired blocks*/
+		if (remaining) {	/* Any to sort? */
+			do {
+				Merge(size,size);	/* All groups equal size */
+			} while (--remaining);
+		}
+		
+		/* copy or merge the leftovers */
+		remaining = count&((size<<1)-1);	/* Create mask (1 bit higher) */
+		if (remaining > size) {	/* one complete block and one fragment */
+			src1 = &src2[size];
+			Merge(remaining-size,size);
+		} else if (remaining) {	/* just a single sorted fragment */
+			memcpy(dest,src2,remaining*sizeof(Word));	/* Copy it */
+		}
+		
+		/* get ready to sort back to the other array */
+		
+		size <<= 1;		/* Double the entry size */
+		++sort;			/* Increase the shift size */
+		temp = sorted;	/* Swap the pointers */
+		sorted = unsorted;
+		unsorted = temp;
+	} while (size<count);
+	firstevent = sorted;
+}
+
+/**********************************
+	
+	Add a sprite entry to the render list
+	
+**********************************/
+
+void AddSprite (thing_t *thing, Word actornum)
+{
+	fixed_t tx;		/* New X coord */
+	fixed_t tz;		/* New z coord (Size) */
+	Word scale;		/* Scaled size */
+	fixed_t trx,try;	/* x,y from the camera */
+	vissprite_t *VisPtr;	/* Local pointer to visible sprite record */
+	int px;			/* Center X coord */
+	unsigned short *patch;  /* Pointer to sprite data */
+	int x1, x2;		/* Left,Right x */
+	Word width;		/* Width of sprite */
+		
+/* transform the origin point */
+	
+	if (numvisspr>=(MAXVISSPRITES-1)) {
+		return;
+	}
+	trx = thing->x - viewx;		/* Adjust from the camera view */
+	try = viewy - thing->y;		/* Adjust from the camera view */
+	tz = R_TransformZ(trx,try);	/* Get the distance */
+
+	if (tz < MINZ) {		/* Too close? */
+		return;
+	}
+		
+	if (tz>=MAXZ) {		/* Force smallest */
+		tz = MAXZ-1;
+	}
+	scale = scaleatzptr[tz];	/* Get the scale at the z coord */
+	tx = R_TransformX(trx,try);	/* Get the screen x coord */
+	px = ((tx*(long)scale)>>7) + CENTERX; /* Use 32 bit precision! */
+	
+/* calculate edges of the shape */
+
+	patch = SpriteArray[thing->sprite];     /* Pointer to the sprite info */
+	width =((LongWord)sMSB(patch[0])*scale)>>6; /* Get the width of the sprite */
+	if (!width)
+		return; 	/* too far away */
+	
+	x1 = px - (width>>1);   /* Get the left edge */
+	if (x1 >= (int) SCREENWIDTH)
+		return;         /* off the right side */
+	
+	x2 = x1 + width - 1;                    /* Get the right edge */
+	if (x2 < 0) 
+		return;		/* off the left side */	
+	
+	VisPtr = &vissprites[numvisspr];
+	VisPtr->actornum = actornum;	/* Actor who this is (0 for static) */
+	VisPtr->x1 = x1;
+	VisPtr->x2 = x2;
+	VisPtr->pos = thing;
+	
+/* pack the vissprite number into the low 6 bits of the scale for sorting */
+
+	xevents[numvisspr] = (scale<<6) | numvisspr;		/* Pass the scale in the upper 10 bits */
+	++numvisspr;		/* 1 more valid record */
+}
+
+/**********************************
+	
+	Draw all the character sprites
+	
+**********************************/
+
+void DrawSprites(void)
+{
+	vissprite_t	*dseg;		/* Pointer to visible sprite record */
+	int x1,x2;				/* Left x, Right x */
+	Word i;					/* Index */
+	static_t *stat;			/* Pointer to static sprite record */
+	actor_t	*actor;			/* Pointer to active actor record */
+	missile_t *MissilePtr;	/* Pointer to active missile record */
+	Word *xe;				/* Pointer to sort value */
+
+	numvisspr = 0;			/* Init the sprite count */
+	
+/* add all sprites in visareas*/
+
+	if (numstatics) {		/* Any statics? */
+		i = numstatics;
+		stat = statics;			/* Init my pointer */
+		do {
+			if (areavis[stat->areanumber]) {	/* Is it in a visible area? */
+				AddSprite((thing_t *) stat,0);	/* Add to my list */
+			}
+			++stat;		/* Next index */
+		} while (--i);	/* Count down */
+	}
+	
+	if (numactors>1) {		/* Any actors? */
+		i = 1;				/* Index to the first NON-PLAYER actor */
+		actor = &actors[1];	/* Init pointer */
+		do {
+			if (areavis[actor->areanumber]) {	/* Visible? */
+				AddSprite ((thing_t *)actor, i);	/* Add it */
+			}
+			++actor;		/* Next actor */
+		} while (++i<numactors);	/* Count up */
+	}
+	
+	if (nummissiles) {		/* Any missiles? */
+		i = nummissiles;	/* Get the missile count */
+		MissilePtr = missiles;	/* Get the pointer to the first missile */
+		do {
+			if (areavis[MissilePtr->areanumber]) {	/* Visible? */
+				AddSprite((thing_t *)MissilePtr,0);	/* Show it */
+			}
+			++MissilePtr;	/* Next missile */
+		} while (--i);		/* Count down */
+	}
+
+	i = numvisspr;
+	if (i) {			/* Any sprites? */
+
+/* sort sprites from back to front*/
+
+		SortEvents();
+
+/* draw from smallest scale to largest */
+
+		/* TODO: GL should raw back to front with depth */
+		xe=firstevent;
+		do {
+			dseg = &vissprites[xe[0]&(MAXVISSPRITES-1)];	/* Which one? */
+			DrawSprite(dseg->pos);
+			++xe;
+		} while (--i);
+	}
 }
 
 /*

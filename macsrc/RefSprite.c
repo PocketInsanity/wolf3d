@@ -359,6 +359,3 @@ void DrawSprites(void)
 		} while (--i);
 	}
 }
-
-
-
