@@ -64,19 +64,6 @@ CP_iteminfo
 CP_itemtype 
 MainMenu[]=
 {
-#ifdef JAPAN
-	{1,"",(void *)CP_NewGame},
-	{1,"",(void *)CP_Sound},
-	{1,"",(void *)CP_Control},
-	{1,"",(void *)CP_LoadGame},
-	{0,"",(void *)CP_SaveGame},
-	{1,"",(void *)CP_ChangeView},
-	{2,"",(void *)CP_ReadThis},
-	{1,"",(void *)CP_ViewScores},
-	{1,"",0},
-	{1,"",0}
-#else
-
 	{1,STR_NG,(void *)CP_NewGame},
 	{1,STR_SD,(void *)CP_Sound},
 	{1,STR_CL,(void *)CP_Control},
@@ -99,25 +86,10 @@ MainMenu[]=
 	{1,STR_VS,(void *)CP_ViewScores},
 	{1,STR_BD,0},
 	{1,STR_QT,0}
-#endif
 },
 
 SndMenu[]=
 {
-#ifdef JAPAN
-	{1,"",0},
-	{1,"",0},
-	{1,"",0},
-	{0,"",0},
-	{0,"",0},
-	{1,"",0},
-	{1,"",0},
-	{1,"",0},
-	{0,"",0},
-	{0,"",0},
-	{1,"",0},
-	{1,"",0},
-#else
 	{1,STR_NONE,0},
 	{1,STR_PC,0},
 	{1,STR_ALSB,0},
@@ -130,60 +102,21 @@ SndMenu[]=
 	{0,"",0},
 	{1,STR_NONE,0},
 	{1,STR_ALSB,0}
-#endif
 },
 
 CtlMenu[]=
 {
-#ifdef JAPAN
-	{0,"",0},
-	{0,"",0},
-	{0,"",0},
-	{0,"",0},
-	{0,"",(void *)MouseSensitivity},
-	{1,"",(void *)CustomControls}
-#else
 	{0,STR_MOUSEEN,0},
 	{0,STR_JOYEN,0},
 	{0,STR_PORT2,0},
 	{0,STR_GAMEPAD,0},
 	{0,STR_SENS,(void *)MouseSensitivity},
 	{1,STR_CUSTOM,(void *)CustomControls}
-#endif
 },
 
 #ifndef SPEAR
 NewEmenu[]=
 {
-#ifdef JAPAN
-#ifdef JAPDEMO
-	{1,"",0},
-	{0,"",0},
-	{0,"",0},
-	{0,"",0},
-	{0,"",0},
-	{0,"",0},
-	{0,"",0},
-	{0,"",0},
-	{0,"",0},
-	{0,"",0},
-	{0,"",0},
-	{0,"",0},
-#else
-	{1,"",0},
-	{0,"",0},
-	{1,"",0},
-	{0,"",0},
-	{1,"",0},
-	{0,"",0},
-	{1,"",0},
-	{0,"",0},
-	{1,"",0},
-	{0,"",0},
-	{1,"",0},
-	{0,"",0}
-#endif
-#else
 	#ifdef SPANISH
 	{1,"Episodio 1\n"
 	   "Fuga desde Wolfenstein",0},
@@ -221,24 +154,16 @@ NewEmenu[]=
 	{3,"Episode 6\n"
 		  "Confrontation",0}
 	#endif
-#endif
 },
 #endif
 
 
 NewMenu[]=
 {
-#ifdef JAPAN
-	{1,"",0},
-	{1,"",0},
-	{1,"",0},
-	{1,"",0}
-#else
 	{1,STR_DADDY,0},
 	{1,STR_HURTME,0},
 	{1,STR_BRINGEM,0},
 	{1,STR_DEATH,0}
-#endif
 },
 
 LSMenu[]=
@@ -516,9 +441,7 @@ void US_ControlPanel(byte scancode)
 	if (startgame || loadedgame)
 	{
 		MainMenu[viewscores].routine = NULL;
-		#ifndef JAPAN
 		strcpy(MainMenu[viewscores].string,STR_EG);
-		#endif
 	}
 
 	// RETURN/START GAME EXECUTION
@@ -536,9 +459,6 @@ void US_ControlPanel(byte scancode)
 //
 void DrawMainMenu(void)
 {
-#ifdef JAPAN
-	CA_CacheScreen(S_OPTIONSPIC);
-#else
 	ClearMScreen();
 
 	VWB_DrawPic(112,184,C_MOUSELBACKPIC);
@@ -550,14 +470,12 @@ void DrawMainMenu(void)
 	#else
 	DrawWindow(MENU_X-8,MENU_Y-3,MENU_W,MENU_H,BKGDCOLOR);
 	#endif
-#endif
 
 	//
 	// CHANGE "GAME" AND "DEMO"
 	//
 	if (ingame)
 	{
-		#ifndef JAPAN
 
 		#ifdef SPANISH
 		strcpy(&MainMenu[backtodemo].string,STR_GAME);
@@ -565,32 +483,16 @@ void DrawMainMenu(void)
 		strcpy(&MainMenu[backtodemo].string[8],STR_GAME);
 		#endif
 
-		#else
-		CA_CacheGrChunk(C_MRETGAMEPIC);
-		VWB_DrawPic(12*8,20*8,C_MRETGAMEPIC);
-		UNCACHEGRCHUNK(C_MRETGAMEPIC);
-		CA_CacheGrChunk(C_MENDGAMEPIC);
-		VWB_DrawPic(12*8,18*8,C_MENDGAMEPIC);
-		UNCACHEGRCHUNK(C_MENDGAMEPIC);
-		#endif
 		MainMenu[backtodemo].active=2;
 	}
 	else
 	{
-		#ifndef JAPAN
 		#ifdef SPANISH
 		strcpy(&MainMenu[backtodemo].string,STR_BD);
 		#else
 		strcpy(&MainMenu[backtodemo].string[8],STR_DEMO);
 		#endif
-		#else
-		CA_CacheGrChunk(C_MRETDEMOPIC);
-		VWB_DrawPic(12*8,20*8,C_MRETDEMOPIC);
-		UNCACHEGRCHUNK(C_MRETDEMOPIC);
-		CA_CacheGrChunk(C_MSCORESPIC);
-		VWB_DrawPic(12*8,18*8,C_MSCORESPIC);
-		UNCACHEGRCHUNK(C_MSCORESPIC);
-		#endif
+
 		MainMenu[backtodemo].active=1;
 	}
 
@@ -641,11 +543,7 @@ int CP_CheckQuick(unsigned scancode)
 			CA_CacheGrChunk(STARTFONT+1);
 
 			WindowH=160;
-			#ifdef JAPAN
-			if (GetYorN(7,8,C_JAPQUITPIC))
-			#else
 			if (Confirm(ENDGAMESTR))
-			#endif
 			{
 				playstate = ex_died;
 				pickquick = gamestate.lives = 0;
@@ -796,15 +694,11 @@ int CP_CheckQuick(unsigned scancode)
 			WindowX=WindowY=0;
 			WindowW=320;
 			WindowH=160;
-			#ifdef JAPAN
-			if (GetYorN(7,8,C_QUITMSGPIC))
-			#else
 				#ifdef SPANISH
 			if (Confirm(ENDGAMESTR))
 				#else
 			if (Confirm(endStrings[(US_RndT()&0x7)+(US_RndT()&1)]))
 				#endif
-			#endif
 			{
 				VW_UpdateScreen();
 				SD_MusicOff();
@@ -831,11 +725,7 @@ int CP_CheckQuick(unsigned scancode)
 ////////////////////////////////////////////////////////////////////
 int CP_EndGame(void)
 {
-#ifdef JAPAN
-	if (!GetYorN(7,8,C_JAPQUITPIC))
-#else
 	if (!Confirm(ENDGAMESTR))
-#endif
 		return 0;
 
 	pickquick = gamestate.lives = 0;
@@ -843,9 +733,7 @@ int CP_EndGame(void)
 
 	MainMenu[savegame].active = 0;
 	MainMenu[viewscores].routine= (void *)CP_ViewScores;
-	#ifndef JAPAN
 	strcpy(MainMenu[viewscores].string,STR_VS);
-	#endif
 
 	return 1;
 }
@@ -940,11 +828,7 @@ firstpart:
 	// ALREADY IN A GAME?
 	//
 	if (ingame)
-		#ifdef JAPAN
-		if (!GetYorN(7,8,C_JAPNEWGAMEPIC))
-		#else
 		if (!Confirm(CURGAME))
-		#endif
 		{
 			MenuFadeOut();
 			return;
@@ -1017,9 +901,6 @@ void DrawNewEpisode(void)
 {
 	int i;
 
-#ifdef JAPAN
-	CA_CacheScreen(S_EPISODEPIC);
-#else
 	ClearMScreen();
 	VWB_DrawPic(112,184,C_MOUSELBACKPIC);
 
@@ -1032,7 +913,6 @@ void DrawNewEpisode(void)
 	#else
 	US_CPrint("Which episode to play?");
 	#endif
-#endif
 
 	SETFONTCOLOR(TEXTCOLOR,BKGDCOLOR);
 	DrawMenu(&NewEitems,&NewEmenu[0]);
@@ -1052,9 +932,6 @@ void DrawNewEpisode(void)
 //
 void DrawNewGame(void)
 {
-#ifdef JAPAN
-	CA_CacheScreen(S_SKILLPIC);
-#else
 	ClearMScreen();
 	VWB_DrawPic(112,184,C_MOUSELBACKPIC);
 
@@ -1073,7 +950,6 @@ void DrawNewGame(void)
 #endif
 
 	DrawWindow(NM_X-5,NM_Y-10,NM_W,NM_H,BKGDCOLOR);
-#endif
 
 	DrawMenu(&NewItems,&NewMenu[0]);
 	DrawNewGameDiff(NewItems.curpos);
@@ -1219,10 +1095,6 @@ void DrawSoundMenu(void)
 {
 	int i,on;
 
-
-#ifdef JAPAN
-	CA_CacheScreen(S_SOUNDPIC);
-#else
 	//
 	// DRAW SOUND MENU
 	//
@@ -1232,7 +1104,6 @@ void DrawSoundMenu(void)
 	DrawWindow(SM_X-8,SM_Y1-3,SM_W,SM_H1,BKGDCOLOR);
 	DrawWindow(SM_X-8,SM_Y2-3,SM_W,SM_H2,BKGDCOLOR);
 	DrawWindow(SM_X-8,SM_Y3-3,SM_W,SM_H3,BKGDCOLOR);
-#endif
 
 	//
 	// IF NO ADLIB, NON-CHOOSENESS!
@@ -1252,18 +1123,12 @@ void DrawSoundMenu(void)
 		SndMenu[5].active=0;
 
 	DrawMenu(&SndItems,&SndMenu[0]);
-#ifndef JAPAN
 	VWB_DrawPic(100,SM_Y1-20,C_FXTITLEPIC);
 	VWB_DrawPic(100,SM_Y2-20,C_DIGITITLEPIC);
 	VWB_DrawPic(100,SM_Y3-20,C_MUSICTITLEPIC);
-#endif
 
 	for (i=0;i<SndItems.amount;i++)
-#ifdef JAPAN
-		if (i!=3 && i!=4 && i!=8 && i!=9)
-#else
 		if (SndMenu[i].string[0])
-#endif
 		{
 			//
 			// DRAW SELECTED/NOT SELECTED GRAPHIC BUTTONS
@@ -1551,11 +1416,7 @@ int CP_SaveGame(int quick)
 			// OVERWRITE EXISTING SAVEGAME?
 			//
 			if (SaveGamesAvail[which]) {
-				#ifdef JAPAN
-				if (!GetYorN(7,8,C_JAPSAVEOVERPIC))
-				#else
 				if (!Confirm(GAMESVD))
-				#endif
 				{
 					DrawLoadSaveScreen(1);
 					continue;
@@ -1635,9 +1496,6 @@ int CalibrateJoystick(void)
 
 	word xmin,ymin,xmax,ymax,jb;
 
-	#ifdef JAPAN
-	VWB_DrawPic(CALX,CALY,C_JOY0PIC);
-	#else
 	DrawWindow(CALX-5,CALY-5,CALW,CALH,TEXTCOLOR);
 	DrawOutline(CALX-5,CALY-5,CALW,CALH,0,HIGHLIGHT);
 	SETFONTCOLOR(0,TEXTCOLOR);
@@ -1652,7 +1510,7 @@ int CalibrateJoystick(void)
 	US_Print(STR_MOVEJOY);
 	SETFONTCOLOR(BKGDCOLOR,TEXTCOLOR);
 	US_Print("   "STR_ESCEXIT);
-	#endif
+
 	VW_UpdateScreen();
 
 	do
@@ -1671,9 +1529,6 @@ int CalibrateJoystick(void)
 	IN_GetJoyAbs(joystickport, &xmin, &ymin);
 
 
-	#ifdef JAPAN
-	VWB_DrawPic(CALX,CALY,C_JOY1PIC);
-	#else
 	DrawWindow(CALX-5,CALY-5,CALW,CALH,TEXTCOLOR);
 	DrawOutline(CALX-5,CALY-5,CALW,CALH,0,HIGHLIGHT);
 	SETFONTCOLOR(0,TEXTCOLOR);
@@ -1686,7 +1541,7 @@ int CalibrateJoystick(void)
 	US_Print(STR_MOVEJOY2);
 	SETFONTCOLOR(BKGDCOLOR,TEXTCOLOR);
 	US_Print("   "STR_ESCEXIT);
-	#endif
+
 	VW_UpdateScreen();
 
 	do
@@ -1792,9 +1647,6 @@ void CP_Control(void)
 //
 void DrawMouseSens(void)
 {
-#ifdef JAPAN
-	CA_CacheScreen(S_MOUSESENSPIC);
-#else
 	ClearMScreen();
 	VWB_DrawPic(112,184,C_MOUSELBACKPIC);
 	#ifdef SPANISH
@@ -1823,7 +1675,6 @@ void DrawMouseSens(void)
 	PrintX=269;
 	US_Print(STR_FAST);
 	#endif
-#endif
 
 	VWB_Bar(60,97,200,10,TEXTCOLOR);
 	DrawOutline(60,97,200,10,0,HIGHLIGHT);
@@ -1924,15 +1775,12 @@ void DrawCtlScreen(void)
  int i,x,y;
 
 
-#ifdef JAPAN
-	CA_CacheScreen(S_CONTROLPIC);
-#else
  ClearMScreen();
  DrawStripes(10);
  VWB_DrawPic(80,0,C_CONTROLPIC);
  VWB_DrawPic(112,184,C_MOUSELBACKPIC);
  DrawWindow(CTL_X-8,CTL_Y-5,CTL_W,CTL_H,BKGDCOLOR);
-#endif
+
  WindowX=0;
  WindowW=320;
  SETFONTCOLOR(TEXTCOLOR,BKGDCOLOR);
@@ -2385,27 +2233,6 @@ void DrawCustomScreen(void)
 {
 	int i;
 
-
-#ifdef JAPAN
-	CA_CacheScreen(S_CUSTOMPIC);
-	fontnumber=1;
-
-	PrintX=CST_START;
-	PrintY = CST_Y+26;
-	DrawCustMouse(0);
-
-	PrintX=CST_START;
-	US_Print("\n\n\n");
-	DrawCustJoy(0);
-
-	PrintX=CST_START;
-	US_Print("\n\n\n");
-	DrawCustKeybd(0);
-
-	PrintX=CST_START;
-	US_Print("\n\n\n");
-	DrawCustKeys(0);
-#else
 	ClearMScreen();
 	WindowX=0;
 	WindowW=320;
@@ -2553,7 +2380,7 @@ void DrawCustomScreen(void)
 	#endif
 	DrawWindow(5,PrintY-1,310,13,BKGDCOLOR);
 	DrawCustKeys(0);
-#endif
+
 	//
 	// PICK STARTING POINT IN MENU
 	//
@@ -2772,11 +2599,6 @@ void CP_ChangeView(void)
 //
 void DrawChangeView(int view)
 {
-#ifdef JAPAN
-	CA_CacheScreen(S_CHANGEPIC);
-
-	ShowViewSize(view);
-#else
 	VWB_Bar(0,160,320,40,VIEWCOLOR);
 	ShowViewSize(view);
 
@@ -2788,7 +2610,7 @@ void DrawChangeView(int view)
 	US_CPrint(STR_SIZE1"\n");
 	US_CPrint(STR_SIZE2"\n");
 	US_CPrint(STR_SIZE3);
-#endif
+
 	VW_UpdateScreen();
 
 	MenuFadeIn();
@@ -2805,16 +2627,10 @@ void CP_Quit(void)
 	int i;
 
 
-	#ifdef JAPAN
-	if (GetYorN(7,11,C_QUITMSGPIC))
-	#else
-
 	#ifdef SPANISH
 	if (Confirm(ENDGAMESTR))
 	#else
 	if (Confirm(endStrings[(US_RndT()&0x7)+(US_RndT()&1)]))
-	#endif
-
 	#endif
 	{
 		VW_UpdateScreen();
@@ -3494,63 +3310,6 @@ int Confirm(char *string)
 	return xit;
 }
 
-#ifdef JAPAN
-////////////////////////////////////////////////////////////////////
-//
-// DRAW MESSAGE & GET Y OR N
-//
-////////////////////////////////////////////////////////////////////
-int GetYorN(int x,int y,int pic)
-{
-	int xit=0,whichsnd[2]={ESCPRESSEDSND,SHOOTSND};
-
-
-	CA_CacheGrChunk(pic);
-	VWB_DrawPic(x * 8,y * 8,pic);
-	UNCACHEGRCHUNK(pic);
-	VW_UpdateScreen();
-	IN_ClearKeysDown();
-
-	do
-	{
-		#ifndef SPEAR
-		if (Keyboard[sc_Tab] && Keyboard[sc_P] && MS_CheckParm("goobers"))
-			PicturePause();
-		#endif
-
-	#ifdef SPANISH
-	} while(!Keyboard[sc_S] && !Keyboard[sc_N] && !Keyboard[sc_Escape]);
-	#else
-	} while(!Keyboard[sc_Y] && !Keyboard[sc_N] && !Keyboard[sc_Escape]);
-	#endif
-
-	#ifdef SPANISH
-	if (Keyboard[sc_S])
-	{
-		xit=1;
-		ShootSnd();
-	}
-
-	while(Keyboard[sc_S] || Keyboard[sc_N] || Keyboard[sc_Escape]);
-
-	#else
-
-	if (Keyboard[sc_Y])
-	{
-		xit=1;
-		ShootSnd();
-	}
-
-	while(Keyboard[sc_Y] || Keyboard[sc_N] || Keyboard[sc_Escape]);
-	#endif
-
-	IN_ClearKeysDown();
-	SD_PlaySound(whichsnd[xit]);
-	return xit;
-}
-#endif
-
-
 ////////////////////////////////////////////////////////////////////
 //
 // PRINT A MESSAGE IN A WINDOW
@@ -3708,33 +3467,6 @@ void CheckForEpisodes(void)
 {
 #if 0 /* DOS VERSION */
 	struct ffblk f;
-
-//
-// JAPANESE VERSION
-//
-#ifdef JAPAN
-#ifdef JAPDEMO
-	if (!findfirst("*.WJ1",&f,FA_ARCH))
-	{
-		strcpy(extension,"WJ1");
-#else /* JAPDEMO */
-	if (!findfirst("*.WJ6",&f,FA_ARCH))
-	{
-		strcpy(extension,"WJ6");
-#endif /* JAPDEMO */
-		strcat(configname,extension);
-		strcat(SaveName,extension);
-		strcat(PageFileName,extension);
-		EpisodeSelect[1] =
-		EpisodeSelect[2] =
-		EpisodeSelect[3] =
-		EpisodeSelect[4] =
-		EpisodeSelect[5] = 1;
-	}
-	else
-		Quit("NO JAPANESE WOLFENSTEIN 3-D DATA FILES to be found!");
-#else /* JAPAN */
-
 //
 // ENGLISH
 //
@@ -3767,8 +3499,6 @@ void CheckForEpisodes(void)
 #endif /* SPEAR */
 #endif /* UPLOAD */
 
-
-
 #ifdef SPEAR
 #ifndef SPEARDEMO
 	if (!findfirst("*.SOD",&f,FA_ARCH))
@@ -3794,39 +3524,13 @@ void CheckForEpisodes(void)
 	else
 		Quit("NO WOLFENSTEIN 3-D DATA FILES to be found!");
 #endif /* SPEAR */
-#endif /* JAPAN */
 
 	strcat(configname,extension);
 	strcat(SaveName,extension);
 	strcat(PageFileName,extension);
 
 #else
-
 	glob_t globbuf;
-//
-// JAPANESE VERSION
-//
-#ifdef JAPAN
-#ifdef JAPDEMO
-	if (glob("*.wj1", 0, NULL, &globbuf) == 0) {
-		strcpy(extension, "wj1");
-#else /* JAPDEMO */
-	if (glob("*.wj6", 0, NULL, &globbuf) == 0) {
-		strcpy(extension, "wj6");
-#endif /* JAPDEMO */
-		strcat(configname,extension);
-		strcat(SaveName,extension);
-		strcat(PageFileName,extension);
-		EpisodeSelect[1] =
-		EpisodeSelect[2] =
-		EpisodeSelect[3] =
-		EpisodeSelect[4] =
-		EpisodeSelect[5] = 1;
-	}
-	else
-		Quit("NO JAPANESE WOLFENSTEIN 3-D DATA FILES to be found!");
-#else /* JAPAN */
-
 //
 // ENGLISH
 //
@@ -3876,7 +3580,6 @@ void CheckForEpisodes(void)
 	else
 		Quit("NO WOLFENSTEIN 3-D DATA FILES to be found!");
 #endif /* SPEAR */
-#endif /* JAPAN */
 
 	strcat(configname,extension);
 	strcat(SaveName,extension);

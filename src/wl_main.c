@@ -664,7 +664,6 @@ void FinishSignon (void)
 	WindowW = 320;
 	PrintY = 190;
 
-	#ifndef JAPAN
 	SETFONTCOLOR(14,4);
 
 	#ifdef SPANISH
@@ -673,12 +672,9 @@ void FinishSignon (void)
 	US_CPrint ("Press a key");
 	#endif
 
-	#endif
-
 	if (!NoWait)
 		IN_Ack ();
 
-	#ifndef JAPAN
 	VW_Bar (0,189,300,11,*gfxbuf);
 
 	PrintY = 190;
@@ -688,8 +684,6 @@ void FinishSignon (void)
 	US_CPrint ("pensando...");
 	#else
 	US_CPrint ("Working...");
-	#endif
-
 	#endif
 
 	SETFONTCOLOR(0,15);
@@ -1167,10 +1161,8 @@ void Quit (char *error)
 
 	if (!*error)
 	{
-	 #ifndef JAPAN
 	 CA_CacheGrChunk(ORDERSCREEN);
 	 screen = grsegs[ORDERSCREEN];
-	 #endif
 	 WriteConfig ();
 	}
 	else
@@ -1203,10 +1195,8 @@ void Quit (char *error)
 	if (!error || !(*error))
 	{
 		clrscr();
-		#ifndef JAPAN
 		movedata ((unsigned)screen,7,0xb800,0,4000);
 		gotoxy(1,24);
-		#endif
 	}
 #endif
 
@@ -1234,30 +1224,15 @@ void DemoLoop (void)
 
 	#ifndef UPLOAD
 
-		#ifndef GOODTIMES
-		#ifndef SPEAR
-		#ifndef JAPAN
-		if (!NoWait)
-			NonShareware();
-		#endif
-		#else
-
-			#ifndef GOODTIMES
-			#ifndef SPEARDEMO
-			CopyProtection();
-			#endif
-			#endif
-
-		#endif
-		#endif
+	#if !defined(GOODTIMES) && defined(SPEAR) && !defined(SPEARDEMO)
+		CopyProtection();
+	#endif
 	#endif
 
 	StartCPMusic(INTROSONG);
 
-#ifndef JAPAN
 	if (!NoWait)
 		PG13 ();
-#endif
 
 	while (1)
 	{

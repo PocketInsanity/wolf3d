@@ -221,7 +221,6 @@ typedef struct {
 extern LRstruct LevelRatios[];
 
 void Write (int x,int y,char *string);
-void NonShareware(void);
 int GetYorN(int x,int y,int pic);
 
 #else

@@ -33,18 +33,6 @@ extern char signon;
 
 #define	introscn signon
 
-#ifdef JAPAN
-
-#ifdef JAPDEMO
-#include "FOREIGN\JAPAN\GFXV_WJ1.H"
-#else /* JAPDEMO */
-#include "FOREIGN\JAPAN\GFXV_WJ6.H"
-#endif /* JAPDEMO */
-
-#include "audiowl6.h"
-
-#else /* JAPAN */
-
 #ifndef SPEAR
 
 #ifndef UPLOAD
@@ -66,7 +54,6 @@ extern char signon;
 #endif /* SPEARDEMO */
 
 #endif /* SPEAR */
-#endif /* JAPAN */
 
 /* ---------------- */
 

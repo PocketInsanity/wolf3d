@@ -23,10 +23,6 @@ work the same, let the input handler do it all instead
 * when viewsize is around 20, sprites end up being drawn over the border.
 maybe there are clipping bugs that will cause it to fill over the top, left, 
 and right
-* if japan versions are not to be found, remove the code 
-actually, if you look in wl_menu.c, the japan menus are empty, which means
-no text, and it would have to be that there was no offically released
-japanese version (unless the text was removed, but then why?)
 * remove DEMOEXTERN, and add ability to play demos from commandline 
 * remove SPANISH code (and spanish.h)? honestly i would rather have a german
 version than a spanish version
@@ -57,17 +53,17 @@ remove them
 * remove the time verification code (in wl_inter.c)
 * fix wl_debug.c, lots of junk code..
 * change the current parameter handling code to something like getopt
+* urgent: fix input (event handling), so that it makes sense
 
 Specific:
 * memory/sound intro screen goes
   - trademarked images, only came with wolf3d 1.4's (I believe)
-* japan code goes
-  - Unable to find, doubtful if released
 * spanish code goes
   - Unable to find, doubtful if released
-* no piracy message goes
-  - I think it's a bit useless, and anyone can remove it
 * copy protection goes
   - Who needs a manual to look at the source?
 * time verification code goes
   - The contest was killed before it was started.
+* put event handling in id_in.c
+  - Most loops which take too long call some input function and can place a
+    function call in the rest of the loops
