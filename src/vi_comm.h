@@ -5,16 +5,14 @@
 
 extern byte *gfxbuf;
 
-extern boolean screenfaded;
-
 //===========================================================================
 
-void VL_Startup (void);
-void VL_Shutdown (void);
+void VL_Startup();
+void VL_Shutdown();
 
-void VL_ClearVideo (byte color);
+void VL_ClearVideo(byte color);
 
-void VL_WaitVBL (int vbls);
+void VL_WaitVBL(int vbls);
 void VW_UpdateScreen();
 
 void VL_FillPalette(int red, int green, int blue);
@@ -22,9 +20,6 @@ void VL_SetColor(int color, int red, int green, int blue);
 void VL_GetColor(int color, int *red, int *green, int *blue);
 void VL_SetPalette(byte *palette);
 void VL_GetPalette(byte *palette);
-void VL_FadeOut(int start, int end, int red, int green, int blue, int steps);
-void VL_FadeIn(int start, int end, byte *palette, int steps);
-void VL_ColorBorder (int color);
 
 void VL_Plot(int x, int y, int color);
 void VL_Hlin(unsigned x, unsigned y, unsigned width, unsigned color);

@@ -38,6 +38,7 @@ void VWB_Hlin(int x1, int x2, int y, int color);
 void VWB_Vlin(int y1, int y2, int x, int color);
 
 extern byte gamepal;
+extern boolean screenfaded;
 
 #define VW_Startup		VL_Startup
 #define VW_Shutdown		VL_Shutdown
@@ -45,13 +46,15 @@ extern byte gamepal;
 #define VW_Plot			VL_Plot
 #define VW_Hlin(x,z,y,c)	VL_Hlin(x,y,(z)-(x)+1,c)
 #define VW_Vlin(y,z,x,c)	VL_Vlin(x,y,(z)-(y)+1,c)
-#define VW_ColorBorder		VL_ColorBorder
 #define VW_WaitVBL		VL_WaitVBL
 #define VW_FadeIn()		VL_FadeIn(0,255,&gamepal,30);
 #define VW_FadeOut()		VL_FadeOut(0,255,0,0,0,30);
 void	VW_MeasurePropString(char *string, word *width, word *height);
 
 boolean FizzleFade(unsigned xoffset, unsigned yoffset, unsigned width,unsigned height, unsigned frames,boolean abortable);
+
+void VL_FadeOut(int start, int end, int red, int green, int blue, int steps);
+void VL_FadeIn(int start, int end, byte *palette, int steps);
 
 void LatchDrawPic(unsigned x, unsigned y, unsigned picnum);
 void LoadLatchMem(void);

@@ -2,10 +2,6 @@
 
 #include "id_heads.h"
 
-boolean	screenfaded;
-
-byte palette1[256][3], palette2[256][3];
-
 byte *gfxbuf = NULL;
 
 void VL_WaitVBL(int vbls)
@@ -171,102 +167,6 @@ void VL_GetPalette(byte *palette)
 		palette[i*3+1] = g;
 		palette[i*3+2] = b;
 	}
-}
-
-
-//===========================================================================
-
-/*
-=================
-=
-= VL_FadeOut
-=
-= Fades the current palette to the given color in the given number of steps
-=
-=================
-*/
-
-void VL_FadeOut(int start, int end, int red, int green, int blue, int steps)
-{
-	int i,j,orig,delta;
-	byte *origptr, *newptr;
-
-	VL_WaitVBL(1);
-	VL_GetPalette (&palette1[0][0]);
-	memcpy (palette2,palette1,768);
-
-//
-// fade through intermediate frames
-//
-	for (i=0;i<steps;i++)
-	{
-		origptr = &palette1[start][0];
-		newptr = &palette2[start][0];
-		for (j=start;j<=end;j++)
-		{
-			orig = *origptr++;
-			delta = red-orig;
-			*newptr++ = orig + delta * i / steps;
-			orig = *origptr++;
-			delta = green-orig;
-			*newptr++ = orig + delta * i / steps;
-			orig = *origptr++;
-			delta = blue-orig;
-			*newptr++ = orig + delta * i / steps;
-		}
-
-		VL_WaitVBL(1);
-		VL_SetPalette (&palette2[0][0]);
-	}
-
-//
-// final color
-//
-	VL_FillPalette (red,green,blue);
-
-	screenfaded = true;
-}
-
-
-/*
-=================
-=
-= VL_FadeIn
-=
-=================
-*/
-
-void VL_FadeIn(int start, int end, byte *palette, int steps)
-{
-	int		i,j,delta;
-
-	VL_WaitVBL(1);
-	VL_GetPalette (&palette1[0][0]);
-	memcpy (&palette2[0][0],&palette1[0][0],sizeof(palette1));
-
-	start *= 3;
-	end = end*3+2;
-
-//
-// fade through intermediate frames
-//
-	for (i=0;i<steps;i++)
-	{
-		for (j=start;j<=end;j++)
-		{
-			delta = palette[j]-palette1[0][j];
-			palette2[0][j] = palette1[0][j] + delta * i / steps;
-		}
-
-		VL_WaitVBL(1);
-		VL_SetPalette (&palette2[0][0]);
-	}
-
-//
-// final color
-//
-	VL_SetPalette (palette);
-	screenfaded = false;
 }
 
 /*

@@ -21,6 +21,9 @@ and the intro screen which came with wolf3d has copyrighted images
 two screens for nostalga
 * fix the input code, everything is spread out... ideally everything should
 work the same, let the input handler do it all instead
+i think its safe for now to go with the scancodes as being the "universal"
+key type, and for everything not scancode-based, have a function to
+translate
 * when viewsize is around 20, sprites end up being drawn over the border.
 maybe there are clipping bugs that will cause it to fill over the top, left, 
 and right (happens at any view basically, except this version of source does
@@ -50,24 +53,22 @@ just call a different function (most are left from the update block code)
 rename/remove them
 * fix wl_debug.c, lots of junk code..
 * change the current parameter handling code to something like getopt
-* urgent: fix input (event handling), so that it makes sense
-* wl_menu.c does loops on Keyboard.  should call id_in functions instead
 * rename goobers to debugmode, then remove debugmode for things...
 * for some reason, it feels sluggish, maybe its from having mikmod playing
 at the same time... especially when you pick up items
+or the pallete ops calling waitvbl
 * look for places where gfx needs to be redrawn, like back to game etc 
 * wl_menu uses specific scancodes for names, config file will have to use
 metaname like sc_Left etc or something
 * fizzlefade is hackish, stipple buf would work ok in opengl, maybe only
 update once per frame or such.. hm
 and where is that stray pixel coming from (when using end game with largest
-window size)
+window size) in svgalib
 * change id_sd to sd_oss, sd_win, sd_dos, sd_oal, etc
 idea is that different <outputs> can share some drivers, unlike video
 * check filehandling (ex, file missing, bad file type, and such)
 PlayDemoFromFile specifically
 * make sure all infinite loops are found (looping around Keyboard)
-* move FadeIn/FadeOut to id_vh? since it calls vl functions only
 
 Specific:
 * memory/sound intro screen goes
