@@ -107,7 +107,6 @@ typedef enum {
 //
 #define STARTPCSOUNDS		0
 #define STARTADLIBSOUNDS	87
-#define STARTDIGISOUNDS		174
 #define STARTMUSIC		261
 
 //

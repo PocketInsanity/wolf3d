@@ -5,8 +5,8 @@
 //
 /////////////////////////////////////////////////
 
-#define NUMSOUNDS		69
-#define NUMSNDCHUNKS		234
+#define NUMSOUNDS		87
+#define NUMSNDCHUNKS		288
 
 //
 // Sound names & indexes
@@ -91,9 +91,8 @@ typedef enum {
 // Base offsets
 //
 #define STARTPCSOUNDS		0
-#define STARTADLIBSOUNDS	69
-#define STARTDIGISOUNDS		138
-#define STARTMUSIC		207
+#define STARTADLIBSOUNDS	87
+#define STARTMUSIC		261
 
 //
 // Music names & indexes
@@ -129,8 +128,9 @@ typedef enum {
 		LASTMUSIC
 	     } musicnames;
 
-#define WARMARCH_MUS GETOUT_MUS // TODO: correct? 
-#define PACMAN_MUS WARMRCH1_MUS // Just changed the values to correspond to wl6
+/* TOD: correct? Just changed values to corresspond to wl6 */
+#define WARMARCH_MUS GETOUT_MUS
+#define PACMAN_MUS WARMRCH1_MUS
 
 /////////////////////////////////////////////////
 //

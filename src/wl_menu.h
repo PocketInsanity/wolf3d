@@ -45,7 +45,7 @@
 #define MENU_X	76
 #define MENU_Y	55
 #define MENU_W	178
-#ifndef SPEAR
+#if defined(UPLOAD) || (!defined(GOODTIMES) && !defined(SPEAR))
 #define MENU_H	13*10+6
 #else
 #define MENU_H	13*9+6

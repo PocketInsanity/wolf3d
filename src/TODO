@@ -35,13 +35,7 @@ not leave any artifacts after a few screen redraws)
 * and upload builds with lots of wl6 code anyway (sound references were just
 ifndefed out)
 * verify if the sounds and graphics are correctly numbered, once again...
-* find out why shareware version produces these messages:
-CA_FarRead only read 471 out of 1671
-Trying to free null audio chunk 207!
-CA_FarRead hit EOF?
-CA_FarRead hit EOF?
-CA_FarRead hit EOF?
-* if possible fix/or at least add ViewMap?
+* add a ViewMap?
 * remove the #else at the end of each header since nothing is being doubly
 included now (if ever)
 * especially with the video functions, there are functions/defines which

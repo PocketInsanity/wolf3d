@@ -603,7 +603,9 @@ void CAL_SetupMapFile (void)
 
 	length = filelength(handle);
 	MM_GetPtr ((memptr)&tinf,length);
+	
 	CA_FarRead(handle, tinf, length);
+	
 	close(handle);
 
 //
@@ -655,7 +657,7 @@ void CAL_SetupMapFile (void)
 
 void CAL_SetupAudioFile (void)
 {
-	int handle;
+	int handle, i;
 	long length;
 	char fname[13];
 
@@ -670,10 +672,13 @@ void CAL_SetupAudioFile (void)
 		CA_CannotOpen(fname);
 
 	length = filelength(handle);
-	MM_GetPtr ((memptr)&audiostarts,length);
+	MM_GetPtr((memptr)&audiostarts,length);
 	CA_FarRead(handle, (byte *)audiostarts, length);
+		
 	close(handle);
 
+	for (i = 0; i < length/4; i++)
+		printf("chunk %03d: %08ld\n", i, audiostarts[i]);
 //
 // open the data file
 //
@@ -741,7 +746,7 @@ void CA_Shutdown (void)
 
 void CA_CacheAudioChunk(int chunk)
 {
-	long	pos,compressed;
+	long pos, length;
 
 	if (audiosegs[chunk])
 	{
@@ -754,13 +759,13 @@ void CA_CacheAudioChunk(int chunk)
 // a larger buffer
 //
 	pos = audiostarts[chunk];
-	compressed = audiostarts[chunk+1]-pos;
+	length = audiostarts[chunk+1]-pos;
 
-	lseek(audiohandle,pos,SEEK_SET);
+	lseek(audiohandle, pos, SEEK_SET);
 
-	MM_GetPtr((memptr)&audiosegs[chunk],compressed);
+	MM_GetPtr((memptr)&audiosegs[chunk], length);
 
-	CA_FarRead(audiohandle,audiosegs[chunk],compressed);
+	CA_FarRead(audiohandle,audiosegs[chunk], length);
 }
 
 void CA_UnCacheAudioChunk(int chunk)
@@ -997,7 +1002,9 @@ void CA_CacheScreen(int chunk)
 
 	MM_GetPtr(&bigbufferseg,compressed);
 	MM_SetLock (&bigbufferseg,true);
+	
 	CA_FarRead(grhandle,bigbufferseg,compressed);
+		
 	source = bigbufferseg;
 
 	expanded = *(long *)source;
@@ -1057,10 +1064,10 @@ void CA_CacheMap(int mapnum)
 
 		CA_FarRead(maphandle,(byte *)source,compressed);
 		/*
-		// unhuffman, then unRLEW
-		// The huffman'd chunk has a two byte expanded length first
-		// The resulting RLEW chunk also does, even though it's not really
-		// needed
+		 unhuffman, then unRLEW
+		 The huffman'd chunk has a two byte expanded length first
+		 The resulting RLEW chunk also does, even though it's not really
+		 needed
 		*/
 		expanded = *source;
 		source++;

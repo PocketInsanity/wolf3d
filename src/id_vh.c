@@ -6,7 +6,7 @@
 
 pictabletype *pictable;
 
-int px,py;
+int px, py;
 byte fontcolor,backcolor;
 int fontnumber;
 
@@ -60,14 +60,6 @@ void VW_MeasurePropString (char *string, word *width, word *height)
 	VWL_MeasureString(string,width,height,(fontstruct *)grsegs[STARTFONT+fontnumber]);
 }
 
-/*
-=============================================================================
-
-				Double buffer management routines
-
-=============================================================================
-*/
-
 void VWB_DrawTile8(int x, int y, int tile)
 {
 	VL_MemToScreen(grsegs[STARTTILE8]+(tile*64), 8, 8, x, y);
@@ -86,31 +78,6 @@ void VWB_DrawPic(int x, int y, int chunknum)
 	VL_MemToScreen (grsegs[chunknum],width,height,x,y);
 }
 
-void VWB_DrawPropString(char *string)
-{
-	VW_DrawPropString(string);
-}
-
-void VWB_Bar(int x, int y, int width, int height, int color)
-{
-	VW_Bar(x,y,width,height,color);
-}
-
-void VWB_Plot(int x, int y, int color)
-{
-	VW_Plot(x,y,color);
-}
-
-void VWB_Hlin(int x1, int x2, int y, int color)
-{
-	VW_Hlin(x1,x2,y,color);
-}
-
-void VWB_Vlin(int y1, int y2, int x, int color)
-{
-	VW_Vlin(y1,y2,x,color);
-}
-
 /*
 =====================
 =
@@ -123,8 +90,6 @@ void LatchDrawPic(unsigned x, unsigned y, unsigned picnum)
 {
 	VWB_DrawPic(x*8, y+160, picnum);
 }
-
-/* ======================================================================== */
 
 /*
 ===================
@@ -199,7 +164,6 @@ boolean FizzleFade(unsigned xx, unsigned yy, unsigned width,unsigned height, uns
 		while (get_TimeCount() < frame)	;
 	} while (1);
 }
-
 
 /*
 =================

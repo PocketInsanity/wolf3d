@@ -68,7 +68,7 @@ void EndSpear(void)
 
 	PrintX = 0;
 	PrintY = 180;
-	VWB_Bar(0,180,320,20,0);
+	VW_Bar(0,180,320,20,0);
 	US_CPrint (STR_ENDGAME3"\n");
 	US_CPrint (STR_ENDGAME4);
 	VW_UpdateScreen ();
@@ -123,7 +123,7 @@ void Victory (void)
 	CA_CacheGrChunk(BJCOLLAPSE3PIC);
 	CA_CacheGrChunk(BJCOLLAPSE4PIC);
 
-	VWB_Bar(0,0,320,200,VIEWCOLOR);
+	VW_Bar(0,0,320,200,VIEWCOLOR);
 	VWB_DrawPic (124,44,BJCOLLAPSE1PIC);
 	VW_UpdateScreen ();
 	VW_FadeIn ();
@@ -150,7 +150,7 @@ void Victory (void)
 	CacheLump(LEVELEND_LUMP_START,LEVELEND_LUMP_END);
 	CA_CacheGrChunk(STARTFONT);
 
-	VWB_Bar (0,0,320,200-STATUSLINES,127);
+	VW_Bar (0,0,320,200-STATUSLINES,127);
 
 	Write(18,2,STR_YOUWIN);
 
@@ -255,7 +255,7 @@ void Victory (void)
 void PG13 (void)
 {
 	VW_FadeOut();
-	VWB_Bar(0,0,320,200,0x82);			// background
+	VW_Bar(0,0,320,200,0x82);			// background
 
 	CA_CacheGrChunk (PG13PIC);
 	VWB_DrawPic (216,110,PG13PIC);
@@ -498,7 +498,7 @@ void LevelCompleted()
 
 	CacheLump(LEVELEND_LUMP_START,LEVELEND_LUMP_END);
 	ClearSplitVWB ();			// set up for double buffering in split screen
-	VWB_Bar (0,0,320,200-STATUSLINES,127);
+	VW_Bar (0,0,320,200-STATUSLINES,127);
 	StartCPMusic(ENDLEVEL_MUS);
 
 //
@@ -862,11 +862,11 @@ boolean PreloadUpdate(unsigned current, unsigned total)
 {
 	int w = WindowW - 10;
 
-	VWB_Bar(WindowX + 5,WindowY + WindowH - 3,w,2,BLACK);
+	VW_Bar(WindowX + 5,WindowY + WindowH - 3,w,2,BLACK);
 	w = (w * current) / total;
 	if (w) {
-		VWB_Bar(WindowX + 5,WindowY + WindowH - 3,w,2,0x37); 
-		VWB_Bar(WindowX + 5,WindowY + WindowH - 3,w-1,1,0x32);
+		VW_Bar(WindowX + 5,WindowY + WindowH - 3,w,2,0x37); 
+		VW_Bar(WindowX + 5,WindowY + WindowH - 3,w-1,1,0x32);
 	}
 	VW_UpdateScreen();
 
@@ -878,7 +878,7 @@ void PreloadGraphics()
 	DrawLevel();
 	ClearSplitVWB();
 
-	VWB_Bar(0,0,320,200-STATUSLINES,127);
+	VW_Bar(0,0,320,200-STATUSLINES,127);
 
 	VWB_DrawPic(48, 56, GETPSYCHEDPIC);
 
@@ -1089,7 +1089,7 @@ void	CheckHighScore (long score,word other)
 #else
 		PrintX = 16;
 		fontnumber = 1;
-		VWB_Bar (PrintX-2,PrintY-2,145,15,0x9c);
+		VW_Bar(PrintX-2,PrintY-2,145,15,0x9c);
 		VW_UpdateScreen ();
 		backcolor = 0x9c;
 		fontcolor = 15;

@@ -1388,7 +1388,7 @@ int CP_SaveGame(int quick)
 
 			fontnumber=0;
 			if (!SaveGamesAvail[which])
-				VWB_Bar(LSM_X+LSItems.indent+1,LSM_Y+which*13+1,LSM_W-LSItems.indent-16,10,BKGDCOLOR);
+				VW_Bar(LSM_X+LSItems.indent+1,LSM_Y+which*13+1,LSM_W-LSItems.indent-16,10,BKGDCOLOR);
 			VW_UpdateScreen();
 
 			if (US_LineInput(LSM_X+LSItems.indent+2,LSM_Y+which*13+1,input,input,true,31,LSM_W-LSItems.indent-30))
@@ -1411,7 +1411,7 @@ int CP_SaveGame(int quick)
 			}
 			else
 			{
-				VWB_Bar(LSM_X+LSItems.indent+1,LSM_Y+which*13+1,LSM_W-LSItems.indent-16,10,BKGDCOLOR);
+				VW_Bar(LSM_X+LSItems.indent+1,LSM_Y+which*13+1,LSM_W-LSItems.indent-16,10,BKGDCOLOR);
 				PrintLSEntry(which,HIGHLIGHT);
 				VW_UpdateScreen();
 				SD_PlaySound(ESCPRESSEDSND);
@@ -1614,10 +1614,10 @@ void DrawMouseSens(void)
 	PrintX=269;
 	US_Print(STR_FAST);
 
-	VWB_Bar(60,97,200,10,TEXTCOLOR);
+	VW_Bar(60,97,200,10,TEXTCOLOR);
 	DrawOutline(60,97,200,10,0,HIGHLIGHT);
 	DrawOutline(60+20*mouseadjustment,97,20,10,0,READCOLOR);
-	VWB_Bar(61+20*mouseadjustment,98,19,9,READHCOLOR);
+	VW_Bar(61+20*mouseadjustment,98,19,9,READHCOLOR);
 
 	VW_UpdateScreen();
 	MenuFadeIn();
@@ -1646,10 +1646,10 @@ void MouseSensitivity(void)
 				if (mouseadjustment)
 				{
 					mouseadjustment--;
-					VWB_Bar(60,97,200,10,TEXTCOLOR);
+					VW_Bar(60,97,200,10,TEXTCOLOR);
 					DrawOutline(60,97,200,10,0,HIGHLIGHT);
 					DrawOutline(60+20*mouseadjustment,97,20,10,0,READCOLOR);
-					VWB_Bar(61+20*mouseadjustment,98,19,9,READHCOLOR);
+					VW_Bar(61+20*mouseadjustment,98,19,9,READHCOLOR);
 					VW_UpdateScreen();
 					SD_PlaySound(MOVEGUN1SND);
 					while(Keyboard[sc_LeftArrow]) IN_CheckAck();
@@ -1662,10 +1662,10 @@ void MouseSensitivity(void)
 				if (mouseadjustment<9)
 				{
 					mouseadjustment++;
-					VWB_Bar(60,97,200,10,TEXTCOLOR);
+					VW_Bar(60,97,200,10,TEXTCOLOR);
 					DrawOutline(60,97,200,10,0,HIGHLIGHT);
 					DrawOutline(60+20*mouseadjustment,97,20,10,0,READCOLOR);
-					VWB_Bar(61+20*mouseadjustment,98,19,9,READHCOLOR);
+					VW_Bar(61+20*mouseadjustment,98,19,9,READHCOLOR);
 					VW_UpdateScreen();
 					SD_PlaySound(MOVEGUN1SND);
 					while(Keyboard[sc_RightArrow]) IN_CheckAck();
@@ -1950,7 +1950,7 @@ void EnterCtrlData(int index,CustomCtrls *cust,void (*DrawRtn)(int),void (*Print
 	 switch(tick)
 	 {
 	  case 0:
-	VWB_Bar(x,PrintY+1,CST_SPC-2,10,TEXTCOLOR);
+	VW_Bar(x,PrintY+1,CST_SPC-2,10,TEXTCOLOR);
 	break;
 	  case 1:
 	PrintX=x;
@@ -2116,14 +2116,14 @@ void FixupCustom(int w)
 	int y=CST_Y+26+w*13;
 
 
-	VWB_Hlin(7,32,y-1,DEACTIVE);
-	VWB_Hlin(7,32,y+12,BORD2COLOR);
+	VW_Hlin(7,32,y-1,DEACTIVE);
+	VW_Hlin(7,32,y+12,BORD2COLOR);
 #ifndef SPEAR
-	VWB_Hlin(7,32,y-2,BORDCOLOR);
-	VWB_Hlin(7,32,y+13,BORDCOLOR);
+	VW_Hlin(7,32,y-2,BORDCOLOR);
+	VW_Hlin(7,32,y+13,BORDCOLOR);
 #else
-	VWB_Hlin(7,32,y-2,BORD2COLOR);
-	VWB_Hlin(7,32,y+13,BORD2COLOR);
+	VW_Hlin(7,32,y-2,BORD2COLOR);
+	VW_Hlin(7,32,y+13,BORD2COLOR);
 #endif
 
 	switch(w)
@@ -2138,14 +2138,14 @@ void FixupCustom(int w)
 	if (lastwhich>=0)
 	{
 		y=CST_Y+26+lastwhich*13;
-		VWB_Hlin(7,32,y-1,DEACTIVE);
-		VWB_Hlin(7,32,y+12,BORD2COLOR);
+		VW_Hlin(7,32,y-1,DEACTIVE);
+		VW_Hlin(7,32,y+12,BORD2COLOR);
 #ifndef SPEAR
-		VWB_Hlin(7,32,y-2,BORDCOLOR);
-		VWB_Hlin(7,32,y+13,BORDCOLOR);
+		VW_Hlin(7,32,y-2,BORDCOLOR);
+		VW_Hlin(7,32,y+13,BORDCOLOR);
 #else
-		VWB_Hlin(7,32,y-2,BORD2COLOR);
-		VWB_Hlin(7,32,y+13,BORD2COLOR);
+		VW_Hlin(7,32,y-2,BORD2COLOR);
+		VW_Hlin(7,32,y+13,BORD2COLOR);
 #endif
 
 		if (lastwhich!=w)
@@ -2493,7 +2493,7 @@ void CP_ChangeView(void)
 //
 void DrawChangeView(int view)
 {
-	VWB_Bar(0,160,320,40,VIEWCOLOR);
+	VW_Bar(0,160,320,40,VIEWCOLOR);
 	ShowViewSize(view);
 
 	PrintY=161;
@@ -2546,7 +2546,7 @@ void CP_Quit(void)
 void ClearMScreen(void)
 {
 #ifndef SPEAR
-	VWB_Bar(0,0,320,200,BORDCOLOR);
+	VW_Bar(0,0,320,200,BORDCOLOR);
 #else
 	VWB_DrawPic(0,0,C_BACKDROPPIC);
 #endif
@@ -2583,16 +2583,16 @@ void UnCacheLump(int lumpstart, int lumpend)
 ////////////////////////////////////////////////////////////////////
 void DrawWindow(int x,int y,int w,int h,int wcolor)
 {
-	VWB_Bar(x,y,w,h,wcolor);
+	VW_Bar(x,y,w,h,wcolor);
 	DrawOutline(x,y,w,h,BORD2COLOR,DEACTIVE);
 }
 
 void DrawOutline(int x,int y,int w,int h,int color1,int color2)
 {
-	VWB_Hlin(x,x+w,y,color2);
-	VWB_Vlin(y,y+h,x,color2);
-	VWB_Hlin(x,x+w,y+h,color1);
-	VWB_Vlin(y,y+h,x+w,color1);
+	VW_Hlin(x,x+w,y,color2);
+	VW_Vlin(y,y+h,x,color2);
+	VW_Hlin(x,x+w,y+h,color1);
+	VW_Vlin(y,y+h,x+w,color1);
 }
 
 
@@ -2916,7 +2916,7 @@ int HandleMenu(CP_iteminfo *item_i,CP_itemtype *items,void (*routine)(int w))
 	//
 	if (lastitem!=which)
 	{
-		VWB_Bar(x-1,y,25,16,BKGDCOLOR);
+		VW_Bar(x-1,y,25,16,BKGDCOLOR);
 		PrintX=item_i->x+item_i->indent;
 		PrintY=item_i->y+which*13;
 		US_Print((items+which)->string);
@@ -2960,7 +2960,7 @@ int HandleMenu(CP_iteminfo *item_i,CP_itemtype *items,void (*routine)(int w))
 //
 void EraseGun(CP_iteminfo *item_i,CP_itemtype *items,int x,int y,int which)
 {
-	VWB_Bar(x-1,y,25,16,BKGDCOLOR);
+	VW_Bar(x-1,y,25,16,BKGDCOLOR);
 	SetMenuTextColor(items+which,0);
 
 	PrintX=item_i->x+item_i->indent;
@@ -2988,7 +2988,7 @@ void DrawHalfStep(int x,int y)
 //
 void DrawGun(CP_iteminfo *item_i,CP_itemtype *items,int x,int *y,int which,int basey,void (*routine)(int w))
 {
-	VWB_Bar(x-1,*y,25,16,BKGDCOLOR);
+	VW_Bar(x-1,*y,25,16,BKGDCOLOR);
 	*y=basey+which*13;
 	VWB_DrawPic(x,*y,C_CURSOR1PIC);
 	SetMenuTextColor(items+which,1);
@@ -3137,7 +3137,7 @@ int Confirm(char *string)
 			switch(tick)
 			{
 				case 0:
-					VWB_Bar(x,y,8,13,TEXTCOLOR);
+					VW_Bar(x,y,8,13,TEXTCOLOR);
 					break;
 				case 1:
 					PrintX=x;
@@ -3301,11 +3301,11 @@ void DrawMenuGun(CP_iteminfo *iteminfo)
 void DrawStripes(int y)
 {
 #ifndef SPEAR
-	VWB_Bar(0,y,320,24,0);
-	VWB_Hlin(0,319,y+22,STRIPE);
+	VW_Bar(0,y,320,24,0);
+	VW_Hlin(0,319,y+22,STRIPE);
 #else
-	VWB_Bar(0,y,320,22,0);
-	VWB_Hlin(0,319,y+23,0);
+	VW_Bar(0,y,320,22,0);
+	VW_Hlin(0,319,y+23,0);
 #endif
 }
 

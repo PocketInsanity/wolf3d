@@ -182,11 +182,10 @@ typedef enum {
 #define LATCHPICS_LUMP_START		103
 #define LATCHPICS_LUMP_END		146
 
-
 //
 // Amount of each data item
 //
-#define NUMCHUNKS    556
+#define NUMCHUNKS    156
 #define NUMFONT      2
 #define NUMFONTM     0
 #define NUMPICS      144

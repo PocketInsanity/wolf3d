@@ -193,7 +193,7 @@ void HandleCommand (void)
 		picx=ParseNumber();
 		picwidth=ParseNumber();
 		picheight=ParseNumber();
-		VWB_Bar(picx,picy,picwidth,picheight,BACKCOLOR);
+		VW_Bar(picx,picy,picwidth,picheight,BACKCOLOR);
 		RipToEOL();
 		break;
 	case ';':		// comment
@@ -382,7 +382,7 @@ void HandleWord()
 	// print it
 	//
 	newpos = px+wwidth;
-	VWB_DrawPropString (words);
+	VW_DrawPropString (words);
 	px = newpos;
 
 	//
@@ -418,7 +418,7 @@ void PageLayout (boolean shownumber)
 //
 // clear the screen
 //
-	VWB_Bar (0,0,320,200,BACKCOLOR);
+	VW_Bar (0,0,320,200,BACKCOLOR);
 	VWB_DrawPic (0,0,H_TOPWINDOWPIC);
 	VWB_DrawPic (0,8,H_LEFTWINDOWPIC);
 	VWB_DrawPic (312,8,H_RIGHTWINDOWPIC);
@@ -485,7 +485,7 @@ void PageLayout (boolean shownumber)
 		strcat (str,str2);
 		fontcolor = 0x4f; 			   //12^BACKCOLOR;
 
-		VWB_DrawPropString (str);
+		VW_DrawPropString (str);
 	}
 
 	fontcolor = oldfontcolor;
@@ -601,7 +601,7 @@ void ShowArticle(char *article)
 	fontnumber = 0;
 	/* CA_MarkGrChunk(STARTFONT); */
 	CA_CacheGrChunk(STARTFONT);
-	VWB_Bar (0,0,320,200,BACKCOLOR);
+	VW_Bar (0,0,320,200,BACKCOLOR);
 	CacheLayoutGraphics ();
 
 	newpage = true;

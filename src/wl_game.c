@@ -737,11 +737,11 @@ void DrawPlayBorderSides (void)
 	xl = 160-viewwidth/2;
 	yl = (200-STATUSLINES-viewheight)/2;
 
-	VWB_Bar (0,0,xl-1,200-STATUSLINES,127);
-	VWB_Bar (xl+viewwidth+1,0,xl-2,200-STATUSLINES,127);
+	VW_Bar (0,0,xl-1,200-STATUSLINES,127);
+	VW_Bar (xl+viewwidth+1,0,xl-2,200-STATUSLINES,127);
 
-	VWB_Vlin (yl-1,yl+viewheight,xl-1,0);
-	VWB_Vlin (yl-1,yl+viewheight,xl+viewwidth,125);
+	VW_Vlin (yl-1,yl+viewheight,xl-1,0);
+	VW_Vlin (yl-1,yl+viewheight,xl+viewwidth,125);
 }
 
 
@@ -782,17 +782,17 @@ void DrawPlayBorder (void)
 {
 	int	xl,yl;
 
-	VWB_Bar (0,0,320,200-STATUSLINES,127);
+	VW_Bar (0,0,320,200-STATUSLINES,127);
 
 	xl = 160-viewwidth/2;
 	yl = (200-STATUSLINES-viewheight)/2;
-	VWB_Bar (xl,yl,viewwidth,viewheight,0);
+	VW_Bar (xl,yl,viewwidth,viewheight,0);
 
-	VWB_Hlin (xl-1,xl+viewwidth,yl-1,0);
-	VWB_Hlin (xl-1,xl+viewwidth,yl+viewheight,125);
-	VWB_Vlin (yl-1,yl+viewheight,xl-1,0);
-	VWB_Vlin (yl-1,yl+viewheight,xl+viewwidth,125);
-	VWB_Plot (xl-1,yl+viewheight,124);
+	VW_Hlin (xl-1,xl+viewwidth,yl-1,0);
+	VW_Hlin (xl-1,xl+viewwidth,yl+viewheight,125);
+	VW_Vlin (yl-1,yl+viewheight,xl-1,0);
+	VW_Vlin (yl-1,yl+viewheight,xl+viewwidth,125);
+	VW_Plot (xl-1,yl+viewheight,124);
 }
 
 

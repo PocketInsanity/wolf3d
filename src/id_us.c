@@ -12,7 +12,7 @@ word		WindowX,WindowY,WindowW,WindowH;
 static	boolean		US_Started;
 
 void		(*USL_MeasureString)(char *,word *,word *) = VW_MeasurePropString,
-			(*USL_DrawString)(char *) = VWB_DrawPropString;
+			(*USL_DrawString)(char *) = VW_DrawPropString;
 
 HighScore	Scores[MaxScores] = {
 		{"id software-'92",10000,1},
@@ -212,7 +212,7 @@ void US_CPrint(char *str)
 ///////////////////////////////////////////////////////////////////////////
 void US_ClearWindow(void)
 {
-	VWB_Bar(WindowX,WindowY,WindowW,WindowH,WHITE);
+	VW_Bar(WindowX,WindowY,WindowW,WindowH,WHITE);
 	PrintX = WindowX;
 	PrintY = WindowY;
 }

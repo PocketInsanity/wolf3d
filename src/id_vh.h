@@ -30,12 +30,6 @@ void VW_UpdateScreen (void);
 
 void VWB_DrawTile8(int x, int y, int tile);
 void VWB_DrawPic(int x, int y, int chunknum);
-void VWB_Bar(int x, int y, int width, int height, int color);
-
-void VWB_DrawPropString(char *string);
-void VWB_Plot(int x, int y, int color);
-void VWB_Hlin(int x1, int x2, int y, int color);
-void VWB_Vlin(int y1, int y2, int x, int color);
 
 extern byte gamepal[];
 extern boolean screenfaded;
@@ -50,6 +44,8 @@ extern boolean screenfaded;
 #define VW_FadeIn()		VL_FadeIn(0,255,gamepal,30);
 #define VW_FadeOut()		VL_FadeOut(0,255,0,0,0,30);
 void	VW_MeasurePropString(char *string, word *width, word *height);
+
+void VW_DrawPropString(char *string);
 
 boolean FizzleFade(unsigned xoffset, unsigned yoffset, unsigned width,unsigned height, unsigned frames,boolean abortable);
 

@@ -202,11 +202,11 @@ static	char	buf[10];
 					v2 -= 128;
 					v2 /= 4;
 					if (v2 < 0)
-						VWB_Vlin(WindowY + WindowH - 32 + v2,
+						VW_Vlin(WindowY + WindowH - 32 + v2,
 								WindowY + WindowH - 32,
 								WindowX + 8 + (j / 32),BLACK);
 					else
-						VWB_Vlin(WindowY + WindowH - 32,
+						VW_Vlin(WindowY + WindowH - 32,
 								WindowY + WindowH - 32 + v2,
 								WindowX + 8 + (j / 32),BLACK);
 				}
