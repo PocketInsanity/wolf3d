@@ -11,34 +11,18 @@
 	SDMode		SoundMode;
 	SMMode		MusicMode;
 	SDSMode		DigiMode;
-	longword	TimeCount;
 	word		HackCount;
 	word		*SoundTable;	
-	boolean		ssIsTandy;
 	word		ssPort = 2;
 	int			DigiMap[LASTSOUND];
 
 //	Internal variables
 static	boolean			SD_Started;
 		boolean			nextsoundpos;
-		longword		TimerDivisor,TimerCount;
-static	char			*ParmStrings[] =
-						{
-							"noal",
-							"nosb",
-							"nopro",
-							"noss",
-							"sst",
-							"ss1",
-							"ss2",
-							"ss3",
-							nil
-						};
+
 		soundnames		SoundNumber,DigiNumber;
 		word			SoundPriority,DigiPriority;
 		int				LeftPosition,RightPosition;
-		long			LocalTime;
-		word			TimerRate;
 
 		word			NumDigi,DigiLeft,DigiPage;
 		word			*DigiList;
@@ -50,19 +34,10 @@ static	word			DigiNextLen;
 
 //	SoundBlaster variables
 static	boolean					sbNoCheck,sbNoProCheck;
-static	boolean		sbSamplePlaying;
 static	byte					sbOldIntMask = -1;
 static	byte			*sbNextSegPtr;
-static	byte					sbDMA = 1,
-								sbDMAa1 = 0x83,sbDMAa2 = 2,sbDMAa3 = 3,
-								sba1Vals[] = {0x87,0x83,0,0x82},
-								sba2Vals[] = {0,2,0,6},
-								sba3Vals[] = {1,3,0,7};
-static	int						sbLocation = -1,sbInterrupt = 7,sbIntVec = 0xf,
-								sbIntVectors[] = {-1,-1,0xa,0xb,-1,0xd,-1,0xf,-1,-1,-1};
 static	longword		sbNextSegLen;
 static	SampledSound *sbSamples;
-static	byte					sbpOldFMMix,sbpOldVOCMix;
 
 //	SoundSource variables
 		boolean				ssNoCheck;
@@ -82,15 +57,7 @@ static	byte					sbpOldFMMix,sbpOldVOCMix;
 		byte			*alSound;
 		word			alBlock;
 		longword		alLengthLeft;
-		longword		alTimeCount;
 		Instrument		alZeroInst;
-
-// This table maps channel numbers to carrier and modulator op cells
-static	byte			carriers[9] =  { 3, 4, 5,11,12,13,19,20,21},
-						modifiers[9] = { 0, 1, 2, 8, 9,10,16,17,18},
-// This table maps percussive voice numbers to op cells
-						pcarriers[5] = {19,0xff,0xff,0xff,0xff},
-						pmodifiers[5] = {16,17,18,20,21};
 
 //	Sequencer variables
 		boolean			sqActive;
