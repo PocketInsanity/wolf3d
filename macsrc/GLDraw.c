@@ -1,6 +1,6 @@
 /*
-Copyright (C) 1992-1994 Id Software, Inc.
 Copyright (C) 2000 Steven Fuller <relnev@atdot.org>
+Portions Copyright (C) 1992-1994 Id Software, Inc.
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -44,26 +44,6 @@ void ClearTheScreen(Word c)
 	glClear(GL_COLOR_BUFFER_BIT);
 }
 
-void DrawShape(Word x, Word y, void *ShapePtr)
-{
-}
-
-void DrawXMShape(Word x, Word y, void *ShapePtr)
-{
-}
-
-void DrawSmall(Word x,Word y,Word tile)
-{
-}
-
-void MakeSmallFont(void)
-{
-}
-
-void KillSmallFont(void)
-{
-}
-
 Byte *Pal256toRGB(Byte *dat, int len, Byte *pal)
 {
 	Byte *buf;
@@ -80,6 +60,47 @@ Byte *Pal256toRGB(Byte *dat, int len, Byte *pal)
 	return buf;
 }
 
+void DrawShape(Word x, Word y, void *ShapePtr)
+{
+}
+
+void DrawXMShape(Word x, Word y, void *ShapePtr)
+{
+}
+
+GLuint smltex[65];
+
+void MakeSmallFont()
+{
+	Byte *buf;
+	
+	buf = (Byte *)malloc(16 * 16);
+	
+	free(buf);
+}
+
+void KillSmallFont()
+{
+	int i;
+
+	glDeleteTextures(65, smltex);	
+}
+
+void DrawSmall(Word x,Word y,Word tile)
+{
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+	
+	glPopMatrix();
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+}
+
+
 Byte *FlipWall(Byte *dat, int w, int h)
 {
 	Byte *buf;
@@ -90,6 +111,41 @@ Byte *FlipWall(Byte *dat, int w, int h)
 	for (j = 0; j < h; j++) 
 		for (i = 0; i < w; i++) 
 			buf[(h-j-1)*w+(w-i-1)] = dat[i*w+j];
+	return buf;
+}
+
+typedef struct {
+	unsigned short Topy;
+	unsigned short Boty;
+	unsigned short Shape;
+} PACKED SpriteRun;
+
+Byte *DeSprite(Byte *data, Byte *pal)
+{
+	Byte *buf;
+	unsigned short *dat = (unsigned short *)data;
+	int i, x, width, offset;
+	
+	buf = (Byte *)malloc(128 * 128 * 4);
+	memset(buf, 0, 128 * 128 * 4);
+	
+	width = sMSB(dat[0]);
+	
+	offset = 64 - width / 2;
+	for (x = 0; x < width; x++) {
+		SpriteRun *p = (SpriteRun *)&dat[ sMSB(dat[x+1]) / 2 ];
+		
+		while (p->Topy != 0xFFFF) {
+			for (i = sMSB(p->Topy) / 2; i < sMSB(p->Boty) / 2; i++) {
+				*(buf + (i * 128 + x + offset) * 4 + 0) = pal[data[sMSB(p->Shape)+sMSB(p->Topy)/2 + (i-sMSB(p->Topy)/2)]*3+0];
+				*(buf + (i * 128 + x + offset) * 4 + 1) = pal[data[sMSB(p->Shape)+sMSB(p->Topy)/2 + (i-sMSB(p->Topy)/2)]*3+1];
+				*(buf + (i * 128 + x + offset) * 4 + 2) = pal[data[sMSB(p->Shape)+sMSB(p->Topy)/2 + (i-sMSB(p->Topy)/2)]*3+2];
+				*(buf + (i * 128 + x + offset) * 4 + 3) = 255;
+			}
+			p++;
+		}
+	}
+		
 	return buf;
 }
 
@@ -123,6 +179,7 @@ void IO_ClearViewBuffer()
 }
 
 GLuint waltex[64];
+GLuint sprtex[S_LASTONE];
 
 void InitRenderView()
 {
@@ -130,24 +187,24 @@ void InitRenderView()
 	int i;
 	
 	glEnable(GL_TEXTURE_2D);	
-	if (waltex[0]) {
-		glDeleteTextures(64, waltex);
-		for (i = 0; i < 64; i++)
-			waltex[i] = 0;
-	}
-	
-	glGenTextures(64, waltex);
-	
+		
 	pal = LoadAResource(rGamePal);
 	for (i = 0; i < 64; i++) {
 		Byte *buf, *buf2;
 		
-		glBindTexture(GL_TEXTURE_2D, waltex[i]);
-		if (ArtData[i] == NULL) {
-			glDeleteTextures(1, &waltex[i]);
-			waltex[i] = 0;
+		if (waltex[i]) {
+			if (ArtData[i] == NULL) {
+				glDeleteTextures(1, &waltex[i]);
+				waltex[i] = 0;
+			}
+			continue;
+		} else if (ArtData[i]) {
+			glGenTextures(1, &waltex[i]);
+		} else {
 			continue;
 		}
+		
+		glBindTexture(GL_TEXTURE_2D, waltex[i]);
 		
 		buf2 = FlipWall(ArtData[i], 128, 128);
 		buf = Pal256toRGB(buf2, 128 * 128, pal);
@@ -155,10 +212,10 @@ void InitRenderView()
 		
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);		
-		/*
+		///*
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		*/
+		//*/
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
@@ -166,11 +223,47 @@ void InitRenderView()
 				
 		free(buf);
 	}
+	
+	for (i = 1; i < S_LASTONE; i++) {
+		Byte *buf;
+		
+		if (sprtex[i]) {
+			if (SpriteArray[i] == NULL) {
+				glDeleteTextures(1, &sprtex[i]);
+				sprtex[i] = 0;
+			}
+			continue;
+		} else if (SpriteArray[i]) {
+			glGenTextures(1, &sprtex[i]);
+		} else {
+			continue;
+		}
+		glBindTexture(GL_TEXTURE_2D, sprtex[i]);
+		
+		buf = DeSprite(SpriteArray[i], pal);
 
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);		
+		///*
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		//*/
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 128, 128, 0, GL_RGBA, GL_UNSIGNED_BYTE, buf);
+				
+		free(buf);
+	}
+	
 	ReleaseAResource(rGamePal);
 	
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
+	
+	glEnable(GL_ALPHA_TEST);
+	glAlphaFunc(GL_GREATER, 0.5);
+	/* glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); */
 	
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	
@@ -178,10 +271,11 @@ void InitRenderView()
 	glLoadIdentity();
 	
 	glFrustum(-0.20, 0.20, -0.288675, 0.288675, 0.2, 182.0);
-	
+/*	
 	glFrontFace(GL_CCW);
 	glCullFace(GL_BACK);
 	glEnable(GL_CULL_FACE);
+*/
 }
 
 void StartRenderView()
@@ -200,11 +294,12 @@ void DrawSprite(thing_t *t)
 	glTranslatef(-(double)t->x / 256.0, 0, -(double)t->y / 256.0);
 	glRotatef(90.0+((double)gamestate.viewangle / (double)ANGLES * 360.0), 0.0, 1.0, 0.0);
 	
+	glBindTexture(GL_TEXTURE_2D, sprtex[t->sprite]);
 	glBegin(GL_QUADS);
-	glTexCoord2f(1.0, 1.0); glVertex2f( 0.5, -1); 
-	glTexCoord2f(0.0, 1.0); glVertex2f( 0.5,  1);
+	glTexCoord2f(1.0, 0.0); glVertex2f( 0.5,  1); 
+	glTexCoord2f(1.0, 1.0); glVertex2f( 0.5, -1);
+	glTexCoord2f(0.0, 1.0); glVertex2f(-0.5, -1);
 	glTexCoord2f(0.0, 0.0); glVertex2f(-0.5,  1);
-	glTexCoord2f(1.0, 0.0); glVertex2f(-0.5, -1);
 	glEnd();
 	
 	glPopMatrix();
@@ -216,10 +311,7 @@ void DrawSprites(void)
 	static_t *stat;
 	actor_t *actor;
 	missile_t *MissilePtr;
-	
-	//glRotatef(360.0 - (270.0-((double)gamestate.viewangle / (double)ANGLES * 360.0)), 0.0, 1.0, 0.0);
-	//glRotatef((((double)gamestate.viewangle / (double)ANGLES * 360.0)), 0.0, 1.0, 0.0);
-	
+			
 	if (numstatics) {
 		i = numstatics;
 		stat = statics;

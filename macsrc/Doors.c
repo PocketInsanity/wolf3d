@@ -34,7 +34,7 @@ Open doors conect two areas, so sounds will travel between them and sight
 areaconnect has a list of connected area #'s, used to create the table areabyplayer
 
 Every time a door opens or closes the areabyplayer matrix gets recalculated.
-	An area is True if it connects with the player's current spor.
+	An area is True if it connects with the player's current spot.
 
 **********************************/
 
@@ -253,7 +253,7 @@ void DoorOpening(door_t *door)
 	Byte *SoundNumPtr;
 	
 	position = door->position;	/* Get the pixel position */
-
+	
 	if (!position) {			/* Fully closed? */
 	
 	/* door is just starting to open, so connect the areas*/
@@ -265,6 +265,7 @@ void DoorOpening(door_t *door)
 		if (areabyplayer[area1] || areabyplayer[area2]) {	/* Can I hear it? */
 			PlaySound(SND_OPENDOOR);		/* Play the door sound */
 		}
+		position = 1; /* Offset by one to prevent multiple adds */
 	}
 
 /* slide the door open a bit */

@@ -154,7 +154,7 @@ int main(int argc, char *argv[])
 	
 	glXMakeCurrent(dpy, win, ctx);
 	
-	if (verbose) {
+ 	if (verbose) {
 		printf("GL Library:\n");
 		printf("GL_VENDOR: %s\n", glGetString(GL_VENDOR));
 		printf("GL_RENDERER: %s\n", glGetString(GL_RENDERER));
@@ -173,7 +173,7 @@ int main(int argc, char *argv[])
 	ClearTheScreen(BLACK);
 	BlastScreen();
 
-	NoEnemies = 1;
+	/* NoEnemies = 1; */
 		
 	return WolfMain(argc, argv);
 }

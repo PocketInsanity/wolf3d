@@ -7,23 +7,19 @@ TODO:
 - Require 320x200x256
 - If user requests a gamemode which SVGAlib says it does not support, fail
 - If SVGAlib does not support 512x384x256, allow the user to pan around 
-  with the keypad arrow keys.
+  with the keypad arrow keys if only mode supported 320x200x256 (center if
+  640x400 or 480 is supported?)
 * Finish moving all 2D code to SoftDraw.c
 * Compile with -Wall -ansi -pedantic (there shouldn't be much in the way)
-* OpenGL
+* Finish OpenGL
+* Save/Load Games
 
 BUGS:
 * Software Drawing seems like its imprecise, stationary sprites move back and 
   forth, and walls 'swim' when you move around, or sprites pop into different 
   sizes when are far enough and get closer/farther away
 - Possibly caused by 8.8 imprecision?
-* it crashes somewhere, no reason why (effects everything)...
-#0  0x804fa55 in DrawXMShape (x=128, y=96, ShapePtr=0x8c8c8c8c) at Burger.c:198
-and
-#0  0x805296e in IO_AttackShape (shape=17) at WolfIO.c:201
-(gdb) print GameShapes
-$8 = (unsigned char **) 0x7070707
-But what is trashing GameShapes or its memory?
+* Guns don't work in OpenGL
 
 IDEAS:
 * Menu Keys
