@@ -1,40 +1,6 @@
-//
-//	ID Engine
-//	ID_SD.c - Sound Manager for Wolfenstein 3D
-//	v1.2
-//	By Jason Blochowiak
-//
+/* id_sd.c */
 
-//
-//	This module handles dealing with generating sound on the appropriate
-//		hardware
-//
-//	Depends on: User Mgr (for parm checking)
-//
-//	Globals:
-//		For User Mgr:
-//			SoundSourcePresent - Sound Source thingie present?
-//			SoundBlasterPresent - SoundBlaster card present?
-//			AdLibPresent - AdLib card present?
-//			SoundMode - What device is used for sound effects
-//				(Use SM_SetSoundMode() to set)
-//			MusicMode - What device is used for music
-//				(Use SM_SetMusicMode() to set)
-//			DigiMode - What device is used for digitized sound effects
-//				(Use SM_SetDigiDevice() to set)
-//
-//		For Cache Mgr:
-//			NeedsDigitized - load digitized sounds?
-//			NeedsMusic - load music?
-//
-
-#include <dos.h>
 #include "id_heads.h"
-
-#ifdef	nil
-#undef	nil
-#endif
-#define	nil	0
 
 #define	SDL_SoundFinished()	{SoundNumber = SoundPriority = 0;}
 
@@ -92,7 +58,6 @@ static	void			(*SoundUserHook)(void);
 		soundnames		SoundNumber,DigiNumber;
 		word			SoundPriority,DigiPriority;
 		int				LeftPosition,RightPosition;
-		void interrupt	(*t0OldService)(void);
 		long			LocalTime;
 		word			TimerRate;
 
@@ -106,9 +71,9 @@ static	word			DigiNextLen;
 
 //	SoundBlaster variables
 static	boolean					sbNoCheck,sbNoProCheck;
-static	volatile boolean		sbSamplePlaying;
+static	boolean		sbSamplePlaying;
 static	byte					sbOldIntMask = -1;
-static	volatile byte			*sbNextSegPtr;
+static	byte			*sbNextSegPtr;
 static	byte					sbDMA = 1,
 								sbDMAa1 = 0x83,sbDMAa2 = 2,sbDMAa3 = 3,
 								sba1Vals[] = {0x87,0x83,0,0x82},

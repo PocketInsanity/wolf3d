@@ -1,15 +1,7 @@
-//
-//	ID Engine
-//	ID_IN.h - Header file for Input Manager
-//	v1.0d1
-//	By Jason Blochowiak
-//
-
-#ifndef	__ID_IN__
-#define	__ID_IN__
+#ifndef	__ID_IN_H__
+#define	__ID_IN_H__
 
 #define	MaxPlayers	4
-#define	MaxKbds		2
 #define	MaxJoys		2
 #define	NumCodes	128
 
@@ -106,11 +98,7 @@ typedef	byte		ScanCode;
 #define	Mouse(x)	_AX = x,geninterrupt(MouseInt)
 
 typedef	enum		{
-						demo_Off,demo_Record,demo_Playback,demo_PlayDone
-					} Demo;
-typedef	enum		{
 						ctrl_Keyboard,
-							ctrl_Keyboard1 = ctrl_Keyboard,ctrl_Keyboard2,
 						ctrl_Joystick,
 							ctrl_Joystick1 = ctrl_Joystick,ctrl_Joystick2,
 						ctrl_Mouse
@@ -159,10 +147,6 @@ extern	KeyboardDef	KbdDefs;
 extern	JoystickDef	JoyDefs[];
 extern	ControlType	Controls[MaxPlayers];
 
-extern	Demo		DemoMode;
-extern	byte 		*DemoBuffer;
-extern	word		DemoOffset,DemoSize;
-
 // Function prototypes
 #define	IN_KeyDown(code)	(Keyboard[(code)])
 #define	IN_ClearKey(code)	{Keyboard[code] = false; \
@@ -173,18 +157,14 @@ extern	void		IN_Startup(void),IN_Shutdown(void),
 					IN_Default(boolean gotit,ControlType in),
 					IN_SetKeyHook(void (*)()),
 					IN_ClearKeysDown(void),
-					IN_ReadCursor(CursorInfo *),
 					IN_ReadControl(int,ControlInfo *),
 					IN_SetControlType(int,ControlType),
 					IN_GetJoyAbs(word joy,word *xp,word *yp),
 					IN_SetupJoy(word joy,word minx,word maxx,
 								word miny,word maxy),
-					IN_StopDemo(void),IN_FreeDemoBuffer(void),
-					IN_Ack(void),IN_AckBack(void);
+					IN_Ack(void);
 extern	boolean		IN_UserInput(longword delay);
 extern	char		IN_WaitForASCII(void);
-extern	ScanCode	IN_WaitForKey(void);
-extern	word		IN_GetJoyButtonsDB(word joy);
 extern	byte		*IN_GetScanName(ScanCode);
 
 
@@ -195,4 +175,6 @@ void INL_GetJoyDelta(word joy,int *dx,int *dy);
 void IN_StartAck(void);
 boolean IN_CheckAck (void);
 
+#elif
+#error "fix me TODO"
 #endif

@@ -1,8 +1,6 @@
 /* wl_main.c */
 
-#include <conio.h>
 #include "wl_def.h"
-
 
 /*
 =============================================================================
@@ -61,8 +59,11 @@ void            Quit (char *error);
 boolean         startgame,loadedgame,virtualreality;
 int             mouseadjustment;
 
-char	configname[13]="CONFIG.";
+char	configname[13]="config.";
 
+
+int _argc;
+char **argv;
 
 /*
 =============================================================================
@@ -1525,10 +1526,13 @@ void    DemoLoop (void)
 ==========================
 */
 
-void main (void)
+void main(int argc, char *argv[])
 {
 	int i;
 
+	_argc = argc;
+	_argv = argv;
+	
 	CheckForEpisodes();
 
 	InitGame();
