@@ -189,7 +189,6 @@ void UpdateSoundLoc(void)
 
 void ClearMemory (void)
 {
-	PM_UnlockMainMem();
 	SD_StopDigitized();
 	MM_SortMem ();
 }
@@ -996,7 +995,6 @@ void RecordDemo (void)
 
 	SetupGameLevel ();
 	StartMusic ();
-	PM_CheckMainMem ();
 	fizzlein = true;
 
 	PlayLoop ();
@@ -1062,7 +1060,6 @@ void PlayDemo (int demonumber)
 
 	SetupGameLevel ();
 	StartMusic ();
-	PM_CheckMainMem ();
 	fizzlein = true;
 
 	PlayLoop ();
@@ -1250,7 +1247,6 @@ restart:
 
 		ingame = true;
 		StartMusic ();
-		PM_CheckMainMem ();
 		if (!died)
 			PreloadGraphics ();
 		else
@@ -1283,7 +1279,6 @@ startplayloop:
 			gamestate.mapon = 20;
 			SetupGameLevel ();
 			StartMusic ();
-			PM_CheckMainMem ();
 			player->x = spearx;
 			player->y = speary;
 			player->angle = spearangle;

@@ -773,8 +773,6 @@ int CP_CheckQuick(unsigned scancode)
 
 				lasttimecount = TimeCount;
 
-				PM_CheckMainMem ();
-
 				#ifndef SPEAR
 				UNCACHEGRCHUNK(C_CURSOR1PIC);
 				UNCACHEGRCHUNK(C_CURSOR2PIC);
@@ -815,11 +813,6 @@ int CP_CheckQuick(unsigned scancode)
 				SD_StopSound();
 				MenuFadeOut();
 
-				//
-				// SHUT-UP THE ADLIB
-				//
-				for (i=1;i<=0xf5;i++)
-					alOut(i,0);
 				Quit(NULL);
 			}
 
@@ -2828,11 +2821,6 @@ void CP_Quit(void)
 		SD_MusicOff();
 		SD_StopSound();
 		MenuFadeOut();
-		//
-		// SHUT-UP THE ADLIB
-		//
-		for (i=1;i<=0xf5;i++)
-			alOut(i,0);
 		Quit(NULL);
 	}
 

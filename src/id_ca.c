@@ -938,7 +938,6 @@ void CA_CacheScreen (int chunk)
 //
 	/* TODO: this cheats and expands to the 320x200 screen buffer */
 	CAL_HuffExpand(source, gfxbuf, expanded, grhuffman);
-	VW_MarkUpdateBlock (0,0,319,199);
 	MM_FreePtr(&bigbufferseg);
 }
 

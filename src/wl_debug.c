@@ -224,7 +224,7 @@ static	char	buf[10];
 
 		US_Print("\n Address: ");
 		addr = PM_GetPageAddress(i);
-		sprintf(buf,"0x%04x",(word)addr);
+		sprintf(buf,"%p", addr); /* TODO: might wanna check */
 		US_Print(buf);
 
 		if (addr)
@@ -236,11 +236,10 @@ static	char	buf[10];
 			//
 				postx = 128;
 				postwidth = 1;
-				postsource = ((long)((unsigned)addr))<<16;
 				for (x=0;x<64;x++,postx++,postsource+=64)
 				{
 					wallheight[postx] = 256;
-					FarScalePost ();
+					ScalePost((byte *)addr, x);
 				}
 			}
 			else if (i < PMSoundStart)
