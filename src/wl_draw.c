@@ -1,4 +1,4 @@
-// WL_DRAW.C
+/* wl_draw.c */
 
 #include "wl_def.h" 
 

@@ -10,9 +10,6 @@
 =============================================================================
 */
 
-#define MAXMOUSETURN	10
-
-
 #define MOVESCALE		150l
 #define BACKMOVESCALE	100l
 #define ANGLESCALE		20
@@ -24,8 +21,6 @@
 
 =============================================================================
 */
-
-
 
 //
 // player state info
@@ -54,9 +49,6 @@ void	T_Attack (objtype *ob);
 statetype s_player = {false,0,0,T_Player,NULL,NULL};
 statetype s_attack = {false,0,0,T_Attack,NULL,NULL};
 
-
-long	playerxmove,playerymove;
-
 struct atkinf
 {
 	char	tics,attack,frame;		// attack is 1 for gun, 2 for knife
@@ -68,9 +60,6 @@ struct atkinf
 { {6,0,1},{6,1,2},{6,3,3},{6,-1,4} },
 { {6,0,1},{6,1,2},{6,4,3},{6,-1,4} },
 };
-
-
-int	strafeangle[9] = {0,90,180,270,45,135,225,315,0};
 
 void DrawWeapon (void);
 void GiveWeapon (int weapon);
@@ -145,16 +134,11 @@ void CheckWeaponChange (void)
 
 void ControlMovement (objtype *ob)
 {
-	long	oldx,oldy;
 	int		angle,maxxmove;
 	int		angleunits;
 	long	speed;
 
 	thrustspeed = 0;
-
-	oldx = player->x;
-	oldy = player->y;
-
 //
 // side to side move
 //
@@ -213,12 +197,6 @@ void ControlMovement (objtype *ob)
 
 	if (gamestate.victoryflag)		// watching the BJ actor
 		return;
-
-//
-// calculate total move
-//
-	playerxmove = player->x - oldx;
-	playerymove = player->y - oldy;
 }
 
 /*

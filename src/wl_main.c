@@ -556,6 +556,8 @@ void BuildTables (void)
 ====================
 */
 
+#include <sys/mman.h>
+
 void CalcProjection (long focal)
 {
 	int             i;

@@ -70,6 +70,8 @@
 #define PLAYERSIZE		MINDIST			// player radius
 #define MINACTORDIST	0x10000l		// minimum dist from player center
 						// to any actor center
+						
+#undef PI
 #define PI	3.141592657
 
 #define GLOBAL1		(1l<<16)
@@ -83,8 +85,8 @@
 
 #define MINDIST		(0x5800l)
 
-
-#define	MAXSCALEHEIGHT	256				// largest scale on largest view
+/* xwolf code needs max height to double */
+#define	MAXSCALEHEIGHT	512 /* largest scale on largest view */
 
 #define MAXVIEWWIDTH		320
 
@@ -559,7 +561,7 @@ typedef struct statestruct
 	int		tictime;
 	void	(*think) (),(*action) ();
 	struct statestruct *next;
-} statetype;
+} PACKED statetype;
 
 
 //---------------------
@@ -575,7 +577,7 @@ typedef struct statstruct
 	int	shapenum;		/* if shapenum == -1 the obj has been removed */
 	byte	flags;
 	byte	itemnumber;
-} statobj_t;
+} PACKED statobj_t;
 
 //---------------------
 //
@@ -590,7 +592,7 @@ typedef struct doorstruct
 	byte	lock;
 	enum	{dr_open,dr_closed,dr_opening,dr_closing}	action;
 	int		ticcount;
-} doorobj_t;
+} PACKED doorobj_t;
 
 //--------------------
 //
@@ -624,7 +626,7 @@ typedef struct objstruct
 
 	int		temp1,temp2,temp3;
 	struct		objstruct *next,*prev;
-} objtype;
+} PACKED objtype;
 
 
 #define NUMBUTTONS	8
@@ -682,7 +684,7 @@ typedef	struct
 	long		TimeCount;
 	long		killx,killy;
 	boolean		victoryflag;		// set during victory animations
-} gametype;
+} PACKED gametype;
 
 
 typedef	enum	{
@@ -935,9 +937,7 @@ void	ClearScreen (void);
 int		CalcRotate (objtype *ob);
 void	DrawScaleds (void);
 void	CalcTics (void);
-void	FixOfs (void);
 void	ThreeDRefresh (void);
-void  FarScalePost (void);
 
 /*
 =============================================================================
