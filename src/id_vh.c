@@ -27,8 +27,8 @@ int xfrac, yfrac;
 boolean FizzleFade(unsigned xx, unsigned yy, unsigned width, unsigned height, unsigned frames, boolean abortable)
 {
 	int pixperframe;
-	unsigned x, y, p, frame;
-	long rndval;
+	int x, y, p, frame;
+	unsigned int rndval;
 	int retr;
 		
 	rndval = 1;
@@ -43,6 +43,8 @@ boolean FizzleFade(unsigned xx, unsigned yy, unsigned width, unsigned height, un
 		return false;
 	
 	retr = -1;
+	
+	/* VL_DirectPlotInit(); */
 		
 	do {
 		if (abortable && IN_CheckAck())
@@ -70,6 +72,7 @@ boolean FizzleFade(unsigned xx, unsigned yy, unsigned width, unsigned height, un
 			}
 
 		}
+		
 		VL_DirectPlotFlush();
 		
 		frame++;
@@ -287,9 +290,10 @@ void VW_DrawPropString(char *string)
 	}
 }
 
-static void VWL_MeasureString(char *string, word *width, word *height, byte *font)
+void VW_MeasurePropString(char *string, word *width, word *height)
 {
 	int w, mw;
+	byte *font = grsegs[STARTFONT+fontnumber];
 	
 	w = 0;
 	mw = 0;
@@ -311,11 +315,6 @@ static void VWL_MeasureString(char *string, word *width, word *height, byte *fon
 	*width = mw;
 }
 
-void VW_MeasurePropString(char *string, word *width, word *height)
-{
-	VWL_MeasureString(string,width,height,grsegs[STARTFONT+fontnumber]);
-}
-
 void VWB_DrawTile8(int x, int y, int tile)
 {
 	VL_MemToScreen(grsegs[STARTTILE8]+(tile*64), 8, 8, x, y);
@@ -324,14 +323,12 @@ void VWB_DrawTile8(int x, int y, int tile)
 void VWB_DrawPic(int x, int y, int chunknum)
 {
 	int picnum = chunknum - STARTPICS;
-	unsigned width,height;
-
-	x &= ~7;
+	int width, height;
 
 	width = pictable[picnum].width;
 	height = pictable[picnum].height;
 
-	VL_MemToScreen(grsegs[chunknum],width,height,x,y);
+	VL_MemToScreen(grsegs[chunknum], width, height, x, y);
 }
 
 /*

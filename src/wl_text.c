@@ -151,12 +151,12 @@ void ParseTimedCommand()
 
 void TimedPicCommand()
 {
-	ParseTimedCommand ();
+	ParseTimedCommand();
 
 //
 // update the screen, and wait for time delay
 //
-	VW_UpdateScreen ();
+	VW_UpdateScreen();
 
 //
 // wait for time
@@ -167,7 +167,7 @@ void TimedPicCommand()
 //
 // draw pic
 //
-	VWB_DrawPic (picx&~7,picy,picnum);
+	VWB_DrawPic(picx&~7, picy, picnum);
 }
 
 
@@ -234,7 +234,7 @@ void HandleCommand()
 		break;
 
 	case 'T':		// ^Tyyy,xxx,ppp,ttt waits ttt tics, then draws pic
-		TimedPicCommand ();
+		TimedPicCommand();
 		break;
 
 	case 'G':		// ^Gyyy,xxx,ppp draws graphic

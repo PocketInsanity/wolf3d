@@ -58,8 +58,10 @@ void VL_WaitVBL(int vbls)
 void VW_UpdateScreen()
 {
 	//VL_WaitVBL(1); 
-	memcpy(surface->pixels, gfxbuf, vwidth*vheight);
-	SDL_UpdateRect(surface, 0, 0, 0, 0);
+	//memcpy(surface->pixels, gfxbuf, vwidth*vheight);
+	//SDL_UpdateRect(surface, 0, 0, 0, 0);
+	
+	SDL_Flip(surface);
 }
 
 /*
@@ -83,22 +85,25 @@ void VL_Startup()
 		vheight *= 3;
 	}
 	
-	if (gfxbuf == NULL) 
-		gfxbuf = malloc(vwidth * vheight * 1);
+	//if (gfxbuf == NULL) 
+	//	gfxbuf = malloc(vwidth * vheight * 1);
 		
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 		Quit("Couldn't init SDL");
 	}
 
 	if (MS_CheckParm("fullscreen"))
-		surface = SDL_SetVideoMode(vwidth, vheight, 8, SDL_SWSURFACE|SDL_HWPALETTE|SDL_FULLSCREEN);
+		//surface = SDL_SetVideoMode(vwidth, vheight, 8, SDL_SWSURFACE|SDL_HWPALETTE|SDL_FULLSCREEN);
+		surface = SDL_SetVideoMode(vwidth, vheight, 8, SDL_SWSURFACE|SDL_HWPALETTE|SDL_FULLSCREEN|SDL_DOUBLEBUF);
 	else
-		surface = SDL_SetVideoMode(vwidth, vheight, 8, SDL_SWSURFACE|SDL_HWPALETTE);
+		//surface = SDL_SetVideoMode(vwidth, vheight, 8, SDL_SWSURFACE|SDL_HWPALETTE);
+		surface = SDL_SetVideoMode(vwidth, vheight, 8, SDL_SWSURFACE|SDL_HWPALETTE|SDL_DOUBLEBUF);
 		
 	if (surface == NULL) {
 		SDL_Quit();
-		Quit ("Couldn't set 320x200 mode");
+		Quit("Couldn't set 320x200 mode");
 	}
+	gfxbuf = surface->pixels;
 	
 	SDL_WM_SetCaption(GAMENAME, GAMENAME);
 
@@ -115,10 +120,10 @@ void VL_Startup()
 
 void VL_Shutdown()
 {
-	if (gfxbuf != NULL) {
-		free(gfxbuf);
-		gfxbuf = NULL;
-	}
+	//if (gfxbuf != NULL) {
+	//	free(gfxbuf);
+	//	gfxbuf = NULL;
+	//}
 	SDL_Quit();
 }
 
@@ -174,7 +179,8 @@ void VL_DirectPlot(int x1, int y1, int x2, int y2)
 
 void VL_DirectPlotFlush()
 {
-	SDL_UpdateRect(surface, 0, 0, 0, 0);
+	//SDL_UpdateRect(surface, 0, 0, 0, 0);
+	SDL_Flip(surface);
 }
 
 static int XKeysymToScancode(unsigned int keysym)
