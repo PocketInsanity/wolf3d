@@ -50,14 +50,11 @@ extern	boolean		ingame,		// Set by game code if a game is in progress
 					loadedgame,	// Set if the current game was loaded
 					NoWait,
 					HighScoresDirty;
-extern	char		*abortprogram;	// Set to error msg if program is dying
 extern	GameDiff	restartgame;	// Normally gd_Continue, else starts game
 extern	word		PrintX,PrintY;	// Current printing location in the window
 extern	word		WindowX,WindowY,// Current location of window
 					WindowW,WindowH;// Current size of window
 
-extern	boolean		Button0,Button1,
-					CursorBad;
 extern	int			CursorX,CursorY;
 
 extern	void		(*USL_MeasureString)(char *,word *,word *),
@@ -68,9 +65,7 @@ extern	void		(*USL_ResetGame)(void);
 extern	SaveGame	Games[MaxSaveGames];
 extern	HighScore	Scores[];
 
-#define	US_HomeWindow()	{PrintX = WindowX; PrintY = WindowY;}
-
-extern	void	US_Startup(void),
+void	US_Startup(void),
 				US_Setup(void),
 				US_Shutdown(void),
 				US_InitRndT(boolean randomize),
@@ -97,10 +92,10 @@ extern	void	US_Startup(void),
 				US_ShutCursor(void),
 				US_CheckHighScore(long score,word other),
 				US_DisplayHighScores(int which);
-extern	boolean	US_UpdateCursor(void),
+boolean	US_UpdateCursor(void),
 				US_LineInput(int x,int y,char *buf,char *def,boolean escok,
 								int maxchars,int maxwidth);
-extern	int		US_CheckParm(char *parm,char **strings),
+int		US_CheckParm(char *parm,char **strings),
 				US_RndT(void);
 
 		void	USL_PrintInCenter(char *s,Rect r);

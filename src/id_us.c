@@ -3,38 +3,31 @@
 #include "id_heads.h"
 
 //	Global variables
-		char		*abortprogram;
-		boolean		NoWait;
-		word		PrintX,PrintY;
-		word		WindowX,WindowY,WindowW,WindowH;
+boolean		NoWait;
+word		PrintX,PrintY;
+word		WindowX,WindowY,WindowW,WindowH;
 
 //	Internal variables
-#define	ConfigVersion	1
 
 static	char		*ParmStrings[] = {"TEDLEVEL","NOWAIT"},
 					*ParmStrings2[] = {"COMP","NOCOMP"};
 static	boolean		US_Started;
 
-		boolean		Button0,Button1,
-					CursorBad;
-		int			CursorX,CursorY;
+int			CursorX,CursorY;
 
-		void		(*USL_MeasureString)(char *,word *,word *) = VW_MeasurePropString,
-					(*USL_DrawString)(char *) = VWB_DrawPropString;
+void		(*USL_MeasureString)(char *,word *,word *) = VW_MeasurePropString,
+			(*USL_DrawString)(char *) = VWB_DrawPropString;
 
-		SaveGame	Games[MaxSaveGames];
-		HighScore	Scores[MaxScores] =
-					{
-						{"id software-'92",10000,1},
-						{"Adrian Carmack",10000,1},
-						{"John Carmack",10000,1},
-						{"Kevin Cloud",10000,1},
-						{"Tom Hall",10000,1},
-						{"John Romero",10000,1},
-						{"Jay Wilbur",10000,1},
-					};
-
-//	Internal routines
+SaveGame	Games[MaxSaveGames];
+HighScore	Scores[MaxScores] = {
+		{"id software-'92",10000,1},
+		{"Adrian Carmack",10000,1},
+		{"John Carmack",10000,1},
+		{"Kevin Cloud",10000,1},
+		{"Tom Hall",10000,1},
+		{"John Romero",10000,1},
+		{"Jay Wilbur",10000,1},
+};
 
 //	Public routines
 
@@ -94,8 +87,7 @@ void US_Shutdown(void)
 //		index of the string that matched, or -1 if no matches were found
 //
 ///////////////////////////////////////////////////////////////////////////
-int
-US_CheckParm(char *parm,char **strings)
+int US_CheckParm(char *parm,char **strings)
 {
 	char	cp,cs,
 			*p,*s;
@@ -132,8 +124,7 @@ US_CheckParm(char *parm,char **strings)
 //		between masked and non-masked fonts
 //
 ///////////////////////////////////////////////////////////////////////////
-void
-US_SetPrintRoutines(void (*measure)(char *,word *,word *),void (*print)(char *))
+void US_SetPrintRoutines(void (*measure)(char *,word *,word *),void (*print)(char *))
 {
 	USL_MeasureString = measure;
 	USL_DrawString = print;
@@ -224,8 +215,7 @@ void USL_PrintInCenter(char *s, Rect r)
 //	US_PrintCentered() - Prints a string centered in the current window.
 //
 ///////////////////////////////////////////////////////////////////////////
-void
-US_PrintCentered(char *s)
+void US_PrintCentered(char *s)
 {
 	Rect	r;
 

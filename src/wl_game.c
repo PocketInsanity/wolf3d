@@ -208,7 +208,7 @@ void ScanInfoPlane (void)
 {
 	unsigned	x,y,i,j;
 	int			tile;
-	unsigned	far	*start;
+	word	*start;
 
 	start = mapsegs[1];
 	for (y=0;y<mapheight;y++)
@@ -611,7 +611,7 @@ void ScanInfoPlane (void)
 void SetupGameLevel (void)
 {
 	int	x,y,i;
-	unsigned	far *map,tile,spot;
+	word *map,tile,spot;
 
 
 	if (!loadedgame)
@@ -896,7 +896,7 @@ void StartDemoRecord (int levelnumber)
 {
 	MM_GetPtr (&demobuffer,MAXDEMOSIZE);
 	MM_SetLock (&demobuffer,true);
-	demoptr = (char far *)demobuffer;
+	demoptr = (char *)demobuffer;
 	lastdemoptr = demoptr+MAXDEMOSIZE;
 
 	*demoptr = levelnumber;
@@ -921,10 +921,10 @@ void FinishDemoRecord (void)
 
 	demorecord = false;
 
-	length = demoptr - (char far *)demobuffer;
+	length = demoptr - (char *)demobuffer;
 
-	demoptr = ((char far *)demobuffer)+1;
-	*(unsigned far *)demoptr = length;
+	demoptr = ((char *)demobuffer)+1;
+	*(word *)demoptr = length;
 
 	CenterWindow(24,3);
 	PrintY+=6;
@@ -937,7 +937,7 @@ void FinishDemoRecord (void)
 		if (level>=0 && level<=9)
 		{
 			demoname[4] = '0'+level;
-			CA_WriteFile (demoname,(void far *)demobuffer,length);
+			CA_WriteFile (demoname,(void *)demobuffer,length);
 		}
 	}
 
@@ -1041,13 +1041,13 @@ void PlayDemo (int demonumber)
 	demoname[4] = '0'+demonumber;
 	CA_LoadFile (demoname,&demobuffer);
 	MM_SetLock (&demobuffer,true);
-	demoptr = (char far *)demobuffer;
+	demoptr = (char *)demobuffer;
 #endif
 
 	NewGame (1,0);
 	gamestate.mapon = *demoptr++;
 	gamestate.difficulty = gd_hard;
-	length = *((unsigned far *)demoptr)++;
+	length = *((word *)demoptr)++;
 	demoptr++;
 	lastdemoptr = demoptr-4+length;
 
@@ -1324,12 +1324,10 @@ startplayloop:
 
 				CheckHighScore (gamestate.score,gamestate.mapon+1);
 
-				#pragma warn -sus
 				#ifndef JAPAN
 				_fstrcpy(MainMenu[viewscores].string,STR_VS);
 				#endif
 				MainMenu[viewscores].routine = CP_ViewScores;
-				#pragma warn +sus
 
 				return;
 			}
@@ -1416,12 +1414,10 @@ startplayloop:
 
 			CheckHighScore (gamestate.score,gamestate.mapon+1);
 
-			#pragma warn -sus
 			#ifndef JAPAN
-			_fstrcpy(MainMenu[viewscores].string,STR_VS);
+			strcpy(MainMenu[viewscores].string,STR_VS);
 			#endif
 			MainMenu[viewscores].routine = CP_ViewScores;
-			#pragma warn +sus
 
 			return;
 
@@ -1440,12 +1436,10 @@ startplayloop:
 
 			CheckHighScore (gamestate.score,gamestate.mapon+1);
 
-			#pragma warn -sus
 			#ifndef JAPAN
-			_fstrcpy(MainMenu[viewscores].string,STR_VS);
+			strcpy(MainMenu[viewscores].string,STR_VS);
 			#endif
 			MainMenu[viewscores].routine = CP_ViewScores;
-			#pragma warn +sus
 
 			return;
 
