@@ -81,7 +81,7 @@ typedef	struct
 #include "id_sd.h"
 #include "id_us.h"
 
-extern byte signon;
+extern byte signon[];
 
 #define	introscn signon
 

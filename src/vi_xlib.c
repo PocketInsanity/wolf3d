@@ -13,6 +13,7 @@
 #include <X11/extensions/XShm.h>
 
 byte *gfxbuf = NULL;
+byte *disbuf = NULL;
 
 Display *dpy;
 int screen;
@@ -24,6 +25,113 @@ Colormap cmap;
 Atom wmDeleteWindow;
 
 XColor clr[256];
+
+int indexmode;
+int rbias, gbias, bbias;
+int rmask, gmask, bmask;
+unsigned char mypal[768];
+
+Colormap GetVisual()
+{
+	XVisualInfo vitemp;
+	Colormap cmap;
+	
+	int i, numVisuals;
+		
+	vitemp.screen = screen;
+	vitemp.depth = 8;
+	vitemp.class = PseudoColor;
+	
+	vi = XGetVisualInfo(dpy, VisualScreenMask | VisualDepthMask |
+			    VisualClassMask, &vitemp, &numVisuals);
+	
+	if (vi && (numVisuals > 0)) {
+		indexmode = 1;
+	
+		cmap = XCreateColormap(dpy, root, vi->visual, AllocAll);
+		for (i = 0; i < 256; i++) {
+			clr[i].pixel = i;
+			clr[i].flags = DoRed|DoGreen|DoBlue;
+		}
+	
+		return cmap;
+	}
+	
+	vitemp.depth = 15;
+	vitemp.class = TrueColor;
+	
+	vi = XGetVisualInfo(dpy, VisualScreenMask | VisualDepthMask |
+			    VisualClassMask, &vitemp, &numVisuals);
+	
+	if (vi && (numVisuals > 0)) {
+		indexmode = 0;
+		
+		printf("15: rm:%d gm:%d bm:%d cs:%d bpr:%d\n", vi->red_mask,
+			vi->green_mask, vi->blue_mask, vi->colormap_size,
+			vi->bits_per_rgb);
+			
+		cmap = XCreateColormap(dpy, root, vi->visual, AllocNone);
+		
+		return cmap;
+	} 
+	
+	vitemp.depth = 16;
+	vitemp.class = TrueColor;
+	
+	vi = XGetVisualInfo(dpy, VisualScreenMask | VisualDepthMask |
+			    VisualClassMask, &vitemp, &numVisuals);
+	
+	if (vi && (numVisuals > 0)) {
+		indexmode = 0;
+
+		printf("16: rm:%d gm:%d bm:%d cs:%d bpr:%d\n", vi->red_mask,
+			vi->green_mask, vi->blue_mask, vi->colormap_size,
+			vi->bits_per_rgb);
+		
+		cmap = XCreateColormap(dpy, root, vi->visual, AllocNone);
+		
+		return cmap;
+	}
+	
+	vitemp.depth = 24;
+	vitemp.class = TrueColor;
+	
+	vi = XGetVisualInfo(dpy, VisualScreenMask | VisualDepthMask |
+			    VisualClassMask, &vitemp, &numVisuals);
+	
+	if (vi && (numVisuals > 0)) {
+		indexmode = 0;
+
+		printf("24: rm:%d gm:%d bm:%d cs:%d bpr:%d\n", vi->red_mask,
+			vi->green_mask, vi->blue_mask, vi->colormap_size,
+			vi->bits_per_rgb);
+		
+		cmap = XCreateColormap(dpy, root, vi->visual, AllocNone);
+		
+		return cmap;
+	}
+	
+	vitemp.depth = 32;
+	vitemp.class = TrueColor;
+	
+	vi = XGetVisualInfo(dpy, VisualScreenMask | VisualDepthMask |
+			    VisualClassMask, &vitemp, &numVisuals);
+	
+	if (vi && (numVisuals > 0)) {
+		indexmode = 0;
+
+		printf("32: rm:%d gm:%d bm:%d cs:%d bpr:%d\n", vi->red_mask,
+			vi->green_mask, vi->blue_mask, vi->colormap_size,
+			vi->bits_per_rgb);
+		
+		cmap = XCreateColormap(dpy, root, vi->visual, AllocNone);
+		
+		return cmap;
+	}
+	
+	Quit("No usable visual found!");
+		
+}
 
 int main(int argc, char *argv[])
 {
@@ -54,27 +162,7 @@ int main(int argc, char *argv[])
 	
 	root = RootWindow(dpy, screen);
 	
-	vitemp.screen = screen;
-	vitemp.depth = 8;
-	vitemp.class = PseudoColor;
-	
-	vi = XGetVisualInfo(dpy, VisualScreenMask | VisualDepthMask |
-			    VisualClassMask, &vitemp, &numVisuals);
-	
-	if ((vi == NULL) || (numVisuals == 0)) {
-		Quit("No visuals found!");
-	}
-	
-	if (vi->class != PseudoColor) {
-		Quit("Currently no support for non-TrueColor visuals");
-	}
-	
-	cmap = XCreateColormap(dpy, root, vi->visual, AllocAll);
-	for (i = 0; i < 256; i++) {
-		clr[i].pixel = i;
-		clr[i].flags = DoRed|DoGreen|DoBlue;
-	}
-	                      	
+	cmap = GetVisual(); /* GetVisual will quit for us if no visual.. */                      	
 	attr.colormap = cmap;		   
 	attr.event_mask = KeyPressMask | KeyReleaseMask | ExposureMask;
 	attrmask = CWColormap | CWEventMask;
@@ -123,6 +211,14 @@ void VL_WaitVBL(int vbls)
 
 void VW_UpdateScreen()
 {
+	int i;
+	
+	if (indexmode == 0) {
+		for (i = 0; i < 64000; i++) {
+		}
+		memcpy(disbuf, gfxbuf, 64000);
+	}
+	
 	XPutImage(dpy, win, gc, img, 0, 0, 0, 0, 320, 200);
 }
 
@@ -134,15 +230,42 @@ void VW_UpdateScreen()
 =======================
 */
 
+
+int BPP(int d)
+{
+	switch(d) {
+		case 15:
+		case 16:
+			return 2;
+		case 24:
+			return 3;
+		case 32:
+			return 4;
+		default:
+			Quit("Sorry, BPP doesn't like that...");
+	}
+}
+	
 void VL_Startup()
 {
 	if (gfxbuf == NULL) 
 		gfxbuf = malloc(320 * 200 * 1);
 	
-	img = XCreateImage(dpy, vi->visual, 8, ZPixmap, 0, (char *)gfxbuf, 320, 200,
-			   8, 320);
-			   
+	if (indexmode) 
+		disbuf = gfxbuf;
+	else 
+		disbuf = malloc(320 * 200 * BPP(vi->depth));
+		
+	img = XCreateImage(dpy, vi->visual, vi->depth, ZPixmap, 0, (char *)disbuf, 320, 200,
+			   8, 320 * BPP(vi->depth));
+	
+	if (img == NULL) {
+		Quit("XCreateImage returned NULL");
+	}
+					   
 	XMapWindow(dpy, win);
+	
+	XFlush(dpy);
 }
 
 /*
@@ -158,6 +281,11 @@ void VL_Shutdown (void)
 	if (gfxbuf != NULL) {
 		free(gfxbuf);
 		gfxbuf = NULL;
+	}
+	
+	if ( (indexmode == 0) && (disbuf != NULL) ) {
+		free(disbuf);
+		disbuf = NULL;
 	}
 }
 
@@ -200,14 +328,22 @@ void VL_ClearVideo(byte color)
 void VL_FillPalette(int red, int green, int blue)
 {
 	int i;
-
-	for (i = 0; i < 256; i++) {
-		clr[i].red = red << 10;
-		clr[i].green = green << 10;
-		clr[i].blue = blue << 10;
-	}
 	
-	XStoreColors(dpy, cmap, clr, 256);	
+	if (indexmode) {
+		for (i = 0; i < 256; i++) {
+			clr[i].red = red << 10;
+			clr[i].green = green << 10;
+			clr[i].blue = blue << 10;
+		}
+	
+		XStoreColors(dpy, cmap, clr, 256);	
+	} else {
+		for (i = 0; i < 256; i++) {
+			mypal[i*3+0] = red;
+			mypal[i*3+1] = green;
+			mypal[i*3+2] = blue;
+		}
+	}
 }	
 
 //===========================================================================
@@ -222,11 +358,17 @@ void VL_FillPalette(int red, int green, int blue)
 
 void VL_SetColor(int color, int red, int green, int blue)
 {
-	clr[color].red = red << 10;
-	clr[color].green = green << 10;
-	clr[color].blue = blue << 10;
+	if (indexmode) {
+		clr[color].red = red << 10;
+		clr[color].green = green << 10;
+		clr[color].blue = blue << 10;
 	
-	XStoreColors(dpy, cmap, clr, 256);
+		XStoreColors(dpy, cmap, clr, 256);
+	} else {
+		mypal[color*3+0] = red;
+		mypal[color*3+1] = green;
+		mypal[color*3+2] = blue;
+	}
 }
 
 //===========================================================================
@@ -241,9 +383,15 @@ void VL_SetColor(int color, int red, int green, int blue)
 
 void VL_GetColor(int color, int *red, int *green, int *blue)
 {
-	*red = clr[color].red >> 10;
-	*green = clr[color].green >> 10;
-	*blue = clr[color].blue >> 10;
+	if (indexmode) {
+		*red = clr[color].red >> 10;
+		*green = clr[color].green >> 10;
+		*blue = clr[color].blue >> 10;
+	} else {
+		*red = mypal[color*3+0];
+		*green = mypal[color*3+1];
+		*blue = mypal[color*3+2];
+	}
 }
 
 //===========================================================================
@@ -260,12 +408,20 @@ void VL_SetPalette(byte *palette)
 {
 	int i;
 	
-	for (i = 0; i < 256; i++) {
-		clr[i].red = palette[i*3+0] << 10;
-		clr[i].green = palette[i*3+1] << 10;
-		clr[i].blue = palette[i*3+2] << 10;
-	}
-	XStoreColors(dpy, cmap, clr, 256);
+	if (indexmode) {
+		for (i = 0; i < 256; i++) {
+			clr[i].red = palette[i*3+0] << 10;
+			clr[i].green = palette[i*3+1] << 10;
+			clr[i].blue = palette[i*3+2] << 10;
+		}
+		XStoreColors(dpy, cmap, clr, 256);
+	} else {
+		for (i = 0; i < 256; i++) {
+			mypal[i*3+0] = palette[i*3+0];
+			mypal[i*3+1] = palette[i*3+1];
+			mypal[i*3+2] = palette[i*3+2];
+		}
+	}		
 }
 
 
@@ -283,10 +439,14 @@ void VL_GetPalette(byte *palette)
 {	
 	int i;
 	
-	for (i = 0; i < 256; i++) {
-		palette[i*3+0] = clr[i].red >> 10;
-		palette[i*3+1] = clr[i].green >> 10;
-		palette[i*3+2] = clr[i].blue >> 10;
+	if (indexmode) {
+		for (i = 0; i < 256; i++) {
+			palette[i*3+0] = clr[i].red >> 10;
+			palette[i*3+1] = clr[i].green >> 10;
+			palette[i*3+2] = clr[i].blue >> 10;
+		}
+	} else {
+		memcpy(palette, mypal, 768);
 	}
 }
 
@@ -396,6 +556,7 @@ void VL_DeModeXize(byte *buf, int width, int height)
 		return;
 	}
 	
+	/* TODO: can this malloc be removed, and have this func swap each pixel? */
 	mem = malloc(width * height);
 	ptr = buf;
 	for (plane = 0; plane < 4; plane++) {
@@ -412,8 +573,36 @@ void VL_DeModeXize(byte *buf, int width, int height)
 
 void VL_DirectPlot(int x1, int y1, int x2, int y2)
 {
-	XSetForeground(dpy, gc, *(gfxbuf + x1 + y1 * 320));
-	XDrawPoint(dpy, win, gc, x2, y2);
+	if (indexmode) {
+		XSetForeground(dpy, gc, *(gfxbuf + x1 + y1 * 320));
+		XDrawPoint(dpy, win, gc, x2, y2);
+	} else {
+		#if 0
+		unsigned char pix = *(gfxbuf + x1 + y1 * 320);
+		XColor c;
+		c.pixel = 0;
+		c.flags = DoRed|DoGreen|DoBlue;
+		c.red = mypal[pix*3+0] << 10;
+		c.green = mypal[pix*3+1] << 10;
+		c.blue = mypal[pix*3+2] << 10;
+		XStoreColor(dpy, cmap, &c);
+		XSetForeground(dpy, gc, 0);
+		XDrawPoint(dpy, win, gc, x2, y2);
+		#endif
+	#if 0
+		unsigned char pix = *(gfxbuf + x1 + y1 * 320);
+		XColor c;
+		c.pixel = 0;
+		c.flags = DoRed|DoGreen|DoBlue;
+		c.red = mypal[pix*3+0] << 10;
+		c.green = mypal[pix*3+1] << 10;
+		c.blue = mypal[pix*3+2] << 10;
+		XAllocColor(dpy, cmap, &c);
+		//XStoreColor(dpy, cmap, &c);
+		XSetForeground(dpy, gc, c.pixel);
+		XDrawPoint(dpy, win, gc, x2, y2);
+	#endif
+	}
 }
 
 /*

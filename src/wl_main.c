@@ -639,7 +639,7 @@ void SetupWalls (void)
 void SignonScreen()
 {
 	VL_SetPalette(&gamepal);
-	VL_MemToScreen(&introscn, 320, 200, 0, 0);
+	VL_MemToScreen(introscn, 320, 200, 0, 0);
 	VW_UpdateScreen();
 }
 
@@ -656,7 +656,7 @@ void FinishSignon (void)
 {
 
 #ifndef SPEAR
-	VW_Bar (0,189,300,11, *gfxbuf);
+	VW_Bar (0,189,300,11, introscn[0]);
 	WindowX = 0;
 	WindowW = 320;
 	PrintY = 190;
@@ -669,7 +669,7 @@ void FinishSignon (void)
 	if (!NoWait)
 		IN_Ack ();
 
-	VW_Bar (0,189,300,11,*gfxbuf);
+	VW_Bar (0,189,300,11, introscn[0]);
 
 	PrintY = 190;
 	SETFONTCOLOR(10,4);

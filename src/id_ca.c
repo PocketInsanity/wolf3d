@@ -975,9 +975,9 @@ void CA_CacheScreen(int chunk)
 {
 	long	pos,compressed,expanded;
 	memptr	bigbufferseg;
-	byte *source;
+	byte *source, *dest;
 	int		next;
-
+	
 //
 // load the chunk into a buffer
 //
@@ -1001,11 +1001,12 @@ void CA_CacheScreen(int chunk)
 // allocate final space, decompress it, and free bigbuffer
 // Sprites need to have shifts made and various other junk
 //
-	/* TODO: this cheats and expands to the 320x200 screen buffer */
-	CAL_HuffExpand(source, gfxbuf, expanded, grhuffman);
-	/* and then fixes it also! */
-	VL_DeModeXize(gfxbuf, 320, 200);
+	MM_GetPtr((void *)&dest, expanded);
+	CAL_HuffExpand(source, dest, expanded, grhuffman);
+	VL_DeModeXize(dest, 320, 200);
+	VL_MemToScreen(dest, 320, 200, 0, 0);
 	MM_FreePtr(&bigbufferseg);
+	MM_FreePtr((void *)&dest);
 }
 
 //==========================================================================
