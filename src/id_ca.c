@@ -63,23 +63,13 @@ long *audiostarts; /* array of offsets in audio / audiot */
 
 huffnode	grhuffman[255];
 
-huffnode	audiohuffman[255];
-
 int grhandle; /* handle to VGAGRAPH */
 int maphandle; /* handle to MAPTEMP / GAMEMAPS */
 int audiohandle; /* handle to AUDIOT / AUDIO */
 
-long chunkcomplen, chunkexplen;
-
 SDMode oldsoundmode;
 
-void CAL_CarmackExpand (word *source, word *dest, word length);
-
-
 #define FILEPOSSIZE	3
-/*
-#define	GRFILEPOS(c) (*(long *)(((byte *)grstarts)+(c)*3)&0xffffff)
-*/
 long GRFILEPOS(int c)
 {
 	long value;
@@ -104,24 +94,6 @@ long GRFILEPOS(int c)
 
 =============================================================================
 */
-
-/*
-============================
-=
-= CAL_GetGrChunkLength
-=
-= Gets the length of an explicit length chunk (not tiles)
-= The file pointer is positioned so the compressed data can be read in next.
-=
-============================
-*/
-
-void CAL_GetGrChunkLength (int chunk)
-{
-	lseek(grhandle,GRFILEPOS(chunk),SEEK_SET);
-	read(grhandle,&chunkexplen,sizeof(chunkexplen));
-	chunkcomplen = GRFILEPOS(chunk+1)-GRFILEPOS(chunk)-4;
-}
 
 void CA_CannotOpen(char *string)
 {
@@ -516,6 +488,27 @@ void CA_RLEWexpand(word *source, word *dest, long length, word rlewtag)
 =============================================================================
 */
 
+
+/*
+============================
+=
+= CAL_GetGrChunkLength
+=
+= Gets the length of an explicit length chunk (not tiles)
+= The file pointer is positioned so the compressed data can be read in next.
+=
+============================
+*/
+
+long CAL_GetGrChunkLength(int chunk)
+{
+	long chunkexplen; /* temp var */
+	
+	lseek(grhandle,GRFILEPOS(chunk),SEEK_SET);
+	read(grhandle,&chunkexplen,sizeof(chunkexplen));
+	return GRFILEPOS(chunk+1)-GRFILEPOS(chunk)-4;
+}
+
 /*
 ======================
 =
@@ -530,6 +523,7 @@ void CAL_SetupGrFile (void)
 	int handle;
 	memptr compseg;
 
+	long chunkcomplen;
 //
 // load ???dict.ext (huffman dictionary for graphics files)
 //
@@ -575,7 +569,7 @@ void CAL_SetupGrFile (void)
 // load the pic and sprite headers into the arrays in the data segment
 //
 	MM_GetPtr((memptr)&pictable,NUMPICS*sizeof(pictabletype));
-	CAL_GetGrChunkLength(STRUCTPIC);		// position file pointer
+	chunkcomplen = CAL_GetGrChunkLength(STRUCTPIC);
 	MM_GetPtr(&compseg,chunkcomplen);
 	CA_FarRead(grhandle,compseg,chunkcomplen);
 	CAL_HuffExpand (compseg, (byte *)pictable,NUMPICS*sizeof(pictabletype),grhuffman);
