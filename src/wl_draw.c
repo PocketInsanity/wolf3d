@@ -461,7 +461,7 @@ static void WallRefresh()
 
 /* ======================================================================== */
 
-#define	MAXVIEWHEIGHT	200
+#define	MAXVIEWHEIGHT	(MAXVIEWWIDTH/2)
 
 static int spanstart[MAXVIEWHEIGHT/2];
 
@@ -651,7 +651,7 @@ void ThreeDRefresh()
 //
 // follow the walls from there to the right, drawwing as we go
 //
-	DrawPlayBorder();
+	//DrawPlayBorder();
 #ifndef DRAWCEIL	
 	ClearScreen();
 #endif	
@@ -684,103 +684,6 @@ void ThreeDRefresh()
 
 /* ======================================================================== */
 
-#if 0
-static void ScaledDraw(byte *gfx, int scale, byte *vid, unsigned long tfrac, unsigned long tint, unsigned long delta)
-{
-	unsigned long OldDelta;
-	
-	while (scale--) {
-		*vid = *gfx;
-		vid += vwidth;
-		OldDelta = delta;
-		delta += tfrac;
-		gfx += tint;
-
-		if (OldDelta > delta)
-			gfx += 1;
-	}	
-}
-
-static void ScaledDrawTrans(byte *gfx, int scale, byte *vid, unsigned long tfrac, unsigned long tint, unsigned long delta)
-{
-	unsigned long OldDelta;
-	
-	while (scale--) {
-		if (*gfx != 255)
-			*vid = *gfx;
-		vid += vwidth;
-		OldDelta = delta;
-		delta += tfrac;
-		gfx += tint;
-
-		if (OldDelta > delta)
-			gfx += 1;
-	}
-}
-
-static void ScaleLine(unsigned int height, byte *source, int x)
-{
-	unsigned long TheFrac;
-	unsigned long TheInt;
-	unsigned long y;
-	
-	if (height) {
-		TheFrac = 0x40000000UL / height;	
-		
-		if (height < viewheight) {
-			y = yoffset + (viewheight - height) / 2;
-			TheInt = TheFrac >> 24;
-			TheFrac <<= 8;
-			
-			ScaledDraw(source, height, gfxbuf + (y * vwidth) + x + xoffset, 
-			TheFrac, TheInt, 0);
-			
-			return;	
-		} 
-		
-		y = (height - viewheight) / 2;
-		y *= TheFrac;
-		
-		TheInt = TheFrac >> 24;
-		TheFrac <<= 8;
-		
-		ScaledDraw(&source[y >> 24], viewheight, gfxbuf + (yoffset * vwidth) + x + xoffset, 
-		TheFrac, TheInt, y << 8);
-	}
-}
-
-static void ScaleLineTrans(unsigned int height, byte *source, int x)
-{
-	unsigned long TheFrac;
-	unsigned long TheInt;
-	unsigned long y;
-	
-	if (height) {
-		TheFrac = (64 << 16) / height;
-		
-		if (height < viewheight) {
-			y = yoffset + (viewheight - height) / 2;
-			TheInt = TheFrac >> 24;
-			TheFrac <<= 8;
-			
-			ScaledDrawTrans(source, height, gfxbuf + (y * vwidth) + x + xoffset, 
-			TheFrac, TheInt, 0);
-			
-			return;	
-		} 
-		
-		y = (height - viewheight) / 2;
-		y *= TheFrac;
-		
-		TheInt = TheFrac >> 24;
-		TheFrac <<= 8;
-		
-		ScaledDrawTrans(&source[y >> 24], viewheight, gfxbuf + (yoffset * vwidth) + x + xoffset, 
-		TheFrac, TheInt, y << 8);
-	}
-}
-#endif
-
 static void ScaledDraw(byte *gfx, int count, byte *vid, unsigned int frac, unsigned int delta)
 {
 	while (count--) {
@@ -790,9 +693,9 @@ static void ScaledDraw(byte *gfx, int count, byte *vid, unsigned int frac, unsig
 	}
 }
 
-static void ScaledDrawTrans(byte *gfx, int scale, byte *vid, unsigned int frac, unsigned int delta)
+static void ScaledDrawTrans(byte *gfx, int count, byte *vid, unsigned int frac, unsigned int delta)
 {
-	while (scale--) {
+	while (count--) {
 		if (gfx[frac >> 16] != 255)
 			*vid = gfx[frac >> 16];
 		vid += vwidth;
@@ -831,7 +734,7 @@ static void ScaleLineTrans(unsigned int height, byte *source, int x)
 	unsigned long y;
 	
 	if (height) {
-		TheFrac = 0x00400000UL / height;	
+		TheFrac = (64 << 16) / height;
 		
 		if (height < viewheight) {
 			y = yoffset + (viewheight - height) / 2;

@@ -15,9 +15,6 @@ SDL_Surface *surface;
 
 int main (int argc, char *argv[])
 {
-	vwidth = 320;
-	vheight = 200;	
-	
 	return WolfMain(argc, argv);
 }
 
@@ -72,6 +69,17 @@ void VW_UpdateScreen()
 
 void VL_Startup()
 {
+	vwidth = 320;
+	vheight = 200;
+	
+	if (MS_CheckParm("x2")) {
+		vwidth *= 2;
+		vheight *= 2;
+	} else if (MS_CheckParm("x3")) {
+		vwidth *= 3;
+		vheight *= 3;
+	}
+	
 	if (gfxbuf == NULL) 
 		gfxbuf = malloc(vwidth * vheight * 1);
 		
