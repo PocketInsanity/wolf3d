@@ -1,8 +1,8 @@
 CC = gcc
 #CC=/opt/intel/compiler60/ia32/bin/icc
 
-CFLAGS = -g -Wall
-#CFLAGS = -g -O2 -Wall -pedantic 
+#CFLAGS = -g -Wall
+CFLAGS = -g -O2 -Wall
 #CFLAGS = -Wall -O6 -fomit-frame-pointer -ffast-math -funroll-loops -march=pentiumpro
 #CFLAGS = -g -Wall -pedantic -std=gnu99
 #CFLAGS = -Os -Wall -pedantic
@@ -26,9 +26,6 @@ OBJS += sd_null.o
 #OBJS += sd_oss.o fmopl.o
 #CFLAGS += -D_REENTRANT
 #LDLIBS += -lpthread
-# sound using SDL_mixer
-#OBJS += sd_mixer.o fmopl.o
-#LDLIBS += -lSDL_mixer
 
 CFLAGS += $(shell sdl-config --cflags)
 
