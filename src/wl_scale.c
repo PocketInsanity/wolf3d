@@ -2,87 +2,12 @@
 
 #include "wl_def.h" 
 
-/* Originally from David Haslam -- dch@sirius.demon.co.uk */
-
-/*
-=============================================================================
-
-						  GLOBALS
-
-=============================================================================
-*/
-
-/* scaling data for a given height */
-typedef struct {
-    /* number of destination pixels each source pixels maps to in x and y */
-    int count[64];
-    /* the destination pixel for each source pixel row */
-    int desty[64];
-} t_scaledata;
-
-static t_scaledata scaledata[MAXSCALEHEIGHT+1];
-static int maxscale;
-
-static void BuildCompScale(int height)
+typedef struct
 {
-	long fix, step;
-	int src;
-	int startpix, endpix, toppix;
-
-	step = ((long)height << 16) / 64;
-	toppix = (viewheight - height) / 2;
-	fix = 0;
-		
-	for (src = 0; src < 64; src++)
-	{
-		startpix = fix >> 16;
-		fix += step;
-		endpix = fix >> 16;
-		
-		if (endpix > startpix)
-		    scaledata[height].count[src] = endpix - startpix;
-		else
-		    scaledata[height].count[src] = 0;
-
-		startpix += toppix;
-		endpix += toppix;
-
-		if ((startpix == endpix) || (endpix < 0) || (startpix >= viewheight) /*|| (src == 64)*/) {
-			/* source pixel goes off screen */
-			scaledata[height].desty[src] = -1;
-		} else if (startpix < 0) {
-			scaledata[height].desty[src] = 0;
-		} else {
-			scaledata[height].desty[src] = startpix;
-			/* Clip if needed */    
-			if ((scaledata[height].count[src] + scaledata[height].desty[src]) > viewheight)
-				scaledata[height].count[src] = viewheight - scaledata [height].desty[src];
-		}
-	}
-
-}
-
-/*
-==========================
-=
-= SetupScaling
-=
-==========================
-*/
-
-void SetupScaling(int maxscaleheight)
-{
-	int i;
-
-	maxscale = maxscaleheight-1;
-//
-// build the compiled scalers
-//
-	for (i = 1; i <= maxscaleheight; i++) {
-		BuildCompScale(i);
-	}
-
-}
+	word leftpix, rightpix;
+	word dataofs[64];
+        /* table data after dataofs[rightpix-leftpix+1] */
+} PACKED t_compshape;
 
 /* ======================================================================== */
 
@@ -103,7 +28,24 @@ static void ScaledDraw(byte *gfx, int scale, byte *vid, unsigned long tfrac, uns
 	}
 }
 
-void xBuildCompScale(unsigned int height, byte *source, int x)
+static void ScaledDrawTrans(byte *gfx, int scale, byte *vid, unsigned long tfrac, unsigned long tint, unsigned long delta)
+{
+	unsigned long OldDelta;
+	
+	while (scale--) {
+		if (*gfx != 255)
+			*vid = *gfx;
+		vid += 320; /* TODO: compiled in constant! */
+		OldDelta = delta;
+		delta += tfrac;
+		gfx += tint;
+
+		if (OldDelta > delta)
+			gfx += 1;
+	}
+}
+
+void ScaleLine(unsigned int height, byte *source, int x)
 {
 	unsigned long TheFrac;
 	unsigned long TheInt;
@@ -134,306 +76,140 @@ void xBuildCompScale(unsigned int height, byte *source, int x)
 	}
 }
 
-/*
-=======================
-=
-= ScaleLine
-=
-=======================
-*/
-
-static int slinex, slinewidth;
-static short *linecmds;
-static int linescale;
-static t_compshape *shapeptr;
-
-/* 
-   linecmds - points to line segment data 
-   slinewidth - pixels across
-   slinex - screen coord of first column
-*/
-
-static void ScaleLine()
+static void ScaleLineTrans(unsigned int height, byte *source, int x)
 {
-	int x, y, ys;
-	int n, ny;
-	int y0, y1;
-	unsigned char *pixels;
-	unsigned char color;
-
-	while (linecmds[0]) {
-		y0 = linecmds[2] / 2;
-		y1 = linecmds[0] / 2;
-		pixels = (unsigned char *)shapeptr + y0 + linecmds[1];
-
-		for (y = y0; y < y1; y++) {
-			color = *pixels++;
-			ys = scaledata[linescale].desty[y];
+	unsigned long TheFrac;
+	unsigned long TheInt;
+	unsigned long y;
+	
+	if (height) {
+		TheFrac = 0x40000000UL / height;	
+		
+		if (height < viewheight) {
+			y = yoffset + (viewheight - height) / 2;
+			TheInt = TheFrac >> 24;
+			TheFrac <<= 8;
 			
-			if (ys >= 0) {
-				for (ny = 0; ny < scaledata[linescale].count[y]; ny++)
-					for (n = 0, x = slinex; n < slinewidth; n++, x++)
-						VL_Plot(x+xoffset, ys+ny+yoffset, color);
-			}
-		}
-		linecmds += 3;
+			ScaledDrawTrans(source, height, gfxbuf + (y * 320) + x + xoffset, 
+			TheFrac, TheInt, 0);
+			
+			return;	
+		} 
+		
+		y = (height - viewheight) / 2;
+		y *= TheFrac;
+		
+		TheInt = TheFrac >> 24;
+		TheFrac <<= 8;
+		
+		ScaledDrawTrans(&source[y >> 24], viewheight, gfxbuf + (yoffset * 320) + x + xoffset, 
+		TheFrac, TheInt, y << 8);
 	}
 }
 
-/*
-=======================
-=
-= ScaleShape
-=
-= Draws a compiled shape at [scale] pixels high
-=
-=======================
-*/
+static unsigned char *spritegfx[SPR_TOTAL];
+
+/* TODO: merge FlipWall into function below */
+static byte *FlipWall(byte *dat, int w, int h)
+{
+        byte *buf;
+        int i, j;
+
+        buf = (byte *)malloc(w * h);
+
+        for (j = 0; j < h; j++)
+                for (i = 0; i < w; i++)
+			buf[j*w+i] = dat[i*w+j];
+        return buf;
+}
+
+static void DeCompileSprite(int shapenum)
+{
+	t_compshape *ptr;
+	unsigned char *buf;
+	int srcx = 32;
+	int slinex = 31;
+	int stopx;
+	unsigned short int *cmdptr;
+	
+	MM_GetPtr((void *)&buf, 64 * 64);
+	
+	ptr = PM_GetSpritePage(shapenum);
+
+	memset(buf, 255, 64 * 64);
+
+	stopx = ptr->leftpix;
+	cmdptr = &ptr->dataofs[31-stopx];
+	while ( --srcx >=stopx ) {
+		short *linecmds = (short *)((unsigned char *)ptr + *cmdptr--);
+		slinex--;
+		while (linecmds[0]) {
+			int y;
+			int y0 = linecmds[2] / 2;
+			int y1 = linecmds[0] / 2 - 1;
+			unsigned char *pixels = (unsigned char *)ptr + y0 + linecmds[1];
+			for (y=y0; y<=y1; y++) {
+				unsigned char color = *pixels++;
+				*(buf + slinex + (y*64)) = color;
+			}
+			linecmds += 3;
+		}
+	}
+	slinex = 31;
+	stopx = ptr->rightpix;
+	if (ptr->leftpix < 31) {
+		srcx = 31;
+		cmdptr = &ptr->dataofs[32 - ptr->leftpix];
+	} else {
+		srcx = ptr->leftpix - 1;
+		cmdptr = &ptr->dataofs[0];
+	}
+	while (++srcx <= stopx) {
+		short *linecmds = (short *)((unsigned char *)ptr + *cmdptr++);
+		while (linecmds[0]) {
+			int y;
+			int y0 = linecmds[2] / 2;
+			int y1 = linecmds[0] / 2 - 1;
+			unsigned char *pixels = (unsigned char *)ptr + y0 + linecmds[1];
+			for (y=y0; y<=y1; y++) {
+				unsigned char color = *pixels++;
+				*(buf + slinex + (y*64)) = color;
+			}
+			linecmds += 3;
+		}
+		slinex++;
+	}
+	
+	spritegfx[shapenum] = FlipWall(buf, 64, 64);
+	MM_FreePtr((void *)&buf);
+}
 
 void ScaleShape(int xcenter, int shapenum, unsigned height)
 {
-	t_compshape	*shape;
-	unsigned	scale,srcx,stopx;
-	word *cmdptr;
-	boolean		leftvis,rightvis;
+	unsigned int scaler = (64 << 16) / (height >> 2);
+	unsigned int x, p;
 
-	shape = PM_GetSpritePage(shapenum);
-
-	scale = height>>2;		// low three bits are fractional
-	scale += 4; /* sprites look a bit better pulled up some */
+	if (spritegfx[shapenum] == NULL)
+		DeCompileSprite(shapenum);
 	
-	if (!scale || scale>maxscale)
-		return;			// too close or far away
-
-
-	linescale = scale;
-	shapeptr = shape;
-//
-// scale to the left (from pixel 31 to shape->leftpix)
-//
-	srcx = 32;
-	slinex = xcenter;
-	stopx = shape->leftpix;
-	cmdptr = (word *)&(shape->dataofs[31-stopx]);
-
-	while ( --srcx >= stopx && slinex>0)
-	{
-		linecmds = (short *)((char *) shapeptr + *cmdptr--);
-		if ( !(slinewidth = scaledata[scale].count[srcx]) )
+	for (p = xcenter - (height >> 3), x = 0; x < (64 << 16); x += scaler, p++) {
+		if ((p < 0) || (p >= viewwidth) || (wallheight[p] >= height))
 			continue;
-
-		if (slinewidth == 1)
-		{
-			slinex--;
-			if (slinex<viewwidth)
-			{
-				if (wallheight[slinex] >= height)
-					continue;		// obscured by closer wall
-				ScaleLine ();
-			}
-			continue;
-		}
-
-		//
-		// handle multi pixel lines
-		//
-		if (slinex>viewwidth)
-		{
-			slinex -= slinewidth;
-			slinewidth = viewwidth-slinex;
-			if (slinewidth<1)
-				continue;		// still off the right side
-		}
-		else
-		{
-			if (slinewidth>slinex)
-				slinewidth = slinex;
-			slinex -= slinewidth;
-		}
-
-
-		leftvis = (wallheight[slinex] < height);
-		rightvis = (wallheight[slinex+slinewidth-1] < height);
-
-		if (leftvis)
-		{
-			if (rightvis)
-				ScaleLine ();
-			else
-			{
-				while (wallheight[slinex+slinewidth-1] >= height)
-					slinewidth--;
-				ScaleLine ();
-			}
-		}
-		else
-		{
-			if (!rightvis)
-				continue;		// totally obscured
-
-			while (wallheight[slinex] >= height)
-			{
-				slinex++;
-				slinewidth--;
-			}
-			ScaleLine();
-			break;			// the rest of the shape is gone
-		}
-	}
-
-
-//
-// scale to the right
-//
-	slinex = xcenter;
-	stopx = shape->rightpix;
-	if (shape->leftpix<31)
-	{
-		srcx = 31;
-		cmdptr = (word *)&shape->dataofs[32-shape->leftpix];
-	}
-	else
-	{
-		srcx = shape->leftpix-1;
-		cmdptr = (word *)&shape->dataofs[0];
-	}
-	slinewidth = 0;
-
-	while ( ++srcx <= stopx && (slinex+=slinewidth)<viewwidth)
-	{
-		linecmds = (short *)((char *) shapeptr + *cmdptr++);
-		if ( !(slinewidth = scaledata[scale].count[srcx]) )
-			continue;
-
-		if (slinewidth == 1)
-		{
-			if (slinex>=0 && wallheight[slinex] < height)
-			{
-				ScaleLine ();
-			}
-			continue;
-		}
-
-		//
-		// handle multi pixel lines
-		//
-		if (slinex<0)
-		{
-			if (slinewidth <= -slinex)
-				continue;		// still off the left edge
-
-			slinewidth += slinex;
-			slinex = 0;
-		}
-		else
-		{
-			if (slinex + slinewidth > viewwidth)
-				slinewidth = viewwidth-slinex;
-		}
-
-
-		leftvis = (wallheight[slinex] < height);
-		rightvis = (wallheight[slinex+slinewidth-1] < height);
-
-		if (leftvis)
-		{
-			if (rightvis)
-			{
-				ScaleLine ();
-			}
-			else
-			{
-				while (wallheight[slinex+slinewidth-1] >= height)
-					slinewidth--;
-				ScaleLine ();
-				break;			// the rest of the shape is gone
-			}
-		}
-		else
-		{
-			if (rightvis)
-			{
-				while (wallheight[slinex] >= height)
-				{
-					slinex++;
-					slinewidth--;
-				}
-				ScaleLine ();
-			}
-			else
-				continue;		// totally obscured
-		}
-	}
+		ScaleLineTrans((height >> 2) + 0, spritegfx[shapenum] + ((x >> 16) << 6), p);
+	}	
 }
-
-
-
-/*
-=======================
-=
-= SimpleScaleShape
-=
-= NO CLIPPING, height in pixels
-=
-= Draws a compiled shape at [scale] pixels high
-=
-=======================
-*/
 
 void SimpleScaleShape(int xcenter, int shapenum, unsigned height)
 {
-	t_compshape	*shape;
-	unsigned	scale,srcx,stopx;
-	unsigned short	*cmdptr;
-
-	shape = PM_GetSpritePage (shapenum);
-
-	scale = height;
-
-	linescale = scale;
-	shapeptr = shape;
-//
-// scale to the left (from pixel 31 to shape->leftpix)
-//
-	srcx = 32;
-	slinex = xcenter;
-	stopx = shape->leftpix;
-	cmdptr = (word *)&shape->dataofs[31-stopx];
-
-	while ( --srcx >=stopx )
-	{
-		linecmds = (short *)((char *) shapeptr + *cmdptr--);
-		if ( !(slinewidth = scaledata[scale].count[srcx]) )
+	unsigned int scaler = (64 << 16) / height;
+	unsigned int x, p;
+	
+	if (spritegfx[shapenum] == NULL)
+		DeCompileSprite(shapenum);
+	
+	for (p = xcenter - (height / 2), x = 0; x < (64 << 16); x += scaler, p++) {
+		if ((p < 0) || (p >= viewwidth))
 			continue;
-		slinex -= slinewidth;
-		ScaleLine ();
-	}
-
-
-//
-// scale to the right
-//
-	slinex = xcenter;
-	stopx = shape->rightpix;
-	if (shape->leftpix<31)
-	{
-		srcx = 31;
-		cmdptr = (word *)&shape->dataofs[32-shape->leftpix];
-	}
-	else
-	{
-		srcx = shape->leftpix-1;
-		cmdptr = (word *)&shape->dataofs[0];
-	}
-	slinewidth = 0;
-
-	while ( ++srcx <= stopx )
-	{
-		linecmds = (short *)((char *) shapeptr + *cmdptr++);
-		if ( !(slinewidth = scaledata[scale].count[srcx]) )
-			continue;
-
-		ScaleLine();
-		slinex += slinewidth;
+		ScaleLineTrans(height, spritegfx[shapenum] + ((x >> 16) << 6), p);
 	}
 }

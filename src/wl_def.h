@@ -96,7 +96,7 @@
 // sprite constants
 //
 
-enum	{
+enum {
 		SPR_DEMO,
 		SPR_DEATHCAM,
 //
@@ -404,9 +404,8 @@ enum	{
 		SPR_MACHINEGUNATK4,
 
 		SPR_CHAINREADY,SPR_CHAINATK1,SPR_CHAINATK2,SPR_CHAINATK3,
-		SPR_CHAINATK4, SPR_NULLSPRITE
-
-		};
+		SPR_CHAINATK4, SPR_NULLSPRITE, SPR_TOTAL
+};
 
 
 /*
@@ -437,7 +436,6 @@ typedef enum {
 	ac_badobject = -1,
 	ac_no,
 	ac_yes,
-	ac_allways
 } activetype;
 
 typedef enum {
@@ -931,16 +929,8 @@ boolean	CheckSight (objtype *ob);
 =============================================================================
 */
 
-typedef struct
-{
-	word leftpix,rightpix;
-	word dataofs[64];
-/* table data after dataofs[rightpix-leftpix+1] */
-} PACKED t_compshape;
-
-void SetupScaling (int maxscaleheight);
-void ScaleShape (int xcenter, int shapenum, unsigned height);
-void SimpleScaleShape (int xcenter, int shapenum, unsigned height);
+void ScaleShape(int xcenter, int shapenum, unsigned height);
+void SimpleScaleShape(int xcenter, int shapenum, unsigned height);
 
 /*
 =============================================================================

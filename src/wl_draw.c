@@ -36,7 +36,7 @@ static long xstep, ystep;
 static unsigned postx;
 
 static void AsmRefresh();
-void xBuildCompScale(int height, byte *source, int x);
+void ScaleLine(int height, byte *source, int x);
 
 #define NOASM
 
@@ -241,7 +241,7 @@ static void ScalePost(byte *wall, int texture)
 	height = (wallheight[postx] & 0xfff8) >> 1;
 	
 	source = wall+texture;
-	xBuildCompScale(height/2, source, postx);
+	ScaleLine(height/2, source, postx);
 }
 
 /*

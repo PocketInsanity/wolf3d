@@ -1119,12 +1119,8 @@ boolean SetViewSize(unsigned width, unsigned height)
 //
 // calculate trace angles and projection constants
 //
-	CalcProjection (FOCALLENGTH);
+	CalcProjection(FOCALLENGTH);
 
-//
-// build all needed compiled scalers
-//
-	SetupScaling(viewwidth*1.5);
 	return true;
 }
 
