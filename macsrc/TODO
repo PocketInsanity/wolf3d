@@ -23,9 +23,9 @@ TODO:
   - Is GL_REPLACE faster than GL_MODULATE for textures?
   - Save "draw state" so redrawing works right when screen is
     resized/exposed
-* Save/Load Games
-  - Menu code does not exist yet -- so just have a compiled in default save
-    and load files
+  - What about using CVAs for the Walls - when loading level create a
+    CVA with every wall entry, then just reference the right one (go by BSP
+    number)
 * Documentation
 * Sound!
   - Need to write sound playing code (probably access /dev/dsp directly

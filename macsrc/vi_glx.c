@@ -22,6 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <stdlib.h>
 #include <ctype.h>
 #include <getopt.h>
+#include <setjmp.h>
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -40,8 +41,6 @@ XVisualInfo *vi;
 GLXContext ctx;
 Atom wmDeleteWindow;
 
-int VidWidth, VidHeight, ViewHeight;
-
 #ifdef GL_EXT_shared_texture_palette
 extern int UseSharedTexturePalette;
 extern PFNGLCOLORTABLEEXTPROC pglColorTableEXT;
@@ -49,7 +48,12 @@ extern PFNGLCOLORTABLEEXTPROC pglColorTableEXT;
 
 extern int CheckToken(const char *str, const char *item);
 
+int VidWidth, VidHeight, ViewHeight;
+
 int HandleEvents();
+
+extern jmp_buf ResetJmp;
+extern Boolean JumpOK;
 
 int attrib[] = {
 	GLX_RGBA,
@@ -424,6 +428,19 @@ void keyboard_handler(KeySym keycode, int press)
 		switch(keycode) {
 		case XK_Escape:
 			Quit(NULL); /* fast way out */
+		case XK_F2:
+			if (playstate == EX_STILLPLAYING) {
+				if (!SaveGame("wolf3d.sav")) 
+					fprintf(stderr, "Unable to save game\n");
+			}
+			break;
+		case XK_F3:
+			if (!LoadGame("wolf3d.sav")) {
+				fprintf(stderr, "Unable to load game\n");
+			} else {
+				longjmp(ResetJmp, EX_LOADGAME);
+			}
+			break;
 		default:
 			break;
 		}

@@ -18,8 +18,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "wolfdef.h"
-#include <string.h>
-#include <stdlib.h>
 
 extern Word NumberIndex;	/* Hack for drawing numbers */
 static LongWord BJTime;	/* Time to draw BJ? */

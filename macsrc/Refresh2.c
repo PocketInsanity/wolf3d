@@ -18,7 +18,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "wolfdef.h"
-#include <stdlib.h>
 
 Word MathSize;			/* What size of math data is calculated? */
 Word *scaleatzptr;		/* Pointer to the scale table for z projection */

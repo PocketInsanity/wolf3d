@@ -595,6 +595,8 @@ extern void InitData();
 extern int WolfMain(int argc, char *argv[]);
 extern void FreeResources();
 extern void RedrawScreen();
+extern Boolean SaveGame(char *file);
+extern Boolean LoadGame(char *file);
 
 extern void BlastScreen(void);
 extern void BlastScreen2(Rect *BlastRect);
