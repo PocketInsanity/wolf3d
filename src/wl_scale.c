@@ -20,11 +20,10 @@ typedef struct {
     short desty [65];
 } t_scaledata;
 
-t_scaledata scaledata [MAXSCALEHEIGHT+1];
+static t_scaledata scaledata[MAXSCALEHEIGHT+1];
+static int maxscale;
 
-int maxscale;
-
-void BuildCompScale(int height)
+static void BuildCompScale(int height)
 {
 	long		fix,step;
 	unsigned	src;
@@ -79,7 +78,7 @@ void SetupScaling(int maxscaleheight)
 //
 	for (i=1;i<=maxscaleheight;i++)
 	{
-		BuildCompScale (i);
+		BuildCompScale(i);
 	}
 
 }
@@ -141,10 +140,10 @@ void xBuildCompScale(unsigned int height, byte *source, int x)
 =======================
 */
 
-int slinex, slinewidth;
-short *linecmds;
-int linescale;
-t_compshape *shapeptr;
+static int slinex, slinewidth;
+static short *linecmds;
+static int linescale;
+static t_compshape *shapeptr;
 
 /* 
    linecmds - points to line segment data 
@@ -152,7 +151,7 @@ t_compshape *shapeptr;
    slinex - screen coord of first column
 */
 
-void ScaleLine()
+static void ScaleLine()
 {
 	int x, y, ys;
 	int n, ny;
@@ -445,7 +444,7 @@ void SimpleScaleShape(int xcenter, int shapenum, unsigned height)
 		if ( !(slinewidth = scaledata[scale].count[srcx]) )
 			continue;
 
-		ScaleLine ();
-		slinex+=slinewidth;
+		ScaleLine();
+		slinex += slinewidth;
 	}
 }

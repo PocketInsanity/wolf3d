@@ -1379,19 +1379,19 @@ void MM_SetLock (memptr *baseptr, boolean locked)
 =====================
 */
 
-void MM_SortMem (void)
+void MM_SortMem()
 {
 }
 
-	boolean PMStarted;
-	char			PageFileName[13] = {"vswap."};
-	int				PageFile = -1;
-	word			ChunksInFile;
-	word			PMSpriteStart,PMSoundStart;
+boolean PMStarted;
+char			PageFileName[13] = {"vswap."};
+int			PageFile = -1;
+word			ChunksInFile;
+word			PMSpriteStart,PMSoundStart;
 
-	word PMNumBlocks;
-	long PMFrameCount;
-	PageListStruct *PMPages, *PMSegPages;
+word PMNumBlocks;
+long PMFrameCount;
+PageListStruct *PMPages, *PMSegPages;
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -1402,13 +1402,13 @@ void MM_SortMem (void)
 //
 //	PML_ReadFromFile() - Reads some data in from the page file
 //
-void PML_ReadFromFile(byte *buf, long offset, word length)
+static void PML_ReadFromFile(byte *buf, long offset, word length)
 {
 	if (!buf)
 		Quit("PML_ReadFromFile: Null pointer");
 	if (!offset)
 		Quit("PML_ReadFromFile: Zero offset");
-	if (lseek(PageFile,offset,SEEK_SET) != offset)
+	if (lseek(PageFile, offset, SEEK_SET) != offset)
 		Quit("PML_ReadFromFile: Seek failed");
 	if (!CA_FarRead(PageFile,buf,length))
 		Quit("PML_ReadFromFile: Read failed");
@@ -1417,7 +1417,7 @@ void PML_ReadFromFile(byte *buf, long offset, word length)
 //
 //	PML_OpenPageFile() - Opens the page file and sets up the page info
 //
-void PML_OpenPageFile(void)
+static void PML_OpenPageFile()
 {
 	int				i;
 	long			size;
@@ -1465,7 +1465,7 @@ void PML_OpenPageFile(void)
 //
 //  PML_ClosePageFile() - Closes the page file
 //
-void PML_ClosePageFile(void)
+static void PML_ClosePageFile()
 {
 	if (PageFile != -1)
 		close(PageFile);
@@ -1534,7 +1534,7 @@ void PM_Preload(boolean (*update)(word current,word total))
 //
 //	PM_NextFrame() - Increments the frame counter
 //
-void PM_NextFrame(void)
+void PM_NextFrame()
 {
 	int	i;
 
@@ -1566,7 +1566,7 @@ void PM_Reset()
 //
 //	PM_Startup() - Start up the Page Mgr
 //
-void PM_Startup(void)
+void PM_Startup()
 {
 	if (PMStarted)
 		return;
@@ -1581,7 +1581,7 @@ void PM_Startup(void)
 //
 //	PM_Shutdown() - Shut down the Page Mgr
 //
-void PM_Shutdown(void)
+void PM_Shutdown()
 {
 	if (!PMStarted)
 		return;

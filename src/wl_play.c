@@ -14,7 +14,7 @@ boolean		madenoise;					// true when shooting or screaming
 
 exit_t		playstate;
 
-int			DebugOk;
+int		DebugOk;
 
 objtype 	objlist[MAXACTORS],*new,*obj,*player,*lastobj,
 			*objfreelist,*killerobj;
@@ -418,41 +418,47 @@ void PollJoystickMove (void)
 ===================
 */
 
-void PollControls (void)
+void PollControls()
 {
-	int		max,min,i;
+	int	max, min, i;
 	byte	buttonbits;
 
 //
 // get timing info for last frame
 //
-	if (demoplayback)
-	{
-		while ( get_TimeCount() < (lasttimecount+DEMOTICS) ) ;
-		set_TimeCount(lasttimecount + DEMOTICS);
-		lasttimecount += DEMOTICS;
-		tics = DEMOTICS;
-	}
-	else if (demorecord)			// demo recording and playback needs
-	{								// to be constant
+	if (demoplayback) {
+	#if 0
+		if (1 /* (TEMP) TODO: TimeDemo */) {
+			set_TimeCount(lasttimecount + DEMOTICS);
+			lasttimecount += DEMOTICS;
+			tics = DEMOTICS;
+		} else 
+	#endif	
+		{
+			while ( get_TimeCount() < (lasttimecount+DEMOTICS) ) ;
+			set_TimeCount(lasttimecount + DEMOTICS);
+			lasttimecount += DEMOTICS;
+			tics = DEMOTICS;
+		}
+	} else if (demorecord) {
+				// demo recording and playback needs
+				// to be constant
 //
 // take DEMOTICS or more tics, and modify Timecount to reflect time taken
 //
-		while ( get_TimeCount() < (lasttimecount+DEMOTICS) ) ;
+		while (get_TimeCount() < (lasttimecount+DEMOTICS)) ;
 		set_TimeCount(lasttimecount + DEMOTICS);
 		lasttimecount += DEMOTICS;
 		tics = DEMOTICS;
-	}
-	else
+	} else
 		CalcTics ();
 
 	controlx = 0;
 	controly = 0;
-	memcpy (buttonheld,buttonstate,sizeof(buttonstate));
-	memset (buttonstate,0,sizeof(buttonstate));
+	memcpy(buttonheld, buttonstate, sizeof(buttonstate));
+	memset(buttonstate, 0, sizeof(buttonstate));
 
-	if (demoplayback)
-	{
+	if (demoplayback) {
 	//
 	// read commands from demo buffer
 	//
@@ -481,26 +487,26 @@ void PollControls (void)
 //
 
 	/* Update keys */
-	IN_CheckAck(); /* TODO: better name */
+	IN_CheckAck(); 
 	
-	PollKeyboardButtons ();
+	PollKeyboardButtons();
 
 	if (mouseenabled)
-		PollMouseButtons ();
+		PollMouseButtons();
 
 	if (joystickenabled)
-		PollJoystickButtons ();
+		PollJoystickButtons();
 
 //
 // get movements
 //
-	PollKeyboardMove ();
+	PollKeyboardMove();
 
 	if (mouseenabled)
-		PollMouseMove ();
+		PollMouseMove();
 
 	if (joystickenabled)
-		PollJoystickMove ();
+		PollJoystickMove();
 
 //
 // bound movement to a maximum

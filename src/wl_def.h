@@ -898,10 +898,7 @@ extern	unsigned	pwallpos;
 
 
 fixed	FixedByFrac (fixed a, fixed b);
-void	TransformActor (objtype *ob);
 void	BuildTables (void);
-int		CalcRotate (objtype *ob);
-void	DrawScaleds (void);
 void	CalcTics (void);
 void	ThreeDRefresh (void);
 

@@ -94,7 +94,7 @@ void PicturePause (void)
 ================
 */
 
-void ShapeTest (void)
+void ShapeTest()
 {
 #if 0 /* TODO: this code want to access the raycasting renderer directly */
 extern	word	NumDigi;
