@@ -19,6 +19,51 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "wolfdef.h"
 
+Word SystemState=3;
+
+void DLZSSSound(Byte *Dest,Byte *Src,LongWord Length)
+{
+	Word BitBucket;
+	Word RunCount;
+	Word Fun;
+	Byte *BackPtr;
+	
+	if (!Length) {
+		return;
+	}
+	BitBucket = (Word) Src[0] | 0x100;
+	++Src;
+	do {
+		if (BitBucket&1) {
+			Dest[0] = Src[0];
+			++Src;
+			++Dest;
+			--Length;
+		} else {
+			RunCount = (Word) Src[1] | ((Word) Src[0]<<8);
+			Fun = 0x1000-(RunCount&0xfff);
+			BackPtr = Dest-Fun;
+			RunCount = ((RunCount>>12) & 0x0f) + 3;
+			if (Length >= RunCount) {
+				Length -= RunCount;
+			} else {
+				printf("Overrun: l:%d r:%d\n", Length, RunCount);
+				RunCount = Length;
+				Length = 0;
+			}
+			while (RunCount--) {
+				*Dest++ = *BackPtr++;
+			}
+			Src+=2;
+		}
+		BitBucket>>=1;
+		if (BitBucket==1) {
+			BitBucket = (Word)Src[0] | 0x100;
+			++Src;
+		}
+	} while (Length);
+}
+
 /**********************************
 
 	Stop the current song from playing
