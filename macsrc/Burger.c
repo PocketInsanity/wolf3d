@@ -11,6 +11,17 @@
 #include <stdio.h>
 
 
+Word FontX;
+Word FontY;
+unsigned char *FontPtr; 
+unsigned char *FontWidths;
+Word FontHeight;
+Word FontFirst; 
+Word FontLast;
+Word FontLoaded; 
+Word FontInvisible;
+unsigned char FontOrMask[16];
+
 /**********************************
 
 	Sound sub-system
@@ -513,39 +524,6 @@ Byte CurrentPal[768];
 
 void SetAPalettePtr(unsigned char *PalPtr)
 {
-	CTabHandle ColorHandle;		/* Handle to the main palette */
-	Handle PalHand;			/* Handle to palette */
-	Word i;					/* Temp */
-	CSpecArray *Colors;		/* Pointer to color array */
-	GDHandle OldDevice;
-	
-	memcpy(CurrentPal,PalPtr,768);
-	ColorHandle = MainColorHandle;
-	HLock((Handle) ColorHandle);
-	Colors = &(*ColorHandle)->ctTable;
-	++Colors;		/* Go to color #0 */
-	i = 1;			/* Skip color #0 */
-	PalPtr+=3;
-	do {			/* Fill in all the color entries */
-		Colors[0]->rgb.red = (Word) (PalPtr[0]<<8) | PalPtr[0];
-		Colors[0]->rgb.green = (Word) (PalPtr[1]<<8) | PalPtr[1];
-		Colors[0]->rgb.blue = (Word) (PalPtr[2]<<8) | PalPtr[2];
-		if (!Colors[0]->rgb.blue) {
-			Colors[0]->rgb.blue = 0x0101;
-		}
-	    PalPtr+=3;
-	    ++Colors;
-	} while (++i<255);	/* All done? */
-	OldDevice = GetGDevice();
-	SetGDevice(gMainGDH);
-	SetEntries(0,255-1,(*ColorHandle)->ctTable);	/* Set the color entries */
-	PalHand = (Handle) (**(*GameGWorld).portPixMap).pmTable;
-	PtrToXHand(*ColorHandle,PalHand,8+(8*256));
-	PalHand = (Handle) (**(*GameWindow).portPixMap).pmTable;
-	PtrToXHand(*ColorHandle,PalHand,8+(8*256));
-	HUnlock((Handle)ColorHandle);	/* Release the main handle */
-	MakeITable(0,0,0);				/* Create the proper color table */
-	SetGDevice(OldDevice);
 }
 
 /**********************************

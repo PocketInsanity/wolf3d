@@ -66,22 +66,12 @@ typedef unsigned short ufixed_t;	/* 8.8 unsigned fixed point number */
 #define	ANGLE90		0x4000		/* Use a 0x10000 angle range */
 #define	ANGLE180	0x8000		/* Use a 0x10000 angle range */
 
-#ifdef __MAC__
-#define	SCREENWIDTH	MacWidth		/* Size of the offscreen buffer */
-#define SCREENHEIGHT MacHeight	/* Height of the offscreen buffer */
-#define VIEWHEIGHT MacViewHeight		/* Height of the viewing area */
-Word ScaleX(Word x);		/* Scale factor for 320 mode points projected to SCREEN */
-Word ScaleY(Word y);
-extern Word MacWidth;
-extern Word MacHeight;
-extern Word MacViewHeight;
-#else
 #define	SCREENWIDTH	320		/* Size of the offscreen buffer */
 #define SCREENHEIGHT 200	/* Height of the offscreen buffer */
 #define VIEWHEIGHT 160		/* Height of the viewing area */
 #define ScaleX(x) x		/* Scale factor for 320 mode points projected to SCREEN */
 #define ScaleY(y) y
-#endif
+
 #define	CENTERY	(VIEWHEIGHT/2)	/* Center of the viewing area */
 #define	CENTERX	(SCREENWIDTH/2)	/* Center of the viewing area */
 
@@ -227,10 +217,8 @@ enum {BSPTOP,BSPBOTTOM,BSPLEFT,BSPRIGHT};	/* BSP quadrants */
 
 typedef struct {
 	unsigned short codeofs[WALLHEIGHT+1];		/* Entry to the code for sprites */
-#ifndef __APPLEIIGS__
 	Byte FixA1[WALLHEIGHT+1];		/* A1 adjust for the screen */
 	Byte Pad[1];			/* Long word align it... */
-#endif
 	Byte code[1];					/* Scaler code */
 } t_compscale;
 

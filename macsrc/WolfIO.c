@@ -210,8 +210,6 @@ void IO_DrawStatusBar(void)
 	
 **********************************/
 
-#ifndef __APPLEIIGS__		/* Done in assembly on the IIgs version */
-#ifndef __3DO__
 void IO_ClearViewBuffer(void)
 {
 	unsigned char *Screenad;
@@ -241,8 +239,6 @@ void IO_ClearViewBuffer(void)
 		Screenad+=VideoWidth;
 	} while (--Count);
 }
-#endif
-#endif
 
 /**********************************
 
