@@ -577,22 +577,16 @@ int XKeysymToScancode(unsigned int keysym)
 			
 void keyboard_handler(int code, int press)
 {
-	static boolean special;
-	byte k, c;
+	byte k, c = 0;
 
 	k = code;
 
-	if (k == 0xe0)		// Special key prefix
-		special = true;
-	else if (k == 0xe1)	// Handle Pause key
+	if (k == 0xe1)	// Handle Pause key
 		Paused = true;
 	else
 	{
 		if (press == 0)	
 		{
-
-// DEBUG - handle special keys: ctl-alt-delete, print scrn
-
 			Keyboard[k] = false;
 		}
 		else			// Make code
@@ -601,33 +595,27 @@ void keyboard_handler(int code, int press)
 			CurCode = LastScan = k;
 			Keyboard[k] = true;
 
-			if (special)
-				c = SpecialNames[k];
+			if (k == sc_CapsLock)
+			{
+				CapsLock ^= true;
+			}
+
+			if (Keyboard[sc_LShift] || Keyboard[sc_RShift])	// If shifted
+			{
+				c = ShiftNames[k];
+				if ((c >= 'A') && (c <= 'Z') && CapsLock)
+					c += 'a' - 'A';
+			}
 			else
 			{
-				if (k == sc_CapsLock)
-				{
-					CapsLock ^= true;
-				}
-
-				if (Keyboard[sc_LShift] || Keyboard[sc_RShift])	// If shifted
-				{
-					c = ShiftNames[k];
-					if ((c >= 'A') && (c <= 'Z') && CapsLock)
-						c += 'a' - 'A';
-				}
-				else
-				{
-					c = ASCIINames[k];
-					if ((c >= 'a') && (c <= 'z') && CapsLock)
-						c -= 'a' - 'A';
-				}
+				c = ASCIINames[k];
+				if ((c >= 'a') && (c <= 'z') && CapsLock)
+					c -= 'a' - 'A';
 			}
+			
 			if (c)
 				LastASCII = c;
 		}
-
-		special = false;
 	}
 }
 

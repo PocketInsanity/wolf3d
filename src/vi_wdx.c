@@ -611,20 +611,7 @@ static byte ASCIINames[] =		// Unshifted ASCII for scan codes
 	'2','3','0',127,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,	// 5
 	0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,	// 6
 	0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0   	// 7
-					},
-					 SpecialNames[] =	// ASCII for 0xe0 prefixed codes
-					{
-//	 0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F
-	0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,	// 0
-	0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,13 ,0  ,0  ,0  ,	// 1
-	0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,	// 2
-	0  ,0  ,0  ,0  ,0  ,'/',0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,	// 3
-	0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,	// 4
-	0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,	// 5
-	0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,	// 6
-	0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0   	// 7
 					};
-
 
 static	boolean		IN_Started;
 static	boolean		CapsLock;
@@ -641,22 +628,16 @@ static	Direction	DirTable[] =		// Quick lookup for total direction
 
 void keyboard_handler(int code, int press)
 {
-	static boolean special;
-	byte k, c;
+	byte k, c = 0;
 
 	k = code;
 
-	if (k == 0xe0)		// Special key prefix
-		special = true;
-	else if ( k == 0xE1 )	// Handle Pause key
+	if ( k == 0xE1 )	// Handle Pause key
 		Paused = true;
 	else
 	{
 		if (press == 0)	
 		{
-
-// DEBUG - handle special keys: ctl-alt-delete, print scrn
-
 			Keyboard[k] = false;
 		}
 		else			// Make code
@@ -665,33 +646,26 @@ void keyboard_handler(int code, int press)
 			CurCode = LastScan = k;
 			Keyboard[k] = true;
 
-			if (special)
-				c = SpecialNames[k];
+			if (k == sc_CapsLock)
+			{
+				CapsLock ^= true;
+			}
+
+			if (Keyboard[sc_LShift] || Keyboard[sc_RShift])	// If shifted
+			{
+				c = ShiftNames[k];
+				if ((c >= 'A') && (c <= 'Z') && CapsLock)
+					c += 'a' - 'A';
+			}
 			else
 			{
-				if (k == sc_CapsLock)
-				{
-					CapsLock ^= true;
-				}
-
-				if (Keyboard[sc_LShift] || Keyboard[sc_RShift])	// If shifted
-				{
-					c = ShiftNames[k];
-					if ((c >= 'A') && (c <= 'Z') && CapsLock)
-						c += 'a' - 'A';
-				}
-				else
-				{
-					c = ASCIINames[k];
-					if ((c >= 'a') && (c <= 'z') && CapsLock)
-						c -= 'a' - 'A';
-				}
+				c = ASCIINames[k];
+				if ((c >= 'a') && (c <= 'z') && CapsLock)
+					c -= 'a' - 'A';
 			}
 			if (c)
 				LastASCII = c;
 		}
-
-		special = false;
 	}
 }
 
