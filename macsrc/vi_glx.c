@@ -615,6 +615,7 @@ int HandleEvents()
 					glViewport(0, 0, event.xconfigure.width, event.xconfigure.height);
 					glPixelZoom(1.0f, -1.0f);
 					glRasterPos2f(-1.0f, 1.0f);
+					RedrawScreen();
 					break;
 				case ClientMessage:
 					if (event.xclient.data.l[0] == wmDeleteWindow)

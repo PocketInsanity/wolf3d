@@ -786,13 +786,9 @@ void InitRenderView()
 
 void IO_AttackShape(Word shape)
 {
-	if (weptex[shape] == 0) {
-		fprintf(stderr, "Weapon shape %d is zero texture!\n", shape);
-	}
-	
 	glDisable(GL_DEPTH_TEST);
 	
-	glBindTexture(GL_TEXTURE_2D, weptex[shape]);
+	ChangeTextureSimple(weptex[shape]);
 	
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
