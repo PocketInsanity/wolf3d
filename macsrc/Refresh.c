@@ -190,7 +190,6 @@ void DrawAutomap(Word tx,Word ty)
 
 Boolean StartupRendering(Word NewSize)
 {
-#ifdef __MAC__
 	int		i;
 	Word minz;
 	int		x;
@@ -199,14 +198,11 @@ Boolean StartupRendering(Word NewSize)
 	LongWord focallength;
 	Word j;
 	Word *ScalePtr;
-#endif
 
 	if (NewSize == MathSize) {	/* Already loaded? */
 		return TRUE;
 	}
 	
-#ifdef __MAC__		/* Only the mac version will calculate the tables */
-
 /* generate scaleatz*/
 
 	ScalePtr = scaleatzptr;
@@ -290,28 +286,6 @@ Boolean StartupRendering(Word NewSize)
 			viewangletox[i] = SCREENWIDTH;
 		}
 	}
-	
-#if 0		/* Should I save these tables? */
-if (!NewSize) {
-SaveJunk(scaleatzptr,sizeof(Word)*MAXZ);
-SaveJunk(finetangent,sizeof(short)*FINEANGLES/2);
-SaveJunk(finesine,sizeof(short)*FINEANGLES/2);
-SaveJunk(viewangletox,sizeof(short)*FINEANGLES/2);
-SaveJunk(xtoviewangle,sizeof(short)*(SCREENWIDTH+1));
-GoodBye();
-}
-#endif
-	
-#else
-/* All other versions load the tables from disk (MUCH FASTER!!) */
-	if (MathSize==-1) {
-		finetangent = LoadAResource(rFineTangent);
-		finesine = LoadAResource(rFineSine);
-	}
-	scaleatzptr = LoadAResource(rScaleAtZ);
-	viewangletox = LoadAResource(rViewAngleToX);
-	xtoviewangle = LoadAResource(rXToViewAngle);
-#endif
 
 	clipshortangle = xtoviewangle[0]<<ANGLETOFINESHIFT;	/* Save leftmost angle for view */
 	clipshortangle2 = clipshortangle*2;					/* Double the angle for constant */

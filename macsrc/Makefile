@@ -9,8 +9,8 @@ CFLAGS = -g
 OBJS =  Data.o Doors.o EnMove.o EnThink.o Intro.o Level.o \
 	Missiles.o Music.o PlMove.o PlStuff.o PlThink.o PushWall.o \
 	RefBsp.o RefSprite.o Refresh.o Refresh2.o Sight.o Main.o \
-	StateDef.o WolfMain.o WolfIO.o InterMis.o Burger.o
-SOBJS = $(OBJS) 
+	StateDef.o WolfMain.o WolfIO.o InterMis.o Burger.o stub.o res.o
+SOBJS = $(OBJS) vi_svga.o
 XOBJS = $(OBJS)
 GOBJS = $(OBJS)
 
@@ -25,11 +25,12 @@ NASM = nasm
 
 .SUFFIXES: .asm
 
-all:	swolf3d xwolf3d gwolf3d
+#all:	swolf3d xwolf3d gwolf3d
+all:	swolf3d
 
-$(SOBJS):
-$(XOBJS):
-$(GOBJS):
+$(SOBJS): Sounds.h  Sprites.h  States.h  Wolf.h  burger.h  wolfdef.h
+$(XOBJS): Sounds.h  Sprites.h  States.h  Wolf.h  burger.h  wolfdef.h
+$(GOBJS): Sounds.h  Sprites.h  States.h  Wolf.h  burger.h  wolfdef.h
 
 .asm.o:
 	$(NASM) -f elf -o $@ $<

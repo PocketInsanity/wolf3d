@@ -15,6 +15,11 @@ typedef struct {
 	int bottom;
 } Rect;
 
+unsigned short int sLSB(unsigned short int i);
+unsigned short int sMSB(unsigned short int i);
+unsigned long lLSB(unsigned long i);
+unsigned long lMSB(unsigned long i);
+
 /* an angle_t occupies an entire 16 bits so wraparound is automatically handled */
 
 #define	SHORTTOANGLESHIFT	7	/* 0x10000 to ANGLES */
@@ -782,7 +787,6 @@ extern void SetupPlayScreen(void);
 extern void RunAutoMap(void);
 extern void StartGame(void);
 extern Boolean TitleScreen(void);
-extern void WolfMain(void);
 
 /* In Intermis.c */
 

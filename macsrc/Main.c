@@ -119,9 +119,9 @@ Boolean TitleScreen (void)
 	NewGameWindow(1);	/* Set to 512 mode */
 	FadeToBlack();		/* Fade out the video */
 	PackPtr = LoadAResource(rTitlePic);
-	PackLen = PackPtr[0];
+	PackLen = lMSB(PackPtr[0]);
 	ShapePtr = (Byte *)AllocSomeMem(PackLen);
-	DLZSS(ShapePtr,(Byte *) &PackPtr[1],PackLen);
+	DLZSS(ShapePtr, (Byte *)&PackPtr[1], PackLen);
 	DrawShape(0,0,ShapePtr);
 	ReleaseAResource(rTitlePic);
 	FreeSomeMem(ShapePtr);
@@ -144,9 +144,8 @@ jmp_buf ResetJmp;
 Boolean JumpOK;
 extern Word NumberIndex;
 
-int main(int argc, char *argv[])
+int WolfMain(int argc, char *argv[])
 {
-	InitTools();		/* Init the system environment */
 	WaitTick();			/* Wait for a system tick to go by */
 	playstate = (exit_t)setjmp(ResetJmp);	
 	NumberIndex = 36;	/* Force the score to redraw properly */

@@ -10,6 +10,9 @@
 #include <string.h>
 #include <stdio.h>
 
+unsigned char *VideoPointer;
+Word VideoWidth;
+LongWord YTable[480]; 
 
 Word FontX;
 Word FontY;
@@ -21,6 +24,10 @@ Word FontLast;
 Word FontLoaded; 
 Word FontInvisible;
 unsigned char FontOrMask[16];
+
+Word SystemState=3;
+
+#define BRGR 0x42524752
 
 /**********************************
 
@@ -47,7 +54,7 @@ void SoundOff(void)
 
 void PlaySound(Word SoundNum)
 {
-	if (SoundNum && (SystemState&SfxActive)) {
+	if (SoundNum) {
 		SoundNum+=127;
 		if (SoundNum&0x8000) {		/* Mono sound */
 			EndSound(SoundNum&0x7fff);
@@ -74,7 +81,6 @@ static Word LastSong = -1;
 void PlaySong(Word Song)
 {
 	if (Song) {
-		KilledSong = Song;
 		if (SystemState&MusicActive) {
 			if (Song!=LastSong) {
 				BeginSongLooped(Song);	
@@ -606,17 +612,7 @@ void FadeToPtr(unsigned char *PalPtr)
 
 void *LoadAResource(Word RezNum) 
 {
-	return(LoadAResource2(RezNum,'BRGR'));
-}
-
-/**********************************
-
-	Load a global resource
-
-**********************************/
-
-void *LoadAResource2(Word RezNum,LongWord Type)
-{
+	return(LoadAResource2(RezNum, BRGR));
 }
 
 /**********************************
@@ -627,17 +623,7 @@ void *LoadAResource2(Word RezNum,LongWord Type)
 
 void ReleaseAResource(Word RezNum)
 {
-	ReleaseAResource2(RezNum,'BRGR');
-}
-
-/**********************************
-
-	Release a global resource
-
-**********************************/
-
-void ReleaseAResource2(Word RezNum,LongWord Type)
-{
+	ReleaseAResource2(RezNum, BRGR);
 }
 
 /**********************************
@@ -648,17 +634,7 @@ void ReleaseAResource2(Word RezNum,LongWord Type)
 
 void KillAResource(Word RezNum)
 {
-	KillAResource2(RezNum,'BRGR');
-}
-
-/**********************************
-
-	Kill a global resource
-
-**********************************/
-
-void KillAResource2(Word RezNum,LongWord Type)
-{
+	KillAResource2(RezNum, BRGR);
 }
 
 void SaveJunk(void *AckPtr,Word Length)
@@ -716,11 +692,13 @@ void DLZSS(Byte *Dest,Byte *Src,LongWord Length)
 			if (Length >= RunCount) {
 				Length -= RunCount;
 			} else {
+				printf("Overrun: l:%d r:%d\n", Length, RunCount);
+				RunCount = Length;
 				Length = 0;
 			}
-			do {
+			while (RunCount--) {
 				*Dest++ = *BackPtr++;
-			} while (--RunCount);
+			}
 			Src+=2;
 		}
 		BitBucket>>=1;
