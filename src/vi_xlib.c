@@ -413,14 +413,6 @@ void VL_Startup()
 
 void VL_Shutdown()
 {
-	if (dga) {
-		XF86DGADirectVideo(dpy, screen, 0);
-		XUngrabKeyboard(dpy, CurrentTime);
-		free(gfxbuf);
-		free(disbuf);
-		gfxbuf = disbuf = NULL;
-	}
-	
 	if (fullscreen) {
 		XF86VidModeLockModeSwitch(dpy, screen, False);
 		//printf("%d, %d\n", vidmode.hdisplay, vidmode.vdisplay);
@@ -428,6 +420,14 @@ void VL_Shutdown()
 		XF86VidModeSwitchToMode(dpy, screen, vmmi[0]);
 	}
 	
+	if (dga) {
+		XF86DGADirectVideo(dpy, screen, 0);
+		XUngrabKeyboard(dpy, CurrentTime);
+		free(gfxbuf);
+		free(disbuf);
+		gfxbuf = disbuf = NULL;
+	}
+
 	if ( !shmmode && (gfxbuf != NULL) ) {
 		free(gfxbuf);
 		gfxbuf = NULL;
@@ -597,7 +597,7 @@ void VL_FillPalette(int red, int green, int blue)
 void VL_SetPalette(const byte *palette)
 {
 	int i;
-	
+
 	if (indexmode) {
 		for (i = 0; i < 256; i++) {
 			clr[i].red = palette[i*3+0] << 10;

@@ -1058,7 +1058,7 @@ void SpawnPlayer (int tilex, int tiley, int dir)
 	player->flags = FL_NEVERMARK;
 	Thrust (0,0);				// set some variables
 
-	InitAreas ();
+	InitAreas();
 }
 
 
@@ -1074,7 +1074,7 @@ void SpawnPlayer (int tilex, int tiley, int dir)
 ===============
 */
 
-void	KnifeAttack (objtype *ob)
+void KnifeAttack (objtype *ob)
 {
 	objtype *check,*closest;
 	long	dist;
@@ -1104,14 +1104,14 @@ void	KnifeAttack (objtype *ob)
 	}
 
 // hit something
-	DamageActor (closest,US_RndT() >> 4);
+	DamageActor(closest, US_RndT() >> 4);
 }
 
 
 
-void	GunAttack (objtype *ob)
+void GunAttack(objtype *ob)
 {
-	objtype *check,*closest,*oldclosest;
+	objtype *check, *closest, *oldclosest;
 	int		damage;
 	int		dx,dy,dist;
 	long	viewdist;
@@ -1157,7 +1157,7 @@ void	GunAttack (objtype *ob)
 			}
 
 		if (closest == oldclosest)
-			return;						// no more targets, all missed
+			return;		// no more targets, all missed
 
 	//
 	// trace a line from player to enemey

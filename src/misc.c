@@ -193,6 +193,6 @@ void DisplayTextSplash(byte *text)
 		else
 			printf(" ");
 	}
-	/* TODO: reset color */
+	printf("%c[m", 27);
 	printf("\n");
 }
