@@ -933,7 +933,7 @@ static void HitVertDoor()
 			break;
 	}
 
-	wall = PM_GetPage(doorpage);
+	wall = PM_GetPage(doorpage+1);
 	ScalePost(wall, texture);
 }
 
