@@ -19,6 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 #include "wolfdef.h"
 
@@ -37,6 +38,33 @@ typedef struct ResItem_t
 
 ResItem *lr;
 
+static int32_t Read32M(FILE *fp)
+{
+	unsigned char d[4];
+	
+	fread(d, 1, 4, fp);
+	
+	return (d[0] << 24) | (d[1] << 16) | (d[2] << 8) | (d[3] << 0);
+}
+
+static int32_t Read24M(FILE *fp)
+{
+	unsigned char d[3];
+	
+	fread(d, 1, 3, fp);
+	
+	return (d[0] << 16) | (d[1] << 8) | (d[2] << 0);
+}
+
+static int16_t Read16M(FILE *fp)
+{
+	unsigned char d[2];
+	
+	fread(d, 1, 2, fp);
+	
+	return (d[0] << 8) | (d[1] << 0);
+}
+
 int InitResources(char *name)
 {	
 	FILE *fp;
@@ -51,26 +79,26 @@ int InitResources(char *name)
 	if (fp == NULL) 
 		return -1;
 	
-	resfork = (fgetc(fp) << 24) | (fgetc(fp) << 16) | (fgetc(fp) << 8) | (fgetc(fp) << 0);
-	resmap  = (fgetc(fp) << 24) | (fgetc(fp) << 16) | (fgetc(fp) << 8) | (fgetc(fp) << 0);
-	forklen = (fgetc(fp) << 24) | (fgetc(fp) << 16) | (fgetc(fp) << 8) | (fgetc(fp) << 0);
-	maplen  = (fgetc(fp) << 24) | (fgetc(fp) << 16) | (fgetc(fp) << 8) | (fgetc(fp) << 0);
+	resfork = Read32M(fp);
+	resmap  = Read32M(fp);
+	forklen = Read32M(fp);
+	maplen  = Read32M(fp);
 	
 	fseek(fp, resmap, SEEK_SET);
 	fseek(fp, 24, SEEK_CUR); /* Skip over reserved */
 	
-	typelist = (fgetc(fp) << 8) | (fgetc(fp) << 0);
-	namelist = (fgetc(fp) << 8) | (fgetc(fp) << 0);
-	typecount = ((fgetc(fp) << 8) | (fgetc(fp) << 0)) + 1;
+	typelist = Read16M(fp);
+	namelist = Read16M(fp);
+	typecount = Read16M(fp) + 1;
 	
 	for (i = 0; i < typecount; i++) {
 		int type;
 		int off, bak, bak2, data, count, x;
 		
-		type = (fgetc(fp) << 24) | (fgetc(fp) << 16) | (fgetc(fp) << 8) | (fgetc(fp) << 0);
+		type = Read32M(fp);
 		
-		count = ((fgetc(fp) << 8) | fgetc(fp)) + 1;
-		off = (fgetc(fp) << 8) | fgetc(fp);
+		count = Read16M(fp) + 1;
+		off = Read16M(fp);
 		
 		bak = ftell(fp);
 		
@@ -78,16 +106,18 @@ int InitResources(char *name)
 		for (x = 0; x < count; x++) {
 			int id;
 			
-			id = (fgetc(fp) << 8) | fgetc(fp);
-			off = (fgetc(fp) << 8) | fgetc(fp);
-			fgetc(fp);
-			data = (fgetc(fp) << 16) | (fgetc(fp) << 8) | (fgetc(fp) << 0);
+			id =  Read16M(fp);
+			off = Read16M(fp);
 			
-			fgetc(fp); fgetc(fp); fgetc(fp); fgetc(fp);
+			fgetc(fp); /* not needed */
+
+			data = Read24M(fp); 
+			
+			fgetc(fp); fgetc(fp); fgetc(fp); fgetc(fp); /* not needed */
 			
 			bak2 = ftell(fp);
 			fseek(fp, resfork + data, SEEK_SET);
-			datalen = (fgetc(fp) << 24) | (fgetc(fp) << 16) | (fgetc(fp) << 8) | (fgetc(fp) << 0);
+			datalen = Read32M(fp);
 			
 			t = (ResItem *)malloc(sizeof(ResItem));
 			

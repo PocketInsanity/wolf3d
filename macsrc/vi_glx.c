@@ -191,7 +191,7 @@ int main(int argc, char *argv[])
 	if (CheckToken(ext, "GL_EXT_shared_texture_palette")) {
 		pglColorTableEXT = glXGetProcAddressARB((unsigned const char *)"glColorTableEXT");
 		if (pglColorTableEXT) {
-			UseSharedTexturePalette = 1;
+			UseSharedTexturePalette = 0;
 			printf("GL_EXT_shared_texture_palette found...\n");
 		}
 	}

@@ -745,13 +745,13 @@ void InitRenderView()
 		glBindTexture(GL_TEXTURE_2D, waltex[i]);
 		buf = FlipWall(ArtData[i], 128, 128);
 		
-		/*
+#ifdef USE_NEAREST
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);		
-		*/
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+#else
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		
+#endif
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);		
@@ -786,13 +786,13 @@ void InitRenderView()
 		}
 		glBindTexture(GL_TEXTURE_2D, sprtex[i]);
 		
-		/*
+#ifdef USE_NEAREST
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);		
-		*/
+#else
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		
+#endif		
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
@@ -832,13 +832,13 @@ void InitRenderView()
 			
 			glBindTexture(GL_TEXTURE_2D, weptex[i]);
 			
-			/*
+#ifdef USE_NEAREST
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);		
-			*/
+#else
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			
+#endif			
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
@@ -1321,8 +1321,8 @@ void P_DrawSeg(saveseg_t *seg)
 	Word	segplane;
 	Word    door;
 	door_t  *door_p;
-	unsigned short span, tspan;
-	unsigned short angle1 = 0, angle2 = 0;
+	unsigned short int span, tspan;
+	unsigned short int angle1 = 0, angle2 = 0;
 	
 	WallSeen = 0;
 	
@@ -1386,9 +1386,10 @@ void P_DrawSeg(saveseg_t *seg)
 /* clip to view edges*/
 
 	span = (angle1 - angle2);
-	if (span >= 0x8000) {		/* Test for negative (32 bit clean) */
+	if (span >= 0x8000) {
 		return;
 	}
+	
 	angle1 -= centershort;
 	angle2 -= centershort;
 	++angle2;	/* make angle 2 non inclusive*/

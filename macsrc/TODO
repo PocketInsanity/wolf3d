@@ -43,6 +43,7 @@ TODO:
     - Would like to have a "lower level" X Toolkit, to provide menus and
       dialog boxes, and various widgets, but I rather not be "forced" into
       losing the ability to call Xlib functions directly.
+    - Make them like PC Wolf3D.
 * Different depths/visuals for software clients.
   + Different functions to draw with different bpps.
     - 15 bpp uses same draw routes as 16 but different set palette
@@ -50,8 +51,6 @@ TODO:
       - don't support them generally
       - MacPlay->Id Logo: have some sort of redraw.
       - Fades in game can just call renderview each time
-* Get it to compile/work with g++ if it is not too much trouble.
-  - Have to rename class..
 * SDL version (software)
 * Mouse
 * Psyched bar
@@ -59,7 +58,6 @@ TODO:
 * vi_glx.c will probably be the most updated of the frontends. Be sure to
   update the others later.
 * Finish moving things out of stub.c
-* Name conflicts between wolf3d and Xt types
 
 BUGS:
 * Software Drawing seems like its imprecise, stationary sprites move back and 
