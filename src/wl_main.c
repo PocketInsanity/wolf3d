@@ -698,7 +698,7 @@ void FinishSignon (void)
 =================
 */
 
-boolean MS_CheckParm(char *check)
+int MS_CheckParm(char *check)
 {
 	int             i;
 	char    *parm;
@@ -712,10 +712,10 @@ boolean MS_CheckParm(char *check)
 				break;                          // hit end of string without an alphanum
 
 		if ( !strcasecmp(check,parm) )
-			return true;
+			return i;
 	}
 
-	return false;
+	return 0;
 }
 
 //===========================================================================
@@ -1154,7 +1154,7 @@ void Quit(char *error)
 {
 	memptr screen = NULL;
 
-	if (error && !*error) {
+	if (!error || !*error) {
 		CA_CacheGrChunk(ORDERSCREEN);
 		screen = grsegs[ORDERSCREEN];
 		WriteConfig();
@@ -1166,13 +1166,13 @@ void Quit(char *error)
 	ShutdownId();
 	
 	if (screen) {
-		/* blah blah */
+		printf("TODO: spiffy ansi screen goes here..\n");
 	}
 	
 	if (error && *error) {
 		printf("Quit: %s\n", error);
 		exit(EXIT_FAILURE);
-	}
+ 	}
 		
 	exit(EXIT_SUCCESS);
 }
@@ -1192,15 +1192,13 @@ void Quit(char *error)
 void DemoLoop (void)
 {
 	static int LastDemo;
+	int i;
 //
 // main game cycle
 //
 
-	#ifndef UPLOAD
-
 	#if !defined(GOODTIMES) && defined(SPEAR) && !defined(SPEARDEMO)
 		CopyProtection();
-	#endif
 	#endif
 
 	StartCPMusic(INTROSONG);
@@ -1208,6 +1206,17 @@ void DemoLoop (void)
 	if (!NoWait)
 		PG13 ();
 
+	i = MS_CheckParm("playdemo");
+	if ( i && ( (i+1) < _argc) ) {
+		i++;
+		for (; i < _argc; i++) {
+			IN_ClearKeysDown();
+			if (PlayDemoFromFile(_argv[i]))
+				IN_UserInput(3 * 70);
+		}
+		VW_FadeOut();
+	}
+	
 	while (1)
 	{
 		while (!NoWait)
@@ -1273,11 +1282,7 @@ void DemoLoop (void)
 
 		VW_FadeOut ();
 
-#ifndef SPEAR
-		if (Keyboard[sc_Tab] && MS_CheckParm("goobers"))
-#else
 		if (Keyboard[sc_Tab] && MS_CheckParm("debugmode"))
-#endif
 			RecordDemo ();
 		else
 			US_ControlPanel (0);
@@ -1303,7 +1308,7 @@ void DemoLoop (void)
 ==========================
 */
 
-int main(int argc, char *argv[])
+int WolfMain(int argc, char *argv[])
 {
 	int i;
 
@@ -1321,3 +1326,8 @@ int main(int argc, char *argv[])
 	return 0;
 }
 
+
+int main(int argc, char *argv[])
+{
+	return WolfMain(argc, argv);
+}

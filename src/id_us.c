@@ -142,6 +142,9 @@ void US_Print(char *str)
 			PrintX += w;
 	}
 	
+	px = PrintX;
+	py = PrintY;
+	
 	free(sz);
 }
 

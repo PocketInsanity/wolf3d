@@ -23,8 +23,8 @@ two screens for nostalga
 work the same, let the input handler do it all instead
 * when viewsize is around 20, sprites end up being drawn over the border.
 maybe there are clipping bugs that will cause it to fill over the top, left, 
-and right
-* remove DEMOEXTERN, and add ability to play demos from commandline 
+and right (happens at any view basically, except this version of source does
+not leave any artifacts after a few screen redraws)
 * remove GOODTIMES (the piracy message is somewhat worthless)
 * then consider removing the SOD manual check
 * Use either US_CheckParm or MS_CheckParm.
@@ -63,6 +63,11 @@ update once per frame or such.. hm
 and where is that greenpixel coming from (when using end game with largest
 window size)
 * merge id_vl.c and id_in.c to get id_svga.c
+* change id_sd to sd_oss, sd_win, sd_dos, sd_oal, etc
+idea is that different <outputs> can share some drivers, unlike video
+* check filehandling (ex, file missing, bad file type, and such)
+PlayDemoFromFile specifically
+* make sure all infinite loops are found (looping around Keyboard)
 
 Specific:
 * memory/sound intro screen goes

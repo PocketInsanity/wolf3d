@@ -895,6 +895,7 @@ void FinishDemoRecord (void)
 
 	CenterWindow(24,3);
 	PrintY+=6;
+	VW_FadeIn();
 	US_Print(" Demo number (0-9):");
 	VW_UpdateScreen();
 
@@ -1037,11 +1038,16 @@ void PlayDemo(int demonumber)
 	ClearMemory ();
 }
 
-void PlayDemoFromFile(char *demoname)
+int PlayDemoFromFile(char *demoname)
 {
 	int length;
 
 	CA_LoadFile(demoname, &demobuffer);
+	if (demobuffer == NULL) {
+		fprintf(stderr, "Unable to load demo: %s\n", demoname);
+		return 0;
+	}
+		
 	MM_SetLock(&demobuffer,true);
 	demoptr = (char *)demobuffer;
 
@@ -1074,10 +1080,9 @@ void PlayDemoFromFile(char *demoname)
 	demoplayback = false;
 
 	StopMusic ();
-	VW_FadeOut ();
-	ClearMemory ();
-	
-	IN_Ack();
+	ClearMemory ();	
+
+	return 1;
 }
 
 //==========================================================================

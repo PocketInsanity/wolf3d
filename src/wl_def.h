@@ -702,7 +702,7 @@ typedef	enum	{
 =============================================================================
 */
 
-extern	boolean		MS_CheckParm (char *string);
+int MS_CheckParm(char *string);
 
 extern	char		str[80],str2[20];
 
@@ -771,7 +771,8 @@ void 	DrawPlayScreen (void);
 void 	FizzleOut (void);
 void 	GameLoop (void);
 void ClearMemory (void);
-void PlayDemo (int demonumber);
+void PlayDemo(int demonumber);
+int PlayDemoFromFile(char *demoname);
 void RecordDemo (void);
 void DrawAllPlayBorder (void);
 void	DrawHighScores(void);
