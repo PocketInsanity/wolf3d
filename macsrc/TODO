@@ -13,7 +13,7 @@ TODO:
 * Finish moving all 2D code to SoftDraw.c
   - Should move some code so it is not such a large file (SoftDraw2.c)
 * Finish OpenGL
-  + Status bars, Level completed screen, Psyched [DrawShape]
+  + Status bars, Level completed screen, Psyched
     - IO_Draw* (status bar versions) are stubbed, update statusbar when
       doing screen update
   - Finish window resizing
@@ -24,8 +24,6 @@ TODO:
   - Save "draw state" so redrawing works right when screen is
     resized/exposed
   - GLX 1.3?
-  - As an experiement, see if adding CVAs to the wall code will speed
-    anything up?
 * Documentation
 * Sound!
   - Need to write sound playing code (probably access /dev/dsp directly
@@ -33,7 +31,7 @@ TODO:
   - Check 'csnd' for a sample, then 'snd ' if not found.
   + Music is planned.
     - Output using timidity with sounds did not end up sounding good.
-      Probably the INST resources are used for ASDR/looping/etc...
+      Probably the INST resources are used for ADSR/looping/etc...
   - csnd: sox -t raw -r 11025 -c 1 -w -s a.dat -r 11025 -c 1 -w -s -t wav a.wav
   - snd: sox -t raw -r 11025 -c 1 -w -u a.dat -r 11025 -c 1 -w -s -t wav a.wav
   - csnd might be -b -s (odd)
@@ -61,6 +59,7 @@ TODO:
 * vi_glx.c will probably be the most updated of the frontends. Be sure to
   update the others later.
 * Finish moving things out of stub.c
+* Name conflicts between wolf3d and Xt types
 
 BUGS:
 * Software Drawing seems like its imprecise, stationary sprites move back and 

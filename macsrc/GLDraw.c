@@ -196,17 +196,98 @@ void DrawPsyched(Word Index)
 void EndGetPsyched()
 {
 }
-                
+
+static Texture BJPics[3];
 void InitInterMisPic()
 {
+	LongWord *PackPtr;
+	LongWord PackLength;
+	Byte *BJPtr, *Pal, *buf, *tmp;
+	LongWord Indexs[3];
+	ShortWord *Ptr;
+	int width, height, i;
+	
+	PackPtr = LoadAResource(rInterPics);
+	PackLength = lMSB(PackPtr[0]);
+	BJPtr = (Byte *)AllocSomeMem(PackLength);
+	DLZSS(BJPtr, (Byte *)&PackPtr[1], PackLength);
+	ReleaseAResource(rInterPics);
+	memcpy(Indexs, BJPtr, 12);
+	
+	Indexs[0] = lMSB(Indexs[0]);
+	Indexs[1] = lMSB(Indexs[1]);
+	Indexs[2] = lMSB(Indexs[2]);
+	
+	Pal = LoadAResource(rInterPal);
+	
+	tmp = malloc(256 * 256 * 3);
+	for (i = 0; i < 3; i++) {
+		glGenTextures(1, &BJPics[i].t);
+	
+		Ptr = (ShortWord *)&BJPtr[Indexs[i]];
+		width = sMSB(Ptr[0]);
+		height = sMSB(Ptr[1]);
+		
+		BJPics[i].w = width;
+		BJPics[i].h = height;
+		
+		buf = Pal256toRGB((Byte*)&Ptr[2], width * height, Pal);
+		
+		glBindTexture(GL_TEXTURE_2D, BJPics[i].t);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 256, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, tmp);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, buf);
+		
+		free(buf);
+	}
+	
+	free(tmp);
+	
+	ReleaseAResource(rInterPal);
+	
+	FreeSomeMem(BJPtr);
 }
 
 void DrawInterMisPic(Word index)
 {
+	GLfloat r[4] = { 
+	-1 + (73.0 / 256.0), 1.0 - (48.0 / 192.0), 
+	-1 + (204.0 / 256.0), 1 - (190.0 / 192.0) };
+	
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
+	glBindTexture(GL_TEXTURE_2D, BJPics[index].t);
+	
+	glBegin(GL_QUADS);
+
+	glTexCoord2f(0.0f, 0.0f);
+	glVertex2f(r[0], r[1]);
+	glTexCoord2f(0.0f, (GLfloat)BJPics[index].h / 256.0f);
+	glVertex2f(r[0], r[3]);
+	glTexCoord2f(0.0f, (GLfloat)BJPics[index].h / 256.0f);
+	glTexCoord2f((GLfloat)BJPics[index].w / 256.0f, (GLfloat)BJPics[index].h / 256.0f);
+	glVertex2f(r[2], r[3]);
+	glTexCoord2f((GLfloat)BJPics[index].w / 256.0f, 0.0f);
+	glVertex2f(r[2], r[1]);
+	
+	glEnd();
 }
 
 void FreeInitMisPic()
 {
+	int i;
+	
+	for (i = 0; i < 3; i++) {
+		glDeleteTextures(1, &BJPics[i].t);
+		BJPics[i].t = 0;
+	}
 }
 
 void DisplayScreen(Word res, Word pres)
@@ -624,8 +705,8 @@ glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	/* glColor3f(1.0, 1.0, 1.0);  */
 glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);	
 
-	glRotatef(270.0-((GLfloat)gamestate.viewangle / (GLfloat)ANGLES * 360.0), 0.0, 1.0, 0.0);
-	glTranslatef((GLfloat)actors[0].x / 256.0, 0, (GLfloat)actors[0].y / 256.0);
+	glRotatef(270.0f-((GLfloat)gamestate.viewangle / (GLfloat)ANGLES * 360.0f), 0.0, 1.0, 0.0);
+	glTranslatef((GLfloat)actors[0].x / 256.0f, 0.0f, (GLfloat)actors[0].y / 256.0f);
 }
 
 GLuint waltex[64];
@@ -1379,7 +1460,7 @@ void P_DrawSegx(saveseg_t *seg)
 			min = 0.5;
 			i++;
 		} else {
-			i+=2;
+			i += 2;
 			min = 0.0;
 		}
 		max = 1.0f;

@@ -198,6 +198,7 @@ int main(int argc, char *argv[])
 #endif
 	
 	glShadeModel(GL_FLAT);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	
 	InitData();
 	

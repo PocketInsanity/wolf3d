@@ -341,30 +341,9 @@ typedef struct {
 
 /**********************************
 
-	Static data for each sprite state
-	
-**********************************/
-
-typedef struct {
-	Word sightsound;	/* Sound at the sight of you */
-	Word deathsound;	/* Sound at the death of the actor */
-	stateindex_t sightstate;	/* State when you are sighted */
-	stateindex_t standstate;	/* State when at rest */
-	stateindex_t attackstate;	/* State when attacking you */
-	stateindex_t painstate;		/* State when hit */
-	stateindex_t deathstate;	/* State when dead */
-	Word points;		/* Points for death */
-	Word speed;			/* Speed of actor */
-	Word reactionmask;	/* reaction time = 1 + w_rnd()&reactionmask*/
-	Word hitpoints;		/* Hit points */
-} classinfo_t;
-
-enum {di_north, di_east, di_south, di_west};		/* BSP base directions */
-
-/**********************************
-
-	The saved data structures are held in a single list, with segs being differentiated from 
-	nodes by the presence of DIR_SEGFLAG in the dir field
+	The saved data structures are held in a single list, with segs being 
+	differentiated from nodes by the presence of DIR_SEGFLAG in the dir 
+	field.
 	Note... saveseg_t and savenode_t share the same memory
 	
 **********************************/
@@ -397,6 +376,28 @@ typedef struct {
 	Byte	texture;
 } PACKED saveseg_t;
 #endif
+
+/**********************************
+
+	Static data for each sprite state
+	
+**********************************/
+
+typedef struct {
+	Word sightsound;	/* Sound at the sight of you */
+	Word deathsound;	/* Sound at the death of the actor */
+	stateindex_t sightstate;	/* State when you are sighted */
+	stateindex_t standstate;	/* State when at rest */
+	stateindex_t attackstate;	/* State when attacking you */
+	stateindex_t painstate;		/* State when hit */
+	stateindex_t deathstate;	/* State when dead */
+	Word points;		/* Points for death */
+	Word speed;			/* Speed of actor */
+	Word reactionmask;	/* reaction time = 1 + w_rnd()&reactionmask*/
+	Word hitpoints;		/* Hit points */
+} classinfo_t;
+
+enum {di_north, di_east, di_south, di_west};		/* BSP base directions */
 
 /**********************************
 
