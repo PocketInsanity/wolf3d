@@ -173,6 +173,7 @@ static void INL_GetMouseDelta(int *x,int *y)
 ///////////////////////////////////////////////////////////////////////////
 static word INL_GetMouseButtons(void)
 {
+	return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -244,13 +245,6 @@ static boolean INL_StartMouse(void)
 //
 ///////////////////////////////////////////////////////////////////////////
 static void INL_ShutMouse(void)
-{
-}
-
-//
-//	INL_SetJoyScale() - Sets up scaling values for the specified joystick
-//
-static void INL_SetJoyScale(word joy)
 {
 }
 
@@ -350,8 +344,6 @@ void IN_Shutdown(void)
 ///////////////////////////////////////////////////////////////////////////
 void IN_ClearKeysDown(void)
 {
-	int i;
-
 	LastScan = sc_None;
 	LastASCII = key_None;
 	memset(Keyboard, 0, sizeof(Keyboard));
@@ -366,7 +358,6 @@ void IN_ClearKeysDown(void)
 void IN_ReadControl(int player,ControlInfo *info)
 {
 			boolean		realdelta;
-			byte		dbyte;
 			word		buttons;
 			int			dx,dy;
 			Motion		mx,my;

@@ -55,3 +55,4 @@ just call a different function (most are left from the update block code)
 remove them
 * implement fizzlefade, and get that last pixel!
 * remove the time verification code (in wl_inter.c)
+* fix wl_debug.c, lots of junk code..

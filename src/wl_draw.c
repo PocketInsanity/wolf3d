@@ -725,7 +725,7 @@ void	ThreeDRefresh (void)
 
 	}
 
-	VL_UpdateScreen ();
+	VW_UpdateScreen ();
 
 	frameon++;
 }

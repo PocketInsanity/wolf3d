@@ -24,13 +24,11 @@ t_scaledata scaledata [MAXSCALEHEIGHT+1];
 
 int maxscale,maxscaleshl2;
 
-unsigned BuildCompScale(int height)
+void BuildCompScale(int height)
 {
-
-	int			i;
 	long		fix,step;
-	unsigned	src,totalscaled,totalsize;
-	int			startpix,endpix,toppix;
+	unsigned	src;
+	int		startpix,endpix,toppix;
 
 
 	step = ((long)height<<16) / 64;
@@ -67,10 +65,9 @@ unsigned BuildCompScale(int height)
 ==========================
 */
 
-void SetupScaling (int maxscaleheight)
+void SetupScaling(int maxscaleheight)
 {
-	int		i,x,y;
-	byte	*dest;
+	int i;
 
 	maxscale = maxscaleheight-1;
 	maxscaleshl2 = maxscale<<2;
@@ -107,7 +104,7 @@ void SetupScaling (int maxscaleheight)
 ========================
 */
 
-unsigned xBuildCompScale (int height, byte *source, int x)
+void xBuildCompScale(int height, byte *source, int x)
 {
 
 	int			i;
@@ -158,16 +155,16 @@ unsigned xBuildCompScale (int height, byte *source, int x)
 =======================
 */
 
-int			slinex,slinewidth;
-short	*linecmds;
+int slinex, slinewidth;
+short *linecmds;
 int linescale;
-unsigned	maskword;
 t_compshape *shapeptr;
 
-/* linecmds - points to line segment data 
+/* 
+   linecmds - points to line segment data 
    slinewidth - pixels across
    slinex - screen coord of first column
-   */
+*/
 
 void ScaleLine (void)
 {
@@ -228,24 +225,18 @@ void ScaleLine (void)
 =======================
 */
 
-static	long		longtemp;
-
-void ScaleShape (int xcenter, int shapenum, unsigned height)
+void ScaleShape(int xcenter, int shapenum, unsigned height)
 {
 	t_compshape	*shape;
-	unsigned	scale,srcx,stopx,tempx;
-	int			t;
+	unsigned	scale,srcx,stopx;
 	word *cmdptr;
 	boolean		leftvis,rightvis;
 
-	//printf ("ScaleShape (xcenter=%d, shapenum=%d, height=%d)\n",
-	//	xcenter, shapenum, height);
-
 	shape = PM_GetSpritePage (shapenum);
 
-	scale = height>>2;						// low three bits are fractional
+	scale = height>>2;		// low three bits are fractional
 	if (!scale || scale>maxscale)
-		return;								// too close or far away
+		return;			// too close or far away
 
 
 	linescale = scale;
@@ -434,22 +425,16 @@ void ScaleShape (int xcenter, int shapenum, unsigned height)
 =======================
 */
 
-void SimpleScaleShape (int xcenter, int shapenum, unsigned height)
+void SimpleScaleShape(int xcenter, int shapenum, unsigned height)
 {
 	t_compshape	*shape;
-	unsigned	scale,srcx,stopx,tempx;
-	int			t;
+	unsigned	scale,srcx,stopx;
 	unsigned short	*cmdptr;
-	boolean		leftvis,rightvis;
-
-	//printf ("SimpleScaleShape (xcenter=%d, shapenum=%d, height=%d)\n",
-	//	xcenter, shapenum, height);
 
 	shape = PM_GetSpritePage (shapenum);
 
 	scale = height;
 
-/* 	*(((unsigned *)&linescale)+1)=(unsigned)comptable;	// seg of far call */
 	linescale = scale;
 	shapeptr = shape;
 //

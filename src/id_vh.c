@@ -20,7 +20,7 @@ unsigned latchpics[NUMLATCHPICS];
 void VW_DrawPropString(char *string)
 {
 	fontstruct *font;
-	int width, step, height, i;
+	int width, step, height;
 	byte *source, *dest, *ptrs, *ptrd;
 	byte ch;
 
@@ -111,11 +111,6 @@ void VWB_Hlin(int x1, int x2, int y, int color)
 void VWB_Vlin(int y1, int y2, int x, int color)
 {
 	VW_Vlin(y1,y2,x,color);
-}
-
-void VW_UpdateScreen(void)
-{
-	VL_UpdateScreen();
 }
 
 /*

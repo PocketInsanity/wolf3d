@@ -13,7 +13,7 @@ void VL_WaitVBL(int vbls)
 	vga_waitretrace();
 }
 
-void VL_UpdateScreen()
+void VW_UpdateScreen()
 {
 	memcpy(graph_mem, gfxbuf, 64000);
 }

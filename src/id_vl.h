@@ -15,6 +15,7 @@ void VL_Shutdown (void);
 void VL_ClearVideo (byte color);
 
 void VL_WaitVBL (int vbls);
+void VW_UpdateScreen();
 
 void VL_FillPalette(int red, int green, int blue);
 void VL_SetColor(int color, int red, int green, int blue);
