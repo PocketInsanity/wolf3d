@@ -988,7 +988,7 @@ void Died()
 //
 	FinishPaletteShifts();
 
-	VW_Bar(xoffset, yoffset, viewwidth, viewheight, 4);
+	VL_Bar(xoffset, yoffset, viewwidth, viewheight, 4);
 	
 	IN_ClearKeysDown();
 	FizzleFade(xoffset, yoffset, viewwidth, viewheight, 70, false);
@@ -1008,12 +1008,12 @@ void Died()
 		gamestate.attackframe = gamestate.attackcount =
 		gamestate.weaponframe = 0;
 
-		DrawKeys ();
-		DrawWeapon ();
-		DrawAmmo ();
-		DrawHealth ();
-		DrawFace ();
-		DrawLives ();
+		DrawKeys();
+		DrawWeapon();
+		DrawAmmo();
+		DrawHealth();
+		DrawFace();
+		DrawLives();
 	}
 
 }

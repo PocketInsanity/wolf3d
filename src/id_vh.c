@@ -58,6 +58,9 @@ boolean FizzleFade(unsigned xx, unsigned yy, unsigned width, unsigned height, un
 	frame = 0;
 	set_TimeCount(0);
 	
+	if (vwidth != 320)
+		return false;
+		
 	do {
 		if (abortable && IN_CheckAck())
 			return true;
@@ -256,7 +259,27 @@ static void VL_Plot(int x, int y, int color)
 
 void VW_Plot(int x, int y, int color)
 {
+	int xend, yend, xfrac, yfrac, xs, ys;
+	
+	xend = x + 1;
+	yend = y + 1;
+
+	xfrac = (vwidth << 16) / 320;
+	yfrac = (vheight << 16) / 200;
+	
+	x *= xfrac;
+	y *= yfrac;
+	xend *= xfrac;
+	yend *= yfrac;
+	xfrac = (320 << 16) / vwidth;
+	yfrac = (200 << 16) / vheight;
+
+	for (xs = x; xs < xend; xs += xfrac)
+		for (ys = y; ys < yend; ys += yfrac)
+			*(gfxbuf + (ys >> 16) * vwidth + (xs >> 16)) = color;
+/*	
 	*(gfxbuf + vwidth * y + x) = color;
+*/
 }
 
 void VW_DrawPropString(char *string)
@@ -310,16 +333,15 @@ void VW_DrawPropString(char *string)
 */
 }
 
-void VWL_MeasureString(char *string, word *width, word *height, 
-	fontstruct *font)
+void VWL_MeasureString(char *string, word *width, word *height, fontstruct *font)
 {
 	/* proportional width */
 	*height = font->height;
-	for (*width = 0;*string;string++)
+	for (*width = 0; *string; string++)
 		*width += font->width[*((byte *)string)]; 
 }
 
-void VW_MeasurePropString (char *string, word *width, word *height)
+void VW_MeasurePropString(char *string, word *width, word *height)
 {
 	VWL_MeasureString(string,width,height,(fontstruct *)grsegs[STARTFONT+fontnumber]);
 }
@@ -352,11 +374,36 @@ void VWB_DrawPic(int x, int y, int chunknum)
 
 void VL_Hlin(unsigned x, unsigned y, unsigned width, unsigned color)
 {
+	int xend, yend, xfrac, yfrac;
+	int w, h;
+	byte *ptr;
+	
+	xend = x + width;
+	yend = y + 1;
+	
+	xfrac = (vwidth << 16) / 320;
+	yfrac = (vheight << 16) / 200;
+	
+	x *= xfrac;
+	y *= yfrac;
+	xend *= xfrac;
+	yend *= yfrac;
+	
+	w = (xend - x) >> 16;
+	h = (yend - y) >> 16;
+
+	ptr = gfxbuf + vwidth * (y >> 16) + (x >> 16);
+	
+	while (h--) {
+		memset(ptr, color, w);
+		ptr += vwidth;
+	}
+/*
 	int w;
 	
 	for (w = 0; w < width; w++)
 		VL_Plot(x+w, y, color);
-		
+*/		
 /*	
 	memset(gfxbuf + vwidth * y + x, color, width);
 */
@@ -372,10 +419,36 @@ void VL_Hlin(unsigned x, unsigned y, unsigned width, unsigned color)
 
 void VL_Vlin(int x, int y, int height, int color)
 {
+	int xend, yend, xfrac, yfrac;
+	int w, h;
+	byte *ptr;
+	
+	xend = x + 1;
+	yend = y + height;
+	
+	xfrac = (vwidth << 16) / 320;
+	yfrac = (vheight << 16) / 200;
+	
+	x *= xfrac;
+	y *= yfrac;
+	xend *= xfrac;
+	yend *= yfrac;
+	
+	w = (xend - x) >> 16;
+	h = (yend - y) >> 16;
+
+	ptr = gfxbuf + vwidth * (y >> 16) + (x >> 16);
+	
+	while (h--) {
+		memset(ptr, color, w);
+		ptr += vwidth;
+	}
+/*
 	int h;
 	
 	for (h = 0; h < height; h++)
 		VL_Plot(x, y+h, color);
+*/		
 /*
 	byte *ptr = gfxbuf + vwidth * y + x;
 	while (height--) {
@@ -395,12 +468,45 @@ void VL_Vlin(int x, int y, int height, int color)
 
 void VW_Bar(int x, int y, int width, int height, int color)
 {
+	//int xend, yend;
+	int xfrac, yfrac;
+	int w, h;
+	byte *ptr;
+	
+	//xend = x + width;
+	//yend = y + height;
+
+	xfrac = (vwidth << 16) / 320;
+	yfrac = (vheight << 16) / 200;
+	
+	x *= xfrac;
+	y *= yfrac;
+	//xend *= xfrac;
+	//yend *= yfrac;
+
+	//w = (xend - x) >> 16;
+	//h = (yend - y) >> 16;
+
+	w = (width * xfrac) >> 16;
+	h = (height * yfrac) >> 16;
+	
+	//if ((w != ((width * xfrac) >> 16)) || (h != ((height * yfrac) >> 16)))
+	//	printf("test\n");
+		
+	ptr = gfxbuf + vwidth * (y >> 16) + (x >> 16);
+	
+	while (h--) {
+		memset(ptr, color, w);
+		ptr += vwidth;
+	}
+				
+/*	
 	int w, h;
 	
 	for (w = 0; w < width; w++)
 		for (h = 0; h < height; h++)
 			VL_Plot(x+w, y+h, color);
-	
+*/	
 /*	
 	byte *ptr;
 	width *= vwidth / 320;

@@ -651,7 +651,7 @@ void ThreeDRefresh()
 //
 // follow the walls from there to the right, drawwing as we go
 //
-	//DrawPlayBorder();
+	DrawPlayBorder();
 #ifndef DRAWCEIL	
 	ClearScreen();
 #endif	

@@ -3235,26 +3235,25 @@ void Message(char *string)
 	VW_UpdateScreen();
 }
 
-static int lastmusic;
+static int lastmusic = -1;
 
 void StartCPMusic(int song)
 {
-	musicnames chunk;
+	FreeMusic();
 	
-	SD_MusicOff();
-	CA_UnCacheAudioChunk(STARTMUSIC + lastmusic);
-
 	lastmusic = song;
-	chunk =	song;
 
-	CA_CacheAudioChunk(STARTMUSIC + chunk);
-	MM_SetLock((memptr *)&(audiosegs[STARTMUSIC + chunk]),true);
-	SD_StartMusic((MusicGroup *)audiosegs[STARTMUSIC + chunk]);
+	CA_CacheAudioChunk(STARTMUSIC + song);
+	MM_SetLock((memptr *)&(audiosegs[STARTMUSIC + song]), true);
+	SD_StartMusic((MusicGroup *)audiosegs[STARTMUSIC + song]);
 }
 
 void FreeMusic()
 {
-	CA_UnCacheAudioChunk(STARTMUSIC + lastmusic);
+	SD_MusicOff();
+	
+	if (lastmusic >= 0)
+		CA_UnCacheAudioChunk(STARTMUSIC + lastmusic);
 }
 
 ///////////////////////////////////////////////////////////////////////////

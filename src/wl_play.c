@@ -873,19 +873,8 @@ static void RemoveObj(objtype *gone)
 
 void StopMusic()
 {
-	int	i;
-
-	SD_MusicOff();
-	for (i = 0;i < LASTMUSIC;i++)
-		if (audiosegs[STARTMUSIC + i])
-		{
-			MM_SetPurge((memptr)&(audiosegs[STARTMUSIC + i]),3);
-			MM_SetLock((memptr)&(audiosegs[STARTMUSIC + i]),false);
-		}
+	FreeMusic();
 }
-
-//==========================================================================
-
 
 /*
 =================
@@ -897,14 +886,7 @@ void StopMusic()
 
 void StartMusic()
 {
-	musicnames chunk;
-
-	SD_MusicOff();
-	chunk = songs[gamestate.mapon+gamestate.episode*10];
-
-	CA_CacheAudioChunk(STARTMUSIC + chunk);
-	MM_SetLock((memptr)&(audiosegs[STARTMUSIC + chunk]),true);
-	SD_StartMusic((MusicGroup *)audiosegs[STARTMUSIC + chunk]);
+	StartCPMusic(songs[gamestate.mapon+gamestate.episode*10]);
 }
 
 
