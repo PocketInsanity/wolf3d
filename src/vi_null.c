@@ -6,6 +6,8 @@
 
 byte *gfxbuf = NULL;
 
+static unsigned char pal[768];
+
 /*
 ==========================
 =
@@ -58,8 +60,9 @@ void VW_UpdateScreen()
 
 void VL_Startup()
 {
-	if (gfxbuf == NULL) 
-		gfxbuf = malloc(320 * 200 * 1);		
+	if (gfxbuf == NULL) {
+		gfxbuf = malloc(320 * 200 * 1);
+	}
 }
 
 /*
@@ -90,6 +93,7 @@ void VL_Shutdown()
 
 void VL_SetPalette(const byte *palette)
 {
+	memcpy(pal, palette, 768);
 }
 
 /*
@@ -102,10 +106,22 @@ void VL_SetPalette(const byte *palette)
 
 void VL_GetPalette(byte *palette)
 {
+	memcpy(palette, pal, 768);
 }
 
 void INL_Update()
 {
+}
+
+void IN_GetMouseDelta(int *dx, int *dy)
+{
+	*dx = 0;
+	*dy = 0;
+}
+
+byte IN_MouseButtons()
+{
+	return 0;
 }
 
 /*
@@ -151,53 +167,6 @@ void INL_GetJoyDelta(word joy,int *dx,int *dy)
 //
 ///////////////////////////////////////////////////////////////////////////
 word INL_GetJoyButtons(word joy)
-{
-	return 0;
-}
-
-/*
-===================
-=
-= IN_JoyButtons
-=
-===================
-*/
-
-byte IN_JoyButtons()
-{
-	return 0;
-}
-
-///////////////////////////////////////////////////////////////////////////
-//
-//	IN_GetJoyAbs() - Reads the absolute position of the specified joystick
-//
-///////////////////////////////////////////////////////////////////////////
-void IN_GetJoyAbs(word joy,word *xp,word *yp)
-{
-	*xp = 0;
-	*yp = 0;
-}
-
-///////////////////////////////////////////////////////////////////////////
-//
-//	INL_GetJoyDelta() - Returns the relative movement of the specified
-//		joystick (from +/-127)
-//
-///////////////////////////////////////////////////////////////////////////
-void INL_GetJoyDelta(word joy,int *dx,int *dy)
-{
-	*dx = 0;
-	*dy = 0;
-}
-
-///////////////////////////////////////////////////////////////////////////
-//
-//	INL_GetJoyButtons() - Returns the button status of the specified
-//		joystick
-//
-///////////////////////////////////////////////////////////////////////////
-static word INL_GetJoyButtons(word joy)
 {
 	return 0;
 }
