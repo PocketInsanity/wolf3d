@@ -38,35 +38,14 @@ char extension[5];
 #define afilename "audiot."
 #define pfilename "vswap."
 
-static long *grstarts;	/* array of offsets in vgagraph, -1 for sparse */
-static long *audiostarts; /* array of offsets in audio / audiot */
+static long *grstarts;	/* array of offsets in vgagraph */
+static long *audiostarts; /* array of offsets in audiot */
 
 static huffnode grhuffman[255];
 
 static int grhandle; /* handle to VGAGRAPH */
 static int maphandle; /* handle to GAMEMAPS */
 static int audiohandle; /* handle to AUDIOT */
-
-SDMode oldsoundmode;
-
-#define FILEPOSSIZE	3
-static long GRFILEPOS(int c)
-{
-	long value;
-	int offset;
-
-	offset = c*3;
-
-/* TODO: unaligned access */
-	value = *(long *)(((byte *)grstarts)+offset);
-
-	value &= 0x00ffffffl;
-
-	if (value == 0xffffffl)
-		value = -1;
-
-	return value;
-}
 
 /*
 =============================================================================
@@ -223,7 +202,7 @@ void CAL_HuffExpand(byte *source, byte *dest, long length, huffnode *htable)
 {
 	huffnode *headptr;          
 	huffnode *nodeon;           
-	byte      mask = 0x0001;    
+	byte      mask = 0x01;    
 	word      path;             
 	byte     *endoff = dest + length;    
 
@@ -235,8 +214,8 @@ void CAL_HuffExpand(byte *source, byte *dest, long length, huffnode *htable)
 	        else
 			path = nodeon->bit0;
        		mask <<= 1;
-	        if (mask == 0x0000) {   
-			mask = 0x0001;
+	        if (mask == 0x00) {   
+			mask = 0x01;
 			source++;
 	        } 
 		if (path < 256) {  
@@ -354,27 +333,6 @@ void CA_RLEWexpand(word *source, word *dest, long length, word rlewtag)
 =============================================================================
 */
 
-
-/*
-============================
-=
-= CAL_GetGrChunkLength
-=
-= Gets the length of an explicit length chunk (not tiles)
-= The file pointer is positioned so the compressed data can be read in next.
-=
-============================
-*/
-
-static long CAL_GetGrChunkLength(int chunk)
-{
-	long chunkexplen;
-	
-	lseek(grhandle, GRFILEPOS(chunk), SEEK_SET);
-	read(grhandle, &chunkexplen, sizeof(chunkexplen));
-	return GRFILEPOS(chunk+1)-GRFILEPOS(chunk)-4;
-}
-
 /*
 ======================
 =
@@ -388,8 +346,10 @@ static void CAL_SetupGrFile()
 	char fname[13];
 	int handle;
 	memptr compseg;
-
 	long chunkcomplen;
+	byte *grtemp;
+	int i;
+	
 //
 // load vgadict.ext (huffman dictionary for graphics files)
 //
@@ -405,16 +365,22 @@ static void CAL_SetupGrFile()
 //
 // load the data offsets from vgahead.ext
 //
-	MM_GetPtr((memptr)&grstarts, (NUMCHUNKS+1)*FILEPOSSIZE);
-
+	MM_GetPtr((memptr)&grstarts, (NUMCHUNKS+1)*4);
+	MM_GetPtr((memptr)&grtemp, (NUMCHUNKS+1)*3);
+	
 	strcpy(fname, gheadname);
 	strcat(fname, extension);
 
 	if ((handle = open(fname, O_RDONLY | O_BINARY)) == -1)
 		CA_CannotOpen(fname);
 
-	CA_FarRead(handle, (memptr)grstarts, (NUMCHUNKS+1)*FILEPOSSIZE);
+	CA_FarRead(handle, (memptr)grtemp, (NUMCHUNKS+1)*3);
 
+	for (i = 0; i < NUMCHUNKS+1; i++)
+		grstarts[i] = (grtemp[i*3+0]<<0)|(grtemp[i*3+1]<<8)|(grtemp[i*3+2]<<16);
+
+	MM_FreePtr((memptr)&grtemp);
+	
 	close(handle);
 
 //
@@ -429,13 +395,15 @@ static void CAL_SetupGrFile()
 
 
 //
-// load the pic and sprite headers into the arrays in the data segment
+// load the pic headers into pictable
 //
 	MM_GetPtr((memptr)&pictable,NUMPICS*sizeof(pictabletype));
-	chunkcomplen = CAL_GetGrChunkLength(STRUCTPIC);
-	MM_GetPtr(&compseg,chunkcomplen);
+	chunkcomplen = grstarts[STRUCTPIC+1] - grstarts[STRUCTPIC];
+	lseek(grhandle, grstarts[STRUCTPIC], SEEK_SET);
+
+	MM_GetPtr(&compseg, chunkcomplen);
 	CA_FarRead(grhandle,compseg,chunkcomplen);
-	CAL_HuffExpand(compseg, (byte *)pictable,NUMPICS*sizeof(pictabletype),grhuffman);
+	CAL_HuffExpand(compseg+4, (byte *)pictable, NUMPICS*sizeof(pictabletype), grhuffman);
 	MM_FreePtr(&compseg);
 }
 
@@ -485,16 +453,18 @@ static void CAL_SetupMapFile()
 //
 // load all map header
 //
-	for (i=0;i<NUMMAPS;i++)
+	for (i = 0; i < NUMMAPS; i++)
 	{
 		pos = tinf->headeroffsets[i];
-		if (pos < 0)	/* $FFFFFFFF start is a sparse map */
+		if (pos == 0) {
+			mapheaderseg[i] = NULL;
 			continue;
-
-		MM_GetPtr((memptr)&mapheaderseg[i],sizeof(maptype));
+		}
+			
+		MM_GetPtr((memptr)&mapheaderseg[i], sizeof(maptype));
 		MM_SetLock((memptr)&mapheaderseg[i],true);
-		lseek(maphandle,pos,SEEK_SET);
-		CA_FarRead (maphandle,(memptr)mapheaderseg[i],sizeof(maptype));
+		lseek(maphandle, pos, SEEK_SET);
+		CA_FarRead(maphandle, (memptr)mapheaderseg[i], sizeof(maptype));
 	}
 
 //
@@ -567,9 +537,6 @@ void CA_Startup()
 	mapon = -1;
 }
 
-//==========================================================================
-
-
 /*
 ======================
 =
@@ -633,8 +600,6 @@ void CA_UnCacheAudioChunk(int chunk)
 	audiosegs[chunk] = 0;
 }
 
-//===========================================================================
-
 /*
 ======================
 =
@@ -649,43 +614,8 @@ void CA_LoadAllSounds()
 {
 	unsigned start, i;
 
-#if 0
-	switch (oldsoundmode)
-	{
-	case sdm_PC:
-		start = STARTPCSOUNDS;
-		break;
-	case sdm_AdLib:
-		start = STARTADLIBSOUNDS;
-		break;
-	default:
-		goto cachein;
-	}
-
-	for (i=0;i<NUMSOUNDS;i++,start++)
-		if (audiosegs[start])
-			MM_SetPurge ((memptr)&audiosegs[start],3);		
-			// make purgable
-
-cachein:
-
-	switch (SoundMode)
-	{
-	case sdm_PC:
-		start = STARTPCSOUNDS;
-		break;
-	case sdm_AdLib:
-		start = STARTADLIBSOUNDS;
-		break;
-	default:
-		return;
-	}
-#endif
-
 	for (start = STARTADLIBSOUNDS, i = 0; i < NUMSOUNDS; i++, start++)
 		CA_CacheAudioChunk(start);
-
-	oldsoundmode = SoundMode;
 }
 
 //===========================================================================
@@ -711,7 +641,7 @@ static void CAL_ExpandGrChunk(int chunk, byte *source)
 	if (chunk >= STARTTILE8 && chunk < STARTEXTERNS)
 	{
 	//
-	// expanded sizes of tile8/16/32 are implicit
+	// expanded sizes of tile8 are implicit
 	//
 		expanded = (8*8)*NUMTILE8;
 		width = 8;
@@ -744,7 +674,6 @@ static void CAL_ExpandGrChunk(int chunk, byte *source)
 	}
 }
 
-
 /*
 ======================
 =
@@ -759,7 +688,6 @@ void CA_CacheGrChunk(int chunk)
 {
 	long pos, compressed;
 	byte *source;
-	int next;
 
 	/* this is due to Quit() wanting to cache the error screen before this has been set up! */
 	if ( (grhandle == 0) || (grhandle == -1) ) 
@@ -772,15 +700,9 @@ void CA_CacheGrChunk(int chunk)
 //
 // load the chunk into a buffer
 //
-	pos = GRFILEPOS(chunk);
-	if (pos < 0) /* $FFFFFFFF start is a sparse tile */
-		return;
+	pos = grstarts[chunk];
 
-	next = chunk +1;
-	while (GRFILEPOS(next) == -1)		// skip past any sparse tiles
-		next++;
-
-	compressed = GRFILEPOS(next)-pos;
+	compressed = grstarts[chunk+1]-pos;
 
 	lseek(grhandle,pos,SEEK_SET);
 
@@ -799,12 +721,10 @@ void CA_UnCacheGrChunk(int chunk)
 		return;
 	}
 	
-	MM_FreePtr((void *)&grsegs[chunk]);
+	MM_FreePtr((memptr)&grsegs[chunk]);
 	
 	grsegs[chunk] = 0;
 }
-
-//==========================================================================
 
 /*
 ======================
@@ -818,44 +738,12 @@ void CA_UnCacheGrChunk(int chunk)
 
 void CA_CacheScreen(int chunk)
 {
-	long	pos,compressed,expanded;
-	memptr	bigbufferseg;
-	byte *source, *dest;
-	int		next;
-	
-//
-// load the chunk into a buffer
-//
-	pos = GRFILEPOS(chunk);
-	next = chunk +1;
-	while (GRFILEPOS(next) == -1)		// skip past any sparse tiles
-		next++;
-	compressed = GRFILEPOS(next)-pos;
-
-	lseek(grhandle,pos,SEEK_SET);
-
-	MM_GetPtr(&bigbufferseg,compressed);
-	MM_SetLock (&bigbufferseg,true);
-	
-	CA_FarRead(grhandle,bigbufferseg,compressed);
-		
-	source = bigbufferseg;
-
-	expanded = *(long *)source;
-	source += 4;			// skip over length
-
-//
-// allocate final space, decompress it, and free bigbuffer
-//
-	MM_GetPtr((void *)&dest, expanded);
-	CAL_HuffExpand(source, dest, expanded, grhuffman);
-	VL_DeModeXize(dest, 320, 200);
-	VL_MemToScreen(dest, 320, 200, 0, 0);
-	MM_FreePtr(&bigbufferseg);
-	MM_FreePtr((void *)&dest);
+	CA_CacheGrChunk(chunk);
+	VL_MemToScreen(grsegs[chunk], 320, 200, 0, 0);
+	CA_UnCacheGrChunk(chunk);
 }
 
-//==========================================================================
+/* ======================================================================== */
 
 /*
 ======================
@@ -962,7 +850,7 @@ static int PageFile = -1;
 word ChunksInFile;
 word PMSpriteStart, PMSoundStart;
 
-PageListStruct *PMPages, *PMSegPages;
+PageListStruct *PMPages;
 
 //
 //	PML_ReadFromFile() - Reads some data in from the page file

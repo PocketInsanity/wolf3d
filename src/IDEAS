@@ -1,11 +1,6 @@
-
-
-
-------------- Please Disregard the Following Outdated Text: ----------------
 * One binary, any game type.
 * A key to change viewsize while playing (note: max == 20, min == 5 or so...)
-* Game able to cope at any virtual resolution in software mode. OpenGL
-  handles this transparently (after setting correct glViewport)
+* Game able to work with any resolution in software mode
 * Audio support using OpenAL
 * Add support for the Mac version, if possible
 * Network support!
@@ -25,3 +20,4 @@
 * Configuration files and save games which work regardless of operating
   system/processor/binary build
 * Suite of utilities to edit the game data.
+* Resolve any endian issues

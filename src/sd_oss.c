@@ -231,6 +231,7 @@ void Blah()
         MM_GetPtr(&list,PMPageSize);
         p = PM_GetPage(ChunksInFile - 1);
         memcpy((void *)list,(void *)p,PMPageSize);
+        
         pg = PMSoundStart;
         for (i = 0;i < PMPageSize / (sizeof(word) * 2);i++,p += 2)
         {

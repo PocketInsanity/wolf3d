@@ -13,10 +13,7 @@ Sound Menu:
 * Sampling Rate:
 - 44100
 - 22050
-
-
-
-------------- Please Disregard the Following Outdated Text: ----------------
+------------------------------------------------------------------------------
 *
 SD_StartMusic((MusicGroup *)audiosegs[STARTMUSIC + chunk]);
 =>
@@ -39,7 +36,7 @@ prevent confusion. OR ver.c would depend on the source, but it does not have
 a version number, just __TIME__.  this version id would be used for
 savegames until they are fixed to not use pointers
 * use static and const where appropriate
-* convert uses of open() to fopen(), etc
+* convert uses of open() to fopen(), etc maybe
 * menu code is a mess, always does things differently than the rest of the
 code, it really needs to be cleaned up
 * id_ca.c cache code: fix/readd/rewrite the "garbage collection" system?
@@ -92,14 +89,9 @@ directly
 * rename visable to visible
 * create 'sound channels' with priority.. ie a door can only make one sound
 at a time
-* cat file.c | perl -e 'while($in = <STDIN>)
-{$in =~ s/\/\/(.*)$/\/\* \1\ *\//gm;print $in;}'
-or
-cat foo.txt |sed -e "s/\/\/\(.*\)$/\/\*\1\*\//g"
 * systems with no sound should still have working WaitSoundDone.. it's 
 possible to calculate the sound lengths in terms of 70Hz (adlib sound len / 2, 
 pcm sound len / 100).
 
 Things to try:
-* Convert to a 320x200xWhatever screen first then draw all at once
 * Create a native palette format instead of doing conversions each frame
