@@ -644,8 +644,7 @@ void CAL_SetupMapFile (void)
 }
 
 
-//==========================================================================
-
+/* ======================================================================== */
 
 /*
 ======================
@@ -657,13 +656,12 @@ void CAL_SetupMapFile (void)
 
 void CAL_SetupAudioFile (void)
 {
-	int handle, i;
+	int handle;
 	long length;
 	char fname[13];
 
-//
-// load maphead.ext (offsets and tileinfo for map file)
-//
+/* load maphead.ext (offsets and tileinfo for map file) */
+
 	strcpy(fname,aheadname);
 	strcat(fname,extension);
 
@@ -677,11 +675,8 @@ void CAL_SetupAudioFile (void)
 		
 	close(handle);
 
-	for (i = 0; i < length/4; i++)
-		printf("chunk %03d: %08ld\n", i, audiostarts[i]);
-//
-// open the data file
-//
+/* open the data file */
+
 	strcpy(fname,afilename);
 	strcat(fname,extension);
 
@@ -690,8 +685,7 @@ void CAL_SetupAudioFile (void)
 		CA_CannotOpen(fname);
 }
 
-//==========================================================================
-
+/* ======================================================================== */
 
 /*
 ======================

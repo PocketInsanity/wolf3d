@@ -694,12 +694,11 @@ void CheckKeys (void)
 	 DrawAllPlayBorder ();
 	}
 
-//
-// pause key weirdness can't be checked as a scan code
-//
 	if (Paused)
 	{
-		LatchDrawPic (20-4,80-2*8,PAUSEDPIC);
+		VWB_DrawPic(128, 64, PAUSEDPIC);
+		VW_UpdateScreen();
+		
 		SD_MusicOff();
 		IN_Ack();
 		IN_ClearKeysDown ();

@@ -69,10 +69,10 @@ typedef	struct
 		} Rect;
 
 #include "vi_comm.h"
+#include "sd_comm.h"
 
 #include "id_ca.h"
 #include "id_vh.h"
-#include "id_sd.h"
 #include "id_us.h"
 
 extern byte signon[];

@@ -759,6 +759,8 @@ int XKeysymToScancode(unsigned int keysym)
 			return sc_Y;
 		case XK_n:
 			return sc_N;
+		case XK_Pause:
+			return 0xE1;
 		default:
 			printf("unknown: %s\n", XKeysymToString(keysym));
 			return sc_None;

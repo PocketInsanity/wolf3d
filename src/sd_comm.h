@@ -1,7 +1,7 @@
-#ifndef	__ID_SD_H__
-#define	__ID_SD_H__
+#ifndef	__SD_COMM_H__
+#define	__SD_COMM_H__
 
-#define	TickBase	70		// 70Hz per tick - used as a base for timer 0
+#define	TickBase	70	// 70Hz per tick
 
 typedef	enum	{
 					sdm_Off,

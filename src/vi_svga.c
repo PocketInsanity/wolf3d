@@ -358,7 +358,7 @@ void keyboard_handler(int code, int press)
 
 	if (k == 0xe0)		// Special key prefix
 		special = true;
-	else if (k == 0xe1)	// Handle Pause key
+	else if ( (k == SCANCODE_BREAK) || (k == SCANCODE_BREAK_ALTERNATIVE) )	// Handle Pause key
 		Paused = true;
 	else
 	{
