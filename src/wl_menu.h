@@ -1,6 +1,6 @@
-//
-// WL_MENU.H
-//
+#ifndef __WL_MENU_H__
+#define __WL_MENU_H__
+
 #ifdef SPEAR
 
 #define BORDCOLOR	0x99
@@ -224,4 +224,6 @@ void Write (int x,int y,char *string);
 void NonShareware(void);
 int GetYorN(int x,int y,int pic);
 
-
+#else
+#error "fix me TODO"
+#endif
