@@ -109,79 +109,67 @@ static void ScaleLineTrans(unsigned int height, byte *source, int x)
 
 static unsigned char *spritegfx[SPR_TOTAL];
 
-/* TODO: merge FlipWall into function below */
-static byte *FlipWall(byte *dat, int w, int h)
-{
-        byte *buf;
-        int i, j;
-
-        buf = (byte *)malloc(w * h);
-
-        for (j = 0; j < h; j++)
-                for (i = 0; i < w; i++)
-			buf[j*w+i] = dat[i*w+j];
-        return buf;
-}
-
 static void DeCompileSprite(int shapenum)
 {
 	t_compshape *ptr;
 	unsigned char *buf;
-	int srcx = 32;
-	int slinex = 31;
-	int stopx;
+	int srcx;
 	unsigned short int *cmdptr;
+	short int *linecmds;
+	unsigned char *pixels;
+	int y, y0, y1;
 	
 	MM_GetPtr((void *)&buf, 64 * 64);
 	
+	memset(buf, 255, 64 * 64);
+	
 	ptr = PM_GetSpritePage(shapenum);
 
-	memset(buf, 255, 64 * 64);
-
-	stopx = ptr->leftpix;
-	cmdptr = &ptr->dataofs[31-stopx];
-	while ( --srcx >=stopx ) {
-		short *linecmds = (short *)((unsigned char *)ptr + *cmdptr--);
-		slinex--;
+	cmdptr = &ptr->dataofs[31 - ptr->leftpix];
+	
+	for (srcx = 31; srcx >= ptr->leftpix; srcx--) {
+		linecmds = (short *)((unsigned char *)ptr + *cmdptr--);
+		
 		while (linecmds[0]) {
-			int y;
-			int y0 = linecmds[2] / 2;
-			int y1 = linecmds[0] / 2 - 1;
-			unsigned char *pixels = (unsigned char *)ptr + y0 + linecmds[1];
-			for (y=y0; y<=y1; y++) {
-				unsigned char color = *pixels++;
-				*(buf + slinex + (y*64)) = color;
+			y0 = linecmds[2] / 2;
+			y1 = linecmds[0] / 2;
+			pixels = (unsigned char *)ptr + y0 + linecmds[1];
+			
+			for (y = y0; y < y1; y++) {
+				//*(buf + slinex + (y*64)) = *pixels;
+				*(buf + (srcx*64) + y) = *pixels;
+				pixels++;
 			}
 			linecmds += 3;
 		}
-	}
-	slinex = 31;
-	stopx = ptr->rightpix;
-	if (ptr->leftpix < 31) {
-		srcx = 31;
-		cmdptr = &ptr->dataofs[32 - ptr->leftpix];
-	} else {
-		srcx = ptr->leftpix - 1;
-		cmdptr = &ptr->dataofs[0];
-	}
-	while (++srcx <= stopx) {
-		short *linecmds = (short *)((unsigned char *)ptr + *cmdptr++);
-		while (linecmds[0]) {
-			int y;
-			int y0 = linecmds[2] / 2;
-			int y1 = linecmds[0] / 2 - 1;
-			unsigned char *pixels = (unsigned char *)ptr + y0 + linecmds[1];
-			for (y=y0; y<=y1; y++) {
-				unsigned char color = *pixels++;
-				*(buf + slinex + (y*64)) = color;
-			}
-			linecmds += 3;
-		}
-		slinex++;
 	}
 	
-	spritegfx[shapenum] = FlipWall(buf, 64, 64);
-	MM_FreePtr((void *)&buf);
+	if (ptr->leftpix < 31) {
+		srcx = 32;
+		cmdptr = &ptr->dataofs[32 - ptr->leftpix];
+	} else {
+		srcx = ptr->leftpix;
+		cmdptr = &ptr->dataofs[0];
+	}
+	
+	for (; srcx <= ptr->rightpix; srcx++) {
+		linecmds = (short *)((unsigned char *)ptr + *cmdptr++);
+		
+		while (linecmds[0]) {
+			y0 = linecmds[2] / 2;
+			y1 = linecmds[0] / 2;
+			pixels = (unsigned char *)ptr + y0 + linecmds[1];
+			
+			for (y = y0; y < y1; y++) {
+				//*(buf + slinex + (y*64)) = *pixels;
+				*(buf + (srcx*64) + y) = *pixels;
+				pixels++;
+			}
+			linecmds += 3;
+		}
+	}
+	
+	spritegfx[shapenum] = buf;
 }
 
 void ScaleShape(int xcenter, int shapenum, unsigned height)
@@ -195,7 +183,7 @@ void ScaleShape(int xcenter, int shapenum, unsigned height)
 	for (p = xcenter - (height >> 3), x = 0; x < (64 << 16); x += scaler, p++) {
 		if ((p < 0) || (p >= viewwidth) || (wallheight[p] >= height))
 			continue;
-		ScaleLineTrans((height >> 2) + 0, spritegfx[shapenum] + ((x >> 16) << 6), p);
+		ScaleLineTrans(height >> 2, spritegfx[shapenum] + ((x >> 16) << 6), p);
 	}	
 }
 

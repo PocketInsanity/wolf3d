@@ -22,6 +22,7 @@ SD_StartMusic((MusicGroup *)audiosegs[STARTMUSIC + chunk]);
 =>
 SD_StartMusic(chunk);
 
+* merge wl_scale with wl_draw?
 * refresh rate under svgalib is horrible. the screen keeps getting updated
 midframe.  it's due to the way CalcTics works
 * rewrite hw (sound, input) code, remove stuff like SD_SetSoundMode
@@ -94,8 +95,6 @@ also, it should be able to compile without extensions
 * rename visable to visible
 * create 'sound channels' with priority.. ie a door can only make one sound
 at a time
-* change wl_scale to use mac wolf3d's version of scaling
-wall drawing is done, just needed to fix sprite code
 * cat file.c | perl -e 'while($in = <STDIN>)
 {$in =~ s/\/\/(.*)$/\/\* \1\ *\//gm;print $in;}'
 or
