@@ -234,8 +234,6 @@ void ScalePost(byte *wall, int texture)
 	byte *source;
 
 	height = (wallheight [postx] & 0xfff8) >> 1;
-	if (height > maxscaleshl2)
-		height = maxscaleshl2;
 	
 	source = wall+texture;
 	xBuildCompScale (height/2, source, postx);

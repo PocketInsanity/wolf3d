@@ -227,31 +227,12 @@ int CalcHeight (void)
 
 unsigned postx;
 
-#if 0
 void ScalePost(byte *wall, int texture)
 {
 	int height;
 	byte *source;
 
 	height = (wallheight [postx] & 0xfff8) >> 1;
-	if (height > maxscaleshl2)
-		height = maxscaleshl2;
-	
-	source = wall+texture;
-	xBuildCompScale (height/2, source, postx);
-}
-#endif
-
-/* TODO: this is new ScalePost for new scaling routine */
-void ScalePost(byte *wall, int texture)
-{
-	int height;
-	byte *source;
-
-	height = (wallheight [postx] & 0xfff8) >> 1;
-	/* TODO: i can remove maxscaleshl2 now */
-	//if (height > maxscaleshl2)
-	//	height = maxscaleshl2;
 	
 	source = wall+texture;
 	xBuildCompScale (height/2, source, postx);

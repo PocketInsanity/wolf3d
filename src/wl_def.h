@@ -951,7 +951,7 @@ typedef struct
 /* table data after dataofs[rightpix-leftpix+1] */
 } PACKED t_compshape;
 
-extern	int			maxscale,maxscaleshl2;
+extern	int			maxscale;
 
 void SetupScaling (int maxscaleheight);
 void ScaleShape (int xcenter, int shapenum, unsigned height);

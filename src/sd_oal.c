@@ -145,9 +145,9 @@ void SD_Startup(void)
 		}
 			
 		buffers = (ALuint *)malloc(sizeof(ALuint) * x);
-		if (alGenBuffers(x, buffers) != x) 
-			printf("OpenAL buffer allocation problem\n");
-				
+		//if (alGenBuffers(x, buffers) != x) 
+		//	printf("OpenAL buffer allocation problem\n");
+		alGenBuffers(x, buffers);		
 			
 		x = 0;
 		for (i = 0; i < p / 2; i += 2) {
@@ -174,9 +174,7 @@ void SD_Startup(void)
 				memcpy(dat+z, PM_GetPage(w + PMSoundStart), page->length);
 				z += page->length;
 			}
-			/* TODO: openal bug! */
-			//alBufferData(buffers[x], AL_FORMAT_MONO8, dat, y, 6896);
-			alBufferData(buffers[x], AL_FORMAT_MONO8, dat, y, 22050/4);
+			alBufferData(buffers[x], AL_FORMAT_MONO8, dat, y, 6896);
 			
 			if(alGetError() != AL_NO_ERROR) {
 				printf("AL error\n");
@@ -232,8 +230,9 @@ void SD_PlaySound(soundnames sound)
 	
 	if (DigiMap[sound] != -1) {
 		/* TODO: openal bug? (need to stop before play) */
+		/* what is there to replayce SourceIsPlaying (was removed from AL)? */
 		for (i = 0; i < 4; i++) {
-			if (alSourceIsPlaying(sources[i]) == AL_FALSE) {
+			/* if (alSourceIsPlaying(sources[i]) == AL_FALSE) */ {
 				//alSourceStop(*sources);
 				alSourcefv(sources[i], AL_POSITION, gval);
 				alSource3f(sources[i], AL_DIRECTION, -pval[0], 0.0f, -pval[2]);
@@ -273,7 +272,7 @@ void PlaySoundLocGlobal(word sound, fixed x, fixed y)
 	if (DigiMap[sound] != -1) {
 		/* TODO: openal bug? (need to stop before play) */
 		for (i = 0; i < 4; i++) {
-			if (alSourceIsPlaying(sources[i]) == AL_FALSE) {
+			/* if (alSourceIsPlaying(sources[i]) == AL_FALSE) */ {
 				//alSourceStop(*sources);
 				val[0] = x >> 15;
 				val[1] = 0.0f;
@@ -300,10 +299,10 @@ word SD_SoundPlaying(void)
 	
 	/* Watch out for any looped sounds */
 	for (i = 0; i < 4; i++) {
-		if (alSourceIsPlaying(sources[i]) == AL_TRUE) {
+		/* if (alSourceIsPlaying(sources[i]) == AL_TRUE) */ {
 			ALint ret;
 			
-			alGetSourcei(sources[i], AL_LOOPING, &ret);
+			alGetSourcei(sources[i], AL_SOURCE_LOOPING, &ret);
 			if (ret == AL_FALSE)
 				return true;
 		}

@@ -90,6 +90,13 @@ either that or use extern "C" { ... } in the header files
 wall drawing is done, just needed to fix sprite code
 * check in wolftools and add mac wolftools (currently the res dumping stuff)
 * have vi_xlib.c compile without the extensions
+* cat file.c | perl -e 'while($in = <STDIN>)
+{$in =~ s/\/\/(.*)$/\/\* \1\ *\//gm;print $in;}'
+or
+cat foo.txt |sed -e "s/\/\/\(.*\)$/\/\*\1\*\//g"
+* oal version locks up at end of level (hit switch but before the ratios)
+the api is a bit unstable at the moment so wait for 1.0 of linux version to
+be released before fixing it, although that lame sampling bug got fixed
 
 Things to try:
 * Any speed gain with comparing values in screen before writing?

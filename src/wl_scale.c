@@ -22,7 +22,7 @@ typedef struct {
 
 t_scaledata scaledata [MAXSCALEHEIGHT+1];
 
-int maxscale,maxscaleshl2;
+int maxscale;
 
 void BuildCompScale(int height)
 {
@@ -74,8 +74,6 @@ void SetupScaling(int maxscaleheight)
 	int i;
 
 	maxscale = maxscaleheight-1;
-	maxscaleshl2 = maxscale<<2;
-
 //
 // build the compiled scalers
 //
@@ -143,9 +141,9 @@ void xBuildCompScale(int height, byte *source, int x)
 #endif
 
 /* TODO: this accesses gfxbuf directly! */
-void ScaledDraw(byte *gfx, int scale, byte *vid, unsigned long tfrac, unsigned long tint, unsigned long delta)
+static void ScaledDraw(byte *gfx, int scale, byte *vid, unsigned long tfrac, unsigned long tint, unsigned long delta)
 {
-	fixed OldDelta;
+	unsigned long OldDelta;
 	
 	while (scale--) {
 		*vid = *gfx;
@@ -262,6 +260,8 @@ void ScaleShape(int xcenter, int shapenum, unsigned height)
 	shape = PM_GetSpritePage (shapenum);
 
 	scale = height>>2;		// low three bits are fractional
+	scale += 4; /* sprites look a bit better pulled up some */
+	
 	if (!scale || scale>maxscale)
 		return;			// too close or far away
 
