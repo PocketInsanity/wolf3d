@@ -8,11 +8,13 @@ TODO:
 - If user requests a gamemode which SVGAlib says it does not support, fail
 - If SVGAlib does not support 512x384x256, allow the user to pan around 
   with the keypad arrow keys.
+* Finish moving all 2D code to SoftDraw.c
 
 BUGS:
-* drawing seems like its imprecise, stationary sprites move back and forth,
-and walls 'swim' when you move around, or sprites pop into different sizes
-when are far enough and get closer/farther away
+* Drawing seems like its imprecise, stationary sprites move back and forth,
+  and walls 'swim' when you move around, or sprites pop into different sizes
+  when are far enough and get closer/farther away
+- Possibly caused by 8.8 fixed?
 * it crashes somewhere, no reason why...
 #0  0x804fa55 in DrawXMShape (x=128, y=96, ShapePtr=0x8c8c8c8c) at
 Burger.c:198
@@ -21,8 +23,6 @@ I don't think GameShapes itself is being ran over, just the memory allocated
 to it...
 * added an 'and' hack to lines 33 and 50 in RefBsp.c  Not sure if this causes
 any problems (value was overflowing finetangent...)
-
-MISC:
 
 IDEAS:
 * Menu Keys
@@ -33,8 +33,8 @@ IDEAS:
 - XXX: Save Game
 - XXX: Save Game to Previously used File
 - XXX: Options
-
 * How about adding red/white shifts (from PC wolf3d)? So screen changes
 color when you are hit or pick up items.
-
 * when saving/loading games, run them through htons/etc.
+
+MISC:

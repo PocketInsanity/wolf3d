@@ -36,24 +36,31 @@ typedef struct {
 	int bottom;
 } Rect;
 
+#ifdef    __BIGENDIAN__
+unsigned short int sLSB(unsigned short int i);
+#define sMSB(i) i
+unsigned long lLSB(unsigned long i);
+#define lMSB(i) i
+#else  /* __BIGENDIAN__ */
 unsigned short int sLSB(unsigned short int i);
 unsigned short int sMSB(unsigned short int i);
 unsigned long lLSB(unsigned long i);
 unsigned long lMSB(unsigned long i);
+#endif /* __BIGENDIAN__ */
 
 /* an angle_t occupies an entire 16 bits so wraparound is automatically handled */
 
 #define	SHORTTOANGLESHIFT	7	/* 0x10000 to ANGLES */
-#define	SLOPEBITS 9		/* Used in AngleFromSlope2 */
+#define	SLOPEBITS 		9	/* Used in AngleFromSlope2 */
 
 typedef unsigned short angle_t;		/* Must be short to allow wraparound */
-typedef short fixed_t;				/* 8.8 fixed point number */	
+typedef short fixed_t;			/* 8.8 fixed point number */	
 typedef unsigned short ufixed_t;	/* 8.8 unsigned fixed point number */
 
 #include "burger.h"		/* My standard system equates */
 #include "States.h"		/* Think state equates */
 #include "Sounds.h"		/* Sound equates */
-#include "Sprites.h"	/* Sprite indexs */
+#include "Sprites.h"		/* Sprite indexs */
 #include "Wolf.h"		/* Resource maps */
 
 /**********************************
@@ -69,22 +76,22 @@ typedef unsigned short ufixed_t;	/* 8.8 unsigned fixed point number */
 	
 **********************************/
 
-#define	MAXVISSPRITES 64	/* Maximum number of sprites to display (Must be a power of 2!) */
-#define MAXACTORS	128		/* max number of nazis, etc / map */
-#define MAXSTATICS	200		/* max number of lamps, bonus, etc */
-#define MAXMISSILES	32		/* max missiles, flames, smokes, etc */
-#define MAXDOORS	64		/* max number of sliding doors (64<=) */
-#define MAXAREAS	64		/* max number of bsp areas */
-#define	NUMBUTTONS	10		/* Number of control buttons */
-#define WALLHEIGHT 128		/* Height,width of walls */
-#define SPRITEHEIGHT 64		/* Height,width of a sprite */
+#define	MAXVISSPRITES 	64	/* Maximum number of sprites to display (Must be a power of 2!) */
+#define MAXACTORS	128	/* max number of nazis, etc / map */
+#define MAXSTATICS	200	/* max number of lamps, bonus, etc */
+#define MAXMISSILES	32	/* max missiles, flames, smokes, etc */
+#define MAXDOORS	64	/* max number of sliding doors (64<=) */
+#define MAXAREAS	64	/* max number of bsp areas */
+#define	NUMBUTTONS	10	/* Number of control buttons */
+#define WALLHEIGHT	128	/* Height,width of walls */
+#define SPRITEHEIGHT	64	/* Height,width of a sprite */
 
-#define	PLAYERSIZE	88		/* radius of player in 8.8 fixed point */
+#define	PLAYERSIZE	88	/* radius of player in 8.8 fixed point */
 #define	PROJECTIONSCALE	(SCREENWIDTH/2)*0x90l
-#define	FIELDOFVIEW	364*4 /* fineangles in the SCREENWIDTH wide window*/
+#define	FIELDOFVIEW	364*4	/* fineangles in the SCREENWIDTH wide window*/
 #define MINZ 62			/* PLAYERSIZE/sqrt(2) rounded down*/
 #define	MAXZ (32*FRACUNIT)	/* Farthest thing away */
-#define	FINEANGLES	0x2000		/* Power of 2 */
+#define	FINEANGLES	0x2000	/* Power of 2 */
 #define	FINEMASK	(FINEANGLES-1)	
 #define	ANGLETOFINESHIFT	3	/* 0x10000 >> 0x2000*/
 #define GAMEANGLETOFINE		4	/* 512 << 0x2000 */
@@ -92,15 +99,16 @@ typedef unsigned short ufixed_t;	/* 8.8 unsigned fixed point number */
 #define	ANGLE180	0x8000		/* Use a 0x10000 angle range */
 
 #if 0
-#define	SCREENWIDTH	320		/* Size of the offscreen buffer */
-#define SCREENHEIGHT 200	/* Height of the offscreen buffer */
-#define VIEWHEIGHT 160		/* Height of the viewing area */
+#define	SCREENWIDTH	320	/* Size of the offscreen buffer */
+#define SCREENHEIGHT	200	/* Height of the offscreen buffer */
+#define VIEWHEIGHT	160	/* Height of the viewing area */
 #endif
 
 #define SCREENWIDTH	VidWidth
 #define SCREENHEIGHT	VidHeight
 #define VIEWHEIGHT	ViewHeight
 extern int VidWidth, VidHeight, ViewHeight;
+
 Word ScaleX(Word x);	/* Scale factor for 320 mode points projected to SCREEN */
 Word ScaleY(Word y);
 
@@ -116,14 +124,14 @@ Word ScaleY(Word y);
 #define MAXBONUSCOLOR 8		/* Number of shades of gold to use for damage */
 
 #define EXTRAPOINTS	20000	/* Points for a free man */
-#define STARTAMMO	16		/* Ammo to begin the game with */
-#define TILEGLOBAL 	 256	/* Pixels per tile */
+#define STARTAMMO	16	/* Ammo to begin the game with */
+#define TILEGLOBAL 	256	/* Pixels per tile */
 #define MINACTORDIST 192	/* minimum dist from player center*/
-							/* to any actor center*/
-#define KNIFEDIST	480		/* max dist for a knife hit (fixed_t) */
-#define BITERANGE	350		/* max dist for a bite hit (fixed_t) */
-#define MISSILEHITDIST 120	/* max dist for a missile impact (fixed_t) */
-#define MAPSIZE		64		/* Size of a map in tiles */
+					/* to any actor center */
+#define KNIFEDIST	480	/* max dist for a knife hit (fixed_t) */
+#define BITERANGE	350	/* max dist for a bite hit (fixed_t) */
+#define MISSILEHITDIST	120	/* max dist for a missile impact (fixed_t) */
+#define MAPSIZE		64	/* Size of a map in tiles */
 
 
 /* joypad masks */

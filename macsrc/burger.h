@@ -53,7 +53,6 @@ extern LongWord LastTick;
 extern LongWord YTable[480];
 
 void DLZSS(Byte *Dest, Byte *Src,LongWord Length);
-unsigned short SwapUShort(unsigned short Val);
 
 void WaitTick(void);
 void WaitTicks(Word TickCount);

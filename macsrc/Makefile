@@ -8,14 +8,16 @@ CFLAGS = -g
 #CFLAGS = -Os -g
 #CFLAGS = -g -Wall -I/home/relnev/cvs/oal/include
 
-OBJS =  Data.o Doors.o EnMove.o EnThink.o Intro.o Level.o \
-	Missiles.o Sounds.o PlMove.o PlStuff.o PlThink.o PushWall.o \
-	RefBsp.o RefSprite.o Refresh.o Refresh2.o Sight.o Main.o \
-	StateDef.o WolfMain.o WolfIO.o InterMis.o Burger.o stub.o res.o
-SOBJS = $(OBJS) vi_svga.o
-XOBJS = $(OBJS) vi_xlib.o
-GOBJS = $(OBJS) vi_gtk.o
-GLOBJS = $(OBJS) vi_glx.o
+OBJS 	 = Data.o Doors.o EnMove.o EnThink.o Intro.o Level.o \
+	   Missiles.o Sounds.o PlMove.o PlStuff.o PlThink.o PushWall.o \
+	   RefBsp.o RefSprite.o Refresh.o Refresh2.o Sight.o Main.o \
+	   StateDef.o WolfMain.o WolfIO.o InterMis.o Burger.o stub.o res.o
+SOFTOBJS = SoftDraw.o
+OGLOBJS	 = SoftDraw.o #
+SOBJS	 = $(SOFTOBJS) $(OBJS) vi_svga.o
+XOBJS	 = $(SOFTOBJS) $(OBJS) vi_xlib.o
+GOBJS	 = $(SOFTOBJS) $(OBJS) vi_gtk.o
+GLOBJS	 = $(OGLOBJS)  $(OBJS) vi_glx.o
 
 LFLAGS = -lm 
 #LFLAGS = -lm -L/home/relnev/cvs/oal/linux/src -lopenal -lpthread -ldl
@@ -34,9 +36,9 @@ NASM = nasm
 
 all:	swolf3d xwolf3d gwolf3d glwolf3d
 
-$(SOBJS): Sounds.h  Sprites.h  States.h  Wolf.h  burger.h  wolfdef.h
-$(XOBJS): Sounds.h  Sprites.h  States.h  Wolf.h  burger.h  wolfdef.h
-$(GOBJS): Sounds.h  Sprites.h  States.h  Wolf.h  burger.h  wolfdef.h
+$(SOBJS):  Sounds.h  Sprites.h  States.h  Wolf.h  burger.h  wolfdef.h
+$(XOBJS):  Sounds.h  Sprites.h  States.h  Wolf.h  burger.h  wolfdef.h
+$(GOBJS):  Sounds.h  Sprites.h  States.h  Wolf.h  burger.h  wolfdef.h
 $(GLOBJS): Sounds.h  Sprites.h  States.h  Wolf.h  burger.h  wolfdef.h
 
 .asm.o:

@@ -244,9 +244,9 @@ void P_DrawSeg (saveseg_t *seg)
 /* adjust pushwall segs */
 
 	if (seg == pwallseg) {		/* Is this the active pushwall? */
-		if (seg->dir&1)	{	/* east/west*/
+		if (seg->dir&1)	{	/* east/west */
 			segplane += PushWallRec.pwallychange;
-		} else {	/* north/south*/
+		} else {		/* north/south */
 			segplane += PushWallRec.pwallxchange;
 		}
 	}
@@ -467,13 +467,13 @@ void RenderBSPNode(Word bspnum)
 	}
 	
 	savedcoordinate = bspcoord[savednum];	/* Save this coord */
-	bspcoord[savednum] = coordinate;		/* Set my new coord boundary */
+	bspcoord[savednum] = coordinate;	/* Set my new coord boundary */
 	RenderBSPNode(bsp->children[side^1]);	/* recursively divide front space*/
 
 	bspcoord[savednum] = savedcoordinate;	/* Restore the coord */
-	savednum ^= 1;							/* Negate the index */
+	savednum ^= 1;				/* Negate the index */
 	savedcoordinate = bspcoord[savednum];	/* Save the other side */
-	bspcoord[savednum] = coordinate;		/* Set the new side */
+	bspcoord[savednum] = coordinate;	/* Set the new side */
 	
 /* if the back side node is a single seg, don't bother explicitly checking visibility */
 

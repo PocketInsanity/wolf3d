@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 /*
 This is NOT the OpenGL version!
 This is a COPY of vi_xlib.c as a placeholder!
+(with minor changes)
 */
 
 #include <stdio.h>
@@ -30,6 +31,10 @@ This is a COPY of vi_xlib.c as a placeholder!
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
+
+#include <GL/gl.h>
+#include <GL/glx.h>
+#include <GL/glext.h>
 
 #include "wolfdef.h"
 
@@ -46,6 +51,16 @@ XColor clr[256];
 
 Byte *gfxbuf;
 
+int attrib[] = {
+	GLX_RGBA,
+	GLX_RED_SIZE,		5,
+	GLX_GREEN_SIZE,		5,
+	GLX_BLUE_SIZE,		5,
+	GLX_DEPTH_SIZE,		16,
+	GLX_DOUBLEBUFFER,
+	None
+};
+                                                        
 int main(int argc, char *argv[])
 {
 	XSetWindowAttributes attr;
