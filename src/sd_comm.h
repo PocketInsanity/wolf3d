@@ -49,7 +49,7 @@ extern	int		DigiMap[];
 // Function prototypes
 extern	void	SD_Startup(), SD_Shutdown();
 
-extern	void	SD_PlaySound(soundnames sound);
+extern	boolean SD_PlaySound(soundnames sound);
 extern	void	SD_StopSound(),
 				SD_WaitSoundDone(),
 				SD_StartMusic(MusicGroup *music),

@@ -9,18 +9,13 @@
 
 #define ACTORSIZE	0x4000
 
-unsigned	wallheight[MAXVIEWWIDTH];
-
-#define mindist	MINDIST
-
-//int 		pixelangle[MAXVIEWWIDTH]; /* TODO: i put these in wl_main */
-//long		finetangent[FINEANGLES/4];
+unsigned wallheight[MAXVIEWWIDTH];
 
 //
 // refresh variables
 //
-static fixed viewx,viewy;			// the focal point
-static int viewangle;
+fixed viewx,viewy;			// the focal point
+int viewangle;
 
 //
 // ray casting variables
@@ -110,7 +105,7 @@ static void TransformActor(objtype *ob)
 	ob->transx = nx;
 	ob->transy = ny;
 
-	if (nx < mindist) /* too close, don't overflow the divide */
+	if (nx < MINDIST) /* too close, don't overflow the divide */
 	{
 	  ob->viewheight = 0;
 	  return;
@@ -173,7 +168,7 @@ static boolean TransformTile(int tx, int ty, int *dispx, int *dispheight)
 //
 // calculate perspective ratio
 //
-	if (nx<mindist)			/* too close, don't overflow the divide */
+	if (nx<MINDIST)			/* too close, don't overflow the divide */
 	{
 		*dispheight = 0;
 		return false;
@@ -219,8 +214,8 @@ static int CalcHeight()
   //
   // calculate perspective ratio (heightnumerator/(nx>>8))
   //
-	if (nx<mindist)
-		nx=mindist;			/* don't let divide overflow */
+	if (nx<MINDIST)
+		nx=MINDIST;			/* don't let divide overflow */
 
 	return heightnumerator/(nx>>8);
 }
@@ -545,7 +540,7 @@ static int weaponscale[NUMWEAPONS] = {SPR_KNIFEREADY,SPR_PISTOLREADY
 
 static void DrawPlayerWeapon()
 {
-	int	shapenum;
+	int shapenum;
 
 #ifndef SPEAR
 	if (gamestate.victoryflag)
@@ -624,7 +619,7 @@ void ThreeDRefresh()
 	DrawPlayBorder();
 	ClearScreen();
 
-	WallRefresh ();
+	WallRefresh();
 
 //
 // draw all the scaled images
@@ -637,15 +632,14 @@ void ThreeDRefresh()
 //
 	if (fizzlein)
 	{
-		FizzleFade(xoffset, yoffset, viewwidth,viewheight,20,false);
+		FizzleFade(xoffset, yoffset, viewwidth, viewheight, 20, false);
 		fizzlein = false;
 
 		lasttimecount = 0;		/* don't make a big tic count */
 		set_TimeCount(0);
-
 	}
 
-	VW_UpdateScreen ();
+	VW_UpdateScreen();
 	frameon++;
 }
 
@@ -831,12 +825,12 @@ static void AsmRefresh()
 			    goto passhoriz;
 			xintercept = doorxhit;
 			yintercept = (ytile << 16) + 32768;
-			HitHorizDoor ();
+			HitHorizDoor();
 		    }
 		}
 		else {
 		    yintercept = ytile << 16;
-		    HitHorizWall ();
+		    HitHorizWall();
 		}
 		goto nextpix;
 	    }

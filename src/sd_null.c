@@ -13,34 +13,16 @@ int DigiMap[LASTSOUND];
 
 static boolean SD_Started;
 
-static boolean nextsoundpos;
-
-static int LeftPosition, RightPosition;
-
 static boolean sqActive;
 
 
-void SD_StopDigitized()
-{
-}
-
 void SD_Poll()
-{
-}
-
-void SD_SetPosition(int leftpos, int rightpos)
-{
-}
-
-void SD_PlayDigitized(word which, int leftpos, int rightpos)
 {
 }
 
 void SD_SetDigiDevice(SDSMode mode)
 {
 }
-
-//	Public routines
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -65,7 +47,6 @@ boolean SD_SetMusicMode(SMMode mode)
 ///////////////////////////////////////////////////////////////////////////
 //
 //	SD_Startup() - starts up the Sound Mgr
-//		Detects all additional sound hardware and installs my ISR
 //
 ///////////////////////////////////////////////////////////////////////////
 void SD_Startup()
@@ -79,7 +60,6 @@ void SD_Startup()
 ///////////////////////////////////////////////////////////////////////////
 //
 //	SD_Shutdown() - shuts down the Sound Mgr
-//		Removes sound ISR and turns off whatever sound hardware was active
 //
 ///////////////////////////////////////////////////////////////////////////
 void SD_Shutdown()
@@ -100,17 +80,6 @@ void SD_Shutdown()
 ///////////////////////////////////////////////////////////////////////////
 void SD_PlaySound(soundnames sound)
 {
-	boolean		ispos;
-	int	lp,rp;
-
-	lp = LeftPosition;
-	rp = RightPosition;
-	LeftPosition = 0;
-	RightPosition = 0;
-
-	ispos = nextsoundpos;
-	nextsoundpos = false;
-
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -298,9 +267,10 @@ static void SetSoundLoc(fixed gx, fixed gy)
 ///////////////////////////////////////////////////////////////////////////
 static void SD_PositionSound(int leftvol, int rightvol)
 {
-	LeftPosition = leftvol;
-	RightPosition = rightvol;
-	nextsoundpos = true;
+}
+
+static void SD_SetPosition(int leftpos, int rightpos)
+{
 }
 
 /*

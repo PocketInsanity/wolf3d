@@ -37,7 +37,6 @@ extern	char		extension[5],
 
 boolean CA_FarRead(int handle, byte *dest, long length);
 boolean CA_FarWrite(int handle, byte *source, long length);
-boolean CA_ReadFile(char *filename, memptr *ptr);
 boolean CA_LoadFile(char *filename, memptr *ptr);
 boolean CA_WriteFile(char *filename, void *ptr, long length);
 
@@ -46,7 +45,6 @@ void CA_RLEWexpand(word *source, word *dest, long length, word rlewtag);
 void CA_Startup();
 void CA_Shutdown();
 
-void CA_SetGrPurge();
 void CA_CacheAudioChunk(int chunk);
 void CA_UnCacheAudioChunk(int chunk);
 void CA_LoadAllSounds();
@@ -58,8 +56,6 @@ void CA_UnCacheGrChunk(int chunk);
 void CA_UpLevel();
 void CA_DownLevel();
 /*
-void CA_SetAllPurge();
-
 void CA_ClearMarks();
 void CA_ClearAllMarks();
 

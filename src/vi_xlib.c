@@ -871,6 +871,26 @@ static	Direction	DirTable[] =		// Quick lookup for total direction
 int XKeysymToScancode(unsigned int keysym)
 {
 	switch (keysym) {
+		case XK_1:
+			return sc_1;
+		case XK_2:
+			return sc_2;
+		case XK_3:
+			return sc_3;
+		case XK_4:
+			return sc_4;
+		case XK_a:
+			return sc_A;
+		case XK_b:
+			return sc_B;
+		case XK_i:
+			return sc_I;
+		case XK_l:
+			return sc_L;
+		case XK_m:
+			return sc_M;
+		case XK_t:
+			return sc_T;
 		case XK_Left:
 		case XK_KP_Left:
 			return sc_LeftArrow;

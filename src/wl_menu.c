@@ -3276,17 +3276,11 @@ void Message(char *string)
 	VW_UpdateScreen();
 }
 
-
-////////////////////////////////////////////////////////////////////
-//
-// THIS MAY BE FIXED A LITTLE LATER...
-//
-////////////////////////////////////////////////////////////////////
-static	int	lastmusic;
+static int lastmusic;
 
 void StartCPMusic(int song)
 {
-	musicnames	chunk;
+	musicnames chunk;
 	
 	SD_MusicOff();
 	CA_UnCacheAudioChunk(STARTMUSIC + lastmusic);
@@ -3299,19 +3293,17 @@ void StartCPMusic(int song)
 	SD_StartMusic((MusicGroup *)audiosegs[STARTMUSIC + chunk]);
 }
 
-void FreeMusic(void)
+void FreeMusic()
 {
 	CA_UnCacheAudioChunk(STARTMUSIC + lastmusic);
 }
-
-
 
 ///////////////////////////////////////////////////////////////////////////
 //
 // CHECK FOR PAUSE KEY (FOR MUSIC ONLY)
 //
 ///////////////////////////////////////////////////////////////////////////
-void CheckPause(void)
+void CheckPause()
 {
 	if (Paused)
 	{

@@ -1328,7 +1328,7 @@ void PlayLoop()
  		UpdateSoundLoc(player->x, player->y, player->angle);
 
 		if (screenfaded)
-			VW_FadeIn ();
+			VW_FadeIn();
 
 		CheckKeys();
 
@@ -1345,9 +1345,9 @@ void PlayLoop()
 
 		if (demoplayback)
 		{
-			if (IN_CheckAck ())
+			if (IN_CheckAck())
 			{
-				IN_ClearKeysDown ();
+				IN_ClearKeysDown();
 				playstate = ex_abort;
 			}
 		}
@@ -1355,5 +1355,5 @@ void PlayLoop()
 	} while (!playstate && !startgame);
 
 	if (playstate != ex_died)
-		FinishPaletteShifts ();
+		FinishPaletteShifts();
 }

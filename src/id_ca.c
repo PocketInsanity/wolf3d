@@ -65,8 +65,8 @@ static long *audiostarts; /* array of offsets in audio / audiot */
 static huffnode grhuffman[255];
 
 static int grhandle; /* handle to VGAGRAPH */
-static int maphandle; /* handle to MAPTEMP / GAMEMAPS */
-static int audiohandle; /* handle to AUDIOT / AUDIO */
+static int maphandle; /* handle to GAMEMAPS */
+static int audiohandle; /* handle to AUDIOT */
 
 SDMode oldsoundmode;
 
@@ -96,7 +96,7 @@ static long GRFILEPOS(int c)
 =============================================================================
 */
 
-void CA_CannotOpen(char *string)
+static void CA_CannotOpen(char *string)
 {
 	/* TODO Ow, string must be a small one else boom */
 	char str[30];
@@ -167,34 +167,6 @@ boolean CA_FarWrite(int handle, byte *source, long length)
 /*
 ==========================
 =
-= CA_ReadFile
-=
-= Reads a file into an allready allocated buffer
-=
-==========================
-*/
-
-boolean CA_ReadFile(char *filename, memptr *ptr)
-{
-	int handle;
-	long size;
-
-	if ((handle = open(filename, O_RDONLY | O_BINARY)) == -1)
-		return false;
-	size = filelength(handle);
-	
-	if (!CA_FarRead(handle, *ptr, size)) {
-		close(handle);
-		return false;
-	}
-
-	close(handle);
-	return true;
-}
-
-/*
-==========================
-=
 = CA_WriteFile
 =
 = Writes a file from a memory buffer
@@ -231,7 +203,7 @@ boolean CA_WriteFile(char *filename, void *ptr, long length)
 ==========================
 */
 
-boolean CA_LoadFile (char *filename, memptr *ptr)
+boolean CA_LoadFile(char *filename, memptr *ptr)
 {
 	int handle;
 	long size;
@@ -322,8 +294,7 @@ void CAL_CarmackExpand(word *source, word *dest, word length)
 	inptr = (byte *)source;
 	outptr = dest;
 
-	while (length) {
-		/* LSB */
+	while (length) {		
 		chlow = *inptr++; /* count */
 		chhigh = *inptr++;
 		
@@ -366,60 +337,6 @@ void CAL_CarmackExpand(word *source, word *dest, word length)
 		}
 	}
 }
-
-#if 0
-void CAL_CarmackExpand(word *source, word *dest, word length)
-{
-	word ch, chhigh, count, offset;
-	word *copyptr, *inptr, *outptr;
-	byte **byteinc = (byte **)&inptr;
-	
-	length /= 2;
-
-	inptr = source;
-	outptr = dest;
-
-	while (length) {
-		ch = *inptr++;
-		chhigh = ch>>8;
-		if (chhigh == NEARTAG) {
-			count = ch&0xff;
-			if (!count) {	
-			/* have to insert a word containing the tag byte */
-				ch |= **byteinc;
-				(*byteinc)++;
-				*outptr++ = ch;
-				length--;
-			} else {
-				offset = **byteinc;
-				(*byteinc)++;
-				copyptr = outptr - offset;
-				length -= count;
-				while (count--)
-					*outptr++ = *copyptr++;
-			}
-		} else if (chhigh == FARTAG) {
-			count = ch&0xff;
-			if (!count) {
-			/* have to insert a word containing the tag byte */
-				ch |= **byteinc;
-				(*byteinc)++;
-				*outptr++ = ch;
-				length --;
-			} else {
-				offset = *inptr++;
-				copyptr = dest + offset;
-				length -= count;
-				while (count--)
-					*outptr++ = *copyptr++;
-			}
-		} else {
-			*outptr++ = ch;
-			length--;
-		}
-	}
-}
-#endif
 
 /*
 ======================
@@ -497,7 +414,7 @@ static void CAL_SetupGrFile()
 
 	long chunkcomplen;
 //
-// load ???dict.ext (huffman dictionary for graphics files)
+// load vgadict.ext (huffman dictionary for graphics files)
 //
 
 	strcpy(fname, gdictname);
@@ -509,7 +426,7 @@ static void CAL_SetupGrFile()
 	read(handle, &grhuffman, sizeof(grhuffman));
 	close(handle);
 //
-// load the data offsets from ???head.ext
+// load the data offsets from vgahead.ext
 //
 	MM_GetPtr((memptr)&grstarts, (NUMCHUNKS+1)*FILEPOSSIZE);
 
@@ -688,11 +605,11 @@ void CA_Startup()
 ======================
 */
 
-void CA_Shutdown (void)
+void CA_Shutdown()
 {
-	close (maphandle);
-	close (grhandle);
-	close (audiohandle);
+	close(maphandle);
+	close(grhandle);
+	close(audiohandle);
 }
 
 //===========================================================================
@@ -731,7 +648,7 @@ void CA_CacheAudioChunk(int chunk)
 
 void CA_UnCacheAudioChunk(int chunk)
 {
-	/* TODO: For now the warning is ignorable since wl_menu.c does it */
+	/* TODO: For now the warning may be ignored since wl_menu.c causes it */
 	if (audiosegs[chunk] == 0) {
 		fprintf(stderr, "Trying to free null audio chunk %d!\n", chunk);
 		return;
@@ -757,6 +674,7 @@ void CA_LoadAllSounds()
 {
 	unsigned start, i;
 
+#if 0
 	switch (oldsoundmode)
 	{
 	case sdm_PC:
@@ -787,9 +705,10 @@ cachein:
 	default:
 		return;
 	}
+#endif
 
-	for (i=0;i<NUMSOUNDS;i++,start++)
-		CA_CacheAudioChunk (start);
+	for (start = STARTADLIBSOUNDS, i = 0; i < NUMSOUNDS; i++, start++)
+		CA_CacheAudioChunk(start);
 
 	oldsoundmode = SoundMode;
 }
@@ -993,7 +912,7 @@ void CA_CacheMap(int mapnum)
 //
 	size = 64*64*2;
 
-	for (plane = 0; plane<MAPPLANES; plane++)
+	for (plane = 0; plane < MAPPLANES; plane++)
 	{
 		pos = mapheaderseg[mapnum]->planestart[plane];
 		compressed = mapheaderseg[mapnum]->planelength[plane];
@@ -1014,11 +933,10 @@ void CA_CacheMap(int mapnum)
 		*/
 		expanded = *source;
 		source++;
-		MM_GetPtr (&buffer2seg,expanded);
-		CAL_CarmackExpand (source, (word *)buffer2seg,expanded);
-		CA_RLEWexpand (((word *)buffer2seg)+1,*dest,size,
-		((mapfiletype *)tinf)->RLEWtag);
-		MM_FreePtr (&buffer2seg);
+		MM_GetPtr(&buffer2seg, expanded);
+		CAL_CarmackExpand(source, (word *)buffer2seg,expanded);
+		CA_RLEWexpand(((word *)buffer2seg)+1,*dest,size,((mapfiletype *)tinf)->RLEWtag);
+		MM_FreePtr(&buffer2seg);
 
 		MM_FreePtr(&bigbufferseg);
 	}
@@ -1037,7 +955,7 @@ void CA_CacheMap(int mapnum)
 ======================
 */
 
-void CA_UpLevel (void)
+void CA_UpLevel()
 {
 /*
 	int	i;
@@ -1066,7 +984,7 @@ void CA_UpLevel (void)
 ======================
 */
 
-void CA_DownLevel (void)
+void CA_DownLevel(d)
 {
 /*
 	if (!ca_levelnum)
@@ -1089,7 +1007,7 @@ void CA_DownLevel (void)
 ======================
 */
 #if 0
-void CA_ClearMarks (void)
+void CA_ClearMarks()
 {
 	int i;
 
@@ -1110,7 +1028,7 @@ void CA_ClearMarks (void)
 ======================
 */
 #if 0
-void CA_ClearAllMarks (void)
+void CA_ClearAllMarks()
 {
 	memset (grneeded,0,sizeof(grneeded));
 	ca_levelbit = 1;
@@ -1120,58 +1038,6 @@ void CA_ClearAllMarks (void)
 
 //===========================================================================
 
-/*
-======================
-=
-= CA_FreeGraphics
-=
-======================
-*/
-#if 0
-void CA_SetGrPurge (void)
-{
-	int i;
-
-//
-// free graphics
-//
-	CA_ClearMarks ();
-
-	for (i=0;i<NUMCHUNKS;i++)
-		if (grsegs[i])
-			MM_SetPurge ((memptr)&grsegs[i],3);
-}
-#endif
-/*
-======================
-=
-= CA_SetAllPurge
-=
-= Make everything possible purgable
-=
-======================
-*/
-#if 0
-void CA_SetAllPurge (void)
-{
-	int i;
-
-
-//
-// free sounds
-//
-	for (i=0;i<NUMSNDCHUNKS;i++)
-		if (audiosegs[i])
-			MM_SetPurge ((memptr)&audiosegs[i],3);
-
-//
-// free graphics
-//
-	CA_SetGrPurge ();
-}
-#endif
-
-//===========================================================================
 #if 0
 /*
 ======================
@@ -1182,7 +1048,7 @@ void CA_SetAllPurge (void)
 */
 #define MAXEMPTYREAD	1024
 
-void CA_CacheMarks (void)
+void CA_CacheMarks()
 {
 	int 	i,next,numcache;
 	long	pos,endpos,nextpos,nextendpos,compressed;
@@ -1334,7 +1200,7 @@ void MM_GetPtr(memptr *baseptr, unsigned long size)
 ====================
 */
 
-void MM_FreePtr (memptr *baseptr)
+void MM_FreePtr(memptr *baseptr)
 {
 	/* TODO: add some sort of linked list for purging, etc */
 	free(*baseptr);
@@ -1352,7 +1218,7 @@ void MM_FreePtr (memptr *baseptr)
 =====================
 */
 
-void MM_SetPurge (memptr *baseptr, int purge)
+void MM_SetPurge(memptr *baseptr, int purge)
 {
 }
 
@@ -1366,7 +1232,7 @@ void MM_SetPurge (memptr *baseptr, int purge)
 =====================
 */
 
-void MM_SetLock (memptr *baseptr, boolean locked)
+void MM_SetLock(memptr *baseptr, boolean locked)
 {
 }
 
@@ -1387,7 +1253,7 @@ void MM_SortMem()
 static boolean PMStarted;
 
 static int PageFile = -1;
-static word ChunksInFile;
+word ChunksInFile;
 word PMSpriteStart, PMSoundStart;
 
 word PMNumBlocks;
@@ -1546,7 +1412,7 @@ void PM_NextFrame()
 	// Frame count overrun - kill the LRU hit entries & reset frame count
 	if (++PMFrameCount >= MAXLONG - 4)
 	{
-		for (i = 0;i < PMNumBlocks;i++)
+		for (i = 0; i < PMNumBlocks; i++)
 			PMPages[i].lastHit = 0;
 		PMFrameCount = 0;
 	}
