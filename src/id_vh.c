@@ -14,7 +14,9 @@ int xfrac, yfrac;
 
 /* ======================================================================== */
 
-#define SKIPFADE 0
+/*
+#define SKIPFADE
+*/
 
 void VL_FillPalette(int red, int green, int blue)
 {
