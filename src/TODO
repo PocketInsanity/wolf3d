@@ -69,6 +69,7 @@ function with same parameters, only difference is the name)
 * look for places where gfx needs to be redrawn, like back to game etc 
 * fizzlefade is hackish, stipple buf would work ok in opengl, maybe only
 update once per frame or such...
+no idea how to do fizzlefade in TrueColor X
 * check filehandling (ex, file missing, bad file type, and such)
 PlayDemoFromFile specifically
 * make sure all infinite loops are found (looping around Keyboard)

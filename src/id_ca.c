@@ -1,5 +1,3 @@
-/* id_ca.c */
-
 #include "id_heads.h"
 
 typedef struct
@@ -30,15 +28,15 @@ maptype		*mapheaderseg[NUMMAPS];
 byte		*audiosegs[NUMSNDCHUNKS];
 byte		*grsegs[NUMCHUNKS];
 
-char extension[5],
-     gheadname[10] = "vgahead.",
-     gfilename[10] = "vgagraph.",
-     gdictname[10] = "vgadict.",
-     mheadname[10] = "maphead.",
-     gmapsname[10] = "gamemaps.",
-     aheadname[10] = "audiohed.",
-     afilename[10] = "audiot.",
-     pfilename[10] = "vswap.";
+char extension[5];
+#define gheadname "vgahead."
+#define gfilename "vgagraph."
+#define gdictname "vgadict."
+#define mheadname "maphead."
+#define gmapsname "gamemaps."
+#define aheadname "audiohed."
+#define afilename "audiot."
+#define pfilename "vswap."
 
 static long *grstarts;	/* array of offsets in vgagraph, -1 for sparse */
 static long *audiostarts; /* array of offsets in audio / audiot */

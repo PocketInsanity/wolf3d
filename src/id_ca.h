@@ -23,13 +23,7 @@ extern	maptype			*mapheaderseg[NUMMAPS];
 extern	byte			*audiosegs[NUMSNDCHUNKS];
 extern	byte			*grsegs[NUMCHUNKS];
 
-extern	char		extension[5],
-			gheadname[10],
-			gfilename[10],
-			gdictname[10],
-			mheadname[10],
-			aheadname[10],
-			afilename[10];
+extern char extension[5];
 
 /* ======================================================================== */
 
