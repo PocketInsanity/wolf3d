@@ -32,7 +32,7 @@ ControlType	Controls[MaxPlayers];
 
 =============================================================================
 */
-static byte ASCIINames[] =		// Unshifted ASCII for scan codes
+static const byte ASCIINames[] =		// Unshifted ASCII for scan codes
 					{
 //	 0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F
 	 0  ,27 ,'1','2','3','4','5','6','7','8','9','0','-','=',8  ,9  ,	// 0
@@ -61,14 +61,15 @@ static	boolean		IN_Started;
 static	boolean		CapsLock;
 static	ScanCode	CurCode,LastCode;
 
-static	Direction	DirTable[] =		// Quick lookup for total direction
+static	const Direction	DirTable[] =		// Quick lookup for total direction
 					{
 						dir_NorthWest,	dir_North,	dir_NorthEast,
 						dir_West,		dir_None,	dir_East,
 						dir_SouthWest,	dir_South,	dir_SouthEast
 					};
 
-			
+static boolean btnstate[8];
+
 void keyboard_handler(int code, int press)
 {
 	byte k, c = 0;
@@ -345,8 +346,6 @@ IN_CheckAck();
 // calling, it must be released for it to be recognized
 //
 ///////////////////////////////////////////////////////////////////////////
-
-boolean	btnstate[8];
 
 void IN_StartAck(void)
 {
