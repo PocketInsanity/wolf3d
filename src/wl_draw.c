@@ -1,11 +1,7 @@
-// WL_DRAW.C
+/* wl_draw.c */
 
-#include "WL_DEF.H"
-#include <DOS.H>
-#pragma hdrstop
-
-//#define DEBUGWALLS
-//#define DEBUGTICS
+#include "wl_def.h"
+#include <dos.h>
 
 /*
 =============================================================================
@@ -29,11 +25,7 @@
 */
 
 
-#ifdef DEBUGWALLS
-unsigned screenloc[3]= {0,0,0};
-#else
 unsigned screenloc[3]= {PAGE1START,PAGE2START,PAGE3START};
-#endif
 unsigned freelatch = FREESTART;
 
 long 	lasttimecount;

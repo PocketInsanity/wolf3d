@@ -2408,9 +2408,6 @@ void MM_BombOnError (boolean bomb)
 //	Primary coder: Jason Blochowiak
 //
 
-#include "ID_HEADS.H"
-#pragma hdrstop
-
 //	Main Mem specific variables
 	boolean			MainPresent;
 	memptr			MainMemPages[PMMaxMainMem];
@@ -2450,273 +2447,6 @@ static	char		*ParmStrings[] = {"nomain","noems","noxms",nil};
 
 /////////////////////////////////////////////////////////////////////////////
 //
-//	EMS Management code
-//
-/////////////////////////////////////////////////////////////////////////////
-
-//
-//	PML_MapEMS() - Maps a logical page to a physical page
-//
-void
-PML_MapEMS(word logical,word physical)
-{
-	_AL = physical;
-	_BX = logical;
-	_DX = EMSHandle;
-	_AH = EMS_MAPPAGE;
-asm	int	EMS_INT
-
-	if (_AH)
-		Quit("PML_MapEMS: Page mapping failed");
-}
-
-//
-//	PML_StartupEMS() - Sets up EMS for Page Mgr's use
-//		Checks to see if EMS driver is present
-//      Verifies that EMS hardware is present
-//		Make sure that EMS version is 3.2 or later
-//		If there's more than our minimum (2 pages) available, allocate it (up
-//			to the maximum we need)
-//
-
-	char	EMMDriverName[9] = "EMMXXXX0";
-
-boolean
-PML_StartupEMS(void)
-{
-	int		i;
-	long	size;
-
-	EMSPresent = false;			// Assume that we'll fail
-	EMSAvail = 0;
-
-	_DX = (word)EMMDriverName;
-	_AX = 0x3d00;
-	geninterrupt(0x21);			// try to open EMMXXXX0 device
-asm	jnc	gothandle
-	goto error;
-
-gothandle:
-	_BX = _AX;
-	_AX = 0x4400;
-	geninterrupt(0x21);			// get device info
-asm	jnc	gotinfo;
-	goto error;
-
-gotinfo:
-asm	and	dx,0x80
-	if (!_DX)
-		goto error;
-
-	_AX = 0x4407;
-	geninterrupt(0x21);			// get status
-asm	jc	error
-	if (!_AL)
-		goto error;
-
-	_AH = 0x3e;
-	geninterrupt(0x21);			// close handle
-
-	_AH = EMS_STATUS;
-	geninterrupt(EMS_INT);
-	if (_AH)
-		goto error;				// make sure EMS hardware is present
-
-	_AH = EMS_VERSION;
-	geninterrupt(EMS_INT);
-	if (_AH || (_AL < 0x32))	// only work on EMS 3.2 or greater (silly, but...)
-		goto error;
-
-	_AH = EMS_GETFRAME;
-	geninterrupt(EMS_INT);
-	if (_AH)
-		goto error;				// find the page frame address
-	EMSPageFrame = _BX;
-
-	_AH = EMS_GETPAGES;
-	geninterrupt(EMS_INT);
-	if (_AH)
-		goto error;
-	if (_BX < 2)
-		goto error;         	// Require at least 2 pages (32k)
-	EMSAvail = _BX;
-
-	// Don't hog all available EMS
-	size = EMSAvail * (long)EMSPageSize;
-	if (size - (EMSPageSize * 2) > (ChunksInFile * (long)PMPageSize))
-	{
-		size = (ChunksInFile * (long)PMPageSize) + EMSPageSize;
-		EMSAvail = size / EMSPageSize;
-	}
-
-	_AH = EMS_ALLOCPAGES;
-	_BX = EMSAvail;
-	geninterrupt(EMS_INT);
-	if (_AH)
-		goto error;
-	EMSHandle = _DX;
-
-	mminfo.EMSmem += EMSAvail * (long)EMSPageSize;
-
-	// Initialize EMS mapping cache
-	for (i = 0;i < EMSFrameCount;i++)
-		EMSList[i].baseEMSPage = -1;
-
-	EMSPresent = true;			// We have EMS
-
-error:
-	return(EMSPresent);
-}
-
-//
-//	PML_ShutdownEMS() - If EMS was used, deallocate it
-//
-void
-PML_ShutdownEMS(void)
-{
-	if (EMSPresent)
-	{
-	asm	mov	ah,EMS_FREEPAGES
-	asm	mov	dx,[EMSHandle]
-	asm	int	EMS_INT
-		if (_AH)
-			Quit ("PML_ShutdownEMS: Error freeing EMS");
-	}
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-//	XMS Management code
-//
-/////////////////////////////////////////////////////////////////////////////
-
-//
-//	PML_StartupXMS() - Starts up XMS for the Page Mgr's use
-//		Checks for presence of an XMS driver
-//		Makes sure that there's at least a page of XMS available
-//		Allocates any remaining XMS (rounded down to the nearest page size)
-//
-boolean
-PML_StartupXMS(void)
-{
-	XMSPresent = false;					// Assume failure
-	XMSAvail = 0;
-
-asm	mov	ax,0x4300
-asm	int	XMS_INT         				// Check for presence of XMS driver
-	if (_AL != 0x80)
-		goto error;
-
-
-asm	mov	ax,0x4310
-asm	int	XMS_INT							// Get address of XMS driver
-asm	mov	[WORD PTR XMSDriver],bx
-asm	mov	[WORD PTR XMSDriver+2],es		// function pointer to XMS driver
-
-	XMS_CALL(XMS_QUERYFREE);			// Find out how much XMS is available
-	XMSAvail = _AX;
-	if (!_AX)				// AJR: bugfix 10/8/92
-		goto error;
-
-	XMSAvail &= ~(PMPageSizeKB - 1);	// Round off to nearest page size
-	if (XMSAvail < (PMPageSizeKB * 2))	// Need at least 2 pages
-		goto error;
-
-	_DX = XMSAvail;
-	XMS_CALL(XMS_ALLOC);				// And do the allocation
-	XMSHandle = _DX;
-
-	if (!_AX)				// AJR: bugfix 10/8/92
-	{
-		XMSAvail = 0;
-		goto error;
-	}
-
-	mminfo.XMSmem += XMSAvail * 1024;
-
-	XMSPresent = true;
-error:
-	return(XMSPresent);
-}
-
-//
-//	PML_XMSCopy() - Copies a main/EMS page to or from XMS
-//		Will round an odd-length request up to the next even value
-//
-void
-PML_XMSCopy(boolean toxms,byte *addr,word xmspage,word length)
-{
-	longword	xoffset;
-	struct
-	{
-		longword	length;
-		word		source_handle;
-		longword	source_offset;
-		word		target_handle;
-		longword	target_offset;
-	} copy;
-
-	if (!addr)
-		Quit("PML_XMSCopy: zero address");
-
-	xoffset = (longword)xmspage * PMPageSize;
-
-	copy.length = (length + 1) & ~1;
-	copy.source_handle = toxms? 0 : XMSHandle;
-	copy.source_offset = toxms? (long)addr : xoffset;
-	copy.target_handle = toxms? XMSHandle : 0;
-	copy.target_offset = toxms? xoffset : (long)addr;
-
-asm	push si
-	_SI = (word)&copy;
-	XMS_CALL(XMS_MOVE);
-asm	pop	si
-	if (!_AX)
-		Quit("PML_XMSCopy: Error on copy");
-}
-
-#if 1
-#define	PML_CopyToXMS(s,t,l)	PML_XMSCopy(true,(s),(t),(l))
-#define	PML_CopyFromXMS(t,s,l)	PML_XMSCopy(false,(t),(s),(l))
-#else
-//
-//	PML_CopyToXMS() - Copies the specified number of bytes from the real mode
-//		segment address to the specified XMS page
-//
-void
-PML_CopyToXMS(byte *source,int targetpage,word length)
-{
-	PML_XMSCopy(true,source,targetpage,length);
-}
-
-//
-//	PML_CopyFromXMS() - Copies the specified number of bytes from an XMS
-//		page to the specified real mode address
-//
-void
-PML_CopyFromXMS(byte *target,int sourcepage,word length)
-{
-	PML_XMSCopy(false,target,sourcepage,length);
-}
-#endif
-
-//
-//	PML_ShutdownXMS()
-//
-void
-PML_ShutdownXMS(void)
-{
-	if (XMSPresent)
-	{
-		_DX = XMSHandle;
-		XMS_CALL(XMS_FREE);
-		if (_BL)
-			Quit("PML_ShutdownXMS: Error freeing XMS");
-	}
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
 //	Main memory code
 //
 /////////////////////////////////////////////////////////////////////////////
@@ -2726,8 +2456,7 @@ PML_ShutdownXMS(void)
 //		blocks. This shouldn't be called directly - the PM_LockMainMem() and
 //		PM_UnlockMainMem() macros should be used instead.
 //
-void
-PM_SetMainMemPurge(int level)
+void PM_SetMainMemPurge(int level)
 {
 	int	i;
 
@@ -2749,8 +2478,7 @@ PM_SetMainMemPurge(int level)
 //		PM_UnlockMainMem() needs to be called before any other part of the
 //		program makes allocation requests of the Memory Mgr.
 //
-void
-PM_CheckMainMem(void)
+void PM_CheckMainMem(void)
 {
 	boolean			allocfailed;
 	int				i,n;
@@ -2818,8 +2546,7 @@ PM_CheckMainMem(void)
 //		necessary to make requests of the Memory Mgr, PM_UnlockMainMem()
 //		needs to be called.
 //
-void
-PML_StartupMainMem(void)
+void PML_StartupMainMem(void)
 {
 	int		i,n;
 	memptr	*p;
@@ -2847,8 +2574,7 @@ PML_StartupMainMem(void)
 //	PML_ShutdownMainMem() - Frees all of the main memory blocks used by the
 //		Page Mgr.
 //
-void
-PML_ShutdownMainMem(void)
+void PML_ShutdownMainMem(void)
 {
 	int		i;
 	memptr	*p;
@@ -2868,8 +2594,7 @@ PML_ShutdownMainMem(void)
 //
 //	PML_ReadFromFile() - Reads some data in from the page file
 //
-void
-PML_ReadFromFile(byte *buf,long offset,word length)
+void PML_ReadFromFile(byte *buf,long offset,word length)
 {
 	if (!buf)
 		Quit("PML_ReadFromFile: Null pointer");
@@ -2884,8 +2609,7 @@ PML_ReadFromFile(byte *buf,long offset,word length)
 //
 //	PML_OpenPageFile() - Opens the page file and sets up the page info
 //
-void
-PML_OpenPageFile(void)
+void PML_OpenPageFile(void)
 {
 	int				i;
 	long			size;
@@ -2934,8 +2658,7 @@ PML_OpenPageFile(void)
 //
 //  PML_ClosePageFile() - Closes the page file
 //
-void
-PML_ClosePageFile(void)
+void PML_ClosePageFile(void)
 {
 	if (PageFile != -1)
 		close(PageFile);
@@ -2959,10 +2682,7 @@ PML_ClosePageFile(void)
 //  		to map our page in. If normal page, use EMS physical page 3, else
 //  		use the physical page specified by the lock type
 //
-#if 1
-#pragma argsused	// DEBUG - remove lock parameter
-memptr
-PML_GetEMSAddress(int page,PMLockType lock)
+memptr PML_GetEMSAddress(int page,PMLockType lock)
 {
 	int		i,emspage;
 	word	emsoff,emsbase,offset;
@@ -3006,20 +2726,6 @@ PML_GetEMSAddress(int page,PMLockType lock)
 	offset += emsoff * PMPageSizeSeg;
 	return((memptr)(EMSPageFrame + offset));
 }
-#else
-memptr
-PML_GetEMSAddress(int page,PMLockType lock)
-{
-	word	emspage;
-
-	emspage = (lock < pml_EMSLock)? 3 : (lock - pml_EMSLock);
-
-	PML_MapEMS(page / PMEMSSubPage,emspage);
-
-	return((memptr)(EMSPageFrame + (emspage * EMSPageSizeSeg)
-			+ ((page & (PMEMSSubPage - 1)) * PMPageSizeSeg)));
-}
-#endif
 
 //
 //	PM_GetPageAddress() - Returns the address of a given page
@@ -3027,8 +2733,7 @@ PML_GetEMSAddress(int page,PMLockType lock)
 //		Returns nil if block isn't cached into Main Memory or EMS
 //
 //
-memptr
-PM_GetPageAddress(int pagenum)
+memptr PM_GetPageAddress(int pagenum)
 {
 	PageListStruct *page;
 
@@ -3045,8 +2750,7 @@ PM_GetPageAddress(int pagenum)
 //	PML_GiveLRUPage() - Returns the page # of the least recently used
 //		present & unlocked main/EMS page (or main page if mainonly is true)
 //
-int
-PML_GiveLRUPage(boolean mainonly)
+int PML_GiveLRUPage(boolean mainonly)
 {
 	int				i,lru;
 	long			last;
@@ -3077,8 +2781,7 @@ PML_GiveLRUPage(boolean mainonly)
 //		(and present) XMS page.
 //	This routine won't return the XMS page protected (by XMSProtectPage)
 //
-int
-PML_GiveLRUXMSPage(void)
+int PML_GiveLRUXMSPage(void)
 {
 	int				i,lru;
 	long			last;
@@ -3104,8 +2807,7 @@ PML_GiveLRUXMSPage(void)
 //	PML_PutPageInXMS() - If page isn't in XMS, find LRU XMS page and replace
 //		it with the main/EMS page
 //
-void
-PML_PutPageInXMS(int pagenum)
+void PML_PutPageInXMS(int pagenum)
 {
 	int				usexms;
 	PageListStruct *page;
@@ -3134,8 +2836,7 @@ PML_PutPageInXMS(int pagenum)
 //	PML_TransferPageSpace() - A page is being replaced, so give the new page
 //		the old one's address space. Returns the address of the new page.
 //
-memptr
-PML_TransferPageSpace(int orig,int new)
+memptr PML_TransferPageSpace(int orig,int new)
 {
 	memptr			addr;
 	PageListStruct *origpage, *newpage;
@@ -3182,7 +2883,7 @@ PML_TransferPageSpace(int orig,int new)
 byte *PML_GetAPageBuffer(int pagenum,boolean mainonly)
 {
 	byte			*addr = nil;
-	int				i,n;
+ 	int				i,n;
 	PMBlockAttr		*used;
 	PageListStruct *page;
 
@@ -3230,8 +2931,7 @@ byte *PML_GetAPageBuffer(int pagenum,boolean mainonly)
 //		it won't copy over the page that we're trying to get from XMS.
 //		(pages that are being purged are copied into XMS, if possible)
 //
-memptr
-PML_GetPageFromXMS(int pagenum,boolean mainonly)
+memptr PML_GetPageFromXMS(int pagenum,boolean mainonly)
 {
 	byte			*checkaddr;
 	memptr			addr = nil;
@@ -3257,8 +2957,7 @@ PML_GetPageFromXMS(int pagenum,boolean mainonly)
 //		Load it into either main or EMS. If mainonly is true, the page will
 //		only be loaded into main.
 //
-void
-PML_LoadPage(int pagenum,boolean mainonly)
+void PML_LoadPage(int pagenum,boolean mainonly)
 {
 	byte *addr;
 	PageListStruct *page;
@@ -3274,24 +2973,12 @@ PML_LoadPage(int pagenum,boolean mainonly)
 //		Then, check XMS
 //		If not in XMS, load into Main Memory or EMS
 //
-#pragma warn -pia
-memptr
-PM_GetPage(int pagenum)
+memptr PM_GetPage(int pagenum)
 {
 	memptr	result;
 
 	if (pagenum >= ChunksInFile)
 		Quit("PM_GetPage: Invalid page request");
-
-#if 0	// for debugging
-asm	mov	dx,STATUS_REGISTER_1
-asm	in	al,dx
-asm	mov	dx,ATR_INDEX
-asm	mov	al,ATR_OVERSCAN
-asm	out	dx,al
-asm	mov	al,10	// bright green
-asm	out	dx,al
-#endif
 
 	if (!(result = PM_GetPageAddress(pagenum)))
 	{
@@ -3309,21 +2996,8 @@ if (!PMPages[pagenum].offset)	// JDC: sparse page
 	}
 	PMPages[pagenum].lastHit = PMFrameCount;
 
-#if 0	// for debugging
-asm	mov	dx,STATUS_REGISTER_1
-asm	in	al,dx
-asm	mov	dx,ATR_INDEX
-asm	mov	al,ATR_OVERSCAN
-asm	out	dx,al
-asm	mov	al,3	// blue
-asm	out	dx,al
-asm	mov	al,0x20	// normal
-asm	out	dx,al
-#endif
-
 	return(result);
 }
-#pragma warn +pia
 
 //
 //	PM_SetPageLock() - Sets the lock type on a given page
@@ -3471,8 +3145,7 @@ PM_Preload(boolean (*update)(word current,word total))
 //			we would have thrashed. If so, take us out of panic mode.
 //
 //
-void
-PM_NextFrame(void)
+void PM_NextFrame(void)
 {
 	int	i;
 

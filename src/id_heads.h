@@ -1,20 +1,14 @@
 #ifndef __ID_HEADS_H__
 #define __ID_HEADS_H__
 
-#include <alloc.h>
 #include <ctype.h>
-#include <dos.h>
 #include <errno.h>
 #include <fcntl.h>
-#include <io.h>
-#include <mem.h>
-#include <process.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <values.h>
-#include <dir.h>
 
 #include "version.h"
 
@@ -82,6 +76,8 @@ typedef	unsigned	int			word;
 typedef	unsigned	long		longword;
 typedef	byte *					Ptr;
 
+typedef void * memptr;
+
 typedef	struct
 		{
 			int	x,y;
@@ -93,9 +89,6 @@ typedef	struct
 
 #define	nil	((void *)0)
 
-
-#include "id_mm.h"
-#include "id_pm.h"
 #include "id_ca.h"
 #include "id_vl.h"
 #include "id_vh.h"
