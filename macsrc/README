@@ -1,1 +1,7 @@
 The README has not been written yet.
+
+File Organization:
+Some functions were moved to different files to account for functions which
+did not exist on some platforms, different rendering systems, etc.
+Changes from the orignal source:
+...

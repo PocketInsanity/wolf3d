@@ -10,9 +10,9 @@ CFLAGS = -g
 
 OBJS 	 = Data.o Doors.o EnMove.o EnThink.o Intro.o Level.o \
 	   Missiles.o Sounds.o PlMove.o PlStuff.o PlThink.o PushWall.o \
-	   RefBsp.o RefSprite.o Refresh.o Refresh2.o Sight.o Main.o \
+	   RefBsp.o Refresh.o Refresh2.o Sight.o Main.o \
 	   StateDef.o WolfMain.o WolfIO.o InterMis.o Burger.o stub.o res.o
-SOFTOBJS = SoftDraw.o
+SOFTOBJS = RefSprite.o SoftDraw.o
 OGLOBJS	 = GLDraw.o
 SOBJS	 = $(SOFTOBJS) $(OBJS) vi_svga.o
 XOBJS	 = $(SOFTOBJS) $(OBJS) vi_xlib.o

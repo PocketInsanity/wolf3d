@@ -219,7 +219,9 @@ void Died (void)
 	NoWeaponDraw = TRUE;			/* The weapon is not drawn */
 	PlaySound(SND_PDIE);				/* ARRRGGGHHHH!! */
 	IO_DrawFace(9);					/* Show the dead face */
-		
+
+	FlushKeys();
+			
 /* find angle to face attacker */
 
 	SrcAngle = gamestate.viewangle<<SHORTTOANGLESHIFT;		/* Get the fine current angle */

@@ -1,4 +1,5 @@
 /*
+Copyright (C) 1992-1994 Id Software, Inc.
 Copyright (C) 2000 Steven Fuller <relnev@atdot.org>
 
 This program is free software; you can redistribute it and/or
@@ -16,6 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
+
+#include <stdio.h>
+#include <stdlib.h>
 
 #include <GL/gl.h>
 #include <GL/glext.h>
@@ -50,13 +54,87 @@ void KillSmallFont(void)
 {
 }
 
-void IO_ScaleMaskedColumn(Word x,Word scale, unsigned short *sprite,Word column)
+Byte *Pal256toRGB(Byte *dat, int len, Byte *pal)
 {
-/* TODO: remove stuff from sprites */
+	Byte *buf;
+	int i;
+	
+	buf = (Byte *)malloc(len * 3);
+	
+	for (i = 0; i < len; i++) {
+		buf[i*3+0] = pal[dat[i]*3+0];
+		buf[i*3+1] = pal[dat[i]*3+1];
+		buf[i*3+2] = pal[dat[i]*3+2];
+	}
+	
+	return buf;
 }
+
+Byte *Pal256toRGBA(Byte *dat, int len, Byte *pal)
+{
+	Byte *buf;
+	int i;
+	
+	buf = (Byte *)malloc(len * 4);
+	
+	for (i = 0; i < len; i++) {
+		buf[i*4+0] = pal[dat[i]*3+0];
+		buf[i*4+1] = pal[dat[i]*3+1];
+		buf[i*4+2] = pal[dat[i]*3+2];
+	}
+	
+	return buf;
+}
+
+void DrawSprites(void)
+{
+}
+
+void DrawTopSprite(void)
+{
+}
+
+GLuint waltex[64];
 
 void InitRenderView()
 {
+	Byte *pal;
+	int i;
+	
+	glEnable(GL_TEXTURE_2D);	
+	if (waltex[0]) {
+		glDeleteTextures(64, waltex);
+		for (i = 0; i < 64; i++)
+			waltex[i] = 0;
+	}
+	
+	glGenTextures(64, waltex);
+	
+	pal = LoadAResource(rGamePal);
+	for (i = 0; i < 64; i++) {
+		Byte *buf;
+		
+		glBindTexture(GL_TEXTURE_2D, waltex[i]);
+		if (ArtData[i] == NULL) {
+			glDeleteTextures(1, &waltex[i]);
+			glEnable(GL_TEXTURE_2D);
+			waltex[i] = 0;
+			continue;
+		}
+		
+		buf = Pal256toRGB(ArtData[i], 128 * 128, pal);
+		
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 128, 128, 0, GL_RGB, GL_UNSIGNED_BYTE, buf);
+				
+		free(buf);
+	}
+	ReleaseAResource(rGamePal);
+	
 	glEnable(GL_DEPTH_TEST);
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	
@@ -65,6 +143,10 @@ void InitRenderView()
 	//glFrustum(-0.286751, 0.286751, -0.288675, 0.288675, 0.200000, 182.000000);
 	glFrustum(-0.20, 0.20, -0.288675, 0.288675, 0.200000, 182.000000);
 	//glFrustum(-0.1, 0.1, -0.1, 0.1, .50000, 182.000000);
+	
+	glFrontFace(GL_CCW);
+	glCullFace(GL_BACK);
+	glEnable(GL_CULL_FACE);
 }
 
 void StartRenderView()
@@ -77,17 +159,6 @@ void StartRenderView()
 	//glTranslatef(-(double)actors[0].x / 256.0, 0, (double)actors[0].y / 256.0);
 	glTranslatef((double)actors[0].x / 256.0, 0, (double)actors[0].y / 256.0);
 }
-
-/*
-=====================
-=
-= RenderWallRange
-=
-= Draw a wall segment between start and stop angles (inclusive) (short angles)
-= No clipping is needed
-=
-======================
-*/
 
 int WallSeen = 0;
 
@@ -121,7 +192,7 @@ typedef	struct {
 
 extern screenpost_t solidsegs[MAXSEGS], *newend;	/* newend is one past the last valid seg */
 
-void ClipWallSegment(Word top,Word bottom,saveseg_t *seg,Word distance)
+void ClipWallSegmentx(Word top, Word bottom, saveseg_t *seg)
 {
 	screenpost_t *next, *start;
 	
@@ -167,8 +238,7 @@ void ClipWallSegment(Word top,Word bottom,saveseg_t *seg,Word distance)
 	/* there is a fragment after *next*/
 	WallIsSeen(seg);
 	start->bottom = bottom;		/* adjust the clip size*/
-	
-	
+		
 /* remove start+1 to next from the clip list, because start now covers their area*/
 crunch:
 	if (next == start) {
@@ -194,7 +264,6 @@ void P_DrawSeg(saveseg_t *seg)
 	unsigned short	span, tspan;
 	unsigned short	angle1, angle2;
 	int		texslide;
-	int		distance;
 	
 	WallSeen = 0;
 	
@@ -231,46 +300,30 @@ void P_DrawSeg(saveseg_t *seg)
 	
 	switch (seg->dir&3) {	/* mask off the flags*/
 	case di_north:
-		distance = viewx - segplane;
-		if (distance <= 0) {
+		if (viewx <= segplane) {
 			return;		/* back side*/
 		}
-		rw_downside = FALSE;
-		rw_midpoint = viewy;
-		normalangle = 2*FINEANGLES/4;
 		angle1 = PointToAngle(segplane,rw_maxtex);
 		angle2 = PointToAngle(segplane,rw_mintex);
 		break;
 	case di_south:
-		distance = segplane - viewx;
-		if (distance <= 0) {
+		if (segplane <= viewx) {
 			return;		/* back side*/
 		}
-		rw_downside = TRUE;
-		rw_midpoint = viewy;
-		normalangle = 0*FINEANGLES/4;
 		angle1 = PointToAngle(segplane,rw_mintex);
 		angle2 = PointToAngle(segplane,rw_maxtex);
 		break;
 	case di_east:
-		distance = viewy - segplane;
-		if (distance <= 0) {
+		if (viewy <= segplane) {
 			return;		/* back side*/
 		}
-		rw_downside = TRUE;
-		rw_midpoint = viewx;
-		normalangle = 1*FINEANGLES/4;
 		angle1 = PointToAngle(rw_mintex,segplane);
 		angle2 = PointToAngle(rw_maxtex,segplane);
 		break;
 	case di_west:
-		distance = segplane - viewy;
-		if (distance <= 0) {
+		if (segplane <= viewy) {
 			return;		/* back side*/
 		}
-		rw_downside = FALSE;
-		rw_midpoint = viewx;
-		normalangle = 3*FINEANGLES/4;
 		angle1 = PointToAngle(rw_maxtex,segplane);
 		angle2 = PointToAngle(rw_mintex,segplane);
 		break;
@@ -303,70 +356,79 @@ void P_DrawSeg(saveseg_t *seg)
 		angle2 = -clipshortangle;
 	}
 
-/* calc center angle for texture mapping*/
-
-	rw_centerangle = (centerangle-normalangle)&FINEMASK;
-	if (rw_centerangle > (FINEANGLES/2)) {
-		rw_centerangle -= FINEANGLES;
-	}
-	rw_centerangle += FINEANGLES/4;
-	
-	rw_midpoint -= texslide;
-	rw_mintex -= texslide;
-	
 	angle1 += ANGLE180;		/* adjust so angles are unsigned*/
 	angle2 += ANGLE180;
-	ClipWallSegment(angle1, angle2,seg,distance);
+	ClipWallSegmentx(angle1, angle2, seg);
 	
 	if (WallSeen) P_DrawSegx(seg);
 }
 
 void P_DrawSegx(saveseg_t *seg)
 {
-/*
-	if (seg->dir & DIR_DISABLEDFLAG) {
-		return;
-	}
+	GLfloat min, max;
+	Byte *tex;
+	int i, t;
 	
-	seg->dir |= DIR_SEENFLAG;
-	areavis[seg->area] = 1;
-*/		
+	tex = &textures[seg->texture][0];
+	
+	if (waltex[i]) 
+		glBindTexture(GL_TEXTURE_2D, waltex[i]);
+	else
+		fprintf(stderr, "ERROR: 0 texture in P_DrawSegx!\n");
+	
+	max = (seg->max - seg->min) / 2.0f;
+	/*
+	i = seg->min;
+	min = (float)i - seg->min;
+	*/
+	if (seg->min & 1)
+		min = -0.5f;
+	else
+		min = 0.0f;
+	
+	for (i = seg->min >> 1; i < (seg->max >> 1); i++) {
+	
+	t = tex[i];
+	
+	if (waltex[t]) 
+		glBindTexture(GL_TEXTURE_2D, waltex[t]);
+	else
+		fprintf(stderr, "ERROR: 0 texture in P_DrawSegx!\n");	
+	
+	if (seg->min & 1)
+		min = 0.5f;
+	else
+		min = 0.0f;
+	max = 1.0f;
+	
+	glBegin(GL_QUADS);
 	switch(seg->dir&3) {
 	case di_north:
-		glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
-		glBegin(GL_QUADS);
-		glVertex3f(-(seg->plane)/2.0, -1, -(seg->min)/2.0); 
-		glVertex3f(-(seg->plane)/2.0,  1, -(seg->min)/2.0);
-		glVertex3f(-(seg->plane)/2.0,  1, -(seg->max)/2.0);
-		glVertex3f(-(seg->plane)/2.0, -1, -(seg->max)/2.0);
-		glEnd();
+		glTexCoord2f(min, 0.0); glVertex3f(-(seg->plane)/2.0, -1, -min); 
+		glTexCoord2f(min, 1.0); glVertex3f(-(seg->plane)/2.0,  1, -min);
+		glTexCoord2f(max, 1.0); glVertex3f(-(seg->plane)/2.0,  1, -max);
+		glTexCoord2f(max, 0.0); glVertex3f(-(seg->plane)/2.0, -1, -max);
 		break;
 	case di_south:
-		glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
-		glBegin(GL_QUADS);
-		glVertex3f(-(seg->plane)/2.0, -1, -(seg->min)/2.0); 
-		glVertex3f(-(seg->plane)/2.0,  1, -(seg->min)/2.0);
-		glVertex3f(-(seg->plane)/2.0,  1, -(seg->max)/2.0);
-		glVertex3f(-(seg->plane)/2.0, -1, -(seg->max)/2.0);
-		glEnd();
+		glTexCoord2f(min, 0.0); glVertex3f(-(seg->plane)/2.0, -1, -(seg->max)/2.0); 
+		glTexCoord2f(min, 1.0); glVertex3f(-(seg->plane)/2.0,  1, -(seg->max)/2.0);
+		glTexCoord2f(max, 1.0); glVertex3f(-(seg->plane)/2.0,  1, -(seg->min)/2.0);
+		glTexCoord2f(max, 0.0); glVertex3f(-(seg->plane)/2.0, -1, -(seg->min)/2.0);
 		break;
 	case di_east:
-		glColor4f(0.0f, 0.0f, 1.0f, 1.0f);
-		glBegin(GL_QUADS);
-		glVertex3f(-(seg->min)/2.0, -1, -(seg->plane)/2.0); 
-		glVertex3f(-(seg->min)/2.0,  1, -(seg->plane)/2.0);
-		glVertex3f(-(seg->max)/2.0,  1, -(seg->plane)/2.0);
-		glVertex3f(-(seg->max)/2.0, -1, -(seg->plane)/2.0);
-		glEnd();
+		glTexCoord2f(min, 0.0); glVertex3f(-(seg->max)/2.0, -1, -(seg->plane)/2.0); 
+		glTexCoord2f(min, 1.0); glVertex3f(-(seg->max)/2.0,  1, -(seg->plane)/2.0);
+	 	glTexCoord2f(max, 1.0); glVertex3f(-(seg->min)/2.0,  1, -(seg->plane)/2.0);
+		glTexCoord2f(max, 0.0); glVertex3f(-(seg->min)/2.0, -1, -(seg->plane)/2.0);
 		break;
 	case di_west:
-		glColor4f(1.0f, 0.0f, 1.0f, 1.0f);
-		glBegin(GL_QUADS);
-		glVertex3f(-(seg->min)/2.0, -1, -(seg->plane)/2.0); 
-		glVertex3f(-(seg->min)/2.0,  1, -(seg->plane)/2.0);
-		glVertex3f(-(seg->max)/2.0,  1, -(seg->plane)/2.0);
-		glVertex3f(-(seg->max)/2.0, -1, -(seg->plane)/2.0);
-		glEnd();
+		glTexCoord2f(min, 0.0); glVertex3f(-(seg->min)/2.0, -1, -(seg->plane)/2.0); 
+		glTexCoord2f(min, 1.0); glVertex3f(-(seg->min)/2.0,  1, -(seg->plane)/2.0);
+		glTexCoord2f(max, 1.0); glVertex3f(-(seg->max)/2.0,  1, -(seg->plane)/2.0);
+		glTexCoord2f(max, 0.0); glVertex3f(-(seg->max)/2.0, -1, -(seg->plane)/2.0);
 		break;	
-	}	
+	}
+	glEnd();	
+	
+	}
 }
