@@ -2522,9 +2522,6 @@ void DrawOutline(int x,int y,int w,int h,int color1,int color2)
 ////////////////////////////////////////////////////////////////////
 void SetupControlPanel()
 {
-#ifdef DOSISM /* DOS VERSION */
-#ifdef HAVE_FFBLK
-	struct ffblk f;
 	int which;
 
 	//
@@ -2549,6 +2546,9 @@ void SetupControlPanel()
 	//
 	// SEE WHICH SAVE GAME FILES ARE AVAILABLE & READ STRING IN
 	//
+{
+#if defined(HAVE_FFBLK)
+	struct ffblk f;
 	
 	if (!findfirst(SaveNaame,&f,0))
 		do
@@ -2564,34 +2564,10 @@ void SetupControlPanel()
 				}
 			}
 		} while(!findnext(&f));
-#else 
+#elif defined(HAVE_FINDDATA)
 	struct _finddata_t f;
-	int which;
 	long hand;
 
-	//
-	// CACHE GRAPHICS & SOUNDS
-	//
-	CA_CacheGrChunk(STARTFONT+1);
-#ifndef SPEAR
-	CacheLump(CONTROLS_LUMP_START,CONTROLS_LUMP_END);
-#else
-	CacheLump(BACKDROP_LUMP_START,BACKDROP_LUMP_END);
-#endif
-
-	SETFONTCOLOR(TEXTCOLOR,BKGDCOLOR);
-	fontnumber=1;
-	WindowH=200;
-
-	if (!ingame)
-		CA_LoadAllSounds();
-	else
-		MainMenu[savegame].active=1;
-
-	//
-	// SEE WHICH SAVE GAME FILES ARE AVAILABLE & READ STRING IN
-	//
-	
 	if ((hand = _findfirst(SaveName, &f)) != -1)
 		do
 		{
@@ -2606,28 +2582,9 @@ void SetupControlPanel()
 				}
 			}
 		} while(_findnext(hand, &f) != -1);
-#endif
-
 #else
-
 	glob_t globbuf;
-	int which, x;
-	
-	CA_CacheGrChunk(STARTFONT+1);
-#ifndef SPEAR
-	CacheLump(CONTROLS_LUMP_START, CONTROLS_LUMP_END);
-#else
-	CacheLump(BACKDROP_LUMP_START, BACKDROP_LUMP_END);
-#endif
-
-	SETFONTCOLOR(TEXTCOLOR, BKGDCOLOR);
-	fontnumber = 1;
-	WindowH = 200;
-	
-	if (!ingame)
-		CA_LoadAllSounds();
-	else
-		MainMenu[savegame].active = 1;
+	int x;
 	
 	if (glob(SaveName, 0, NULL, &globbuf))
 		return;
@@ -2643,8 +2600,11 @@ void SetupControlPanel()
 			}
 		}
 	}
+
 	globfree(&globbuf);
 #endif
+}
+
 }
 
 
@@ -3224,8 +3184,7 @@ void ShootSnd()
 ///////////////////////////////////////////////////////////////////////////
 void CheckForEpisodes()
 {
-#ifdef DOSISM /* DOS VERSION */
-#ifdef HAVE_FFBLK
+#if defined(HAVE_FFBLK)
 	struct ffblk f;
 //
 // ENGLISH
@@ -3273,13 +3232,10 @@ void CheckForEpisodes()
 	if (!findfirst("*.wl1",&f,FA_ARCH)) {
 		strcpy(extension, "wl1");
 	} else
-		Quit("NO WOLFENSTEIN 3-D DATA FILES to be found!");
+		Quit("NO WOLFENSTEIN 3-D DATA FILES TO BE FOUND!");
 #endif /* SPEAR */
 
-	strcat(configname, extension);
-	strcat(SaveName, extension);
-
-#else
+#elif defined(HAVE_FINDDATA)
 
 	struct _finddata_t f;
 
@@ -3329,12 +3285,8 @@ void CheckForEpisodes()
 	if (_findfirst("*.wl1",&f) != -1) {
 		strcpy(extension, "wl1");
 	} else
-		Quit("NO WOLFENSTEIN 3-D DATA FILES to be found!");
+		Quit("NO WOLFENSTEIN 3-D DATA FILES TO BE FOUND!");
 #endif /* SPEAR */
-
-	strcat(configname, extension);
-	strcat(SaveName, extension);
-#endif
 
 #else
 	glob_t globbuf;
@@ -3382,13 +3334,12 @@ void CheckForEpisodes()
 	if (glob("*.wl1", 0, NULL, &globbuf) == 0) {
 		strcpy(extension, "wl1");
 	} else
-		Quit("NO WOLFENSTEIN 3-D DATA FILES to be found!");
+		Quit("NO WOLFENSTEIN 3-D DATA FILES TO BE FOUND!");
 #endif /* SPEAR */
 
-	strcat(configname, extension);
-	strcat(SaveName, extension);
-	
 	globfree(&globbuf);
 #endif
 
+	strcat(configname, extension);
+	strcat(SaveName, extension);
 }
