@@ -8,6 +8,13 @@
 #define FALSE 0
 #endif
 
+typedef struct {
+	int left;
+	int top;
+	int right;
+	int bottom;
+} Rect;
+
 /* an angle_t occupies an entire 16 bits so wraparound is automatically handled */
 
 #define	SHORTTOANGLESHIFT	7	/* 0x10000 to ANGLES */

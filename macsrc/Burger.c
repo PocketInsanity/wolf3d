@@ -6,304 +6,10 @@
 
 **********************************/
 
-#include "WolfDef.h"		/* Get the prototypes */
+#include "wolfdef.h"		/* Get the prototypes */
 #include <string.h>
-#include <sound.h>
 #include <stdio.h>
-#include <palettes.h>
-#include "SoundMusicSystem.h"
-#include "PickAMonitor.h"
 
-/**********************************
-
-	Variables used by my global library
-
-**********************************/
-
-Word DoEvent(EventRecord *event);
-void DoMacEvents(void);
-void BlastScreen(void);
-static Word FreeStage(Word Stage,LongWord Size);
-
-extern Boolean MouseHit;		/* True if a mouse down event occured */
-Word NoSystemMem;
-unsigned char *VideoPointer;	/* Pointer to video memory */
-extern Word QuitFlag;			/* Did the application quit? */
-Word VideoWidth;				/* Width to each video scan line */
-Word SystemState=3;				/* Sound on/off flags */
-Word KilledSong;				/* Song that's currently playing */
-Word KeyModifiers;				/* Keyboard modifier flags */
-LongWord LastTick;				/* Last system tick (60hz) */
-Word FontX;						/* X Coord of font */
-Word FontY;						/* Y Coord of font */
-unsigned char *FontPtr;			/* Pointer to font image data */
-unsigned char *FontWidths;		/* Pointer to font width table */
-Word FontHeight;				/* Point size of current font */
-Word FontLast;					/* Number of font entries */
-Word FontFirst;					/* ASCII value of first char */
-Word FontLoaded;				/* Rez number of loaded font (0 if none) */
-Word FontInvisible;				/* Allow masking? */
-unsigned char FontOrMask[16];	/* Colors for font */
-LongWord YTable[480];			/* Offsets to the screen */
-SndChannelPtr myPaddleSndChan;	/* Sound channel */
-Word ScanCode;
-CWindowPtr GameWindow;
-CGrafPtr GameGWorld;
-extern GDHandle gMainGDH;
-extern CTabHandle MainColorHandle;
-extern Boolean DoQuickDraw;
-
-/**********************************
-
-	Wait a single system tick
-
-**********************************/
-
-static Word QuickTicker;
-
-void DoMacEvents(void)
-{
-	EventRecord MyEvent;
-	if (!DoQuickDraw) {
-		if ((ReadTick() - QuickTicker) < 30) {
-			return;
-		}
-		QuickTicker = ReadTick();
-	}
-	PurgeAllSounds(85000);		/* Try to keep some memory free */
-	if (WaitNextEvent2(updateMask|diskMask|driverMask|networkMask|activMask|app4Mask,&MyEvent,0,0)) {
-		DoEvent(&MyEvent);
-	}
-}
-
-/**********************************
-
-	Wait a single system tick
-
-**********************************/
-
-void WaitTick(void)
-{
-	do {
-		DoMacEvents();			/* Allow backgrounding */
-	} while (ReadTick()==LastTick);	/* Tick changed? */
-	LastTick=ReadTick();		/* Save it */
-}
-
-/**********************************
-
-	Wait a specific number of system ticks
-	from a time mark before you get control
-
-**********************************/
-
-void WaitTicks(Word Count)
-{
-	LongWord TickMark;		/* Temp tick mark */
-	
-	do {
-		DoMacEvents();		/* Allow other tasks to execute */
-		TickMark = ReadTick();	/* Get the mark */
-	} while ((TickMark-LastTick)<=Count);	/* Time up? */
-	LastTick = TickMark;	/* Save the new time mark */
-}
-
-/**********************************
-
-	Get the current system tick
-
-**********************************/
-
-LongWord ReadTick(void)
-{
-	return(TickCount());	/* Just get it from the Mac OS */
-}
-
-/**********************************
-
-	Wait for a mouse/keyboard event
-
-**********************************/
-
-Word WaitEvent(void)
-{
-	Word Temp;
-	do {
-		Temp = WaitTicksEvent(6000);	/* Wait 10 minutes */
-	} while (!Temp);	/* No event? */
-	return Temp;		/* Return the event code */
-}
-
-/**********************************
-
-	Wait for an event or a timeout
-
-**********************************/
-
-Word WaitTicksEvent(Word Time)
-{
-	LongWord TickMark;
-	LongWord NewMark;
-	Word RetVal;
-
-	MouseHit = FALSE;
-	TickMark = ReadTick();	/* Get the initial time mark */
-	for (;;) {
-		DoMacEvents();		/* Allow other tasks a shot! */
-		NewMark = ReadTick();		/* Get the new time mark */
-		if (Time) {
-			if ((NewMark-TickMark)>=Time) {	/* Time up? */
-				RetVal = 0;	/* Return timeout */
-				break;
-			}
-		}
-		RetVal = GetAKey();
-		if (RetVal) {
-			break;
-		}
-		if (MouseHit) {
-			RetVal = 1;		/* Hit the mouse */
-			break;
-		}
-	}
-	LastTick = NewMark;
-	return RetVal;
-}
-
-/**********************************
-
-	Get a key from the keyboard
-
-**********************************/
-
-Word GetAKey(void)
-{
-	EventRecord MyRecord;
-
-	if (WaitNextEvent2(everyEvent,&MyRecord,0,0)) {
-		if (!DoEvent(&MyRecord)) {
-			KeyModifiers = MyRecord.modifiers;
-			return 0;
-		}
-		return FixMacKey(&MyRecord);
-	}
-	return 0;
-}
-
-/**********************************
-
-	Check if all keys are released
-
-**********************************/
-
-Word WaitKey(void)
-{
-	Word Key;
-	do {
-		Key = GetAKey();
-	} while (!Key);
-	return (Key);
-}
-
-/**********************************
-
-	Check if all keys are released
-
-**********************************/
-
-Word AllKeysUp(void)
-{
-	KeyMap KeyArray;
-
-	GetKeys(KeyArray);
-	if (KeyArray[0] || KeyArray[1] || KeyArray[2] || KeyArray[3]) {
-		return 0;
-	}
-	return 1;
-}
-
-Word FixMacKey(EventRecord *Event)
-{
-	Word NewKey;
-	NewKey = Event->message & 0xff;
-	ScanCode = (Event->message>>8) & 0xff;
-	switch (NewKey) {
-	case 0x1c :
-		NewKey = 0x08;
-		break;
-	case 0x1d :
-		NewKey = 0x15;
-		break;
-	case 0x1e :
-		NewKey = 0x0b;
-		break;
-	case 0x1f :
-		NewKey = 0x0a;
-		break;
-	}
-	KeyModifiers = Event->modifiers;
-	if (NewKey == 'Q' || NewKey == 'q') {
-		if (KeyModifiers & cmdKey) {
-			QuitFlag = 1;
-		}
-	}
-	return NewKey;
-}	
-			
-/**********************************
-
-	Flush out the keyboard buffer
-
-**********************************/
-
-void FlushKeys(void)
-{
-	while (GetAKey()) {}
-}
-
-/**********************************
-
-	Convert a long value into a ascii string
-
-**********************************/
-
-static LongWord Tens[] = {
-	1,
-	10,
-	100,
-	1000,
-	10000,
-	100000,
-	1000000,
-	10000000,
-	100000000,
-	1000000000};
-
-void ultoa(LongWord Val,char *Text)
-{
-	Word Index;		/* Index to Tens table */
-	Word Hit;		/* Printing? */
-	Word Letter;	/* Letter to print */
-	LongWord LongVal;	/* Tens value */
-
-	Index = 9;		/* Start at the millions */
-	Hit = 0;		/* Didn't print anything yet! */
-	do {
-		Letter = '0';	/* Init the char */
-		LongVal = Tens[Index];	/* Init the value into a local */
-		while (Val >= LongVal) {	/* Is the number in question larger? */
-			Val -= LongVal;		/* Sub the tens value */
-			++Letter;			/* Inc the char */
-			Hit=1;				/* I must draw! */
-		}
-		if (Hit) {	/* Remove the leading zeros */
-			Text[0] = Letter;	/* Save char in the string */
-			++Text;			/* Inc dest */
-		}
-	} while (--Index);		/* All the tens done? */
-	Text[0] = Val + '0';	/* Must print FINAL digit */
-	Text[1] = 0;			/* End the string */
-}
 
 /**********************************
 
@@ -931,24 +637,8 @@ void *LoadAResource(Word RezNum)
 
 **********************************/
 
-Handle RezHandle;
-
 void *LoadAResource2(Word RezNum,LongWord Type)
 {
-	Handle MyHand;
-	Word Stage;
-	
-	Stage = 0;
-	do {
-		Stage = FreeStage(Stage,128000);
-		MyHand = GetResource(Type,RezNum);
-		if (MyHand) {
-			RezHandle = MyHand;
-			HLock(MyHand);
-			return *MyHand;
-		}
-	} while (Stage);
-	return 0;
 }
 
 /**********************************
@@ -970,11 +660,6 @@ void ReleaseAResource(Word RezNum)
 
 void ReleaseAResource2(Word RezNum,LongWord Type)
 {
-	Handle MyHand;
-	
-	MyHand = GetResource(Type,RezNum);	/* Get the resource if available */
-	HUnlock(MyHand);	
-	HPurge(MyHand);			/* Mark handle as purgeable */
 }
 
 /**********************************
@@ -996,9 +681,6 @@ void KillAResource(Word RezNum)
 
 void KillAResource2(Word RezNum,LongWord Type)
 {
-	Handle MyHand;
-	MyHand = GetResource(Type,RezNum);	/* Get the resource if available */
-	ReleaseResource(MyHand);
 }
 
 void SaveJunk(void *AckPtr,Word Length)
@@ -1030,7 +712,6 @@ unsigned short SwapUShort(unsigned short Val)
 
 **********************************/
 
-#if 1
 void DLZSS(Byte *Dest,Byte *Src,LongWord Length)
 {
 	Word BitBucket;
@@ -1071,7 +752,6 @@ void DLZSS(Byte *Dest,Byte *Src,LongWord Length)
 		}
 	} while (Length);
 }
-#endif
 
 /**********************************
 
@@ -1081,21 +761,7 @@ void DLZSS(Byte *Dest,Byte *Src,LongWord Length)
 
 void *AllocSomeMem(LongWord Size)
 {
-	void *MemPtr;
-	Word Stage;
-	
-	Stage = 0;
-	do {
-		Stage = FreeStage(Stage,Size);
-		MemPtr = NewPtr(Size);		/* Get some memory */
-		if (MemPtr) {
-			return MemPtr;			/* Return it */
-		}
-	} while (Stage);
-	if (!NoSystemMem) {
-		MemPtr = NewPtrSys(Size);
-	}
-	return MemPtr;
+	return (void *)malloc(Size);
 }
 
 /**********************************
@@ -1133,5 +799,5 @@ static Word FreeStage(Word Stage,LongWord Size)
 
 void FreeSomeMem(void *MemPtr)
 {
-	DisposePtr(MemPtr);
+	free(MemPtr);
 }

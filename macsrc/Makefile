@@ -9,7 +9,7 @@ CFLAGS = -g
 OBJS =  Data.o Doors.o EnMove.o EnThink.o Intro.o Level.o \
 	Missiles.o Music.o PlMove.o PlStuff.o PlThink.o PushWall.o \
 	RefBsp.o RefSprite.o Refresh.o Refresh2.o Sight.o Main.o \
-	StateDef.o WolfMain.o WolfIO.o InterMis.o
+	StateDef.o WolfMain.o WolfIO.o InterMis.o Burger.o
 SOBJS = $(OBJS) 
 XOBJS = $(OBJS)
 GOBJS = $(OBJS)
