@@ -15,3 +15,7 @@ to it...
 * menu type stuff in svgalib version (would use the Fx keys to save game
 etc, text menus for options?)
 * when saving/loading games, run them through htons/etc.
+* added an 'and' hack to lines 33 and 50 in RefBsp.c  Not sure if this causes
+any problems (value was overflowing finetangent...)
+
+* forget about major svgalib support?

@@ -30,7 +30,7 @@ void RenderWallLoop(Word x1,Word x2,Word distance)
 		while (x1 < x2) {		/* Time to draw? */
 			scaler = rw_scale >> FRACBITS;		/* Get the draw scale */
 			xscale[x1] = scaler;		/* Save the scale factor */
-			angle = xtoviewangle[x1]+rw_centerangle;
+			angle = (xtoviewangle[x1]+rw_centerangle)&4095;/* TODO: for some reason i had to add this */
 			texturecolumn = rw_midpoint - SUFixedMul(finetangent[angle],distance);	/* Which texture to use? */	
 			if ((Word)texturecolumn < rw_mintex) {
 				texturecolumn = rw_mintex;
@@ -47,7 +47,7 @@ void RenderWallLoop(Word x1,Word x2,Word distance)
 	while (x1 < x2) {		/* Time to draw? */
 		scaler = rw_scale >> FRACBITS;		/* Get the draw scale */
 		xscale[x1] = scaler;		/* Save the scale factor */
-		angle = xtoviewangle[x1]+rw_centerangle;
+		angle = (xtoviewangle[x1]+rw_centerangle)&4095; /* TODO: same as above */
 		texturecolumn = SUFixedMul(finetangent[angle],distance)+rw_midpoint;	/* Which texture to use? */
 		if ((Word)texturecolumn < rw_mintex) {
 			texturecolumn = rw_mintex;
@@ -322,7 +322,7 @@ void P_DrawSeg (saveseg_t *seg)
 /* calc center angle for texture mapping*/
 
 	rw_centerangle = (centerangle-normalangle)&FINEMASK;
-	if (rw_centerangle > FINEANGLES/2) {
+	if (rw_centerangle > (FINEANGLES/2)) {
 		rw_centerangle -= FINEANGLES;
 	}
 	rw_centerangle += FINEANGLES/4;

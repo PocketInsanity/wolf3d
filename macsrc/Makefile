@@ -4,8 +4,8 @@ CC = gcc
 #CFLAGS = -g -Wall -O6 -fomit-frame-pointer -ffast-math -funroll-loops -mpentiumpro -mcpu=pentiumpro -march=pentiumpro 
 #CFLAGS = -g -Wall
 #CFLAGS = -g -DNOVGA
-#CFLAGS = -g
-CFLAGS = -Os -g
+CFLAGS = -g
+#CFLAGS = -Os -g
 #CFLAGS = -g -Wall -I/home/relnev/cvs/oal/include
 
 OBJS =  Data.o Doors.o EnMove.o EnThink.o Intro.o Level.o \
@@ -13,15 +13,17 @@ OBJS =  Data.o Doors.o EnMove.o EnThink.o Intro.o Level.o \
 	RefBsp.o RefSprite.o Refresh.o Refresh2.o Sight.o Main.o \
 	StateDef.o WolfMain.o WolfIO.o InterMis.o Burger.o stub.o res.o
 SOBJS = $(OBJS) vi_svga.o
-XOBJS = $(OBJS)
+XOBJS = $(OBJS) vi_xlib.o
 GOBJS = $(OBJS)
 
 LFLAGS = -lm 
 #LFLAGS = -lm -L/home/relnev/cvs/oal/linux/src -lopenal -lpthread -ldl
+#LFLAGS = -lm /home/relnev/ElectricFence-2.1/libefence.a
 #LFLAGS = -lm /home/relnev/ElectricFence-2.2.2/libefence.a -lpthread
 
 SLFLAGS = $(LFLAGS) -lvga
-XLFLAGS = $(LFLAGS) -L/usr/X11R6/lib -lX11 -lXext -lXxf86vm -lXxf86dga
+#XLFLAGS = $(LFLAGS) -L/usr/X11R6/lib -lX11 -lXext -lXxf86vm -lXxf86dga
+XLFLAGS = $(LFLAGS) -L/usr/X11R6/lib -lX11
 GLFLAGS = $(LFLAGS) -L/usr/X11R6/lib -lX11 -lXext -lGL
 
 NASM = nasm
@@ -29,7 +31,7 @@ NASM = nasm
 .SUFFIXES: .asm
 
 #all:	swolf3d xwolf3d gwolf3d
-all:	swolf3d
+all:	swolf3d xwolf3d
 
 $(SOBJS): Sounds.h  Sprites.h  States.h  Wolf.h  burger.h  wolfdef.h
 $(XOBJS): Sounds.h  Sprites.h  States.h  Wolf.h  burger.h  wolfdef.h

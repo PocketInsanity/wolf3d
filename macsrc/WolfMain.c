@@ -285,7 +285,7 @@ void UpdateFace(void)
 	
 **********************************/
 
-void PrepPlayLoop (void)
+void PrepPlayLoop()
 {
 	StartSong(SongListPtr[gamestate.mapon+2]);	/* start music */
 	if (!SetupGameLevel()) {	/* Load the game map */
@@ -293,6 +293,7 @@ void PrepPlayLoop (void)
 		ReleaseScalers();		/* Release the compiled scalers */
 		PlaySong(0);
 		while (!SetupGameLevel()) {	/* Try loading it again */
+			printf("SetGameLevel returned 0...\n");
 Again:
 			ReleaseMap();		/* Oh oh... */
 			if (!GameViewSize) {	/* Smallest screen? */
@@ -303,6 +304,7 @@ Again:
 		}
 	}
 	if (!StartupRendering(GameViewSize)) {
+		printf("StartupRendering returned 0...\n");
 		ReleaseScalers();
 		goto Again;
 	}
