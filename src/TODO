@@ -77,3 +77,33 @@ at a time
 possible to calculate the sound lengths in terms of 70Hz (adlib sound len / 2, 
 pcm sound len / 100).
 ------------------------------------------------------------------------------
+Save game header:
+8 bytes: WOLF3D, 0, 0
+4 bytes: SAV, 0
+4 bytes: version (integer)
+4 bytes: game type (WL1, WL6, SDM, SOD)
+4 bytes: seconds past 1970 (time(NULL))
+4 bytes: padding
+4 bytes: checksum for the data (after text string)
+32 bytes: text string
+
+< data follows >
+
+---
+
+Config header:
+8 bytes: WOLF3D, 0, 0
+4 bytes: CFG, 0
+4 bytes: version (integer)
+4 bytes: game type (WL1, WL6, SDM, SOD)
+4 bytes: seconds past 1970 (time(NULL))
+4 bytes: padding
+4 bytes: checksum for the data
+
+Version 0xFFFFFFFF Data: (Unofficial Config data)
+<see wl_main.c>
+
+Version 0x00000000 Data: (Official)
+<undetermined>
+
+------------------------------------------------------------------------------

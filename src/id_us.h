@@ -7,9 +7,9 @@
 #define	MaxHighName	57
 #define	MaxScores	7
 typedef	struct {
-	char	name[MaxHighName + 1];
-	long	score;
-	word	completed,episode;
+	char name[MaxHighName + 1];
+	int score;
+	int completed, episode;
 } HighScore;
 
 #define	MaxString	128	// Maximum input string size

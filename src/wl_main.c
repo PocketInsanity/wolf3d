@@ -101,117 +101,7 @@ void CalcTics()
 
 /* ======================================================================== */
 
-#if 0
-/*
-====================
-=
-= ReadConfig
-=
-====================
-*/
-
-void ReadConfig()
-{
-	SDMode sd;
-	SMMode sm;
-	SDSMode sds;
-
-	int file;
-	
-	if ((file = open(configname, O_BINARY | O_RDONLY)) != -1)
-	{
-	//
-	// valid config file
-	//
-		read(file,Scores,sizeof(HighScore) * MaxScores);
-
-		read(file,&sd,sizeof(sd));
-		read(file,&sm,sizeof(sm));
-		read(file,&sds,sizeof(sds));
-
-		read(file,&mouseenabled,sizeof(mouseenabled));
-		read(file,&joystickenabled,sizeof(joystickenabled));
-		read(file,&joypadenabled,sizeof(joypadenabled));
-		read(file,&joystickport,sizeof(joystickport));
-
-		read(file,&dirscan,sizeof(dirscan));
-		read(file,&buttonscan,sizeof(buttonscan));
-		read(file,&buttonmouse,sizeof(buttonmouse));
-		read(file,&buttonjoy,sizeof(buttonjoy));
-
-		read(file,&viewsize,sizeof(viewsize));
-		read(file,&mouseadjustment,sizeof(mouseadjustment));
-
-		close(file);
-
-		MainMenu[6].active=1;
-		MainItems.curpos=0;
-	}	
-	else
-	{
-	//
-	// no config file, so select by hardware
-	//
-		viewsize = 15;
-	}
-	
-	mouseenabled = false;
-
-	joystickenabled = false;
-	joypadenabled = false;
-	joystickport = 0;
-
-	mouseadjustment = 5;
-
-	SD_SetMusicMode(smm_AdLib);
-	SD_SetSoundMode(sdm_AdLib);
-	SD_SetDigiDevice(sds_SoundBlaster);
-}
-
-
-/*
-====================
-=
-= WriteConfig
-=
-====================
-*/
-
-void WriteConfig()
-{
-	int file;
-
-	file = open(configname, O_CREAT | O_BINARY | O_WRONLY,
-				S_IREAD | S_IWRITE | S_IFREG);
-
-	if (file != -1)
-	{
-		write(file,Scores,sizeof(HighScore) * MaxScores);
-
-		write(file,&SoundMode,sizeof(SoundMode));
-		write(file,&MusicMode,sizeof(MusicMode));
-		write(file,&DigiMode,sizeof(DigiMode));
-
-		write(file,&mouseenabled,sizeof(mouseenabled));
-		write(file,&joystickenabled,sizeof(joystickenabled));
-		write(file,&joypadenabled,sizeof(joypadenabled));
-		write(file,&joystickport,sizeof(joystickport));
-
-		write(file,&dirscan,sizeof(dirscan));
-		write(file,&buttonscan,sizeof(buttonscan));
-		write(file,&buttonmouse,sizeof(buttonmouse));
-		write(file,&buttonjoy,sizeof(buttonjoy));
-
-		write(file,&viewsize,sizeof(viewsize));
-		write(file,&mouseadjustment,sizeof(mouseadjustment));
-
-		close(file);
-	}
-}
-
-#endif
-
-void DiskFlopAnim(int x, int y)
+static void DiskFlopAnim(int x, int y)
 {
 	static char which = 0;
 	
@@ -224,47 +114,133 @@ void DiskFlopAnim(int x, int y)
 	which ^= 1;
 }
 
-long DoChecksum(byte *source, unsigned size, long checksum)
+static int32_t CalcFileChecksum(int fd, int len)
 {
+	int32_t cs;
 	int i;
-
-	for (i = 0; i < size-1; i++)
-		checksum += source[i]^source[i+1];
-
-	return checksum;
+	int8_t c1, c2;
+	
+	c1 = ReadInt8(fd);
+	cs = 0;
+	for (i = 0; i < len - 1; i++) {
+		c2 = ReadInt8(fd);
+		cs += c1 ^ c2;
+		c1 = c2;
+	}
+	return cs;
 }
 
 int WriteConfig()
 {
+	int i;
 	int fd;
+	int32_t cs;
 	
 	fd = OpenWrite(configname);
 	
 	if (fd != -1) {
+		WriteBytes(fd, (byte *)GAMEHDR, 8);	/* WOLF3D, 0, 0 */
+		WriteBytes(fd, (byte *)CFGTYPE, 4);	/* CFG, 0 */
+	/**/	WriteInt32(fd, 0xFFFFFFFF);		/* Version (integer) */
+		WriteBytes(fd, (byte *)GAMETYPE, 4);	/* XXX, 0 */
+		WriteInt32(fd, time(NULL));		/* Time */
+		WriteInt32(fd, 0x00000000);		/* Padding */
+		WriteInt32(fd, 0x00000000);		/* Checksum (placeholder) */
+	
+		for (i = 0; i < 7; i++) { /* MaxScores = 7 */
+			WriteBytes(fd, (byte *)Scores[i].name, 58);
+			WriteInt32(fd, Scores[i].score);
+			WriteInt32(fd, Scores[i].completed);
+			WriteInt32(fd, Scores[i].episode);
+		}
+		
+		WriteInt32(fd, viewsize);
+
+		CloseWrite(fd);
+		
+		fd = OpenRead(configname);
+		ReadSeek(fd, 32, SEEK_SET);
+		cs = CalcFileChecksum(fd, ReadLength(fd) - 32);
+		CloseRead(fd);
+		
+		fd = OpenWriteAppend(configname);
+		WriteSeek(fd, 28, SEEK_SET);
+		WriteInt32(fd, cs);
+		
 		CloseWrite(fd);
 	}
 	
 	return 0;
 }
 
+static void SetDefaults()
+{
+	viewsize = 15;
+}
+
 int ReadConfig()
 {
-	int fd;
+	int fd, configokay;
+	char buf[8];
+	int32_t v;
+	int i;
+	
+	configokay = 0;
 	
 	fd = OpenRead(configname);
 	
 	if (fd != -1) {
-		CloseRead(fd);
-
+		ReadBytes(fd, (byte *)buf, 8);
+		if (strncmp(buf, GAMEHDR, 8))
+			goto configend;
+		
+		ReadBytes(fd, (byte *)buf, 4);
+		if (strncmp(buf, CFGTYPE, 4))
+			goto configend;
+		
+		v = ReadInt32(fd);
+	/**/	if (v != 0xFFFFFFFF)
+			goto configend;
+		
+		ReadBytes(fd, (byte *)buf, 4);
+		if (strncmp(buf, GAMETYPE, 4))
+			goto configend;
+		
+		ReadInt32(fd);	/* skip over time */
+		ReadInt32(fd);	/* skip over padding */
+		
+		v = ReadInt32(fd);	/* get checksum */
+		if (v != CalcFileChecksum(fd, ReadLength(fd) - 32))
+			goto configend;
+		
+		ReadSeek(fd, 32, SEEK_SET);
+		
+		for (i = 0; i < 7; i++) { /* MaxScores = 7 */
+			ReadBytes(fd, (byte *)Scores[i].name, 58);
+			Scores[i].score = ReadInt32(fd);
+			Scores[i].completed = ReadInt32(fd);
+			Scores[i].episode = ReadInt32(fd);
+		}
+		
+		viewsize = ReadInt32(fd);
+		
 #ifdef UPLOAD		
 		MainMenu[readthis].active = 1;
 		MainItems.curpos = 0;
 #endif
-	} else {
-		viewsize = 15;
-	}
+
+		configokay = 1;
+	} 
 	
-	viewsize = 15;
+configend:	
+	
+	if (fd != -1)
+		CloseRead(fd);
+	
+	if (!configokay) {
+		printf("Config: Setting defaults..\n");
+		SetDefaults();
+	}
 	
 	mouseenabled = false;
 
@@ -281,208 +257,471 @@ int ReadConfig()
 	return 0;
 }
 
-int SaveGame()
+int SaveTheGame(char *fn, char *tag, int dx, int dy)
 {
-	return 0;
-}
-
-int LoadGame()
-{
-	return 0;
-}
-
-/*
-==================
-=
-= SaveTheGame
-=
-==================
-*/
-
-boolean SaveTheGame(int file, int x, int y)
-{
-	long checksum;
-	objtype *ob,nullobj;
-
-	checksum = 0;
-
-	DiskFlopAnim(x,y);
-	CA_FarWrite (file,(void *)&gamestate,sizeof(gamestate));
-	checksum = DoChecksum((byte *)&gamestate,sizeof(gamestate),checksum);
-
-	DiskFlopAnim(x,y);
-#ifdef SPEAR
-	CA_FarWrite (file,(void *)&LevelRatios[0],sizeof(LRstruct)*20);
-	checksum = DoChecksum((byte *)&LevelRatios[0],sizeof(LRstruct)*20,checksum);
-#else
-	CA_FarWrite (file,(void *)&LevelRatios[0],sizeof(LRstruct)*8);
-	checksum = DoChecksum((byte *)&LevelRatios[0],sizeof(LRstruct)*8,checksum);
-#endif
-
-	DiskFlopAnim(x,y);
-	CA_FarWrite (file,(void *)tilemap,sizeof(tilemap));
-	checksum = DoChecksum((byte *)tilemap,sizeof(tilemap),checksum);
-	DiskFlopAnim(x,y);
-	CA_FarWrite (file,(void *)actorat,sizeof(actorat));
-	checksum = DoChecksum((byte *)actorat,sizeof(actorat),checksum);
-
-	CA_FarWrite (file,(void *)areaconnect,sizeof(areaconnect));
-	CA_FarWrite (file,(void *)areabyplayer,sizeof(areabyplayer));
-
-	for (ob = player; ob; ob=ob->next) {
-		DiskFlopAnim(x,y);
-		CA_FarWrite(file, (void *)ob, sizeof(*ob));
-	}
+	objtype *ob;
+	int fd, i, x, y;
+	int32_t cs;
 	
-	nullobj.active = ac_badobject;          // end of file marker
-	DiskFlopAnim(x,y);
-	CA_FarWrite (file,(void *)&nullobj,sizeof(nullobj));
-
-
-	DiskFlopAnim(x,y);
-	CA_FarWrite (file,(void *)&laststatobj,sizeof(laststatobj));
-	checksum = DoChecksum((byte *)&laststatobj,sizeof(laststatobj),checksum);
-	DiskFlopAnim(x,y);
-	CA_FarWrite (file,(void *)statobjlist,sizeof(statobjlist));
-	checksum = DoChecksum((byte *)statobjlist,sizeof(statobjlist),checksum);
-
-	DiskFlopAnim(x,y);
-	CA_FarWrite (file,(void *)doorposition,sizeof(doorposition));
-	checksum = DoChecksum((byte *)doorposition,sizeof(doorposition),checksum);
-	DiskFlopAnim(x,y);
-	CA_FarWrite (file,(void *)doorobjlist,sizeof(doorobjlist));
-	checksum = DoChecksum((byte *)doorobjlist,sizeof(doorobjlist),checksum);
-
-	DiskFlopAnim(x,y);
-	CA_FarWrite (file,(void *)&pwallstate,sizeof(pwallstate));
-	checksum = DoChecksum((byte *)&pwallstate,sizeof(pwallstate),checksum);
-	CA_FarWrite (file,(void *)&pwallx,sizeof(pwallx));
-	checksum = DoChecksum((byte *)&pwallx,sizeof(pwallx),checksum);
-	CA_FarWrite (file,(void *)&pwally,sizeof(pwally));
-	checksum = DoChecksum((byte *)&pwally,sizeof(pwally),checksum);
-	CA_FarWrite (file,(void *)&pwalldir,sizeof(pwalldir));
-	checksum = DoChecksum((byte *)&pwalldir,sizeof(pwalldir),checksum);
-	CA_FarWrite (file,(void *)&pwallpos,sizeof(pwallpos));
-	checksum = DoChecksum((byte *)&pwallpos,sizeof(pwallpos),checksum);
-
-	//
-	// WRITE OUT CHECKSUM
-	//
-	CA_FarWrite(file, (void *)&checksum, sizeof(checksum));
-
-	return true;
-}
-
-/*
-==================
-=
-= LoadTheGame
-=
-==================
-*/
-
-boolean LoadTheGame(int file,int x,int y)
-{
-	long checksum,oldchecksum;
-	objtype nullobj;
-
-	checksum = 0;
-
-	DiskFlopAnim(x,y);
-	CA_FarRead (file,(void *)&gamestate,sizeof(gamestate));
-	checksum = DoChecksum((byte *)&gamestate,sizeof(gamestate),checksum);
-
-	DiskFlopAnim(x,y);
+	fd = OpenWrite(fn);
+	
+	if (fd != -1) {
+		WriteBytes(fd, (byte *)GAMEHDR, 8);
+		WriteBytes(fd, (byte *)SAVTYPE, 4);
+		WriteInt32(fd, 0xFFFFFFFF); /* write version */
+		WriteBytes(fd, (byte *)GAMETYPE, 4);
+	
+		WriteInt32(fd, time(NULL));
+		WriteInt32(fd, 0x00000000);
+	
+		WriteInt32(fd, 0x00000000); /* write checksum (placeholder) */
+	
+		WriteBytes(fd, (byte *)tag, 32); /* write savegame name */
+	
+		DiskFlopAnim(dx, dy);
+	
+		WriteInt32(fd, gamestate.difficulty);
+		WriteInt32(fd, gamestate.mapon);
+		WriteInt32(fd, gamestate.oldscore);
+		WriteInt32(fd, gamestate.score);
+		WriteInt32(fd, gamestate.nextextra);
+		WriteInt32(fd, gamestate.lives);
+		WriteInt32(fd, gamestate.health);
+		WriteInt32(fd, gamestate.ammo);
+		WriteInt32(fd, gamestate.keys);
+		WriteInt32(fd, gamestate.bestweapon);
+		WriteInt32(fd, gamestate.weapon);
+		WriteInt32(fd, gamestate.chosenweapon);
+		WriteInt32(fd, gamestate.faceframe);
+		WriteInt32(fd, gamestate.attackframe);
+		WriteInt32(fd, gamestate.attackcount);
+		WriteInt32(fd, gamestate.weaponframe);
+		WriteInt32(fd, gamestate.episode);
+		WriteInt32(fd, gamestate.secretcount);
+		WriteInt32(fd, gamestate.treasurecount);
+		WriteInt32(fd, gamestate.killcount);
+		WriteInt32(fd, gamestate.secrettotal);
+		WriteInt32(fd, gamestate.treasuretotal);
+		WriteInt32(fd, gamestate.killtotal);
+		WriteInt32(fd, gamestate.TimeCount);
+		WriteInt32(fd, gamestate.killx);
+		WriteInt32(fd, gamestate.killy);
+		WriteInt8(fd, gamestate.victoryflag);
+	
+		DiskFlopAnim(dx, dy);
+	
 #ifdef SPEAR
-	CA_FarRead (file,(void *)&LevelRatios[0],sizeof(LRstruct)*20);
-	checksum = DoChecksum((byte *)&LevelRatios[0],sizeof(LRstruct)*20,checksum);
+		for (i = 0; i < 20; i++) {
 #else
-	CA_FarRead (file,(void *)&LevelRatios[0],sizeof(LRstruct)*8);
-	checksum = DoChecksum((byte *)&LevelRatios[0],sizeof(LRstruct)*8,checksum);
+		for (i = 0; i < 8; i++) {
 #endif
-
-	DiskFlopAnim(x,y);
-	SetupGameLevel ();
-
-	DiskFlopAnim(x,y);
-	CA_FarRead (file,(void *)tilemap,sizeof(tilemap));
-	checksum = DoChecksum((byte *)tilemap,sizeof(tilemap),checksum);
-	DiskFlopAnim(x,y);
-	CA_FarRead(file,(void *)actorat,sizeof(actorat));
-	checksum = DoChecksum((byte *)actorat,sizeof(actorat),checksum);
-
-	CA_FarRead(file,(void *)areaconnect,sizeof(areaconnect));
-	CA_FarRead(file,(void *)areabyplayer,sizeof(areabyplayer));
-
-
-	InitActorList();
-	DiskFlopAnim(x,y);
-	CA_FarRead (file,(void *)player,sizeof(*player));
-
-	while (1)
-	{
-		DiskFlopAnim(x,y);
-		CA_FarRead(file,(void *)&nullobj,sizeof(nullobj));
+			WriteInt32(fd, LevelRatios[i].kill);
+			WriteInt32(fd, LevelRatios[i].secret);
+			WriteInt32(fd, LevelRatios[i].treasure);
+			WriteInt32(fd, LevelRatios[i].time);
+		}
+	
+		DiskFlopAnim(dx, dy);
+	
+		WriteBytes(fd, (byte *)tilemap, 64*64); /* MAPSIZE * MAPSIZE */
+	
+		DiskFlopAnim(dx, dy);
+	
+		for (y = 0; y < 64; y++)
+			for (x = 0; x < 64; x++)
+				WriteInt32(fd, actorat[y][x]);
+	
+		DiskFlopAnim(dx, dy);
+			
+		WriteBytes(fd, (byte *)areaconnect, 37*37); /* NUMAREAS * NUMAREAS */
+	
+		DiskFlopAnim(dx, dy);
+	
+		for (i = 0; i < 37; i++)
+			WriteInt8(fd, areabyplayer[i]);
+	
+		for (ob = player; ob; ob = ob->next) {
+			DiskFlopAnim(dx, dy);
+			
+			WriteInt32(fd, ob->id);
+			WriteInt32(fd, ob->active);
+			WriteInt32(fd, ob->ticcount);
+			WriteInt32(fd, ob->obclass);
+			WriteInt32(fd, ob->state);
+			WriteInt8(fd,  ob->flags);
+			WriteInt32(fd, ob->distance);
+			WriteInt32(fd, ob->dir);
+			WriteInt32(fd, ob->x);
+			WriteInt32(fd, ob->y);
+			WriteInt32(fd, ob->tilex);
+			WriteInt32(fd, ob->tiley);
+			WriteInt8(fd,  ob->areanumber);
+			WriteInt32(fd, ob->viewx);
+			WriteInt32(fd, ob->viewheight);
+			WriteInt32(fd, ob->transx);
+			WriteInt32(fd, ob->transy);
+			WriteInt32(fd, ob->angle);
+			WriteInt32(fd, ob->hitpoints);
+			WriteInt32(fd, ob->speed);
+			WriteInt32(fd, ob->temp1);
+			WriteInt32(fd, ob->temp2);
+			WriteInt32(fd, ob->temp3);
+		}	
 		
-		if (nullobj.active == ac_badobject)
-			break;
+		WriteInt32(fd, 0xFFFFFFFF); /* end of actor list */
 		
-		GetNewActor();
-	 // don't copy over the links
-		memcpy(new, &nullobj, sizeof(nullobj)-4);
-	}
+		DiskFlopAnim(dx, dy);
+		
+		WriteInt32(fd, laststatobj - statobjlist); /* ptr offset */
 
+		for (i = 0; i < 400; i++) { /* MAXSTATS */
+			WriteInt8(fd,  statobjlist[i].tilex);
+			WriteInt8(fd,  statobjlist[i].tiley);
+			WriteInt32(fd, statobjlist[i].shapenum);
+			WriteInt8(fd,  statobjlist[i].flags);
+			WriteInt8(fd,  statobjlist[i].itemnumber);
+		}
+	
+		DiskFlopAnim(dx, dy);
+	
+		for (i = 0; i < 64; i++) { /* MAXDOORS */
+			WriteInt32(fd, doorposition[i]);
+		}
+	
+		DiskFlopAnim(dx, dy);
+	
+		for (i = 0; i < 64; i++) { /* MAXDOORS */
+			WriteInt8(fd,  doorobjlist[i].tilex);
+			WriteInt8(fd,  doorobjlist[i].tiley);
+			WriteInt8(fd,  doorobjlist[i].vertical);
+			WriteInt8(fd,  doorobjlist[i].lock);
+			WriteInt8(fd,  doorobjlist[i].action);
+			WriteInt32(fd, doorobjlist[i].ticcount);
+		}
+	
+		DiskFlopAnim(dx, dy);
+	
+		WriteInt32(fd, pwallstate);
+		WriteInt32(fd, pwallx);
+		WriteInt32(fd, pwally);
+		WriteInt32(fd, pwalldir);
+		WriteInt32(fd, pwallpos);
 
-	DiskFlopAnim(x,y);
-	CA_FarRead (file,(void *)&laststatobj,sizeof(laststatobj));
-	checksum = DoChecksum((byte *)&laststatobj,sizeof(laststatobj),checksum);
-	DiskFlopAnim(x,y);
-	CA_FarRead (file,(void *)statobjlist,sizeof(statobjlist));
-	checksum = DoChecksum((byte *)statobjlist,sizeof(statobjlist),checksum);
+		DiskFlopAnim(dx, dy);
 
-	DiskFlopAnim(x,y);
-	CA_FarRead (file,(void *)doorposition,sizeof(doorposition));
-	checksum = DoChecksum((byte *)doorposition,sizeof(doorposition),checksum);
-	DiskFlopAnim(x,y);
-	CA_FarRead (file,(void *)doorobjlist,sizeof(doorobjlist));
-	checksum = DoChecksum((byte *)doorobjlist,sizeof(doorobjlist),checksum);
+		CloseWrite(fd);
 
-	DiskFlopAnim(x,y);
-	CA_FarRead(file,(void *)&pwallstate,sizeof(pwallstate));
-	checksum = DoChecksum((byte *)&pwallstate,sizeof(pwallstate),checksum);
-	CA_FarRead(file,(void *)&pwallx,sizeof(pwallx));
-	checksum = DoChecksum((byte *)&pwallx,sizeof(pwallx),checksum);
-	CA_FarRead(file,(void *)&pwally,sizeof(pwally));
-	checksum = DoChecksum((byte *)&pwally,sizeof(pwally),checksum);
-	CA_FarRead(file,(void *)&pwalldir,sizeof(pwalldir));
-	checksum = DoChecksum((byte *)&pwalldir,sizeof(pwalldir),checksum);
-	CA_FarRead(file,(void *)&pwallpos,sizeof(pwallpos));
-	checksum = DoChecksum((byte *)&pwallpos,sizeof(pwallpos),checksum);
-
-	CA_FarRead(file, (void *)&oldchecksum, sizeof(oldchecksum));
-
-	if (oldchecksum != checksum)
-	{
-		Message(STR_SAVECHT1"\n"
-			STR_SAVECHT2"\n"
-			STR_SAVECHT3"\n"
-			STR_SAVECHT4);
+		fd = OpenRead(fn);
+		ReadSeek(fd, 64, SEEK_SET);
+		cs = CalcFileChecksum(fd, ReadLength(fd) - 64);
+		CloseRead(fd);
+		
+		fd = OpenWriteAppend(fn);
+		WriteSeek(fd, 28, SEEK_SET);
+		WriteInt32(fd, cs);
+		
+		CloseWrite(fd);
+	} else {
+		Message(STR_NOSPACE1"\n"
+			STR_NOSPACE2);
 			
 		IN_ClearKeysDown();
 		IN_Ack();
-
-		gamestate.score = 0;
-		gamestate.lives = 1;
-		gamestate.weapon =
-			gamestate.chosenweapon =
-			gamestate.bestweapon = wp_pistol;
-		gamestate.ammo = 8;
+		
+		return -1;
 	}
-
-	return true;
+	
+	return 0;
 }
 
-//===========================================================================
+int ReadSaveTag(char *fn, char *tag)
+{
+	char buf[8];
+	int fd;
+	int32_t v;
+	
+	fd = OpenRead(fn);
+	if (fd == -1)
+		goto rstfail;
+	
+	ReadBytes(fd, (byte *)buf, 8);
+	if (strncmp(buf, GAMEHDR, 8))
+		goto rstfail;
+	
+	ReadBytes(fd, (byte *)buf, 4);
+	if (strncmp(buf, SAVTYPE, 4))
+		goto rstfail;
+	
+	v = ReadInt32(fd);
+	if (v != 0xFFFFFFFF)
+		goto rstfail;
+	
+	ReadBytes(fd, (byte *)buf, 4);
+	if (strncmp(buf, GAMETYPE, 4))
+		goto rstfail;
+	
+	ReadInt32(fd);
+	ReadInt32(fd);
+	
+	v = ReadInt32(fd); /* get checksum */
+	
+	ReadSeek(fd, 64, SEEK_SET);
+	if (v != CalcFileChecksum(fd, ReadLength(fd) - 64))
+		goto rstfail;
+	
+	ReadSeek(fd, 32, SEEK_SET);
+	ReadBytes(fd, (byte *)tag, 32);
+		
+	CloseRead(fd);
+	
+	return 0;
+rstfail:
+	if (fd != -1)
+		CloseRead(fd);
+	
+	return -1;
+}
+
+int LoadTheGame(char *fn, int dx, int dy)
+{
+	char buf[8];
+	int fd, i, x, y, id;
+	int32_t v;
+	
+	fd = OpenRead(fn);
+
+	if (fd == -1)
+		goto loadfail;
+	
+	ReadBytes(fd, (byte *)buf, 8);
+	if (strncmp(buf, GAMEHDR, 8))
+		goto loadfail;
+	
+	ReadBytes(fd, (byte *)buf, 4);
+	if (strncmp(buf, SAVTYPE, 4))
+		goto loadfail;
+	
+	v = ReadInt32(fd);
+	if (v != 0xFFFFFFFF)
+		goto loadfail;
+	
+	ReadBytes(fd, (byte *)buf, 4);
+	if (strncmp(buf, GAMETYPE, 4))
+		goto loadfail;
+	
+	ReadInt32(fd);
+	ReadInt32(fd);
+	
+	v = ReadInt32(fd); /* get checksum */
+	
+	ReadSeek(fd, 64, SEEK_SET);
+	if (v != CalcFileChecksum(fd, ReadLength(fd) - 64))
+		goto loadfail;
+	
+	ReadSeek(fd, 64, SEEK_SET);
+	
+	DiskFlopAnim(dx, dy);
+	
+	gamestate.difficulty	= ReadInt32(fd);
+	gamestate.mapon		= ReadInt32(fd);
+	gamestate.oldscore	= ReadInt32(fd);
+	gamestate.score		= ReadInt32(fd);
+	gamestate.nextextra	= ReadInt32(fd);
+	gamestate.lives		= ReadInt32(fd);
+	gamestate.health	= ReadInt32(fd);
+	gamestate.ammo		= ReadInt32(fd);
+	gamestate.keys		= ReadInt32(fd);
+	gamestate.bestweapon	= ReadInt32(fd);
+	gamestate.weapon	= ReadInt32(fd);
+	gamestate.chosenweapon	= ReadInt32(fd);
+	gamestate.faceframe	= ReadInt32(fd);
+	gamestate.attackframe	= ReadInt32(fd);
+	gamestate.attackcount	= ReadInt32(fd);
+	gamestate.weaponframe	= ReadInt32(fd);
+	gamestate.episode	= ReadInt32(fd);
+	gamestate.secretcount	= ReadInt32(fd);
+	gamestate.treasurecount	= ReadInt32(fd);
+	gamestate.killcount	= ReadInt32(fd);
+	gamestate.secrettotal	= ReadInt32(fd);
+	gamestate.treasuretotal = ReadInt32(fd);
+	gamestate.killtotal	= ReadInt32(fd);
+	gamestate.TimeCount	= ReadInt32(fd);
+	gamestate.killx		= ReadInt32(fd);
+	gamestate.killy		= ReadInt32(fd);
+	gamestate.victoryflag	= ReadInt8(fd);
+	
+	DiskFlopAnim(dx, dy);
+	
+#ifdef SPEAR
+	for (i = 0; i < 20; i++) {
+#else
+	for (i = 0; i < 8; i++) {
+#endif
+		LevelRatios[i].kill	= ReadInt32(fd);
+		LevelRatios[i].secret	= ReadInt32(fd);
+		LevelRatios[i].treasure	= ReadInt32(fd);
+		LevelRatios[i].time	= ReadInt32(fd);
+	}
+	
+	DiskFlopAnim(dx, dy);
+	
+	SetupGameLevel();
+	
+	DiskFlopAnim(dx, dy);
+	
+	ReadBytes(fd, (byte *)tilemap, 64*64); /* MAPSIZE * MAPSIZE */
+	
+	DiskFlopAnim(dx, dy);
+	
+	for (y = 0; y < 64; y++)
+		for (x = 0; x < 64; x++)
+			actorat[y][x] = ReadInt32(fd);
+	
+	DiskFlopAnim(dx, dy);
+			
+	ReadBytes(fd, (byte *)areaconnect, 37*37); /* NUMAREAS * NUMAREAS */
+	
+	DiskFlopAnim(dx, dy);
+	
+	for (i = 0; i < 37; i++)
+		areabyplayer[i] = ReadInt8(fd);
+	
+	DiskFlopAnim(dx, dy);
+	
+	InitActorList();
+	
+	DiskFlopAnim(dx, dy);
+	
+	/* player ptr already set up */
+	id			= ReadInt32(fd); /* get id */
+	player->active		= ReadInt32(fd);
+	player->ticcount	= ReadInt32(fd);
+	player->obclass		= ReadInt32(fd);
+	player->state		= ReadInt32(fd);
+	player->flags		= ReadInt8(fd);
+	player->distance	= ReadInt32(fd);
+	player->dir		= ReadInt32(fd);
+	player->x		= ReadInt32(fd);
+	player->y		= ReadInt32(fd);
+	player->tilex		= ReadInt32(fd);
+	player->tiley		= ReadInt32(fd);
+	player->areanumber	= ReadInt8(fd);
+	player->viewx		= ReadInt32(fd);
+	player->viewheight	= ReadInt32(fd);
+	player->transx		= ReadInt32(fd);
+	player->transy		= ReadInt32(fd);
+	player->angle		= ReadInt32(fd);
+	player->hitpoints	= ReadInt32(fd);
+	player->speed		= ReadInt32(fd);
+	player->temp1		= ReadInt32(fd);
+	player->temp2		= ReadInt32(fd);
+	player->temp3		= ReadInt32(fd);
+	
+	/* update the id */
+	for (y = 0; y < 64; y++)
+		for (x = 0; x < 64; x++)
+			if (actorat[y][x] == (id | 0x8000))
+				actorat[y][x] = player->id | 0x8000;
+
+	while (1) {
+		DiskFlopAnim(dx, dy);
+		
+		id			= ReadInt32(fd);
+		
+		if (id == 0xFFFFFFFF)
+			break;
+		
+		GetNewActor();
+		
+		new->active		= ReadInt32(fd);
+		new->ticcount		= ReadInt32(fd);
+		new->obclass		= ReadInt32(fd);
+		new->state		= ReadInt32(fd);
+		new->flags		= ReadInt8(fd);
+		new->distance		= ReadInt32(fd);
+		new->dir		= ReadInt32(fd);
+		new->x			= ReadInt32(fd);
+		new->y			= ReadInt32(fd);
+		new->tilex		= ReadInt32(fd);
+		new->tiley		= ReadInt32(fd);
+		new->areanumber		= ReadInt8(fd);
+		new->viewx		= ReadInt32(fd);
+		new->viewheight		= ReadInt32(fd);
+		new->transx		= ReadInt32(fd);
+		new->transy		= ReadInt32(fd);
+		new->angle		= ReadInt32(fd);
+		new->hitpoints		= ReadInt32(fd);
+		new->speed		= ReadInt32(fd);
+		new->temp1		= ReadInt32(fd);
+		new->temp2		= ReadInt32(fd);
+		new->temp3		= ReadInt32(fd);
+		
+		for (y = 0; y < 64; y++)
+			for (x = 0; x < 64; x++)
+				if (actorat[y][x] == (id | 0x8000))
+					actorat[y][x] = new->id | 0x8000;
+	}
+	
+	DiskFlopAnim(dx, dy);
+	
+	laststatobj = statobjlist + ReadInt32(fd); /* ptr offset */
+	for (i = 0; i < 400; i++) { /* MAXSTATS */
+		statobjlist[i].tilex		= ReadInt8(fd);
+		statobjlist[i].tiley		= ReadInt8(fd);
+		statobjlist[i].shapenum		= ReadInt32(fd);
+		statobjlist[i].flags		= ReadInt8(fd);
+		statobjlist[i].itemnumber	= ReadInt8(fd);
+		statobjlist[i].visspot 		= &spotvis[statobjlist[i].tilex][statobjlist[i].tiley];
+	}
+	
+	DiskFlopAnim(dx, dy);
+	
+	for (i = 0; i < 64; i++) { /* MAXDOORS */
+		doorposition[i] 		= ReadInt32(fd);
+	}
+	
+	DiskFlopAnim(dx, dy);
+	
+	for (i = 0; i < 64; i++) { /* MAXDOORS */
+		doorobjlist[i].tilex	= ReadInt8(fd);
+		doorobjlist[i].tiley	= ReadInt8(fd);
+		doorobjlist[i].vertical = ReadInt8(fd);
+		doorobjlist[i].lock	= ReadInt8(fd);
+		doorobjlist[i].action	= ReadInt8(fd);
+		doorobjlist[i].ticcount	= ReadInt32(fd);
+	}
+	
+	DiskFlopAnim(dx, dy);
+	
+	pwallstate 	= ReadInt32(fd);
+	pwallx		= ReadInt32(fd);
+	pwally		= ReadInt32(fd);
+	pwalldir	= ReadInt32(fd);
+	pwallpos	= ReadInt32(fd);
+
+	DiskFlopAnim(dx, dy);
+	
+	CloseRead(fd);	
+	
+	return 0;
+	
+loadfail:
+	if (fd != -1)
+		CloseRead(fd);
+		
+	Message(STR_SAVECHT1"\n"
+		STR_SAVECHT2"\n"
+		STR_SAVECHT3"\n"
+		STR_SAVECHT4);
+			
+	IN_ClearKeysDown();
+	IN_Ack();
+	
+	NewGame(1, 0);
+	return -1;
+}
+
+/* ======================================================================== */
 
 /*
 =================

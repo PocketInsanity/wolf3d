@@ -689,21 +689,22 @@ extern	int			shootdelta;
 extern	boolean         startgame,loadedgame;
 extern	int		mouseadjustment;
 
-//
-// math tables
-//
+/* math tables */
 extern int pixelangle[MAXVIEWWIDTH];
 extern long finetangent[FINEANGLES/4];
 extern fixed sintable[], *costable;
 
-extern	char	configname[13];
+extern char configname[13];
 
-void 		CalcProjection (long focal);
-void		NewGame (int difficulty,int episode);
-void 		NewViewSize (int width);
-boolean 	LoadTheGame(int file,int x,int y);
-boolean		SaveTheGame(int file,int x,int y);
-void 		ShowViewSize (int width);
+void CalcProjection(long focal);
+void NewGame(int difficulty,int episode);
+void NewViewSize(int width);
+void ShowViewSize(int width);
+
+int LoadTheGame(char *fn, int x, int y);
+int SaveTheGame(char *fn, char *tag, int x, int y);
+int ReadSaveTag(char *fn, char *tag);
+
 void ShutdownId();
 int WriteConfig();
 

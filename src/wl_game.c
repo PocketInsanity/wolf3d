@@ -1058,7 +1058,7 @@ restartgame:
 			SetupGameLevel();
 
 #ifdef SPEAR
-		if (gamestate.mapon == 20)	// give them the key allways
+		if (gamestate.mapon == 20) /* give them the key always */
 		{
 			gamestate.keys |= 1;
 			DrawKeys();

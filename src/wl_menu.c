@@ -1164,11 +1164,10 @@ void DrawLSAction(int which)
 ////////////////////////////////////////////////////////////////////
 int CP_LoadGame(int quick)
 {
-	int handle,which,exit=0;
+	int which, exit=0;
 	char name[13];
 
-
-	strcpy(name,SaveName);
+	strcpy(name, SaveName);
 
 	//
 	// QUICKLOAD?
@@ -1180,12 +1179,9 @@ int CP_LoadGame(int quick)
 		if (SaveGamesAvail[which])
 		{
 			name[7]=which+'0';
-			handle=open(name,O_BINARY);
-			lseek(handle,32,SEEK_SET);
 			loadedgame=true;
-			LoadTheGame(handle,0,0);
+			LoadTheGame(name, 0, 0);
 			loadedgame=false;
-			close(handle);
 
 			DrawStatusBar();
 			
@@ -1209,14 +1205,10 @@ int CP_LoadGame(int quick)
 			ShootSnd();
 			name[7]=which+'0';
 
-			handle=open(name,O_BINARY);
-			lseek(handle,32,SEEK_SET);
-
 			DrawLSAction(0);
 			loadedgame=true;
 
-			LoadTheGame(handle,LSA_X+8,LSA_Y+5);
-			close(handle);
+			LoadTheGame(name, LSA_X+8, LSA_Y+5);
 
 			StartGame=1;
 			ShootSnd();
@@ -1321,10 +1313,8 @@ void PrintLSEntry(int w,int color)
 ////////////////////////////////////////////////////////////////////
 int CP_SaveGame(int quick)
 {
-	int handle,which,exit=0;
-	unsigned nwritten;
-	char name[13],input[32];
-
+	int which, exit=0;
+	char name[13], input[32];
 
 	strcpy(name,SaveName);
 
@@ -1337,16 +1327,9 @@ int CP_SaveGame(int quick)
 
 		if (SaveGamesAvail[which])
 		{
-			name[7]=which+'0';
-			handle=creat(name,S_IREAD|S_IWRITE);
-
-			strcpy(input,&SaveGameNames[which][0]);
-
-			nwritten = write(handle,(void *)input,32);
-			lseek(handle,32,SEEK_SET);
-			SaveTheGame(handle,0,0);
-			close(handle);
-
+			name[7] = which+'0';
+			SaveTheGame(name, &SaveGameNames[which][0], 0, 0);
+			
 			return 1;
 		}
 	}
@@ -1393,17 +1376,9 @@ int CP_SaveGame(int quick)
 			if (US_LineInput(LSM_X+LSItems.indent+2,LSM_Y+which*13+1,input,input,true,31,LSM_W-LSItems.indent-30))
 			{
 				SaveGamesAvail[which] = 1;
-				strcpy(&SaveGameNames[which][0],input);
-
-				handle = creat(name, S_IREAD|S_IWRITE);
-				nwritten = write(handle, (void *)input, 32);
-				lseek(handle, 32, SEEK_SET);
-
 				DrawLSAction(1);
-				SaveTheGame(handle, LSA_X+8, LSA_Y+5);
-
-				close(handle);
-
+				strcpy(&SaveGameNames[which][0],input);
+				SaveTheGame(name, input, LSA_X+8, LSA_Y+5);
 				ShootSnd();
 				exit=1;
 			}
@@ -2622,14 +2597,12 @@ void SetupControlPanel()
 			which=f.ff_name[7]-'0';
 			if (which<10)
 			{
-				int handle;
 				char temp[32];
 
-				SaveGamesAvail[which]=1;
-				handle=open(f.ff_name,O_BINARY);
-				read(handle,temp,32);
-				close(handle);
-				strcpy(&SaveGameNames[which][0],temp);
+				if (ReadSaveTag(f.ff_name, temp) != -1) {
+					SaveGamesAvail[which]=1;
+					strcpy(&SaveGameNames[which][0],temp);
+				}
 			}
 		} while(!findnext(&f));
 #else 
@@ -2666,14 +2639,12 @@ void SetupControlPanel()
 			which=f.name[7]-'0';
 			if (which<10)
 			{
-				int handle;
 				char temp[32];
-
-				SaveGamesAvail[which]=1;
-				handle=open(f.name,O_BINARY);
-				read(handle,temp,32);
-				close(handle);
-				strcpy(&SaveGameNames[which][0],temp);
+				
+				if (ReadSaveTag(f.name, temp) != -1) {
+					SaveGamesAvail[which]=1;
+					strcpy(&SaveGameNames[which][0],temp);
+				}
 			}
 		} while(_findnext(hand, &f) != -1);
 #endif
@@ -2705,14 +2676,12 @@ void SetupControlPanel()
 	for (x = 0; x < globbuf.gl_pathc; x++) {
 		which = globbuf.gl_pathv[x][7] - '0';
 		if (which < 10)	{
-			int handle;
 			char temp[32];
 			
-			SaveGamesAvail[which] = 1;
-			handle = open(globbuf.gl_pathv[x], O_RDONLY);
-			read(handle, temp, 32);
-			close(handle);
-			strcpy(SaveGameNames[which], temp);
+			if (ReadSaveTag(globbuf.gl_pathv[x], temp) != -1) {
+				SaveGamesAvail[which]=1;
+				strcpy(&SaveGameNames[which][0],temp);
+			}
 		}
 	}
 	globfree(&globbuf);

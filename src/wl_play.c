@@ -50,15 +50,7 @@ memptr		demobuffer;
 int			controlx,controly;		// range from -100 to 100 per tic
 boolean		buttonstate[NUMBUTTONS];
 
-
-
-//===========================================================================
-
-
 static void RemoveObj(objtype *gone);
-void StopMusic();
-void StartMusic();
-void PlayLoop();
 
 /*
 =============================================================================
@@ -770,9 +762,6 @@ void InitActorList()
 = Sets the global variable new to point to a free spot in objlist.
 = The free spot is inserted at the end of the liked list
 =
-= When the object list is full, the caller can either have it bomb out ot
-= return a dummy object pointer that will never get used
-=
 =========================
 */
 
@@ -805,7 +794,7 @@ void GetNewActor()
 =
 = RemoveObj
 =
-= Add the given object back into the free list, and unlink it from it's
+= Add the given object back into the free list, and unlink it from its
 = neighbors
 =
 =========================

@@ -226,8 +226,15 @@ int OpenWrite(char *fn)
 {
 	int fp;
 	
-	/* fp = creat(fn, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH); */
 	fp = open(fn, O_CREAT|O_WRONLY|O_TRUNC|O_BINARY, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH);
+	return fp;
+}
+
+int OpenWriteAppend(char *fn)
+{
+	int fp;
+	
+	fp = open(fn, O_CREAT|O_WRONLY|O_BINARY, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH);
 	return fp;
 }
 
@@ -239,6 +246,11 @@ void CloseWrite(int fp)
 int WriteSeek(int fp, int offset, int whence)
 {
 	return lseek(fp, offset, whence);
+}
+
+int WritePos(int fp)
+{
+	return lseek(fp, 0, SEEK_CUR);
 }
 
 int WriteInt8(int fp, int8_t d)

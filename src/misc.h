@@ -25,9 +25,11 @@ char *ultoa(unsigned long value, char *string, int radix);
 #endif /* DOSISM */
 
 extern int OpenWrite(char *fn);
+extern int OpenWriteAppend(char *fn);
 extern void CloseWrite(int fp);
 
 extern int WriteSeek(int fp, int offset, int whence);
+extern int WritePos(int fp);
 
 extern int WriteInt8(int fp, int8_t d);
 extern int WriteInt16(int fp, int16_t d);
