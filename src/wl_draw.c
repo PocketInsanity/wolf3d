@@ -110,7 +110,6 @@ static void TransformActor(objtype *ob)
 	ob->viewx = centerx + ny*scale/nx;	
 
 	ob->viewheight = heightnumerator/(nx>>8);
-
 }
 
 /*

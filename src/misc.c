@@ -80,7 +80,7 @@ char *strlwr(char *s)
 	return s;
 }
 	
-char *itoa(short int value, char *string, int radix)
+char *itoa(int value, char *string, int radix)
 {
 	/* wolf3d only uses radix 10 */
 	sprintf(string, "%d", value);
