@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <setjmp.h>
 #include <ctype.h>
 
 #include <gtk/gtk.h>
@@ -29,7 +30,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "wolfdef.h"
 
-Byte *gfxbuf;
+extern jmp_buf ResetJmp;
+ 
+static Byte *gfxbuf;
 
 static GtkWidget *win;
 static GtkWidget *main_vbox;
@@ -61,9 +64,14 @@ void destroy(GtkWidget *widget, gpointer data)
 	Quit(NULL);
 }
 
-static void menu_quit(GtkWidget *w, gpointer data)
+static void menu_file_quit(GtkWidget *w, gpointer data)
 {
 	destroy(w, data);
+}
+
+static void menu_file_newgame(GtkWidget *w, gpointer data)
+{
+	longjmp(ResetJmp, EX_NEWGAME);
 }
 
 void RestoreColors()
@@ -124,8 +132,9 @@ static void draw_default(GtkWidget *widget, gpointer user_data)
 }
 
 static GtkItemFactoryEntry menu_items[] = {
-{ "/_File",         NULL,         NULL, 0, "<Branch>" },
-{ "/File/Quit",     "<control>Q", menu_quit, 0, NULL },
+{ "/_File",		NULL,		NULL,			0,	"<Branch>"	},
+{ "/File/New Game",	NULL,		menu_file_newgame,	0,	NULL		},	
+{ "/File/Quit",		"<control>Q",	menu_file_quit,		0,	NULL		}
 };
 
 int main(int argc, char *argv[])

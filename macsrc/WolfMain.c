@@ -364,7 +364,7 @@ void PlayLoop(void)
 	
 	LastTicCount = ReadTick();	
 	do {
-		if (!SlowDown)
+		if (SlowDown)
 			Delay = 4; /* 15 Hz */
 		else
 			Delay = 2; /* 30 Hz */
