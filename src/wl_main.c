@@ -58,13 +58,7 @@ typedef _int64 int64_t;
 #endif
 fixed FixedByFrac(fixed a, fixed b)
 {
-	int64_t ra = a;
-	int64_t rb = b;
-	int64_t r;
-	
-	r = ra * rb;
-	r >>= TILESHIFT;
-	return (fixed)r;
+	return (fixed)(((int64_t)(a * (int64_t)b))>>TILESHIFT);
 }
 #endif
 
