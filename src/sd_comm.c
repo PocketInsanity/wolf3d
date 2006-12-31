@@ -10,7 +10,7 @@
 
 int DigiMap[LASTSOUND];
 
-static int wolfdigimap[] =
+static const int wolfdigimap[] =
 {
 #ifndef SPEAR
 	HALTSND,                0,
@@ -114,7 +114,8 @@ static int wolfdigimap[] =
 
 void InitDigiMap()
 {
-	int *map, i;
+	const int *map;
+	int i;
 
 	for (i = 0; i < LASTSOUND; i++)
 		DigiMap[i] = -1;
