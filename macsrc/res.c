@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 typedef struct ResItem_t
 {
-	long type;
+	LongWord type;
 	Word item;
 	
 	Byte *dat;
@@ -69,7 +69,8 @@ static int16_t Read16M(FILE *fp)
 int InitResources(char *name)
 {	
 	FILE *fp;
-	ResItem **cur = &lr, *t;
+	ResItem **cur = &lr;
+	ResItem *t;
 	int resfork, resmap, forklen, maplen;
 	int typelist, namelist, typecount;
 	int datalen;
@@ -77,8 +78,9 @@ int InitResources(char *name)
 		
 	fp = fopen(name, "rb");
 	
-	if (fp == NULL) 
+	if (fp == NULL) {
 		return -1;
+	}
 	
 	resfork = Read32M(fp);
 	resmap  = Read32M(fp);
@@ -104,6 +106,7 @@ int InitResources(char *name)
 		bak = ftell(fp);
 		
 		fseek(fp, resmap + typelist + off, SEEK_SET);
+
 		for (x = 0; x < count; x++) {
 			int id;
 			
@@ -166,8 +169,9 @@ void *LoadAResource2(Word RezNum, LongWord Type)
 				memcpy(c->buf, c->dat, c->size);
 			}
 			
-			if (c->buf == NULL) 
+			if (c->buf == NULL) {
 				Quit("MALLOC FAILED?");
+			}
 				
 			return c->buf;
 		}
@@ -192,18 +196,22 @@ void *FindResource(Word RezNum, LongWord Type)
 			} else {
 				/* DEBUG: we want a fresh copy... */
 				fprintf(stderr, "DEBUG: Item %ld/%d already loaded!\n", Type, RezNum);
+
 			/*	
 				free(c->buf);
 				c->buf = malloc(c->size);
 			*/
+
 				memcpy(c->buf, c->dat, c->size);
 			}
 			
-			if (c->buf == NULL) 
+			if (c->buf == NULL) {
 				Quit("MALLOC FAILED?");
+			}
 				
 			return c->buf;
 		}
+		
 		c = c->next;		
 	}
 
@@ -216,8 +224,10 @@ void ReleaseAResource2(Word RezNum, LongWord Type)
 	
 	while (c != NULL) {
 		if ( (c->type == Type) && (c->item == RezNum) ) {
-			if (c->buf)
+			if (c->buf != NULL) {
 				free(c->buf);
+			}
+			
 			c->buf = NULL;
 			return;
 		}
@@ -240,12 +250,14 @@ void FreeResources()
 	while (c) {
 		ResItem *t = c;
 		
-		if (c->dat)
+		if (c->dat != NULL) {
 			free(c->dat);
-		
-		if (c->buf)
+		}
+				
+		if (c->buf != NULL) {
 			free(c->buf);
-			
+		}
+		
 		c = c->next;
 		
 		free(t);		

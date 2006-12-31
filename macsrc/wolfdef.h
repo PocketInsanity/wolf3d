@@ -756,7 +756,6 @@ extern void IO_AttackShape(Word shape);
 extern void IO_DrawFace(Word face);
 extern void IO_DrawStatusBar(void);
 extern void IO_ClearViewBuffer(void);
-extern void IO_ScaleWallColumn(Word x,Word scale,Word tile,Word column);
 extern void IO_DisplayViewBuffer(void);
 
 extern void IO_ScaleMaskedColumn(Word x,Word scale, unsigned short *sprite,Word column);
