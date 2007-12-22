@@ -159,6 +159,9 @@ extern void IN_Startup(), IN_Shutdown(), IN_ClearKeysDown(),
 		IN_GetJoyAbs(word joy,word *xp,word *yp),
 		IN_SetupJoy(word joy,word minx,word maxx,word miny,word maxy),
 		IN_Ack();
+
+boolean INL_StartJoy(word joy);
+void INL_ShutJoy(word joy);
 		
 extern boolean IN_UserInput(longword delay);
 extern const char *IN_GetScanName(ScanCode);

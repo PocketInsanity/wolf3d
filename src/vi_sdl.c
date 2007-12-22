@@ -2,6 +2,28 @@
 
 #include "SDL.h"
 
+#define	JoyScaleMax		32768
+#define	JoyScaleShift	8
+
+typedef	struct {
+	SDL_Joystick* joystick;
+	
+	word joyMinX;
+	word joyMinY;
+	word threshMinX;
+	word threshMinY;
+	word threshMaxX;
+	word threshMaxY;
+	word joyMaxX;
+	word joyMaxY;
+	word joyMultXL;
+	word joyMultYL;
+	word joyMultXH;
+	word joyMultYH;
+} JoystickDef;
+
+static JoystickDef JoyDefs[MaxJoys];
+
 static SDL_Surface *surface;
 static unsigned int sdl_palettemode;
 
@@ -110,7 +132,9 @@ void VL_Startup()
 	if (surface->flags & SDL_FULLSCREEN)
 		SDL_ShowCursor(0);
 	
-	SDL_WM_SetCaption(GAMENAME, GAMENAME);	
+	SDL_WM_SetCaption(GAMENAME, GAMENAME);
+	
+	SDL_InitSubSystem(SDL_INIT_JOYSTICK);
 }
 
 /*
@@ -145,9 +169,9 @@ void VL_SetPalette(const byte *palette)
 	
 	for (i = 0; i < 256; i++)
 	{
-		colors[i].r = palette[i*3+0] << 2;
-		colors[i].g = palette[i*3+1] << 2;
-		colors[i].b = palette[i*3+2] << 2;
+		colors[i].r = ((int)palette[i*3+0] * 255) / 63;
+		colors[i].g = ((int)palette[i*3+1] * 255) / 63;
+		colors[i].b = ((int)palette[i*3+2] * 255) / 63;
 	}
 	SDL_SetPalette(surface, sdl_palettemode, colors, 0, 256);
 }
@@ -335,6 +359,9 @@ void INL_Update()
 	boolean DebouncedKeyboard[NumCodes];
 	
 	memcpy(DebouncedKeyboard, InternalKeyboard, sizeof(DebouncedKeyboard));
+	
+	/* poll joysticks */
+	SDL_JoystickUpdate();
 		
 	if (SDL_PollEvent(&event)) {
 		do {
@@ -420,6 +447,43 @@ byte IN_MouseButtons()
 	return retr;
 }
 
+///////////////////////////////////////////////////////////////////////////
+//
+//	INL_StartJoy() - Detects & auto-configures the specified joystick
+//					The auto-config assumes the joystick is centered
+//
+///////////////////////////////////////////////////////////////////////////
+boolean INL_StartJoy(word joy)
+{
+	JoystickDef* def;
+	
+	def = &JoyDefs[joy];
+	
+	memset(def, 0, sizeof(*def));
+
+	def->joystick = SDL_JoystickOpen(joy);
+	
+	return (def->joystick != NULL);
+}
+
+///////////////////////////////////////////////////////////////////////////
+//
+//	INL_ShutJoy() - Cleans up the joystick stuff
+//
+///////////////////////////////////////////////////////////////////////////
+void INL_ShutJoy(word joy)
+{
+	JoystickDef* def;
+	
+	def = &JoyDefs[joy];
+	
+	if (def->joystick != NULL) {
+		SDL_JoystickClose(def->joystick);
+	}
+	
+	memset(def, 0, sizeof(*def));
+}
+
 /*
 ===================
 =
@@ -430,7 +494,7 @@ byte IN_MouseButtons()
 
 byte IN_JoyButtons()
 {
-	return 0;
+	return ((INL_GetJoyButtons(0) << 0) | (INL_GetJoyButtons(1) << 2));
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -440,8 +504,17 @@ byte IN_JoyButtons()
 ///////////////////////////////////////////////////////////////////////////
 void IN_GetJoyAbs(word joy,word *xp,word *yp)
 {
-	*xp = 0;
-	*yp = 0;
+	JoystickDef* def;
+	
+	def = &JoyDefs[joy];
+	
+	if (def->joystick != NULL) {
+		*xp = ((int)SDL_JoystickGetAxis(def->joystick, 1) + 32768) / 16;
+		*yp = ((int)SDL_JoystickGetAxis(def->joystick, 0) + 32768) / 16;
+	} else {
+		*xp = 0;
+		*yp = 0;
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -452,8 +525,57 @@ void IN_GetJoyAbs(word joy,word *xp,word *yp)
 ///////////////////////////////////////////////////////////////////////////
 void INL_GetJoyDelta(word joy,int *dx,int *dy)
 {
-	*dx = 0;
-	*dy = 0;
+	word		x,y;
+	JoystickDef	*def;
+
+	IN_GetJoyAbs(joy,&x,&y);
+	def = JoyDefs + joy;
+
+	if (x < def->threshMinX)
+	{
+		if (x < def->joyMinX)
+			x = def->joyMinX;
+
+		x = -(x - def->threshMinX);
+		x *= def->joyMultXL;
+		x >>= JoyScaleShift;
+		*dx = (x > 127)? -127 : -x;
+	}
+	else if (x > def->threshMaxX)
+	{
+		if (x > def->joyMaxX)
+			x = def->joyMaxX;
+
+		x = x - def->threshMaxX;
+		x *= def->joyMultXH;
+		x >>= JoyScaleShift;
+		*dx = (x > 127)? 127 : x;
+	}
+	else
+		*dx = 0;
+
+	if (y < def->threshMinY)
+	{
+		if (y < def->joyMinY)
+			y = def->joyMinY;
+
+		y = -(y - def->threshMinY);
+		y *= def->joyMultYL;
+		y >>= JoyScaleShift;
+		*dy = (y > 127)? -127 : -y;
+	}
+	else if (y > def->threshMaxY)
+	{
+		if (y > def->joyMaxY)
+			y = def->joyMaxY;
+
+		y = y - def->threshMaxY;
+		y *= def->joyMultYH;
+		y >>= JoyScaleShift;
+		*dy = (y > 127)? 127 : y;
+	}
+	else
+		*dy = 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -464,7 +586,30 @@ void INL_GetJoyDelta(word joy,int *dx,int *dy)
 ///////////////////////////////////////////////////////////////////////////
 word INL_GetJoyButtons(word joy)
 {
+	JoystickDef* def;
+	
+	def = &JoyDefs[joy];
+	
+	if (def->joystick != NULL) {
+		return (SDL_JoystickGetButton(def->joystick, 0) << 0)
+			| (SDL_JoystickGetButton(def->joystick, 1) << 1);
+	}
+	
 	return 0;
+}
+
+//
+//	INL_SetJoyScale() - Sets up scaling values for the specified joystick
+//
+static void INL_SetJoyScale(word joy)
+{
+	JoystickDef	*def;
+
+	def = &JoyDefs[joy];
+	def->joyMultXL = JoyScaleMax / (def->threshMinX - def->joyMinX);
+	def->joyMultXH = JoyScaleMax / (def->joyMaxX - def->threshMaxX);
+	def->joyMultYL = JoyScaleMax / (def->threshMinY - def->joyMinY);
+	def->joyMultYH = JoyScaleMax / (def->joyMaxY - def->threshMaxY);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -475,4 +620,24 @@ word INL_GetJoyButtons(word joy)
 ///////////////////////////////////////////////////////////////////////////
 void IN_SetupJoy(word joy,word minx,word maxx,word miny,word maxy)
 {
+	word		d,r;
+	JoystickDef	*def;
+
+	def = &JoyDefs[joy];
+
+	def->joyMinX = minx;
+	def->joyMaxX = maxx;
+	r = maxx - minx;
+	d = r / 3;
+	def->threshMinX = ((r / 2) - d) + minx;
+	def->threshMaxX = ((r / 2) + d) + minx;
+
+	def->joyMinY = miny;
+	def->joyMaxY = maxy;
+	r = maxy - miny;
+	d = r / 3;
+	def->threshMinY = ((r / 2) - d) + miny;
+	def->threshMaxY = ((r / 2) + d) + miny;
+
+	INL_SetJoyScale(joy);
 }

@@ -1411,7 +1411,9 @@ int CalibrateJoystick()
 	IN_GetJoyAbs(joystickport,&xmax,&ymax);
 	SD_PlaySound(SHOOTSND);
 
-	while (IN_JoyButtons());
+	do {
+		IN_CheckAck();
+	} while (IN_JoyButtons());
 
 	//
 	// ASSIGN ACTUAL VALUES HERE
@@ -1458,6 +1460,9 @@ void CP_Control()
 
 			case JOYENABLE:
 				joystickenabled^=1;
+				if (joystickenabled)
+					if (!CalibrateJoystick())
+						joystickenabled = 0;
 				DrawCtlScreen();
 				CusItems.curpos=-1;
 				ShootSnd();
