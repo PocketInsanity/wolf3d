@@ -126,7 +126,7 @@ static int32_t CalcFileChecksum(int fd, int len)
 			i = len;
 		}
 		
-		ReadBytes(fd, buf, i);
+		ReadBytes(fd, (byte *)buf, i);
 		
 		for (j = 0; j < i; j++) {
 			cs += c1 ^ buf[j];

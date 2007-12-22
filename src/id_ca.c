@@ -88,7 +88,7 @@ boolean CA_WriteFile(const char *filename, const void *ptr, long length)
 		fprintf(stderr, "CA_FarWrite hit EOF?\n");
 		return false;
 	} else if (l != length) {
-		fprintf(stderr, "CA_FarWrite only wrote %d out of %ld\n", l, length);
+		fprintf(stderr, "CA_FarWrite only wrote %d out of %ld\n", (int)l, length);
 		return false;
 	}
 
@@ -128,7 +128,7 @@ boolean CA_LoadFile(const char *filename, memptr *ptr)
 		fprintf(stderr, "CA_FarRead hit EOF?\n");
 		return false;
 	} else if (l != size) {
-		fprintf(stderr, "CA_FarRead only read %d out of %ld\n", l, size);
+		fprintf(stderr, "CA_FarRead only read %d out of %ld\n", (int)l, size);
 		return false;
 	}
 	
