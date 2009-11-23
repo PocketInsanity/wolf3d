@@ -741,8 +741,8 @@ void DrawPlayBorder();
 void DrawPlayBorderSides();
 void DrawStatusBar();
 
-#define	PlaySoundLocTile(s,tx,ty)	PlaySoundLocGlobal(s,(int)((tx<<6)|(ty)), (tx << TILESHIFT) + (1 << (TILESHIFT - 1)), (ty << TILESHIFT) + (1L << (TILESHIFT - 1)))
-#define	PlaySoundLocActor(s,ob)		PlaySoundLocGlobal(s,(int)ob,(ob)->x,(ob)->y)
+#define	PlaySoundLocTile(s,tx,ty)	PlaySoundLocGlobal(s,(intptr_t)((tx<<6)|(ty)), (tx << TILESHIFT) + (1 << (TILESHIFT - 1)), (ty << TILESHIFT) + (1L << (TILESHIFT - 1)))
+#define	PlaySoundLocActor(s,ob)		PlaySoundLocGlobal(s,(intptr_t)ob,(ob)->x,(ob)->y)
 
 /*
 =============================================================================

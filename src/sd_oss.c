@@ -552,7 +552,7 @@ static void SetSoundLoc(fixed gx, fixed gy)
 ==========================
 */
 
-void PlaySoundLocGlobal(word s, int id, fixed gx, fixed gy)
+void PlaySoundLocGlobal(word s, intptr_t id, fixed gx, fixed gy)
 {
 	SetSoundLoc(gx, gy);
 	

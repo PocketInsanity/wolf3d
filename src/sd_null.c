@@ -129,7 +129,7 @@ void SD_StartMusic(int music)
 	SD_MusicOff();
 }
 
-void PlaySoundLocGlobal(word s, int id, fixed gx,fixed gy)
+void PlaySoundLocGlobal(word s, intptr_t id, fixed gx,fixed gy)
 {
 	SD_PlaySound(s);
 }

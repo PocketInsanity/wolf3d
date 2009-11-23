@@ -34,7 +34,7 @@ extern word SD_SoundPlaying();
 
 extern void SD_SetDigiDevice(SDSMode);
 
-void PlaySoundLocGlobal(word s, int id, fixed gx, fixed gy);
+void PlaySoundLocGlobal(word s, intptr_t id, fixed gx, fixed gy);
 void UpdateSoundLoc(fixed x, fixed y, int angle);
 
 
